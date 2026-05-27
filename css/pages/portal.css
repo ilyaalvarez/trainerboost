@@ -225,4 +225,110 @@
   .portal-content { padding: var(--space-4); }
   .portal-topbar { padding: 0 var(--space-4); }
   .portal-nav-btn span { display: none; }
+  .portal-tab-btn span { display: none; }
+}
+
+/* ── Portal card ── */
+.portal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-5);
+}
+
+/* ── Portal tabs (bottom nav style) ── */
+.portal-tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.portal-tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition);
+}
+.portal-tab-btn:hover { color: var(--text); background: var(--surface-2); }
+.portal-tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: var(--accent-dim);
+}
+.portal-tab-btn svg { width: 18px; height: 18px; }
+
+/* ── Portal shell full-screen ── */
+#portal-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Exercise row in portal ── */
+.exercise-portal-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.exercise-portal-row:hover { background: var(--surface-2); }
+.exercise-portal-row.done { background: var(--accent-dim); }
+.exercise-portal-row:last-child { border-bottom: none; }
+
+.exercise-check-circle {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--border-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+.exercise-check-circle.checked {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+/* ── Notif badge on bell ── */
+.notif-badge {
+  position: absolute;
+  top: 2px; right: 2px;
+  min-width: 16px; height: 16px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+}
+
+/* ── Utility: max widths ── */
+.max-w-2xl { max-width: 672px; }
+.max-w-xl  { max-width: 560px; }
+.mx-auto   { margin-inline: auto; }
+
+/* ── Hide on small screens ── */
+@media (max-width: 640px) {
+  .hidden-mobile { display: none !important; }
 }

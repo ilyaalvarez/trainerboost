@@ -1,0 +1,131 @@
+/* ============================================================
+   TRAINERFLOW — BOTONES
+   ============================================================ */
+
+/* ── Base ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 9px var(--space-4);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition);
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+/* ── Variantes ── */
+.btn-accent {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+.btn-accent:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  box-shadow: var(--shadow-accent);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border-bright);
+}
+.btn-outline:hover {
+  background: var(--surface-2);
+  border-color: var(--border-bright);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: transparent;
+}
+.btn-ghost:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: var(--danger-dim);
+}
+.btn-danger:hover {
+  background: var(--danger-dim);
+  border-color: var(--danger);
+}
+
+.btn-surface {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn-surface:hover {
+  background: var(--surface-3);
+  border-color: var(--border-bright);
+}
+
+/* ── Tamaños ── */
+.btn-sm {
+  padding: 6px var(--space-3);
+  font-size: var(--text-xs);
+}
+.btn-lg {
+  padding: 13px var(--space-6);
+  font-size: var(--text-md);
+}
+.btn-xl {
+  padding: 16px var(--space-8);
+  font-size: var(--text-lg);
+  border-radius: var(--radius);
+}
+
+/* ── Full width ── */
+.btn-block { width: 100%; }
+
+/* ── Icon only ── */
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+/* ── Loading state ── */
+.btn.loading {
+  pointer-events: none;
+  opacity: 0.7;
+  position: relative;
+}
+.btn.loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Grupo de botones ── */
+.btn-group {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}

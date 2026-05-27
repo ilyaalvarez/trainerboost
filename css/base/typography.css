@@ -1,0 +1,91 @@
+/* ============================================================
+   TRAINERFLOW — TIPOGRAFÍA
+   Escala tipográfica y utilidades de texto
+   ============================================================ */
+
+/* ── Clases de tamaño ── */
+.text-xs   { font-size: var(--text-xs); }
+.text-sm   { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-md   { font-size: var(--text-md); }
+.text-lg   { font-size: var(--text-lg); }
+.text-xl   { font-size: var(--text-xl); }
+.text-2xl  { font-size: var(--text-2xl); }
+.text-3xl  { font-size: var(--text-3xl); }
+.text-4xl  { font-size: var(--text-4xl); }
+
+/* ── Peso ── */
+.font-normal  { font-weight: 400; }
+.font-medium  { font-weight: 500; }
+.font-semibold{ font-weight: 600; }
+.font-bold    { font-weight: 700; }
+.font-black   { font-weight: 800; }
+
+/* ── Familia ── */
+.font-display { font-family: var(--font-display); }
+.font-body    { font-family: var(--font-body); }
+
+/* ── Color ── */
+.text-primary { color: var(--text); }
+.text-muted   { color: var(--text-muted); }
+.text-accent  { color: var(--accent); }
+.text-danger  { color: var(--danger); }
+.text-warning { color: var(--warning); }
+.text-info    { color: var(--info); }
+.text-success { color: var(--success); }
+
+/* ── Alineación ── */
+.text-left   { text-align: left; }
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+
+/* ── Transformación ── */
+.uppercase { text-transform: uppercase; }
+.lowercase { text-transform: lowercase; }
+.capitalize{ text-transform: capitalize; }
+
+/* ── Espaciado de letras ── */
+.tracking-tight  { letter-spacing: -0.02em; }
+.tracking-wide   { letter-spacing: 0.05em; }
+.tracking-widest { letter-spacing: 0.15em; }
+
+/* ── Truncado ── */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Títulos de sección ── */
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--text);
+  letter-spacing: 0.03em;
+}
+
+.section-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+/* ── Etiqueta de campo ── */
+.label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── Número grande / métrica ── */
+.metric-number {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.metric-number.accent { color: var(--accent); }

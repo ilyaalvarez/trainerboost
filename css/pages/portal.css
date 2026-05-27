@@ -1,0 +1,228 @@
+/* ============================================================
+   TRAINERFLOW — CLIENT PORTAL
+   ============================================================ */
+
+/* ── Portal shell ── */
+.portal-shell {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.portal-topbar {
+  height: 60px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  flex-shrink: 0;
+}
+
+.portal-nav {
+  display: flex;
+  gap: var(--space-1);
+}
+.portal-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px var(--space-4);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.portal-nav-btn:hover { background: var(--surface-2); color: var(--text); }
+.portal-nav-btn.active { background: var(--accent-dim); color: var(--accent); }
+
+.portal-content {
+  flex: 1;
+  padding: var(--space-8) var(--space-6);
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Bienvenida al portal ── */
+.portal-welcome {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(0,255,135,0.03) 100%);
+  border: 1px solid var(--accent-glow);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  margin-bottom: var(--space-6);
+  text-align: center;
+}
+.portal-welcome-emoji { font-size: 48px; margin-bottom: var(--space-3); }
+.portal-welcome-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  letter-spacing: 0.03em;
+  margin-bottom: var(--space-2);
+}
+.portal-welcome-sub { font-size: var(--text-sm); color: var(--text-muted); }
+
+/* ── Check-in form del cliente ── */
+.checkin-form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+}
+
+.slider-group {
+  margin-bottom: var(--space-6);
+}
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+.slider-value {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  min-width: 40px;
+  text-align: right;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ── Routine view ── */
+.routine-day-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-4);
+}
+.routine-day-badge {
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.05em;
+}
+
+.exercise-check-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-2);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.exercise-check-row:hover { border-color: var(--border-bright); }
+.exercise-check-row.completed {
+  background: var(--accent-dim);
+  border-color: var(--accent-glow);
+}
+.exercise-check-row.completed .exercise-name-text {
+  color: var(--accent);
+  text-decoration: line-through;
+  text-decoration-color: var(--accent-glow);
+}
+
+.exercise-checkbox {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+.exercise-check-row.completed .exercise-checkbox {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+/* ── Progress view del cliente ── */
+.streak-card {
+  background: linear-gradient(135deg, rgba(0,255,135,0.08) 0%, rgba(0,255,135,0.02) 100%);
+  border: 1px solid var(--accent-glow);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+  margin-bottom: var(--space-5);
+}
+.streak-number {
+  font-family: var(--font-display);
+  font-size: 64px;
+  color: var(--accent);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.streak-label {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-top: var(--space-2);
+}
+
+/* ── Motivational message ── */
+.trainer-message {
+  display: flex;
+  gap: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-5);
+}
+.trainer-message-quote {
+  font-size: var(--text-base);
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+.trainer-message-sig {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin-top: var(--space-3);
+}
+
+/* ── Submit confirmation ── */
+.checkin-submitted {
+  text-align: center;
+  padding: var(--space-10) var(--space-8);
+}
+.checkin-submitted-icon {
+  font-size: 64px;
+  margin-bottom: var(--space-4);
+  animation: bounceIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes bounceIn {
+  from { transform: scale(0) rotate(-10deg); }
+  to   { transform: scale(1) rotate(0deg); }
+}
+
+/* ── Responsive portal ── */
+@media (max-width: 600px) {
+  .portal-content { padding: var(--space-4); }
+  .portal-topbar { padding: 0 var(--space-4); }
+  .portal-nav-btn span { display: none; }
+}

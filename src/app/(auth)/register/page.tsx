@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Mail, Lock, User, ArrowRight, Loader2, Users, Zap } from 'lucide-react'
+import { Mail, Lock, User, ArrowRight, Loader2, Users, Zap, ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 type Step = 1 | 2
@@ -52,6 +52,12 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Back */}
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-white transition-colors mb-8 group">
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          Volver al inicio
+        </Link>
+
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-glow-sm"
                style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>

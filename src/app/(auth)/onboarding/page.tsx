@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Dumbbell, ArrowRight, Loader2, X } from 'lucide-react'
+import { Zap, ArrowRight, Loader2, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const SPECIALTIES = [
@@ -102,8 +102,9 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-brand-primary/20 border border-brand-primary/30 flex items-center justify-center">
-            <Dumbbell className="w-5 h-5 text-brand-primary" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-glow-sm"
+               style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
+            <Zap className="w-5 h-5 text-white" />
           </div>
           <span className="text-xl font-bold text-white">TrainerBoost</span>
         </div>

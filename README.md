@@ -33,9 +33,9 @@ Edit `.env.local` with your credentials:
 | `STRIPE_SECRET_KEY` | Stripe Dashboard → Developers → API keys |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard → Developers → API keys |
 | `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard → Developers → Webhooks |
-| `STRIPE_STARTER_PRICE_ID` | Stripe Dashboard → Products |
-| `STRIPE_PRO_PRICE_ID` | Stripe Dashboard → Products |
-| `STRIPE_UNLIMITED_PRICE_ID` | Stripe Dashboard → Products |
+| `STRIPE_PRICE_ID_STARTER` | Stripe Dashboard → Products |
+| `STRIPE_PRICE_ID_PRO` | Stripe Dashboard → Products |
+| `STRIPE_PRICE_ID_UNLIMITED` | Stripe Dashboard → Products |
 | `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` for local dev |
 
 ### 3. Supabase database
@@ -82,13 +82,29 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Deploy to Vercel
+## Conectar servicios (GitHub → Vercel → Supabase)
 
-1. Push to GitHub
-2. Import the repo in [vercel.com](https://vercel.com)
-3. Add all environment variables from step 2
-4. Set `NEXT_PUBLIC_APP_URL` to your production URL
-5. In Stripe Dashboard → Webhooks, add `https://your-domain.vercel.app/api/webhooks/stripe`
+### GitHub (ya listo)
+El repositorio `ilyaalvarez/trainerboost` ya existe y el CI corre en cada push vía `.github/workflows/ci.yml` (TypeScript + ESLint + build).
+
+### Vercel — 3 pasos
+1. Ve a [vercel.com/new](https://vercel.com/new) → **Import Git Repository** → selecciona `ilyaalvarez/trainerboost`
+2. Framework: **Next.js** (autodetectado). No cambies nada más.
+3. Expande **Environment Variables** y pega todas las de `.env.local.example` con los valores reales → **Deploy**
+
+Vercel redespliega automáticamente en cada push a `main`.
+
+### Supabase — 4 pasos
+1. Crea un proyecto en [supabase.com](https://supabase.com)
+2. Ve a **SQL Editor** → pega el contenido de `supabase/migrations/001_initial_schema.sql` → **Run**
+3. Ve a **Authentication → Providers → Google** → activa y añade tus credenciales OAuth
+4. Ve a **Settings → API** → copia `URL`, `anon key` y `service_role key` → pégalos en Vercel (Settings → Environment Variables)
+
+### Stripe webhook producción — 2 pasos
+1. Stripe Dashboard → **Developers → Webhooks → Add endpoint**
+   - URL: `https://tu-dominio.vercel.app/api/webhooks/stripe`
+   - Eventos: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
+2. Copia el **Signing secret** → añádelo como `STRIPE_WEBHOOK_SECRET` en Vercel → **Redeploy**
 
 ## Project Structure
 

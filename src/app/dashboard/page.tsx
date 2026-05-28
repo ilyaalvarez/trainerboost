@@ -50,10 +50,10 @@ export default async function DashboardPage() {
   const maxClients    = subscription?.max_clients ?? 0
 
   return (
-    <div className="animate-fade-in space-y-8">
+    <div className="space-y-8">
 
       {/* ── Header ────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-fade-in-up">
         <div>
           <h1 className="text-2xl font-bold text-white">Panel principal</h1>
           <p className="text-slate-400 text-sm mt-0.5 capitalize">
@@ -79,7 +79,7 @@ export default async function DashboardPage() {
       )}
 
       {/* ── KPIs ──────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up delay-100">
         <StatsCard
           label="Clientes activos"
           value={activeClients}
@@ -107,7 +107,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Appointments + Messages ────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up delay-200">
 
         {/* Today's appointments */}
         <div className="card p-6">
@@ -199,7 +199,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Client list ───────────────────────────────────────────────── */}
-      <div className="card p-6">
+      <div className="card p-6 animate-fade-in-up delay-300">
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-semibold text-white">Mis clientes</h2>
           <Link href="/dashboard/clients" className="text-xs text-brand-primary hover:underline font-medium">

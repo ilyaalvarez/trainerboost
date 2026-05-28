@@ -127,4 +127,41 @@ body {
     height: 1px;
     background: linear-gradient(90deg, transparent 0%, #334155 20%, #334155 80%, transparent 100%);
   }
+
+  /* ─── Animation utilities ──────────────────────────────────── */
+  .animate-fade-in-up  { animation: fadeInUp  0.45s ease both; }
+  .animate-fade-in     { animation: fadeIn    0.3s  ease both; }
+  .animate-slide-left  { animation: slideLeft 0.35s ease both; }
+  .animate-shimmer     {
+    background: linear-gradient(90deg, #1E293B 25%, #293548 50%, #1E293B 75%);
+    background-size: 400% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  .delay-75  { animation-delay: 75ms;  }
+  .delay-100 { animation-delay: 100ms; }
+  .delay-150 { animation-delay: 150ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+  .delay-600 { animation-delay: 600ms; }
+}
+
+/* ─── Keyframes ────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(-14px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }

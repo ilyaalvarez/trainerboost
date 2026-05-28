@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Dumbbell, Check, Play, ChevronDown, ChevronUp, Loader2, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -13,18 +13,14 @@ interface ExerciseWithCompletion extends RoutineExercise {
 }
 
 export default function ClientRoutinePage() {
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [routine, setRoutine]         = useState<Routine | null>(null)
   const [exercises, setExercises]     = useState<ExerciseWithCompletion[]>([])
   const [loading, setLoading]         = useState(true)
   const [expanded, setExpanded]       = useState<string | null>(null)
   const [completing, setCompleting]   = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchRoutine()
-  }, [])
-
-  async function fetchRoutine() {
+  const fetchRoutine = useCallback(async () => {
     setLoading(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -57,7 +53,11 @@ export default function ClientRoutinePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    fetchRoutine()
+  }, [fetchRoutine])
 
   async function toggleComplete(exercise: ExerciseWithCompletion) {
     setCompleting(exercise.id)

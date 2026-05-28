@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Loader2, CalendarDays, CheckCircle, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
@@ -14,16 +14,14 @@ interface AptWithTrainer extends Appointment {
 }
 
 export default function ClientAppointmentsPage() {
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [upcoming, setUpcoming] = useState<AptWithTrainer[]>([])
   const [past,     setPast]     = useState<AptWithTrainer[]>([])
   const [loading,  setLoading]  = useState(true)
   const [tab,      setTab]      = useState<'upcoming' | 'past'>('upcoming')
   const [acting,   setActing]   = useState<string | null>(null)
 
-  useEffect(() => { fetchApts() }, [])
-
-  async function fetchApts() {
+  const fetchApts = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
@@ -46,7 +44,9 @@ export default function ClientAppointmentsPage() {
     setUpcoming((up || []) as AptWithTrainer[])
     setPast((p || []) as AptWithTrainer[])
     setLoading(false)
-  }
+  }, [supabase])
+
+  useEffect(() => { fetchApts() }, [fetchApts])
 
   async function confirmApt(id: string) {
     setActing(id)

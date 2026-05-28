@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Plus, Loader2, Scale } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -11,7 +11,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import ProgressChart from '../_components/ProgressChart'
 
 export default function ClientProgressPage() {
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [logs, setLogs]           = useState<ProgressLog[]>([])
   const [loading, setLoading]     = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -25,9 +25,7 @@ export default function ClientProgressPage() {
     notes: '',
   })
 
-  useEffect(() => { fetchLogs() }, [])
-
-  async function fetchLogs() {
+  const fetchLogs = useCallback(async () => {
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
@@ -47,7 +45,9 @@ export default function ClientProgressPage() {
     setLogs(l || [])
     setTrainerId(tc?.trainer_id || null)
     setLoading(false)
-  }
+  }, [supabase])
+
+  useEffect(() => { fetchLogs() }, [fetchLogs])
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()

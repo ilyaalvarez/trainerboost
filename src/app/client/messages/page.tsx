@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Send, Loader2, MessageSquare } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -14,7 +14,7 @@ interface MessageWithSender extends Message {
 }
 
 export default function ClientMessagesPage() {
-  const supabase     = createClient()
+  const supabase     = useMemo(() => createClient(), [])
   const bottomRef    = useRef<HTMLDivElement>(null)
   const [messages, setMessages]   = useState<MessageWithSender[]>([])
   const [input, setInput]         = useState('')
@@ -23,40 +23,7 @@ export default function ClientMessagesPage() {
   const [trainer, setTrainer]     = useState<Profile | null>(null)
   const [myId, setMyId]           = useState<string | null>(null)
 
-  useEffect(() => {
-    initChat()
-  }, [])
-
-  async function initChat() {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    setMyId(user.id)
-
-    // Fetch trainer
-    const { data: tc } = await supabase.from('trainer_clients')
-      .select('trainer:trainer_id(*)')
-      .eq('client_id', user.id)
-      .eq('status', 'active')
-      .single()
-
-    if (tc) setTrainer(tc.trainer as unknown as Profile)
-
-    await fetchMessages(user.id)
-
-    // Realtime subscription
-    const channel = supabase.channel('client-messages')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `receiver_id=eq.${user.id}`,
-      }, () => fetchMessages(user.id))
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
-  }
-
-  async function fetchMessages(userId: string) {
+  const fetchMessages = useCallback(async (userId: string) => {
     const { data } = await supabase.from('messages')
       .select('*, sender:sender_id(full_name, avatar_url)')
       .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
@@ -65,14 +32,47 @@ export default function ClientMessagesPage() {
     setMessages((data || []) as MessageWithSender[])
     setLoading(false)
 
-    // Mark unread as read
     await supabase.from('messages')
       .update({ read_at: new Date().toISOString() })
       .eq('receiver_id', userId)
       .is('read_at', null)
 
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    let channelRef: ReturnType<typeof supabase.channel> | null = null
+
+    async function init() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setMyId(user.id)
+
+      const { data: tc } = await supabase.from('trainer_clients')
+        .select('trainer:trainer_id(*)')
+        .eq('client_id', user.id)
+        .eq('status', 'active')
+        .single()
+
+      if (tc) setTrainer(tc.trainer as unknown as Profile)
+
+      await fetchMessages(user.id)
+
+      const channel = supabase.channel('client-messages')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `receiver_id=eq.${user.id}`,
+        }, () => fetchMessages(user.id))
+        .subscribe()
+
+      channelRef = channel
+    }
+
+    init()
+    return () => { if (channelRef) supabase.removeChannel(channelRef) }
+  }, [supabase, fetchMessages])
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault()

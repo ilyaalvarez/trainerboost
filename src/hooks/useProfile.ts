@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile, Subscription } from '@/types/database'
 
@@ -17,9 +17,9 @@ export function useProfile(): UseProfileReturn {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
-  async function fetchProfile() {
+  const fetchProfile = useCallback(async () => {
     setLoading(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -35,7 +35,7 @@ export function useProfile(): UseProfileReturn {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
 
   useEffect(() => {
     fetchProfile()
@@ -43,7 +43,7 @@ export function useProfile(): UseProfileReturn {
       fetchProfile()
     })
     return () => authSub.unsubscribe()
-  }, [])
+  }, [fetchProfile, supabase])
 
   return {
     profile,

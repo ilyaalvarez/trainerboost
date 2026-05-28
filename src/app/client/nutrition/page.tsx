@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Loader2, UtensilsCrossed, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { MealPlan, Meal, FoodItem } from '@/types/database'
@@ -29,7 +29,7 @@ function MacroBar({ label, value, max, color }: {
 }
 
 export default function ClientNutritionPage() {
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [plan, setPlan]     = useState<MealPlanWithMeals | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -56,7 +56,7 @@ export default function ClientNutritionPage() {
       setLoading(false)
     }
     fetchPlan()
-  }, [])
+  }, [supabase])
 
   // Calculate totals from all meals
   const totals = plan?.meals.reduce((acc, meal) => {

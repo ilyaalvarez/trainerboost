@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Dumbbell, ArrowRight, Loader2, X } from 'lucide-react'
@@ -14,7 +14,7 @@ const SPECIALTIES = [
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [role, setRole]                 = useState<'trainer' | 'client' | null>(null)
   const [bio, setBio]                   = useState('')
@@ -33,7 +33,7 @@ export default function OnboardingPage() {
       setFetchingRole(false)
     }
     fetchRole()
-  }, [])
+  }, [router, supabase])
 
   function toggleSpec(spec: string) {
     setSelectedSpec(prev =>

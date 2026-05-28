@@ -1,80 +1,36 @@
-# TrainerFlow 🏋️
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-**La plataforma de gestión para entrenadores personales hispanohablantes.**
+## Getting Started
 
-> Gestiona. Fideliza. Escala.
-
----
-
-## 🚀 Inicio rápido
-
-Abre `index.html` directamente en tu navegador. No necesita servidor ni npm.
+First, run the development server:
 
 ```bash
-# Opcionalmente con servidor local para evitar restricciones CORS:
-npx serve .
-# o
-python3 -m http.server 8080
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
----
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 📁 Estructura del proyecto
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```
-trainerboost/
-├── index.html              # Punto de entrada
-├── css/
-│   ├── main.css            # Solo @imports (orquestador)
-│   ├── base/               # Variables, reset, tipografía
-│   ├── layout/             # Grid, shell de app
-│   ├── components/         # Botones, cards, forms, modals, toasts
-│   └── pages/              # Estilos específicos por vista
-└── js/
-    ├── config.js           # Constantes y configuración
-    ├── utils.js            # Helpers transversales
-    ├── store/state.js      # Estado global y datos de ejemplo
-    ├── services/           # Lógica de negocio (auth, clients, etc.)
-    ├── components/         # Componentes UI (toast, modal, charts...)
-    ├── pages/              # Vistas (landing, auth, dashboard...)
-    └── app.js              # Router principal + init
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
----
+## Learn More
 
-## 👤 Cuentas de demo
+To learn more about Next.js, take a look at the following resources:
 
-| Rol | Email | Contraseña |
-|-----|-------|------------|
-| Entrenador (Pro) | `trainer@demo.com` | `demo123` |
-| Cliente | `cliente@demo.com` | `demo123` |
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
----
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## 🛠️ Stack técnico
+## Deploy on Vercel
 
-- **Vanilla JS** — sin frameworks, sin build step
-- **CSS modular** — design tokens, componentes, páginas
-- **Chart.js** — gráficas de progreso y análisis
-- **Lucide Icons** — iconografía consistente
-- **Google Fonts** — Bebas Neue + DM Sans
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
----
-
-## 📋 Planes
-
-| Plan | Clientes | Precio |
-|------|----------|--------|
-| Free | Hasta 3 | Gratis |
-| Starter | Hasta 20 | 14€/mes |
-| Pro | Ilimitados | 29€/mes |
-
----
-
-## 🗺️ Roadmap
-
-- [ ] Integración WhatsApp Business API
-- [ ] Exportación PDF de rutinas
-- [ ] App móvil nativa
-- [ ] Integración con Stripe real
-- [ ] Google Calendar sync
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

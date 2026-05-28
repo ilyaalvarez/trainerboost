@@ -6,7 +6,7 @@ import { formatRelative, formatDate } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import StatsCard from '@/components/ui/StatsCard'
-import type { Profile, Appointment } from '@/types/database'
+
 
 export default async function DashboardPage() {
   const supabase = createClient()

@@ -58,7 +58,7 @@ export default function PricingPage() {
 
         {/* Plans */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-          {PLAN_ORDER.map((key, i) => {
+          {PLAN_ORDER.map((key) => {
             const plan = PLANS[key]
             const isPopular = key === 'pro'
 

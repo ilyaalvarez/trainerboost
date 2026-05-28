@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Dumbbell, Check, Play, ChevronDown, ChevronUp, Loader2, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { Routine, RoutineExercise, ExerciseCompletion } from '@/types/database'
+import type { Routine, RoutineExercise } from '@/types/database'
 import { formatDate } from '@/lib/utils'
 import EmptyState from '@/components/ui/EmptyState'
 
@@ -208,7 +208,7 @@ export default function ClientRoutinePage() {
             {expanded === ex.id && (
               <div className="px-4 pb-4 space-y-3 border-t border-border/50 pt-3">
                 {ex.notes && (
-                  <p className="text-sm text-slate-400 italic">"{ex.notes}"</p>
+                  <p className="text-sm text-slate-400 italic">&ldquo;{ex.notes}&rdquo;</p>
                 )}
                 {ex.video_url && (
                   <a

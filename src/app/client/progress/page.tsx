@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { TrendingUp, Plus, Loader2, Scale } from 'lucide-react'
+import { Plus, Loader2, Scale } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { ProgressLog } from '@/types/database'
 import { formatDate } from '@/lib/utils'

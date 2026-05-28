@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { CalendarDays, MessageSquare, TrendingUp, Dumbbell, ChevronRight } from 'lucide-react'
+import { CalendarDays, MessageSquare, Dumbbell, ChevronRight } from 'lucide-react'
 import { formatDate, formatRelative } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
-import type { Profile, Appointment } from '@/types/database'
+import type { Profile } from '@/types/database'
 import ProgressChart from './_components/ProgressChart'
 
 export default async function ClientHomePage() {
@@ -18,7 +18,7 @@ export default async function ClientHomePage() {
     { data: trainerRel },
     { data: progressLogs },
     { data: nextApt },
-    { data: unreadMessages },
+    { data: _unreadMessages },
     { data: activeRoutine },
   ] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),

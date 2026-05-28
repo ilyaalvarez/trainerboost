@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   TrendingUp, Dumbbell, UtensilsCrossed, CalendarDays,
-  MessageSquare, Zap, LogOut, ChevronRight,
+  MessageSquare, Zap, LogOut,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'

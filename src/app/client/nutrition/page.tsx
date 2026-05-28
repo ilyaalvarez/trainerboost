@@ -5,7 +5,7 @@ import { Loader2, UtensilsCrossed, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { MealPlan, Meal, FoodItem } from '@/types/database'
 import EmptyState from '@/components/ui/EmptyState'
-import { cn } from '@/lib/utils'
+
 
 interface MealPlanWithMeals extends MealPlan {
   meals: Meal[]

@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
 import Modal from '@/components/ui/Modal'
 import type { Profile, Subscription, SubscriptionPlan } from '@/types/database'
-import { PLAN_LIMITS, PLAN_PRICES } from '@/types/database'
+import { PLAN_PRICES } from '@/types/database'
 
 // ─── Plan display helpers ─────────────────────────────────────────────────────
 

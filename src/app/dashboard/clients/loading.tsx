@@ -1,4 +1,4 @@
-import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export default function ClientsLoading() {
   return (

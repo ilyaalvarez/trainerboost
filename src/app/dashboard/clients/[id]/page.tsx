@@ -39,7 +39,7 @@ interface ClientData {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function TabButton({ tab, active, icon, label, onClick }: {
+function TabButton({ tab: _tab, active, icon, label, onClick }: {
   tab: Tab; active: boolean; icon: React.ReactNode; label: string; onClick: () => void
 }) {
   return (

@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import {
   Dumbbell, Plus, Search, ChevronDown, ChevronUp,
-  Archive, RotateCcw, Trash2, GripVertical,
+  Archive, RotateCcw, GripVertical,
   Link as LinkIcon, X, Users,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
@@ -487,7 +487,7 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
       {step === 2 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-300">Añade los ejercicios a la rutina <span className="font-semibold text-white">"{form.title}"</span></p>
+            <p className="text-sm text-slate-300">Añade los ejercicios a la rutina <span className="font-semibold text-white">&ldquo;{form.title}&rdquo;</span></p>
             <span className="text-xs text-slate-500">{exercises.length} ejercicios</span>
           </div>
 

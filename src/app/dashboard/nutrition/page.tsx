@@ -11,7 +11,7 @@ import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
 import EmptyState from '@/components/ui/EmptyState'
-import { cn, formatDate } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import type { Profile, MealPlan, Meal, FoodItem } from '@/types/database'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -260,7 +260,7 @@ export default function NutritionPage() {
 
 // ─── Plan Card ────────────────────────────────────────────────────────────────
 
-function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, onMealAdded }: {
+function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, onMealAdded: _onMealAdded }: {
   plan: MealPlanWithExtras
   expanded: boolean
   onToggle: () => void

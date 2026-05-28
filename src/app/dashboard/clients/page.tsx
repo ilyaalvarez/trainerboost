@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import {
-  Users, Search, Plus, Copy, RefreshCw, ChevronLeft, ChevronRight,
+  Users, Search, Copy, RefreshCw, ChevronLeft, ChevronRight,
   UserPlus, Loader2, Mail,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -75,7 +75,7 @@ export default function ClientsPage() {
 
       // Fetch last routine for each client
       const clientIds = (data ?? []).map((c: ClientWithProfile) => c.client_id)
-      let routineMap: Record<string, string | null> = {}
+      const routineMap: Record<string, string | null> = {}
 
       if (clientIds.length > 0) {
         const { data: routines } = await supabase

@@ -7,7 +7,7 @@ import {
   CheckCircle2, XCircle, ChevronDown,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { cn, formatRelative, formatDate } from '@/lib/utils'
+import { cn, formatRelative } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'

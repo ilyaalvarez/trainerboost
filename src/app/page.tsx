@@ -1,22 +1,52 @@
 import Link from 'next/link'
 import {
   Zap, Users, Dumbbell, UtensilsCrossed, CalendarDays,
-  MessageSquare, ArrowRight, TrendingUp, CheckCircle2,
+  MessageSquare, ArrowRight, TrendingUp, CheckCircle2, Star,
 } from 'lucide-react'
 
 const FEATURES = [
-  { icon: Users,           bg: 'bg-sky-500/10 border-sky-500/20',     text: 'text-sky-400',
-    title: 'Gestión de clientes',   desc: 'Perfil completo, historial y seguimiento personalizado.' },
-  { icon: Dumbbell,        bg: 'bg-violet-500/10 border-violet-500/20', text: 'text-violet-400',
-    title: 'Rutinas',               desc: 'Crea y asigna rutinas con ejercicios y seguimiento en tiempo real.' },
-  { icon: UtensilsCrossed, bg: 'bg-emerald-500/10 border-emerald-500/20', text: 'text-emerald-400',
-    title: 'Nutrición',             desc: 'Planes nutricionales con macros y seguimiento calórico personalizado.' },
-  { icon: CalendarDays,    bg: 'bg-amber-500/10 border-amber-500/20',   text: 'text-amber-400',
-    title: 'Citas',                 desc: 'Agenda sesiones presenciales, online o por llamada.' },
-  { icon: MessageSquare,   bg: 'bg-pink-500/10 border-pink-500/20',     text: 'text-pink-400',
-    title: 'Mensajería',            desc: 'Chat en tiempo real. Mantén a tus clientes motivados.' },
-  { icon: TrendingUp,      bg: 'bg-teal-500/10 border-teal-500/20',     text: 'text-teal-400',
-    title: 'Progreso',              desc: 'Visualiza la evolución con gráficas y fotos de progreso.' },
+  {
+    icon: Users,
+    bg: 'bg-sky-500/10 border-sky-500/20',
+    text: 'text-sky-400',
+    title: 'Gestión de clientes',
+    desc: 'Perfil completo, historial de entrenamiento y seguimiento personalizado de cada cliente.',
+  },
+  {
+    icon: Dumbbell,
+    bg: 'bg-violet-500/10 border-violet-500/20',
+    text: 'text-violet-400',
+    title: 'Rutinas personalizadas',
+    desc: 'Crea, asigna y ajusta rutinas con ejercicios, series y notas de coaching.',
+  },
+  {
+    icon: UtensilsCrossed,
+    bg: 'bg-emerald-500/10 border-emerald-500/20',
+    text: 'text-emerald-400',
+    title: 'Planes nutricionales',
+    desc: 'Diseña menús con macros, calorías y seguimiento diario desde el móvil.',
+  },
+  {
+    icon: CalendarDays,
+    bg: 'bg-amber-500/10 border-amber-500/20',
+    text: 'text-amber-400',
+    title: 'Gestión de citas',
+    desc: 'Agenda presencial, online o videollamada. Recordatorios automáticos incluidos.',
+  },
+  {
+    icon: MessageSquare,
+    bg: 'bg-pink-500/10 border-pink-500/20',
+    text: 'text-pink-400',
+    title: 'Mensajería integrada',
+    desc: 'Chat directo con cada cliente. Sin WhatsApp, sin correos sueltos.',
+  },
+  {
+    icon: TrendingUp,
+    bg: 'bg-teal-500/10 border-teal-500/20',
+    text: 'text-teal-400',
+    title: 'Progreso y analytics',
+    desc: 'Gráficas de evolución, fotos de progreso y métricas que tus clientes verán.',
+  },
 ]
 
 const STATS = [
@@ -26,9 +56,48 @@ const STATS = [
 ]
 
 const STEPS = [
-  { n: '1', title: 'Regístrate gratis',       desc: 'Crea tu cuenta en 2 minutos. Sin tarjeta de crédito.' },
-  { n: '2', title: 'Añade tus clientes',      desc: 'Invítalos por email o enlace y configura sus rutinas.' },
-  { n: '3', title: 'Gestiona todo en uno',    desc: 'Citas, nutrición, mensajes y progreso desde un solo panel.' },
+  {
+    n: '01',
+    title: 'Regístrate en 2 minutos',
+    desc: 'Crea tu cuenta gratis. Sin tarjeta de crédito, sin configuraciones complejas.',
+  },
+  {
+    n: '02',
+    title: 'Añade tus clientes',
+    desc: 'Invítalos por email o enlace. Configura rutinas y planes desde el primer día.',
+  },
+  {
+    n: '03',
+    title: 'Gestiona todo en uno',
+    desc: 'Citas, nutrición, mensajes y seguimiento de progreso desde un solo panel.',
+  },
+]
+
+const TESTIMONIALS = [
+  {
+    name: 'Carlos Martínez',
+    role: 'Entrenador personal · Madrid',
+    initials: 'CM',
+    color: 'bg-sky-500/20 text-sky-300',
+    text: 'Pasé de gestionar todo con Excel a tener todo centralizado. Mis clientes lo usan a diario y el feedback es increíble.',
+    stars: 5,
+  },
+  {
+    name: 'Sara López',
+    role: 'Nutricionista y PT · Barcelona',
+    initials: 'SL',
+    color: 'bg-violet-500/20 text-violet-300',
+    text: 'Los planes nutricionales que puedo crear son ahora mucho más profesionales. Mis clientes ven todo claro desde el móvil.',
+    stars: 5,
+  },
+  {
+    name: 'Javier Ruiz',
+    role: 'Coach online · Valencia',
+    initials: 'JR',
+    color: 'bg-emerald-500/20 text-emerald-300',
+    text: 'En 2 semanas tenía todo configurado. La mensajería integrada me ahorra horas cada semana. 100% recomendado.',
+    stars: 5,
+  },
 ]
 
 const TRUST = ['Sin tarjeta de crédito', 'Soporte incluido', 'Cancela cuando quieras']
@@ -37,9 +106,9 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-slate-100 overflow-x-hidden">
 
-      {/* ── Nav ─────────────────────────────────────────────────────────── */}
-      <nav className="border-b border-border/60 bg-background/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      {/* ── Nav ────────────────────────────────────────────────────────────── */}
+      <nav className="border-b border-border/60 bg-background/90 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div
               className="w-8 h-8 rounded-xl flex items-center justify-center shadow-glow-sm"
@@ -49,57 +118,194 @@ export default function LandingPage() {
             </div>
             <span className="font-bold text-white text-base tracking-tight">TrainerBoost</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="/pricing" className="text-sm text-slate-400 hover:text-white transition-colors hidden md:block px-3 py-1.5">Precios</Link>
-            <Link href="/demo"    className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block px-3 py-1.5">Ver demo</Link>
-            <Link href="/login"   className="btn-ghost text-sm py-1.5 px-3">Iniciar sesión</Link>
-            <Link href="/register" className="btn-primary text-sm py-1.5 px-4">Empezar gratis</Link>
+          <div className="flex items-center gap-1">
+            <Link href="/pricing" className="text-sm text-slate-400 hover:text-white transition-colors hidden md:block px-3 py-2 rounded-lg hover:bg-surface/60">Precios</Link>
+            <Link href="/demo"    className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block px-3 py-2 rounded-lg hover:bg-surface/60">Demo</Link>
+            <div className="w-px h-4 bg-border mx-2 hidden sm:block" />
+            <Link href="/login"   className="text-sm text-slate-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-surface/60 hidden sm:block">Entrar</Link>
+            <Link href="/register" className="btn-gradient text-sm py-2 px-4 ml-1">Empezar gratis</Link>
           </div>
         </div>
       </nav>
 
-      {/* ── Hero ────────────────────────────────────────────────────────── */}
-      <section className="relative max-w-6xl mx-auto px-4 pt-24 pb-16 text-center">
-        <div className="absolute top-0 left-1/3 w-96 h-96 rounded-full blur-3xl pointer-events-none animate-glow"
-             style={{ background: 'radial-gradient(circle, rgba(14,165,233,0.07) 0%, transparent 70%)' }} />
-        <div className="absolute top-16 right-1/4 w-72 h-72 rounded-full blur-3xl pointer-events-none"
-             style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%)' }} />
+      {/* ── Hero ───────────────────────────────────────────────────────────── */}
+      <section className="relative max-w-6xl mx-auto px-6 pt-20 pb-16">
+        {/* Ambient glow */}
+        <div className="absolute top-0 left-0 w-[600px] h-[400px] pointer-events-none"
+             style={{ background: 'radial-gradient(ellipse at 20% 40%, rgba(14,165,233,0.07) 0%, transparent 65%)' }} />
+        <div className="absolute top-0 right-0 w-[400px] h-[300px] pointer-events-none"
+             style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.05) 0%, transparent 60%)' }} />
 
-        <div className="relative">
-          <div className="chip mb-6 mx-auto w-fit">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse inline-block" />
-            Gratis para empezar · Sin tarjeta de crédito
+        <div className="relative grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left: copy */}
+          <div>
+            <div className="chip mb-6 w-fit">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse inline-block" />
+              Gratis para empezar · Sin tarjeta
+            </div>
+
+            <h1 className="text-5xl md:text-6xl font-bold text-white leading-[1.08] mb-6 text-balance tracking-tight">
+              La plataforma que<br />
+              tu negocio de<br />
+              <span className="gradient-text">entrenamiento</span><br />
+              necesita
+            </h1>
+
+            <p className="text-lg text-slate-400 mb-8 leading-relaxed max-w-lg">
+              Rutinas, nutrición, citas, mensajería y progreso de tus clientes. Todo en un solo sitio, pensado para entrenadores personales.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 mb-8">
+              <Link href="/register" className="btn-gradient text-base px-8 py-3">
+                <Zap className="w-4 h-4" /> Crear cuenta gratis
+              </Link>
+              <Link href="/demo" className="btn-secondary text-base px-6 py-3">
+                Ver demo <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
+              {TRUST.map(t => (
+                <div key={t} className="flex items-center gap-1.5 text-xs text-slate-400">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-brand-accent shrink-0" />
+                  {t}
+                </div>
+              ))}
+            </div>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold text-white leading-[1.1] mb-6 text-balance">
-            Gestiona tu negocio de<br />
-            <span className="gradient-text">entrenamiento</span>
-          </h1>
+          {/* Right: App preview */}
+          <div className="relative hidden lg:block">
+            <div className="absolute inset-0 blur-3xl pointer-events-none"
+                 style={{ background: 'radial-gradient(ellipse at 60% 40%, rgba(14,165,233,0.15) 0%, rgba(124,58,237,0.08) 50%, transparent 70%)' }} />
+            <div className="relative rounded-2xl overflow-hidden border border-border/80 shadow-card-elevated"
+                 style={{ background: '#1E293B' }}>
+              {/* Browser chrome */}
+              <div className="bg-surface-2 border-b border-border px-4 py-2.5 flex items-center gap-2">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500/50" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
+                </div>
+                <div className="flex-1 mx-4 bg-background/60 rounded-md h-5 flex items-center px-2.5">
+                  <span className="text-[10px] text-slate-500">app.trainerboost.es/dashboard</span>
+                </div>
+              </div>
 
-          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 text-balance leading-relaxed">
-            Rutinas, nutrición, citas, mensajería y progreso de clientes.
-            Todo en una plataforma diseñada para entrenadores personales.
-          </p>
+              {/* App content */}
+              <div className="flex" style={{ height: '360px' }}>
+                {/* Sidebar */}
+                <div className="w-36 bg-surface/60 border-r border-border/60 p-2.5 flex flex-col gap-0.5 shrink-0">
+                  <div className="flex items-center gap-1.5 px-2 py-2 mb-1">
+                    <div className="w-5 h-5 rounded-md shrink-0"
+                         style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }} />
+                    <span className="text-[9px] font-bold text-white">TrainerBoost</span>
+                  </div>
+                  {[
+                    { label: 'Panel',     active: true },
+                    { label: 'Clientes',  active: false },
+                    { label: 'Rutinas',   active: false },
+                    { label: 'Nutrición', active: false },
+                    { label: 'Citas',     active: false },
+                    { label: 'Mensajes',  active: false },
+                  ].map(item => (
+                    <div key={item.label}
+                         className={`text-[9px] px-2 py-1.5 rounded-md ${item.active ? 'text-sky-400 font-semibold' : 'text-slate-500'}`}
+                         style={item.active ? { background: 'linear-gradient(90deg, rgba(14,165,233,0.15), transparent)' } : {}}>
+                      {item.label}
+                    </div>
+                  ))}
+                </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
-            <Link href="/register" className="btn-gradient text-base px-8 py-3">
-              <Zap className="w-4 h-4" /> Empezar gratis
-            </Link>
-            <Link href="/demo" className="btn-secondary text-base px-8 py-3">
-              Ver demo <ArrowRight className="w-4 h-4" />
-            </Link>
+                {/* Main */}
+                <div className="flex-1 p-3.5 space-y-2.5 overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-[11px] font-bold text-white">Panel principal</div>
+                      <div className="text-[9px] text-slate-500">Jueves, 29 Mayo 2025</div>
+                    </div>
+                    <div className="h-5 w-16 rounded-md text-[8px] bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 font-semibold">
+                      + Añadir
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {[
+                      { label: 'Clientes', value: '24', accent: 'border-sky-500/25 bg-sky-500/8' },
+                      { label: 'Citas hoy', value: '6',  accent: 'border-violet-500/25 bg-violet-500/8' },
+                      { label: 'Mensajes',  value: '8',  accent: 'border-emerald-500/25 bg-emerald-500/8' },
+                      { label: 'Este mes',  value: '2.8k€', accent: 'border-amber-500/25 bg-amber-500/8' },
+                    ].map(s => (
+                      <div key={s.label} className={`rounded-lg border p-2 ${s.accent}`}>
+                        <div className="text-[8px] text-slate-500 mb-0.5">{s.label}</div>
+                        <div className="text-[12px] font-bold text-white">{s.value}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="rounded-lg bg-surface/50 border border-border/60 p-2">
+                    <div className="text-[8px] font-semibold text-white mb-1.5">Próximas citas</div>
+                    {[
+                      { time: '09:00', name: 'Ana García',    type: 'Online' },
+                      { time: '11:30', name: 'Pedro López',   type: 'Presencial' },
+                      { time: '16:00', name: 'María Fernández', type: 'Online' },
+                    ].map(a => (
+                      <div key={a.name} className="flex items-center gap-2 py-0.5">
+                        <span className="text-[8px] text-slate-500 font-mono w-8 shrink-0">{a.time}</span>
+                        <span className="text-[8px] text-slate-300 flex-1 truncate">{a.name}</span>
+                        <span className="text-[7px] text-sky-400 shrink-0">{a.type}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="rounded-lg bg-surface/50 border border-border/60 p-2">
+                    <div className="text-[8px] font-semibold text-white mb-1.5">Clientes activos</div>
+                    {[
+                      { i: 'AG', name: 'Ana García',   c: 'bg-sky-500/25 text-sky-300' },
+                      { i: 'PL', name: 'Pedro López',  c: 'bg-violet-500/25 text-violet-300' },
+                      { i: 'MF', name: 'María Fdez.',  c: 'bg-emerald-500/25 text-emerald-300' },
+                    ].map(c => (
+                      <div key={c.name} className="flex items-center gap-1.5 py-0.5">
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold shrink-0 ${c.c}`}>{c.i}</div>
+                        <span className="text-[8px] text-slate-300 flex-1">{c.name}</span>
+                        <span className="text-[7px] text-emerald-400">Activo</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom fade */}
+              <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
+                   style={{ background: 'linear-gradient(to top, #0F172A, transparent)' }} />
+            </div>
+
+            {/* Floating badges */}
+            <div className="absolute -left-6 top-16 bg-surface border border-border rounded-xl px-3 py-2 shadow-card-elevated flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+              </div>
+              <div>
+                <div className="text-[9px] font-semibold text-white">Cita confirmada</div>
+                <div className="text-[8px] text-slate-400">Ana · 09:00 Online</div>
+              </div>
+            </div>
+
+            <div className="absolute -right-4 bottom-20 bg-surface border border-border rounded-xl px-3 py-2 shadow-card-elevated">
+              <div className="text-[8px] text-slate-400 mb-0.5">Nuevos clientes</div>
+              <div className="text-[14px] font-bold text-white font-mono">+12 <span className="text-emerald-400 text-[9px]">este mes</span></div>
+            </div>
           </div>
-          <p className="text-xs text-slate-500">Sin tarjeta · Plan gratuito disponible · Cancela cuando quieras</p>
         </div>
       </section>
 
-      {/* ── Stats strip ─────────────────────────────────────────────────── */}
-      <div className="border-y border-border/50 py-8 bg-surface/20">
-        <div className="max-w-4xl mx-auto px-4">
+      {/* ── Stats strip ────────────────────────────────────────────────────── */}
+      <div className="border-y border-border/50 py-10 bg-surface/15">
+        <div className="max-w-4xl mx-auto px-6">
           <div className="grid grid-cols-3 gap-6 text-center">
             {STATS.map((stat, i) => (
               <div key={stat.value} className={i > 0 ? 'border-l border-border/50' : ''}>
-                <div className="text-3xl font-bold font-mono gradient-text mb-1">{stat.value}</div>
+                <div className="text-3xl md:text-4xl font-bold font-mono gradient-text mb-1.5">{stat.value}</div>
                 <div className="text-sm text-slate-400">{stat.label}</div>
               </div>
             ))}
@@ -107,42 +313,48 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Cómo funciona ───────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 py-20">
-        <div className="text-center mb-14">
+      {/* ── Cómo funciona ──────────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-6 py-24">
+        <div className="text-center mb-16">
           <div className="chip-accent mb-4 mx-auto w-fit">Proceso simple</div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Empieza en 3 pasos</h2>
-          <p className="text-slate-400 max-w-xl mx-auto">Sin configuraciones complejas. En minutos ya tienes tu panel listo.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Empieza en 3 pasos</h2>
+          <p className="text-slate-400 max-w-lg mx-auto">Sin configuraciones complejas. En minutos ya tienes tu panel de control listo.</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {STEPS.map(step => (
-            <div key={step.n} className="card p-8 text-center relative">
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-5 text-white font-bold text-xl shadow-glow-sm"
-                style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
-              >
-                {step.n}
+        <div className="grid md:grid-cols-3 gap-6 relative">
+          {/* Connecting line (desktop) */}
+          <div className="absolute top-[3.25rem] left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px hidden md:block"
+               style={{ background: 'linear-gradient(90deg, rgba(14,165,233,0.4), rgba(124,58,237,0.4))' }} />
+
+          {STEPS.map((step, i) => (
+            <div key={step.n} className="relative">
+              <div className="card p-8 text-center h-full flex flex-col items-center">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 text-white font-bold text-xl font-mono relative z-10 shadow-glow-sm"
+                  style={{ background: `linear-gradient(135deg, ${i === 0 ? '#0EA5E9, #7C3AED' : i === 1 ? '#7C3AED, #10B981' : '#10B981, #0EA5E9'})` }}
+                >
+                  {step.n}
+                </div>
+                <h3 className="font-bold text-white mb-3 text-lg">{step.title}</h3>
+                <p className="text-sm text-slate-400 leading-relaxed">{step.desc}</p>
               </div>
-              <h3 className="font-semibold text-white mb-2">{step.title}</h3>
-              <p className="text-sm text-slate-400 leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── Features ────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 pb-20">
-        <div className="text-center mb-14">
+      {/* ── Features ───────────────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-6 pb-24">
+        <div className="text-center mb-16">
           <div className="chip mb-4 mx-auto w-fit">Funcionalidades</div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Todo lo que necesitas para crecer</h2>
-          <p className="text-slate-400 max-w-xl mx-auto">Desde la primera sesión hasta el seguimiento a largo plazo.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Todo lo que necesitas para crecer</h2>
+          <p className="text-slate-400 max-w-lg mx-auto">Desde la primera sesión hasta el seguimiento a largo plazo.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {FEATURES.map(feat => (
             <div key={feat.title} className="card-hover p-6 group">
-              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-4 transition-transform duration-200 group-hover:scale-110 ${feat.bg}`}>
+              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 transition-all duration-200 group-hover:scale-105 group-hover:shadow-glow-sm ${feat.bg}`}>
                 <feat.icon className={`w-5 h-5 ${feat.text}`} />
               </div>
               <h3 className="font-semibold text-white mb-2">{feat.title}</h3>
@@ -152,15 +364,51 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Demo preview ────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 pb-24">
+      {/* ── Testimonials ───────────────────────────────────────────────────── */}
+      <section className="py-24 border-y border-border/50"
+               style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(14,165,233,0.03) 0%, transparent 70%)' }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <div className="chip mb-4 mx-auto w-fit">Testimonios</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Lo que dicen los entrenadores</h2>
+            <p className="text-slate-400 max-w-lg mx-auto">Más de 500 entrenadores ya gestionan su negocio con TrainerBoost.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {TESTIMONIALS.map(t => (
+              <div key={t.name} className="card p-6 flex flex-col gap-5">
+                <div className="flex">
+                  {Array.from({ length: t.stars }).map((_, i) => (
+                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  ))}
+                </div>
+                <p className="text-sm text-slate-300 leading-relaxed flex-1">
+                  &ldquo;{t.text}&rdquo;
+                </p>
+                <div className="flex items-center gap-3 pt-2 border-t border-border/60">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${t.color}`}>
+                    {t.initials}
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-white">{t.name}</div>
+                    <div className="text-xs text-slate-500">{t.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Demo preview ───────────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-6 py-24">
         <div className="text-center mb-14">
           <div className="chip mb-4 mx-auto w-fit">Demo interactiva</div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Descubre lo que te espera
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
+            Explora antes de registrarte
           </h2>
-          <p className="text-slate-400 max-w-xl mx-auto">
-            Explora el panel antes de registrarte. Sin cuenta, sin tarjeta.
+          <p className="text-slate-400 max-w-lg mx-auto">
+            Mira el panel del entrenador y el portal del cliente. Sin cuenta ni tarjeta.
           </p>
         </div>
 
@@ -178,18 +426,19 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Browser mockup */}
-            <div className="rounded-xl bg-background border border-border overflow-hidden mb-5">
+            <div className="rounded-xl bg-background border border-border/70 overflow-hidden mb-5">
               <div className="bg-surface-2 px-3 py-2 border-b border-border flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-red-500/40" />
-                <div className="w-2 h-2 rounded-full bg-amber-500/40" />
-                <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
+                <div className="flex gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-red-500/40" />
+                  <div className="w-2 h-2 rounded-full bg-amber-500/40" />
+                  <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
+                </div>
                 <div className="flex-1 mx-3 bg-surface rounded-md h-4 flex items-center justify-center">
-                  <span className="text-[9px] text-slate-500">trainerboost.es/demo/trainer</span>
+                  <span className="text-[9px] text-slate-500">app.trainerboost.es/demo/trainer</span>
                 </div>
               </div>
-              <div className="flex">
-                <div className="w-28 bg-surface border-r border-border p-2 space-y-1">
+              <div className="flex" style={{ height: '130px' }}>
+                <div className="w-28 bg-surface border-r border-border p-2 space-y-1 shrink-0">
                   {['Panel', 'Clientes', 'Rutinas', 'Nutrición', 'Citas', 'Mensajes'].map((item, i) => (
                     <div key={item}
                          className={`text-[9px] px-2 py-1 rounded ${i === 0 ? 'text-sky-400 font-semibold' : 'text-slate-500'}`}
@@ -201,33 +450,26 @@ export default function LandingPage() {
                 <div className="flex-1 p-3 space-y-2">
                   <div className="grid grid-cols-2 gap-1.5">
                     <div className="h-10 rounded bg-surface border border-border p-2">
-                      <div className="text-[8px] text-slate-500">Clientes activos</div>
-                      <div className="text-xs font-bold text-white">4</div>
+                      <div className="text-[8px] text-slate-500">Clientes</div>
+                      <div className="text-xs font-bold text-white">24</div>
                     </div>
                     <div className="h-10 rounded bg-surface border border-border p-2">
                       <div className="text-[8px] text-slate-500">Citas hoy</div>
-                      <div className="text-xs font-bold text-white">2</div>
+                      <div className="text-xs font-bold text-white">6</div>
                     </div>
                   </div>
                   <div className="h-14 rounded bg-surface border border-border p-2">
                     <div className="text-[8px] text-slate-500 mb-1">Citas de hoy</div>
                     <div className="text-[9px] text-slate-300">09:00 · Ana García · Online</div>
                     <div className="text-[9px] text-slate-300">11:30 · Pedro López · Presencial</div>
-                  </div>
-                  <div className="h-10 rounded bg-surface border border-border p-2 space-y-0.5">
-                    <div className="text-[9px] text-slate-300 flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-full bg-sky-500/20 shrink-0" />Ana García
-                    </div>
-                    <div className="text-[9px] text-slate-300 flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-full bg-violet-500/20 shrink-0" />Pedro López
-                    </div>
+                    <div className="text-[9px] text-slate-300">16:00 · María Fdez. · Online</div>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2 text-brand-primary font-semibold text-sm group-hover:gap-3 transition-all">
-              Ver demo del entrenador <ArrowRight className="w-4 h-4" />
+              Ver panel del entrenador <ArrowRight className="w-4 h-4" />
             </div>
           </Link>
 
@@ -244,18 +486,19 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Browser mockup */}
-            <div className="rounded-xl bg-background border border-border overflow-hidden mb-5">
+            <div className="rounded-xl bg-background border border-border/70 overflow-hidden mb-5">
               <div className="bg-surface-2 px-3 py-2 border-b border-border flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-red-500/40" />
-                <div className="w-2 h-2 rounded-full bg-amber-500/40" />
-                <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
+                <div className="flex gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-red-500/40" />
+                  <div className="w-2 h-2 rounded-full bg-amber-500/40" />
+                  <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
+                </div>
                 <div className="flex-1 mx-3 bg-surface rounded-md h-4 flex items-center justify-center">
-                  <span className="text-[9px] text-slate-500">trainerboost.es/demo/client</span>
+                  <span className="text-[9px] text-slate-500">app.trainerboost.es/demo/client</span>
                 </div>
               </div>
-              <div className="p-3">
-                <div className="flex gap-2 pb-2 mb-3 border-b border-border overflow-hidden">
+              <div className="p-3" style={{ height: '130px' }}>
+                <div className="flex gap-2 pb-2 mb-2 border-b border-border overflow-hidden">
                   {['Progreso', 'Mi Rutina', 'Nutrición', 'Citas', 'Mensajes'].map((item, i) => (
                     <div key={item}
                          className={`text-[9px] px-2 py-0.5 rounded whitespace-nowrap ${i === 1 ? 'bg-brand-primary/15 text-brand-primary font-semibold' : 'text-slate-500'}`}>
@@ -272,7 +515,7 @@ export default function LandingPage() {
                     { name: 'Press militar', sets: '3×10', done: false },
                   ].map(ex => (
                     <div key={ex.name} className="flex items-center gap-2">
-                      <div className={`w-4 h-4 rounded-md border flex items-center justify-center text-[8px] ${ex.done ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400' : 'border-border text-slate-500'}`}>
+                      <div className={`w-4 h-4 rounded-md border flex items-center justify-center text-[8px] shrink-0 ${ex.done ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400' : 'border-border text-slate-500'}`}>
                         {ex.done ? '✓' : ''}
                       </div>
                       <span className={`text-[9px] flex-1 ${ex.done ? 'line-through text-slate-500' : 'text-slate-300'}`}>{ex.name}</span>
@@ -284,27 +527,28 @@ export default function LandingPage() {
             </div>
 
             <div className="flex items-center gap-2 text-brand-accent font-semibold text-sm group-hover:gap-3 transition-all">
-              Ver demo del cliente <ArrowRight className="w-4 h-4" />
+              Ver portal del cliente <ArrowRight className="w-4 h-4" />
             </div>
           </Link>
         </div>
       </section>
 
-      {/* ── CTA ─────────────────────────────────────────────────────────── */}
-      <section className="py-20 relative overflow-hidden">
+      {/* ── CTA ────────────────────────────────────────────────────────────── */}
+      <section className="py-24 relative overflow-hidden border-t border-border/50">
         <div className="absolute inset-0 pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse at center, rgba(14,165,233,0.06) 0%, transparent 65%)' }} />
-        <div className="absolute inset-0 border-y border-border/50 pointer-events-none" />
+             style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(14,165,233,0.08) 0%, transparent 60%)' }} />
 
-        <div className="relative max-w-2xl mx-auto px-4 text-center">
+        <div className="relative max-w-2xl mx-auto px-6 text-center">
           <div className="chip mb-6 mx-auto w-fit">Gratis para siempre</div>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-balance">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-5 text-balance tracking-tight">
             Tu negocio merece<br />
             <span className="gradient-text">las mejores herramientas</span>
           </h2>
-          <p className="text-slate-400 mb-10 text-lg">Empieza gratis. Escala cuando lo necesites.</p>
+          <p className="text-slate-400 mb-10 text-lg leading-relaxed">
+            Empieza gratis con hasta 3 clientes.<br />Escala a medida que crece tu negocio.
+          </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
             <Link href="/register" className="btn-gradient text-base px-10 py-3.5">
               <Zap className="w-4 h-4" /> Crear cuenta gratis
             </Link>
@@ -313,7 +557,7 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
             {TRUST.map(t => (
               <div key={t} className="flex items-center gap-1.5 text-xs text-slate-400">
                 <CheckCircle2 className="w-3.5 h-3.5 text-brand-accent shrink-0" />
@@ -324,38 +568,59 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <footer className="border-t border-border py-12">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-            <div>
-              <div className="flex items-center gap-2.5 mb-3">
+      {/* ── Footer ─────────────────────────────────────────────────────────── */}
+      <footer className="border-t border-border/60 py-14">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center"
                      style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
                   <Zap className="w-3.5 h-3.5 text-white" />
                 </div>
                 <span className="font-bold text-white text-sm">TrainerBoost</span>
               </div>
-              <p className="text-sm text-slate-500 max-w-xs leading-relaxed">
-                La plataforma todo-en-uno para entrenadores personales.
+              <p className="text-sm text-slate-500 leading-relaxed">
+                La plataforma todo-en-uno para entrenadores personales que quieren crecer.
               </p>
             </div>
-            <div className="flex gap-8 text-sm">
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Producto</div>
-                <Link href="/pricing"      className="block text-slate-400 hover:text-white transition-colors">Precios</Link>
-                <Link href="/demo"         className="block text-slate-400 hover:text-white transition-colors">Demo</Link>
-                <Link href="/login"        className="block text-slate-400 hover:text-white transition-colors">Iniciar sesión</Link>
-                <Link href="/register"     className="block text-slate-400 hover:text-white transition-colors">Registrarse</Link>
+
+            {/* Producto */}
+            <div>
+              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Producto</div>
+              <div className="space-y-2.5">
+                <Link href="/pricing" className="block text-sm text-slate-500 hover:text-white transition-colors">Precios</Link>
+                <Link href="/demo"    className="block text-sm text-slate-500 hover:text-white transition-colors">Demo</Link>
+                <Link href="/demo/trainer" className="block text-sm text-slate-500 hover:text-white transition-colors">Demo entrenador</Link>
+                <Link href="/demo/client"  className="block text-sm text-slate-500 hover:text-white transition-colors">Demo cliente</Link>
+              </div>
+            </div>
+
+            {/* Cuenta */}
+            <div>
+              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Cuenta</div>
+              <div className="space-y-2.5">
+                <Link href="/register" className="block text-sm text-slate-500 hover:text-white transition-colors">Registrarse</Link>
+                <Link href="/login"    className="block text-sm text-slate-500 hover:text-white transition-colors">Iniciar sesión</Link>
+              </div>
+            </div>
+
+            {/* Soporte */}
+            <div>
+              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Soporte</div>
+              <div className="space-y-2.5">
+                <a href="mailto:hola@trainerboost.es" className="block text-sm text-slate-500 hover:text-white transition-colors">Contacto</a>
+                <a href="mailto:hola@trainerboost.es" className="block text-sm text-slate-500 hover:text-white transition-colors">Ayuda</a>
               </div>
             </div>
           </div>
 
-          <div className="divider mt-10 mb-6" />
+          <div className="divider mb-6" />
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
             <span>© 2025 TrainerBoost. Todos los derechos reservados.</span>
-            <span>Hecho con ♥ para entrenadores que se toman en serio su negocio</span>
+            <span>Hecho para entrenadores que se toman en serio su negocio</span>
           </div>
         </div>
       </footer>

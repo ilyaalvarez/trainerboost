@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET(
   _request: Request,
   { params }: { params: { code: string } },
 ) {
-  const supabase = await createServerClient()
+  const supabase = createClient()
 
   const { data, error } = await supabase
     .from('invitations')
@@ -28,7 +28,8 @@ export async function GET(
   return NextResponse.json({
     valid: true,
     trainerId: data.trainer_id,
-    trainerName: (data.profiles as { full_name: string } | null)?.full_name ?? 'Tu entrenador',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    trainerName: (data.profiles as any)?.[0]?.full_name ?? (data.profiles as any)?.full_name ?? 'Tu entrenador',
     email: data.email,
   })
 }

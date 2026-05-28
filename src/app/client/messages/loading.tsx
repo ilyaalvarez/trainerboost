@@ -14,10 +14,10 @@ export default function ClientMessagesLoading() {
 
       {/* Messages */}
       <div className="flex-1 p-4 space-y-4">
-        {[60, 44, 56, 72, 48, 64, 40].map((w, i) => (
+        {['w-3/5', 'w-2/5', 'w-1/2', 'w-3/4', 'w-2/5', 'w-3/5', 'w-2/5'].map((w, i) => (
           <div key={i} className={`flex gap-3 ${i % 2 === 0 ? '' : 'flex-row-reverse'}`}>
             <Skeleton className="h-8 w-8 rounded-full flex-shrink-0" />
-            <Skeleton className={`h-11 rounded-2xl`} style={{ width: `${w}%` }} />
+            <Skeleton className={`h-11 rounded-2xl ${w}`} />
           </div>
         ))}
       </div>

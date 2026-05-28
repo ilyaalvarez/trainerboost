@@ -169,12 +169,12 @@ export default function OnboardingPage() {
                   <input
                     value={inviteCode}
                     onChange={e => setInviteCode(e.target.value)}
-                    className="input font-mono text-lg tracking-widest text-center"
-                    placeholder="xxxxxxxxxxxxxxxx"
-                    maxLength={16}
+                    className="input font-mono text-lg tracking-widest text-center uppercase"
+                    placeholder="xxxxxxxx"
+                    maxLength={8}
                   />
                   <p className="text-xs text-slate-500 mt-2">
-                    Tu entrenador te dará este código de 16 caracteres
+                    Tu entrenador te dará este código de 8 caracteres
                   </p>
                 </div>
                 <div>

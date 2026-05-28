@@ -134,8 +134,8 @@ export default function ClientsPage() {
     if (!userId) return
     setInviteLoading(true)
     try {
-      // Generate a random 8-char alphanumeric code
-      const code = Math.random().toString(36).substring(2, 10).toUpperCase()
+      // Generate a random 8-char alphanumeric code (lowercase to match query)
+      const code = Math.random().toString(36).substring(2, 10).toLowerCase()
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 
       const { data, error } = await supabase

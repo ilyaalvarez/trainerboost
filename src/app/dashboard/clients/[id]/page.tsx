@@ -119,7 +119,7 @@ export default function ClientDetailPage() {
       supabase.from('meal_plans').select('*')
         .eq('client_id', clientId).eq('trainer_id', user.id).order('created_at', { ascending: false }),
       supabase.from('progress_logs').select('*')
-        .eq('client_id', clientId).order('logged_at', { ascending: true }),
+        .eq('client_id', clientId).eq('trainer_id', user.id).order('logged_at', { ascending: true }),
       supabase.from('appointments').select('*')
         .eq('client_id', clientId).eq('trainer_id', user.id)
         .gte('scheduled_at', new Date().toISOString())
@@ -592,35 +592,39 @@ export default function ClientDetailPage() {
         </div>
       )}
 
-      {/* ── Modals ── */}
-      <NewRoutineModal
-        isOpen={showRoutineModal}
-        onClose={() => setShowRoutineModal(false)}
-        clientId={clientId}
-        trainerId={trainerId!}
-        onSuccess={() => { setShowRoutineModal(false); loadData() }}
-      />
-      <NewMealPlanModal
-        isOpen={showMealModal}
-        onClose={() => setShowMealModal(false)}
-        clientId={clientId}
-        trainerId={trainerId!}
-        onSuccess={() => { setShowMealModal(false); loadData() }}
-      />
-      <NewProgressModal
-        isOpen={showProgressModal}
-        onClose={() => setShowProgressModal(false)}
-        clientId={clientId}
-        trainerId={trainerId!}
-        onSuccess={() => { setShowProgressModal(false); loadData() }}
-      />
-      <NewAppointmentModal
-        isOpen={showAppointmentModal}
-        onClose={() => setShowAppointmentModal(false)}
-        clientId={clientId}
-        trainerId={trainerId!}
-        onSuccess={() => { setShowAppointmentModal(false); loadData() }}
-      />
+      {/* ── Modals — only render once trainerId is resolved ── */}
+      {trainerId && (
+        <>
+          <NewRoutineModal
+            isOpen={showRoutineModal}
+            onClose={() => setShowRoutineModal(false)}
+            clientId={clientId}
+            trainerId={trainerId}
+            onSuccess={() => { setShowRoutineModal(false); loadData() }}
+          />
+          <NewMealPlanModal
+            isOpen={showMealModal}
+            onClose={() => setShowMealModal(false)}
+            clientId={clientId}
+            trainerId={trainerId}
+            onSuccess={() => { setShowMealModal(false); loadData() }}
+          />
+          <NewProgressModal
+            isOpen={showProgressModal}
+            onClose={() => setShowProgressModal(false)}
+            clientId={clientId}
+            trainerId={trainerId}
+            onSuccess={() => { setShowProgressModal(false); loadData() }}
+          />
+          <NewAppointmentModal
+            isOpen={showAppointmentModal}
+            onClose={() => setShowAppointmentModal(false)}
+            clientId={clientId}
+            trainerId={trainerId}
+            onSuccess={() => { setShowAppointmentModal(false); loadData() }}
+          />
+        </>
+      )}
     </div>
   )
 }

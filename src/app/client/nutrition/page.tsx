@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Loader2, UtensilsCrossed } from 'lucide-react'
+import { Loader2, UtensilsCrossed, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { MealPlan, Meal, FoodItem } from '@/types/database'
 import EmptyState from '@/components/ui/EmptyState'
@@ -88,11 +88,23 @@ export default function ClientNutritionPage() {
     )
   }
 
+  async function handleExportPdf() {
+    if (!plan) return
+    const { exportNutritionPdf } = await import('@/lib/exportPdf')
+    await exportNutritionPdf({ ...plan, meals: plan.meals ?? [] }, '')
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-white">{plan.title}</h1>
-        <p className="text-slate-400 text-sm mt-0.5">Plan nutricional activo</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">{plan.title}</h1>
+          <p className="text-slate-400 text-sm mt-0.5">Plan nutricional activo</p>
+        </div>
+        <button onClick={handleExportPdf} className="btn-secondary flex-shrink-0 text-sm">
+          <Download className="w-4 h-4" />
+          PDF
+        </button>
       </div>
 
       {/* Macros overview */}

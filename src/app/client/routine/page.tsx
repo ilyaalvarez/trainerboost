@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Dumbbell, Check, Play, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
+import { Dumbbell, Check, Play, ChevronDown, ChevronUp, Loader2, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Routine, RoutineExercise, ExerciseCompletion } from '@/types/database'
 import { formatDate } from '@/lib/utils'
@@ -110,17 +110,29 @@ export default function ClientRoutinePage() {
     )
   }
 
+  async function handleExportPdf() {
+    if (!routine) return
+    const { exportRoutinePdf } = await import('@/lib/exportPdf')
+    await exportRoutinePdf({ ...routine, exercises: exercises as import('@/types/database').RoutineExercise[] }, '')
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-white">{routine.title}</h1>
-        <p className="text-slate-400 text-sm mt-0.5">
-          {routine.frequency && `${routine.frequency} · `}
-          {routine.starts_at && `Desde ${formatDate(routine.starts_at)}`}
-        </p>
-        {routine.description && (
-          <p className="text-slate-400 text-sm mt-2">{routine.description}</p>
-        )}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">{routine.title}</h1>
+          <p className="text-slate-400 text-sm mt-0.5">
+            {routine.frequency && `${routine.frequency} · `}
+            {routine.starts_at && `Desde ${formatDate(routine.starts_at)}`}
+          </p>
+          {routine.description && (
+            <p className="text-slate-400 text-sm mt-2">{routine.description}</p>
+          )}
+        </div>
+        <button onClick={handleExportPdf} className="btn-secondary flex-shrink-0 text-sm">
+          <Download className="w-4 h-4" />
+          PDF
+        </button>
       </div>
 
       {/* Progress bar */}

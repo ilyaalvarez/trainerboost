@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, Users, Dumbbell, UtensilsCrossed,
-  CalendarDays, MessageSquare, Settings, LogOut, CreditCard, Zap,
+  CalendarDays, MessageSquare, Settings, LogOut, CreditCard, Zap, BarChart2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/nutrition',    icon: UtensilsCrossed, label: 'Nutrición' },
   { href: '/dashboard/appointments', icon: CalendarDays,    label: 'Citas' },
   { href: '/dashboard/messages',     icon: MessageSquare,   label: 'Mensajes' },
+  { href: '/dashboard/analytics',    icon: BarChart2,       label: 'Analytics' },
 ]
 
 const BOTTOM_ITEMS = [

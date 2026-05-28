@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import {
   Users, Search, Plus, Copy, RefreshCw, ChevronLeft, ChevronRight,
-  UserPlus, Loader2,
+  UserPlus, Loader2, Mail,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn, formatDate, timeAgo } from '@/lib/utils'
@@ -50,9 +50,11 @@ export default function ClientsPage() {
   const [page, setPage]           = useState(1)
 
   // Invite modal
-  const [inviteOpen, setInviteOpen]     = useState(false)
-  const [invitation, setInvitation]     = useState<Invitation | null>(null)
+  const [inviteOpen, setInviteOpen]       = useState(false)
+  const [invitation, setInvitation]       = useState<Invitation | null>(null)
   const [inviteLoading, setInviteLoading] = useState(false)
+  const [emailInput, setEmailInput]       = useState('')
+  const [emailSending, setEmailSending]   = useState(false)
 
   // ── Fetch ────────────────────────────────────────────────────────────────
 
@@ -166,8 +168,29 @@ export default function ClientsPage() {
 
   function copyCode() {
     if (!invitation) return
-    navigator.clipboard.writeText(invitation.code)
+    navigator.clipboard.writeText(invitation.code.toUpperCase())
     toast.success('Código copiado al portapapeles')
+  }
+
+  async function sendInviteEmail() {
+    if (!invitation || !emailInput.trim()) return
+    setEmailSending(true)
+    try {
+      // Update invitation with email first
+      await supabase.from('invitations').update({ email: emailInput.trim() }).eq('id', invitation.id)
+      const res = await fetch('/api/invite/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invitationId: invitation.id }),
+      })
+      if (!res.ok) throw new Error('Error al enviar')
+      toast.success(`Invitación enviada a ${emailInput.trim()}`)
+      setEmailInput('')
+    } catch {
+      toast.error('No se pudo enviar el email')
+    } finally {
+      setEmailSending(false)
+    }
   }
 
   // ── Render ───────────────────────────────────────────────────────────────
@@ -384,10 +407,8 @@ export default function ClientsPage() {
           ) : invitation ? (
             <div className="space-y-3">
               {/* Code display */}
-              <div className="flex items-center gap-2">
-                <div className="flex-1 font-mono text-2xl font-bold text-white tracking-[0.25em] text-center bg-[#0F172A] border border-[#334155] rounded-xl py-4 px-5 select-all">
-                  {invitation.code}
-                </div>
+              <div className="font-mono text-2xl font-bold text-white tracking-[0.25em] text-center bg-[#0F172A] border border-[#334155] rounded-xl py-4 px-5 select-all">
+                {invitation.code.toUpperCase()}
               </div>
 
               {/* Expires */}
@@ -395,8 +416,8 @@ export default function ClientsPage() {
                 Expira el {formatDate(invitation.expires_at, 'dd/MM/yyyy HH:mm')}
               </p>
 
-              {/* Actions */}
-              <div className="flex gap-2 pt-1">
+              {/* Copy + refresh */}
+              <div className="flex gap-2">
                 <button onClick={copyCode} className="btn-primary flex-1">
                   <Copy className="w-4 h-4" />
                   Copiar código
@@ -408,6 +429,28 @@ export default function ClientsPage() {
                 >
                   <RefreshCw className="w-4 h-4" />
                 </button>
+              </div>
+
+              {/* Send by email */}
+              <div className="border-t border-border pt-4 space-y-2">
+                <p className="text-xs text-slate-500">O enviar por email directamente</p>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={emailInput}
+                    onChange={e => setEmailInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && sendInviteEmail()}
+                    placeholder="cliente@email.com"
+                    className="input flex-1 text-sm"
+                  />
+                  <button
+                    onClick={sendInviteEmail}
+                    disabled={emailSending || !emailInput.trim()}
+                    className="btn-secondary px-3 disabled:opacity-50"
+                  >
+                    {emailSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </div>
           ) : (

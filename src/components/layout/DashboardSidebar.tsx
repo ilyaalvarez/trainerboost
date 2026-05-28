@@ -23,8 +23,8 @@ const NAV_ITEMS = [
 ]
 
 const BOTTOM_ITEMS = [
-  { href: '/dashboard/settings', icon: Settings,    label: 'Ajustes' },
-  { href: '/pricing',            icon: CreditCard,  label: 'Plan' },
+  { href: '/dashboard/settings', icon: Settings,   label: 'Ajustes' },
+  { href: '/pricing',            icon: CreditCard, label: 'Plan' },
 ]
 
 interface Props {
@@ -49,24 +49,37 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
 
   return (
     <aside className="w-64 bg-surface border-r border-border flex flex-col shrink-0 h-full">
-      {/* Logo */}
+
+      {/* ── Logo ──────────────────────────────────────────────────────── */}
       <div className="p-5 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-brand-primary/20 border border-brand-primary/30 flex items-center justify-center">
-            <Zap className="w-4 h-4 text-brand-primary" />
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center shadow-glow-sm shrink-0"
+            style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
+          >
+            <Zap className="w-4 h-4 text-white" />
           </div>
           <div>
-            <div className="font-bold text-white text-sm">TrainerBoost</div>
+            <div className="font-bold text-white text-sm tracking-tight">TrainerBoost</div>
             <div className="text-xs text-slate-500 font-medium">Dashboard</div>
           </div>
         </div>
       </div>
 
-      {/* Plan badge */}
+      {/* ── Plan badge ────────────────────────────────────────────────── */}
       {subscription?.status === 'active' && (
-        <div className="mx-4 mt-3 px-3 py-2 rounded-lg bg-brand-primary/10 border border-brand-primary/20">
+        <div
+          className="mx-4 mt-3 px-3 py-2 rounded-lg border"
+          style={{
+            background: 'linear-gradient(135deg, rgba(14,165,233,0.08) 0%, rgba(124,58,237,0.05) 100%)',
+            borderColor: 'rgba(14,165,233,0.25)',
+          }}
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-brand-primary">Plan {planLabel}</span>
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-3 h-3 text-brand-primary" />
+              <span className="text-xs font-semibold text-brand-primary">Plan {planLabel}</span>
+            </div>
             <span className="text-xs text-slate-400">
               {subscription.max_clients === 999999 ? '∞' : subscription.max_clients} clientes
             </span>
@@ -74,7 +87,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
         </div>
       )}
 
-      {/* Nav */}
+      {/* ── Nav ───────────────────────────────────────────────────────── */}
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
         {NAV_ITEMS.map(item => {
           const isActive = pathname === item.href ||
@@ -86,26 +99,38 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group relative',
                 isActive
-                  ? 'bg-brand-primary/15 text-brand-primary'
+                  ? 'text-brand-primary'
                   : 'text-slate-400 hover:bg-surface-2 hover:text-slate-200'
               )}
+              style={isActive ? {
+                background: 'linear-gradient(90deg, rgba(14,165,233,0.12) 0%, transparent 100%)',
+              } : undefined}
             >
-              <item.icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-brand-primary' : 'text-slate-500 group-hover:text-slate-300')} />
+              {/* Active indicator */}
+              {isActive && (
+                <span
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full shadow-glow-sm"
+                  style={{ background: 'linear-gradient(180deg, #38BDF8, #7C3AED)' }}
+                />
+              )}
+
+              <item.icon className={cn(
+                'w-4 h-4 shrink-0',
+                isActive ? 'text-brand-primary' : 'text-slate-500 group-hover:text-slate-300'
+              )} />
               <span>{item.label}</span>
+
               {item.label === 'Mensajes' && unreadMessages > 0 && (
                 <span className="ml-auto bg-brand-primary text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                   {unreadMessages}
                 </span>
-              )}
-              {isActive && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-brand-primary rounded-r-full" />
               )}
             </Link>
           )
         })}
       </nav>
 
-      {/* Bottom items */}
+      {/* ── Bottom items ──────────────────────────────────────────────── */}
       <div className="p-3 border-t border-border space-y-0.5">
         {BOTTOM_ITEMS.map(item => {
           const isActive = pathname.startsWith(item.href)
@@ -125,9 +150,11 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
         })}
 
         {/* User + logout */}
-        <div className="pt-2">
+        <div className="pt-2 mt-1 border-t border-border/50">
           <div className="flex items-center gap-3 px-3 py-2">
-            <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
+            <div className="ring-2 ring-brand-primary/20 rounded-full">
+              <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
+            </div>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-semibold text-white truncate">{profile.full_name}</div>
               <div className="text-xs text-slate-500 truncate">Entrenador</div>

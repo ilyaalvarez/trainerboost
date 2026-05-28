@@ -13,11 +13,11 @@ import type { Profile } from '@/types/database'
 import Avatar from '@/components/ui/Avatar'
 
 const NAV_ITEMS = [
-  { href: '/client',              icon: TrendingUp,      label: 'Progreso' },
-  { href: '/client/routine',     icon: Dumbbell,        label: 'Mi Rutina' },
-  { href: '/client/nutrition',   icon: UtensilsCrossed, label: 'Nutrición' },
-  { href: '/client/appointments',icon: CalendarDays,    label: 'Citas' },
-  { href: '/client/messages',    icon: MessageSquare,   label: 'Mensajes' },
+  { href: '/client',               icon: TrendingUp,      label: 'Progreso' },
+  { href: '/client/routine',       icon: Dumbbell,        label: 'Mi Rutina' },
+  { href: '/client/nutrition',     icon: UtensilsCrossed, label: 'Nutrición' },
+  { href: '/client/appointments',  icon: CalendarDays,    label: 'Citas' },
+  { href: '/client/messages',      icon: MessageSquare,   label: 'Mensajes' },
 ]
 
 interface Props {
@@ -35,19 +35,23 @@ export default function ClientTopbar({ profile }: Props) {
   }
 
   return (
-    <header className="bg-surface border-b border-border sticky top-0 z-40">
+    <header className="bg-surface/90 backdrop-blur-md border-b border-border sticky top-0 z-40">
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center justify-between h-14">
+
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-brand-primary/20 border border-brand-primary/30 flex items-center justify-center">
-              <Zap className="w-3.5 h-3.5 text-brand-primary" />
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
+            >
+              <Zap className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="font-bold text-white text-sm">TrainerBoost</span>
+            <span className="font-bold text-white text-sm tracking-tight">TrainerBoost</span>
           </div>
 
-          {/* Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-0.5">
             {NAV_ITEMS.map(item => {
               const isActive = pathname === item.href ||
                 (item.href !== '/client' && pathname.startsWith(item.href))
@@ -56,26 +60,40 @@ export default function ClientTopbar({ profile }: Props) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                    'relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
                     isActive
-                      ? 'bg-brand-primary/15 text-brand-primary'
+                      ? 'text-brand-primary'
                       : 'text-slate-400 hover:bg-surface-2 hover:text-slate-200'
                   )}
+                  style={isActive ? {
+                    background: 'linear-gradient(180deg, rgba(14,165,233,0.1) 0%, transparent 100%)',
+                  } : undefined}
                 >
                   <item.icon className="w-3.5 h-3.5" />
                   {item.label}
+                  {isActive && (
+                    <span
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                      style={{ background: 'linear-gradient(90deg, #0EA5E9, #7C3AED)' }}
+                    />
+                  )}
                 </Link>
               )
             })}
           </nav>
 
-          {/* User */}
-          <div className="flex items-center gap-2">
-            <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
-            <span className="text-xs text-slate-400 hidden sm:block">{profile.full_name.split(' ')[0]}</span>
+          {/* User area */}
+          <div className="flex items-center gap-2.5">
+            <div className="ring-2 ring-brand-primary/20 rounded-full">
+              <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
+            </div>
+            <span className="text-xs text-slate-400 font-medium hidden sm:block">
+              {profile.full_name.split(' ')[0]}
+            </span>
             <button
               onClick={logout}
               className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all"
+              title="Cerrar sesión"
             >
               <LogOut className="w-3.5 h-3.5" />
             </button>
@@ -83,7 +101,7 @@ export default function ClientTopbar({ profile }: Props) {
         </div>
 
         {/* Mobile nav */}
-        <nav className="flex md:hidden items-center gap-1 pb-2 overflow-x-auto">
+        <nav className="flex md:hidden items-center gap-0.5 pb-2 overflow-x-auto">
           {NAV_ITEMS.map(item => {
             const isActive = pathname === item.href ||
               (item.href !== '/client' && pathname.startsWith(item.href))
@@ -93,7 +111,7 @@ export default function ClientTopbar({ profile }: Props) {
                 href={item.href}
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
-                  isActive ? 'bg-brand-primary/15 text-brand-primary' : 'text-slate-400'
+                  isActive ? 'text-brand-primary bg-brand-primary/10' : 'text-slate-400'
                 )}
               >
                 <item.icon className="w-3.5 h-3.5" />

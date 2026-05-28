@@ -35,16 +35,46 @@ body {
 @layer utilities {
   .text-balance { text-wrap: balance; }
 
+  /* ─── Gradient text ────────────────────────────────────────── */
+  .gradient-text {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-image: linear-gradient(90deg, #38BDF8 0%, #818CF8 100%);
+  }
+  .gradient-text-accent {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-image: linear-gradient(90deg, #10B981 0%, #0EA5E9 100%);
+  }
+
+  /* ─── Cards ────────────────────────────────────────────────── */
   .card {
     @apply bg-surface border border-border rounded-xl shadow-card;
   }
   .card-hover {
-    @apply card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200;
+    @apply card hover:shadow-card-hover hover:-translate-y-0.5 hover:border-border-bright transition-all duration-200;
   }
+  .card-glow-primary {
+    @apply card border-brand-primary/30 shadow-glow-primary;
+  }
+
+  /* ─── Buttons ──────────────────────────────────────────────── */
   .btn-primary {
     @apply bg-brand-primary hover:bg-sky-400 text-white font-semibold rounded-lg
            px-4 py-2 text-sm transition-all duration-150 disabled:opacity-50
            disabled:cursor-not-allowed flex items-center gap-2 justify-center;
+  }
+  .btn-gradient {
+    background: linear-gradient(135deg, #0EA5E9 0%, #7C3AED 100%);
+    @apply text-white font-semibold rounded-lg px-4 py-2 text-sm transition-all duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center
+           shadow-glow-sm;
+  }
+  .btn-gradient:hover {
+    background: linear-gradient(135deg, #38BDF8 0%, #8B5CF6 100%);
+    box-shadow: 0 0 24px rgba(14,165,233,0.25), 0 0 8px rgba(14,165,233,0.1);
   }
   .btn-secondary {
     @apply bg-surface border border-border hover:border-border-bright text-slate-200
@@ -56,6 +86,12 @@ body {
            px-4 py-2 text-sm transition-all duration-150 disabled:opacity-50
            flex items-center gap-2 justify-center;
   }
+  .btn-ghost {
+    @apply text-slate-300 hover:text-white hover:bg-surface-2 font-medium rounded-lg
+           px-4 py-2 text-sm transition-all duration-150 flex items-center gap-2 justify-center;
+  }
+
+  /* ─── Inputs ───────────────────────────────────────────────── */
   .input {
     @apply bg-surface border border-border rounded-lg px-3 py-2 text-sm text-slate-100
            placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/50
@@ -64,6 +100,8 @@ body {
   .label {
     @apply text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1 block;
   }
+
+  /* ─── Badges ───────────────────────────────────────────────── */
   .badge {
     @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold;
   }
@@ -72,4 +110,21 @@ body {
   .badge-ended   { @apply badge bg-red-500/10 text-red-400 border border-red-500/20; }
   .badge-pending { @apply badge bg-slate-700 text-slate-300 border border-slate-600; }
   .badge-pro     { @apply badge bg-violet-500/20 text-violet-300 border border-violet-500/30; }
+  .badge-info    { @apply badge bg-sky-500/10 text-sky-400 border border-sky-500/20; }
+
+  /* ─── Chips (section labels) ───────────────────────────────── */
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold
+           bg-brand-primary/10 border border-brand-primary/20 text-brand-primary;
+  }
+  .chip-accent {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold
+           bg-brand-accent/10 border border-brand-accent/20 text-brand-accent;
+  }
+
+  /* ─── Divider ──────────────────────────────────────────────── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #334155 20%, #334155 80%, transparent 100%);
+  }
 }

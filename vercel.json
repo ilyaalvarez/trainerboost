@@ -29,6 +29,6 @@
     }
   ],
   "env": {
-    "NEXT_PUBLIC_APP_URL": "https://trainerboost.vercel.app"
+    "NEXT_PUBLIC_APP_URL": "https://app.trainerboost.es"
   }
 }

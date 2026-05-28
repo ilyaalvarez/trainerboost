@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Dumbbell, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react'
+import { Zap, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
@@ -47,8 +47,9 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-brand-primary/20 border border-brand-primary/30 flex items-center justify-center">
-            <Dumbbell className="w-5 h-5 text-brand-primary" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-glow-sm"
+               style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
+            <Zap className="w-5 h-5 text-white" />
           </div>
           <span className="text-xl font-bold text-white">TrainerBoost</span>
         </div>
@@ -126,6 +127,12 @@ export default function LoginPage() {
           ¿No tienes cuenta?{' '}
           <Link href="/register" className="text-brand-primary hover:underline font-medium">
             Regístrate gratis
+          </Link>
+        </p>
+        <p className="text-center text-xs text-slate-500 mt-3">
+          ¿Quieres verlo antes?{' '}
+          <Link href="/demo" className="text-slate-400 hover:text-white transition-colors underline underline-offset-2">
+            Explorar demo →
           </Link>
         </p>
       </div>

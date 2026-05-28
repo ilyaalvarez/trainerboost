@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
 
-  const publicPrefixes = ['/_next', '/favicon', '/api/webhooks', '/pricing']
+  const publicPrefixes = ['/_next', '/favicon', '/api/webhooks', '/pricing', '/demo']
   const publicExact = ['/', '/login', '/register', '/onboarding']
   const isPublic = publicPrefixes.some(p => path.startsWith(p)) || publicExact.includes(path)
 

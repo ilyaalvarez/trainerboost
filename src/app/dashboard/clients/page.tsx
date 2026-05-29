@@ -43,6 +43,7 @@ export default function ClientsPage() {
   const [clients, setClients] = useState<ClientRow[]>([])
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
+  const [maxClients, setMaxClients] = useState(0)
 
   // UI state
   const [search, setSearch]       = useState('')
@@ -65,13 +66,21 @@ export default function ClientsPage() {
       if (!user) return
       setUserId(user.id)
 
-      const { data, error } = await supabase
-        .from('trainer_clients')
-        .select('*, profile:client_id(*)')
-        .eq('trainer_id', user.id)
-        .order('started_at', { ascending: false })
+      const [{ data, error }, { data: subData }] = await Promise.all([
+        supabase
+          .from('trainer_clients')
+          .select('*, profile:client_id(*)')
+          .eq('trainer_id', user.id)
+          .order('started_at', { ascending: false }),
+        supabase
+          .from('subscriptions')
+          .select('max_clients')
+          .eq('user_id', user.id)
+          .single(),
+      ])
 
       if (error) throw error
+      setMaxClients(subData?.max_clients ?? 0)
 
       // Fetch last routine for each client
       const clientIds = (data ?? []).map((c: ClientWithProfile) => c.client_id)
@@ -134,10 +143,22 @@ export default function ClientsPage() {
 
   async function generateInvite() {
     if (!userId) return
+
+    // Enforce the plan's client limit before issuing a new invite.
+    const activeCount = clients.filter(c => c.status === 'active').length
+    if (activeCount >= maxClients) {
+      toast.error(
+        maxClients === 0
+          ? 'Activa un plan para empezar a añadir clientes.'
+          : `Has alcanzado el límite de ${maxClients} clientes de tu plan. Actualízalo para añadir más.`,
+      )
+      return
+    }
+
     setInviteLoading(true)
     try {
-      // Generate a random 8-char alphanumeric code (lowercase to match query)
-      const code = Math.random().toString(36).substring(2, 10).toLowerCase()
+      // Cryptographically-random code (not guessable, unlike Math.random()).
+      const code = crypto.randomUUID().replace(/-/g, '').slice(0, 12).toLowerCase()
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 
       const { data, error } = await supabase

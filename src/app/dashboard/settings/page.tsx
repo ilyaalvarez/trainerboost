@@ -204,20 +204,19 @@ export default function SettingsPage() {
     if (deleteConfirm !== 'ELIMINAR') return
     setDeleting(true)
     try {
-      // Mark subscription cancelled
-      if (subscription?.id) {
-        await supabase
-          .from('subscriptions')
-          .update({ status: 'cancelled' })
-          .eq('id', subscription.id)
+      // Server route cancels the Stripe subscription and deletes the auth user.
+      const res = await fetch('/api/account/delete', { method: 'POST' })
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({ error: null }))
+        throw new Error(error || 'No se pudo eliminar la cuenta')
       }
 
-      // Sign out + request deletion via support (Supabase doesn't expose deleteUser client-side)
       await supabase.auth.signOut()
-      toast.success('Tu cuenta ha sido marcada para eliminación. En breve recibirás un correo de confirmación.')
+      toast.success('Tu cuenta y tu suscripción han sido eliminadas.')
       window.location.href = '/'
     } catch (err: unknown) {
-      toast.error('Error al eliminar la cuenta')
+      const msg = err instanceof Error ? err.message : 'Error al eliminar la cuenta'
+      toast.error(msg)
       console.error(err)
     } finally {
       setDeleting(false)

@@ -1,7 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
-import { stripe, PLANS, type PlanKey } from '@/lib/stripe'
+import { stripe, PLANS, planFromPriceId, type PlanKey } from '@/lib/stripe'
 import type Stripe from 'stripe'
+
+/**
+ * Resolve the plan a subscription is actually on, trusting the Stripe price
+ * over mutable metadata. Falls back to metadata only if the price is unknown.
+ */
+function resolvePlan(sub: Stripe.Subscription): PlanKey | null {
+  const priceId = sub.items?.data?.[0]?.price?.id
+  return planFromPriceId(priceId) ?? ((sub.metadata?.plan as PlanKey) || null)
+}
+
+/** Read current_period_end as an ISO string, tolerant of SDK type drift. */
+function periodEndISO(sub: Stripe.Subscription): string {
+  const ts = (sub as unknown as { current_period_end: number }).current_period_end
+  return new Date(ts * 1000).toISOString()
+}
 
 export async function POST(request: NextRequest) {
   const body      = await request.text()
@@ -25,60 +40,96 @@ export async function POST(request: NextRequest) {
 
   const supabase = createServiceClient()
 
+  // ── Idempotency: skip events we've already processed ──────────────────────
+  // Requires a `stripe_events` table (id text primary key, processed_at timestamptz).
+  // If the table is missing we log and continue (fail-open) so payments still work.
+  try {
+    const { error: insertErr } = await supabase
+      .from('stripe_events')
+      .insert({ id: event.id })
+    if (insertErr) {
+      // Unique violation → already processed → ack without reprocessing.
+      if (insertErr.code === '23505') {
+        return NextResponse.json({ received: true, duplicate: true })
+      }
+      // Any other error (e.g. table not yet created) → log and proceed.
+      console.warn('stripe_events dedupe unavailable:', insertErr.message)
+    }
+  } catch (err) {
+    console.warn('stripe_events dedupe threw:', err)
+  }
+
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const session = event.data.object as any
+        const session = event.data.object as Stripe.Checkout.Session
         const userId  = session.metadata?.supabase_user_id
-        const plan    = session.metadata?.plan as PlanKey
-        if (!userId || !plan) break
+        if (!userId || !session.subscription) break
 
-        const planConfig = PLANS[plan]
+        // Read the real subscription to derive the plan from the price paid.
+        const sub      = await stripe.subscriptions.retrieve(session.subscription as string)
+        const plan     = resolvePlan(sub)
+        if (!plan) { console.error('checkout.session.completed: plan no resuelto'); break }
+
         await supabase.from('subscriptions').upsert({
           user_id:                userId,
           stripe_customer_id:     session.customer as string,
           stripe_subscription_id: session.subscription as string,
           status:                 'active',
           plan,
-          max_clients:            planConfig.maxClients,
+          max_clients:            PLANS[plan].maxClients,
+          current_period_end:     periodEndISO(sub),
         }, { onConflict: 'user_id' })
         break
       }
 
       case 'customer.subscription.updated': {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const sub    = event.data.object as any
-        const userId = sub.metadata?.supabase_user_id
-        const plan   = sub.metadata?.plan as PlanKey
-        if (!userId) break
+        const sub  = event.data.object as Stripe.Subscription
+        const plan = resolvePlan(sub)
+        const isActive = sub.status === 'active' || sub.status === 'trialing'
 
-        const planConfig = plan ? PLANS[plan] : null
+        // Build the update without ever zeroing out a paying customer's plan.
+        const update: Record<string, unknown> = {
+          status:             isActive ? 'active' : sub.status,
+          current_period_end: periodEndISO(sub),
+        }
+        if (plan) {
+          update.plan        = plan
+          update.max_clients = PLANS[plan].maxClients
+        }
+
         await supabase.from('subscriptions')
-          .update({
-            status:               sub.status === 'active' ? 'active' : sub.status as string,
-            plan:                 plan || null,
-            max_clients:          planConfig?.maxClients || 0,
-            current_period_end:   new Date(sub.current_period_end * 1000).toISOString(),
-          })
+          .update(update)
           .eq('stripe_subscription_id', sub.id)
         break
       }
 
       case 'customer.subscription.deleted': {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const sub = event.data.object as any
+        const sub = event.data.object as Stripe.Subscription
         await supabase.from('subscriptions')
           .update({ status: 'cancelled', plan: null, max_clients: 0 })
           .eq('stripe_subscription_id', sub.id)
         break
       }
 
+      case 'invoice.payment_succeeded': {
+        // Recovery: restore a previously past_due subscription to active.
+        const invoice = event.data.object as Stripe.Invoice
+        const subId   = (invoice as unknown as { subscription?: string }).subscription
+        if (!subId) break
+        await supabase.from('subscriptions')
+          .update({ status: 'active' })
+          .eq('stripe_subscription_id', subId)
+        break
+      }
+
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
-        await supabase.from('subscriptions')
-          .update({ status: 'past_due' })
-          .eq('stripe_customer_id', invoice.customer as string)
+        const subId   = (invoice as unknown as { subscription?: string }).subscription
+        const query = supabase.from('subscriptions').update({ status: 'past_due' })
+        // Scope to the affected subscription when available, else the customer.
+        if (subId) await query.eq('stripe_subscription_id', subId)
+        else       await query.eq('stripe_customer_id', invoice.customer as string)
         break
       }
     }

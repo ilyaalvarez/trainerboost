@@ -20,10 +20,26 @@ export async function POST(request: NextRequest) {
     const { data: profile } = await supabase
       .from('profiles').select('full_name').eq('id', user.id).single()
 
-    // Get or create Stripe customer
     const { data: sub } = await supabase
-      .from('subscriptions').select('stripe_customer_id').eq('user_id', user.id).single()
+      .from('subscriptions')
+      .select('stripe_customer_id, status')
+      .eq('user_id', user.id)
+      .single()
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+    // Already subscribed → send to the billing portal instead of opening a
+    // second checkout (prevents duplicate parallel subscriptions / double billing).
+    if (sub?.status === 'active' && sub.stripe_customer_id) {
+      const portal = await stripe.billingPortal.sessions.create({
+        customer:   sub.stripe_customer_id,
+        return_url: `${appUrl}/dashboard/settings`,
+      })
+      return NextResponse.json({ url: portal.url })
+    }
+
+    // Get or create Stripe customer, persisting the id immediately so repeated
+    // checkouts before the webhook fires don't create duplicate customers.
     let customerId = sub?.stripe_customer_id
     if (!customerId) {
       const customer = await stripe.customers.create({
@@ -32,9 +48,11 @@ export async function POST(request: NextRequest) {
         metadata: { supabase_user_id: user.id },
       })
       customerId = customer.id
+      await supabase.from('subscriptions').upsert(
+        { user_id: user.id, stripe_customer_id: customerId },
+        { onConflict: 'user_id' },
+      )
     }
-
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,

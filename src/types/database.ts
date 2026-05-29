@@ -1,3 +1,5 @@
+import { PLAN_CONFIG } from '@/lib/plans'
+
 export type Role = 'trainer' | 'client'
 export type AppointmentType = 'presencial' | 'online' | 'llamada'
 export type AppointmentStatus = 'pending' | 'confirmed' | 'done' | 'cancelled'
@@ -171,14 +173,19 @@ export interface MealPlanWithMeals extends MealPlan {
   meals: Meal[]
 }
 
+// Derived from the single source of truth in `@/lib/plans` so prices and
+// limits never drift between the pricing page, settings and the Stripe webhook.
 export const PLAN_LIMITS: Record<SubscriptionPlan, number> = {
-  starter: 5,
-  pro: 20,
-  unlimited: 999999,
+  starter:   PLAN_CONFIG.starter.maxClients,
+  pro:       PLAN_CONFIG.pro.maxClients,
+  unlimited: PLAN_CONFIG.unlimited.maxClients,
 }
 
 export const PLAN_PRICES: Record<SubscriptionPlan, number> = {
-  starter: 29,
-  pro: 59,
-  unlimited: 99,
+  starter:   PLAN_CONFIG.starter.price,
+  pro:       PLAN_CONFIG.pro.price,
+  unlimited: PLAN_CONFIG.unlimited.price,
 }
+
+// SubscriptionPlan and PlanKey (from @/lib/plans) describe the same tiers.
+export type { PlanKey } from '@/lib/plans'

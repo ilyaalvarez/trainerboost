@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Zap, ArrowRight, Loader2, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { FREE_MAX_CLIENTS } from '@/lib/plans'
 
 const SPECIALTIES = [
   'Fuerza y musculación', 'Pérdida de peso', 'Atletismo', 'CrossFit',
@@ -55,12 +56,12 @@ export default function OnboardingPage() {
           specialties: selectedSpec,
         }).eq('id', user.id)
         if (error) { toast.error(error.message); return }
-        // Create free subscription
+        // Create free subscription (free tier allows a few clients to try the product)
         await supabase.from('subscriptions').upsert({
           user_id: user.id,
           status: 'inactive',
-          max_clients: 0,
-        })
+          max_clients: FREE_MAX_CLIENTS,
+        }, { onConflict: 'user_id' })
         toast.success('¡Perfil configurado!')
         router.push('/dashboard')
       } else {
@@ -75,6 +76,20 @@ export default function OnboardingPage() {
           .single()
 
         if (invErr || !inv) { toast.error('Código inválido o expirado'); return }
+
+        // Enforce the trainer's client limit before joining.
+        const [{ data: trainerSub }, { count: trainerClientCount }] = await Promise.all([
+          supabase.from('subscriptions').select('max_clients').eq('user_id', inv.trainer_id).single(),
+          supabase.from('trainer_clients')
+            .select('*', { count: 'exact', head: true })
+            .eq('trainer_id', inv.trainer_id)
+            .eq('status', 'active'),
+        ])
+        const trainerMax = trainerSub?.max_clients ?? 0
+        if ((trainerClientCount ?? 0) >= trainerMax) {
+          toast.error('Tu entrenador ha alcanzado el límite de clientes de su plan. Pídele que actualice su plan.')
+          return
+        }
 
         // Mark invitation used + create trainer_client relation
         await Promise.all([

@@ -102,8 +102,7 @@ export default function RegisterPage() {
           ))}
         </div>
 
-        <div className="card p-8"
-             style={{ boxShadow: '0 20px 60px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)' }}>
+        <div className="glass-card p-8">
 
           {step === 1 ? (
             <div className="animate-fade-in">

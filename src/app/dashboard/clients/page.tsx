@@ -226,17 +226,15 @@ export default function ClientsPage() {
           />
         </div>
 
-        {/* Filter chips */}
-        <div className="flex items-center gap-1.5 flex-wrap">
+        {/* Filter tabs */}
+        <div className="flex gap-1 border-b border-border/40 relative pb-0">
           {FILTER_TABS.map(tab => (
             <button
               key={tab.value}
               onClick={() => setFilter(tab.value)}
               className={cn(
-                'px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 border',
-                filter === tab.value
-                  ? 'bg-[#0EA5E9] border-[#0EA5E9] text-white'
-                  : 'bg-[#1E293B] border-[#334155] text-slate-400 hover:border-slate-500 hover:text-slate-200'
+                'tab-btn',
+                filter === tab.value ? 'tab-btn-active' : ''
               )}
             >
               {tab.label}
@@ -268,7 +266,7 @@ export default function ClientsPage() {
       ) : (
         <div className="space-y-4">
           {/* Client card grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 stagger-children">
             {paginated.map((client, idx) => {
               const profile = client.profile
 
@@ -293,11 +291,12 @@ export default function ClientsPage() {
               return (
                 <div
                   key={client.id}
-                  className="card overflow-hidden hover:-translate-y-1 transition-all duration-200 hover:shadow-card-hover animate-fade-in-up"
-                  style={{ animationDelay: `${idx * 50}ms` }}
+                  className="card card-interactive overflow-hidden"
                 >
-                  {/* Colored accent bar */}
-                  <div className="h-1.5" style={{ background: bar }} />
+                  {/* Colored accent bar with shimmer */}
+                  <div className="h-1.5 rounded-t-2xl relative overflow-hidden" style={{ background: bar }}>
+                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2.5s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                  </div>
 
                   <div className="p-5">
                     {/* Avatar + name + badge */}

@@ -96,7 +96,7 @@ export default async function DashboardPage() {
       )}
 
       {/* ── KPIs ──────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up delay-100">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
         <StatsCard
           label="Clientes activos"
           value={activeClients}
@@ -124,12 +124,15 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Appointments + Messages ────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up delay-200">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger-children">
 
         {/* Today's appointments */}
         <div className="card p-6">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-semibold text-white">Citas de hoy</h2>
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-gradient-to-b from-brand-primary to-brand-secondary shrink-0" />
+              <h2 className="font-semibold text-white">Citas de hoy</h2>
+            </div>
             <Link href="/dashboard/appointments" className="text-xs text-brand-primary hover:underline font-medium">
               Ver todas →
             </Link>
@@ -171,7 +174,10 @@ export default async function DashboardPage() {
         {/* Recent messages */}
         <div className="card p-6">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-semibold text-white">Mensajes recientes</h2>
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-gradient-to-b from-brand-primary to-brand-secondary shrink-0" />
+              <h2 className="font-semibold text-white">Mensajes recientes</h2>
+            </div>
             <Link href="/dashboard/messages" className="text-xs text-brand-primary hover:underline font-medium">
               Ver todos →
             </Link>
@@ -218,7 +224,10 @@ export default async function DashboardPage() {
       {/* ── Client list ───────────────────────────────────────────────── */}
       <div className="card p-6 animate-fade-in-up delay-300">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-semibold text-white">Mis clientes</h2>
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-5 rounded-full bg-gradient-to-b from-brand-primary to-brand-secondary shrink-0" />
+            <h2 className="font-semibold text-white">Mis clientes</h2>
+          </div>
           <Link href="/dashboard/clients" className="text-xs text-brand-primary hover:underline font-medium">
             Gestionar →
           </Link>

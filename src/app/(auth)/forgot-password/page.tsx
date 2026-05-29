@@ -35,6 +35,10 @@ export default function ForgotPasswordPage() {
            style={{ background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 70%)', animationDuration: '8s' }} />
       <div className="absolute bottom-1/4 right-1/4 w-72 h-72 rounded-full pointer-events-none animate-float"
            style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%)', animationDuration: '10s', animationDelay: '2s' }} />
+      <div className="absolute top-1/2 left-1/3 w-32 h-32 rounded-full pointer-events-none animate-float"
+           style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%)', animationDuration: '14s', animationDelay: '3s' }} />
+      <div className="absolute bottom-1/3 right-1/3 w-48 h-48 rounded-full pointer-events-none animate-float"
+           style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%)', animationDuration: '11s', animationDelay: '6s' }} />
 
       {/* Subtle grid */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.025]"
@@ -57,7 +61,7 @@ export default function ForgotPasswordPage() {
           <span className="text-xl font-bold text-white tracking-tight">TrainerBoost</span>
         </div>
 
-        <div className="card p-8" style={{ boxShadow: '0 20px 60px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)' }}>
+        <div className="glass-card p-8">
           {sent ? (
             <div className="text-center py-4 animate-fade-in">
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"

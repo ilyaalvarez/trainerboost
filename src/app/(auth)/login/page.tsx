@@ -77,8 +77,7 @@ export default function LoginPage() {
           <span className="text-xl font-bold text-white tracking-tight">TrainerBoost</span>
         </div>
 
-        <div className="card p-8"
-             style={{ boxShadow: '0 20px 60px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)' }}>
+        <div className="glass-card p-8">
           <h1 className="text-2xl font-bold text-white mb-1">Bienvenido de nuevo</h1>
           <p className="text-slate-400 text-sm mb-6">Inicia sesión en tu cuenta</p>
 

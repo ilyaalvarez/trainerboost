@@ -102,24 +102,13 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ease-smooth-out group relative',
                 isActive
-                  ? 'text-brand-primary'
+                  ? 'nav-pill-active'
                   : 'text-slate-400 hover:bg-surface-2 hover:text-slate-200'
               )}
-              style={isActive ? {
-                background: 'linear-gradient(90deg, rgba(14,165,233,0.12) 0%, transparent 100%)',
-              } : undefined}
             >
-              {/* Active indicator */}
-              {isActive && (
-                <span
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full shadow-glow-sm animate-glow"
-                  style={{ background: 'linear-gradient(180deg, #38BDF8, #7C3AED)' }}
-                />
-              )}
-
               <item.icon className={cn(
                 'w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110',
-                isActive ? 'text-brand-primary' : 'text-slate-500 group-hover:text-slate-300'
+                isActive ? 'text-sky-300' : 'text-slate-500 group-hover:text-slate-300'
               )} />
               <span>{item.label}</span>
 

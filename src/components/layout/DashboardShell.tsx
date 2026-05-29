@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, Zap } from 'lucide-react'
+import { Zap } from 'lucide-react'
 import DashboardSidebar from './DashboardSidebar'
 import Avatar from '@/components/ui/Avatar'
 import type { Profile, Subscription } from '@/types/database'
@@ -53,15 +53,23 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
 
         {/* Mobile top bar */}
         <div
-          className="h-14 flex items-center justify-between px-4 border-b border-border/60 md:hidden shrink-0"
-          style={{ background: 'linear-gradient(180deg, #192035 0%, #1E293B 100%)' }}
+          className="h-14 flex items-center justify-between px-4 border-b md:hidden shrink-0 backdrop-blur-xl"
+          style={{
+            background: 'rgba(15,23,42,0.85)',
+            backdropFilter: 'blur(20px)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+          }}
         >
           <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-surface-2 transition-colors"
-            aria-label="Abrir menú"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-surface-2 transition-all duration-200 active:scale-95"
+            aria-label="Toggle menu"
           >
-            <Menu className="w-5 h-5" />
+            <div className="w-5 h-4 flex flex-col justify-between">
+              <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 origin-left ${sidebarOpen ? 'rotate-45 translate-x-0.5' : ''}`} />
+              <span className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${sidebarOpen ? 'opacity-0 scale-x-0' : ''}`} />
+              <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 origin-left ${sidebarOpen ? '-rotate-45 translate-x-0.5' : ''}`} />
+            </div>
           </button>
 
           <div className="flex items-center gap-2">

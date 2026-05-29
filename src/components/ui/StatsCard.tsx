@@ -62,8 +62,8 @@ export default function StatsCard({
         'rounded-xl border border-[#334155] bg-[#1E293B]',
         'px-5 py-4',
         'shadow-card',
-        'transition-all duration-300 ease-smooth-out',
-        'hover:-translate-y-1 hover:border-[#475569]',
+        'transition-all duration-200',
+        'hover:-translate-y-1.5 hover:border-[#475569] hover:shadow-[0_20px_40px_-8px_rgba(0,0,0,0.55)]',
         className,
       )}
       style={{
@@ -82,6 +82,11 @@ export default function StatsCard({
         style={{ background: accent }}
         aria-hidden="true"
       />
+      <div
+        className="absolute top-0 left-0 h-0.5 rounded-t-xl w-0 group-hover:w-full transition-all duration-500 ease-out opacity-60 blur-[3px]"
+        style={{ background: accent }}
+        aria-hidden="true"
+      />
 
       {/* Label + icon */}
       <div className="flex items-start justify-between gap-2 mt-1">
@@ -92,7 +97,7 @@ export default function StatsCard({
           className={cn(
             'flex items-center justify-center',
             'w-9 h-9 rounded-lg shrink-0 ring-1',
-            'transition-all duration-300 group-hover:scale-110',
+            'transition-all duration-300 group-hover:scale-110 group-hover:rotate-3',
             wrapper,
             iconText,
             '[&>svg]:w-[18px] [&>svg]:h-[18px]',
@@ -105,7 +110,7 @@ export default function StatsCard({
 
       {/* Value */}
       <p
-        className="font-mono text-[1.75rem] font-bold leading-none tracking-tight text-[#F1F5F9]"
+        className="font-mono text-[1.75rem] font-bold leading-none tracking-tight text-[#F1F5F9] transition-all duration-200 group-hover:text-white"
         style={{ fontFamily: "'JetBrains Mono', monospace" }}
       >
         {value}

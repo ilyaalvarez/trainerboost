@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import {
   Users, Search, Copy, RefreshCw, ChevronLeft, ChevronRight,
-  UserPlus, Loader2, Mail,
+  UserPlus, Loader2, Mail, ArrowRight, Dumbbell, Clock,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn, formatDate, timeAgo } from '@/lib/utils'
@@ -266,89 +266,101 @@ export default function ClientsPage() {
           }
         />
       ) : (
-        <div className="card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[#334155]">
-                  {['Cliente', 'Estado', 'Desde', 'Última rutina', 'Acciones'].map((h, i) => (
-                    <th
-                      key={h}
-                      className={cn(
-                        'px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wide',
-                        i === 0 ? 'text-left' : i === 4 ? 'text-right' : 'text-left'
-                      )}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#334155]/50">
-                {paginated.map(client => {
-                  const profile = client.profile
-                  return (
-                    <tr
-                      key={client.id}
-                      className="group hover:bg-[#334155]/20 transition-colors"
-                    >
-                      {/* Avatar + name */}
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
+        <div className="space-y-4">
+          {/* Client card grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {paginated.map((client, idx) => {
+              const profile = client.profile
+
+              const statusBar: Record<string, string> = {
+                active:  'linear-gradient(90deg, #10B981, #0EA5E9)',
+                paused:  'linear-gradient(90deg, #F59E0B, #EF4444)',
+                ended:   'linear-gradient(90deg, #475569, #64748B)',
+                pending: 'linear-gradient(90deg, #0EA5E9, #7C3AED)',
+              }
+              const bar = statusBar[client.status] ?? statusBar.ended
+
+              const startDate = new Date(client.started_at)
+              const now = new Date()
+              const monthsDiff =
+                (now.getFullYear() - startDate.getFullYear()) * 12 +
+                (now.getMonth() - startDate.getMonth())
+              const timeLabel =
+                monthsDiff <= 0 ? 'Este mes' :
+                monthsDiff === 1 ? '1 mes' :
+                `${monthsDiff} meses`
+
+              return (
+                <div
+                  key={client.id}
+                  className="card overflow-hidden hover:-translate-y-1 transition-all duration-200 hover:shadow-card-hover animate-fade-in-up"
+                  style={{ animationDelay: `${idx * 50}ms` }}
+                >
+                  {/* Colored accent bar */}
+                  <div className="h-1.5" style={{ background: bar }} />
+
+                  <div className="p-5">
+                    {/* Avatar + name + badge */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="ring-2 ring-white/10 rounded-full shrink-0">
                           <Avatar
                             name={profile?.full_name ?? '?'}
                             url={profile?.avatar_url}
-                            size="sm"
+                            size="md"
                           />
-                          <div>
-                            <div className="font-medium text-white leading-tight">
-                              {profile?.full_name ?? '—'}
-                            </div>
-                            {profile?.phone && (
-                              <div className="text-xs text-slate-500 mt-0.5">{profile.phone}</div>
-                            )}
-                          </div>
                         </div>
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-4 py-3">
-                        <Badge status={client.status} />
-                      </td>
-
-                      {/* Started at */}
-                      <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
-                        {formatDate(client.started_at)}
-                      </td>
-
-                      {/* Last routine */}
-                      <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
-                        {client.lastRoutine ? timeAgo(client.lastRoutine) : <span className="text-slate-600">—</span>}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-4 py-3 text-right">
-                        <Link
-                          href={`/dashboard/clients/${profile?.id}`}
-                          className={cn(
-                            'inline-flex items-center gap-1 text-xs font-medium',
-                            'text-[#0EA5E9] opacity-0 group-hover:opacity-100',
-                            'hover:underline transition-opacity'
+                        <div className="min-w-0">
+                          <div className="font-semibold text-white text-sm leading-tight truncate">
+                            {profile?.full_name ?? '—'}
+                          </div>
+                          {profile?.phone && (
+                            <div className="text-xs text-slate-500 mt-0.5 truncate">{profile.phone}</div>
                           )}
-                        >
-                          Ver perfil →
-                        </Link>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+                        </div>
+                      </div>
+                      <Badge status={client.status} />
+                    </div>
+
+                    {/* Mini stats */}
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      <div className="rounded-lg px-3 py-2.5" style={{ background: 'rgba(30,41,59,0.8)' }}>
+                        <div className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">
+                          <Clock className="w-2.5 h-2.5" /> Cliente desde
+                        </div>
+                        <div className="text-sm font-semibold text-slate-200">{timeLabel}</div>
+                      </div>
+                      <div className="rounded-lg px-3 py-2.5" style={{ background: 'rgba(30,41,59,0.8)' }}>
+                        <div className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">
+                          <Dumbbell className="w-2.5 h-2.5" /> Última rutina
+                        </div>
+                        <div className="text-sm font-semibold text-slate-200">
+                          {client.lastRoutine
+                            ? timeAgo(client.lastRoutine)
+                            : <span className="text-slate-500 font-normal text-xs">Sin asignar</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CTA */}
+                    <Link
+                      href={`/dashboard/clients/${profile?.id}`}
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-glow-sm group"
+                      style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
+                    >
+                      Ver perfil completo
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </Link>
+                  </div>
+                </div>
+              )
+            })}
           </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="px-4 py-3 border-t border-[#334155] flex items-center justify-between">
+            <div className="card px-4 py-3 flex items-center justify-between">
               <p className="text-xs text-slate-500">
                 {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} de {filtered.length}
               </p>

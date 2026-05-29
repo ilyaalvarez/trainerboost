@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import {
   User, Dumbbell, Apple, TrendingUp, CalendarDays, MessageSquare,
   Phone, Plus, ChevronDown, ChevronUp, ArrowLeft, Clock, Send,
-  Scale, Percent, Zap, CheckCircle2,
+  Scale, Percent, Zap, CheckCircle2, AlertTriangle, Bell,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -180,6 +180,29 @@ export default function ClientDetailPage() {
   const { profile, relation, routines, mealPlans, progressLogs, appointments, messages } = data
   const weightData = progressLogs.filter(l => l.weight_kg != null)
 
+  // ── Smart alerts (computed, no extra queries) ──────────────────────────────
+  const activeRoutine = routines.find(r => r.status === 'active')
+  const activeMealPlan = mealPlans.find(m => m.status === 'active')
+  const lastLog = progressLogs.length > 0 ? progressLogs[progressLogs.length - 1] : null
+  const daysSinceLastLog = lastLog
+    ? Math.floor((Date.now() - new Date(lastLog.logged_at).getTime()) / 86400000)
+    : null
+  const nextAppt = appointments[0] ?? null
+  const hoursToNextAppt = nextAppt
+    ? Math.floor((new Date(nextAppt.scheduled_at).getTime() - Date.now()) / 3600000)
+    : null
+
+  interface SmartAlert { type: 'warn' | 'info' | 'good'; msg: string }
+  const smartAlerts: SmartAlert[] = [
+    ...(!activeRoutine                                          ? [{ type: 'warn' as const, msg: 'Sin rutina activa asignada' }] : []),
+    ...(!activeMealPlan                                         ? [{ type: 'info' as const, msg: 'Sin plan nutricional activo' }] : []),
+    ...(daysSinceLastLog !== null && daysSinceLastLog > 30     ? [{ type: 'warn' as const, msg: `Sin registrar progreso hace ${daysSinceLastLog} días` }] : []),
+    ...(appointments.length === 0                               ? [{ type: 'info' as const, msg: 'No hay citas próximas programadas' }] : []),
+    ...(hoursToNextAppt !== null && hoursToNextAppt >= 0 && hoursToNextAppt <= 24
+      ? [{ type: 'good' as const, msg: `Cita hoy en ${hoursToNextAppt < 1 ? 'menos de 1h' : hoursToNextAppt + 'h'}: ${formatRelative(nextAppt!.scheduled_at)}` }]
+      : []),
+  ]
+
   return (
     <div className="animate-fade-in space-y-6">
       {/* Back button */}
@@ -316,6 +339,88 @@ export default function ClientDetailPage() {
             )
           })()}
         </div>
+      </div>
+
+      {/* ── Smart alerts ── */}
+      {smartAlerts.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {smartAlerts.map((alert, i) => (
+            <div
+              key={i}
+              className={cn(
+                'flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all duration-200 hover:-translate-y-0.5',
+                alert.type === 'warn' ? 'bg-amber-500/10 border-amber-500/25 text-amber-400' :
+                alert.type === 'good' ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400' :
+                                        'bg-sky-500/10 border-sky-500/25 text-sky-400',
+              )}
+            >
+              {alert.type === 'warn'
+                ? <AlertTriangle size={12} />
+                : alert.type === 'good'
+                ? <CheckCircle2 size={12} />
+                : <Bell size={12} />
+              }
+              {alert.msg}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Quick actions ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {([
+          {
+            label: 'Nueva rutina',
+            sub: 'Asignar ejercicios',
+            icon: <Dumbbell size={20} />,
+            gradient: 'linear-gradient(135deg, #0EA5E9, #06B6D4)',
+            bg: 'bg-sky-500/8 border-sky-500/20 hover:border-sky-500/40',
+            onClick: () => setShowRoutineModal(true),
+          },
+          {
+            label: 'Plan nutricional',
+            sub: 'Crear o editar dieta',
+            icon: <Apple size={20} />,
+            gradient: 'linear-gradient(135deg, #10B981, #059669)',
+            bg: 'bg-emerald-500/8 border-emerald-500/20 hover:border-emerald-500/40',
+            onClick: () => setShowMealModal(true),
+          },
+          {
+            label: 'Agendar cita',
+            sub: 'Programar sesión',
+            icon: <CalendarDays size={20} />,
+            gradient: 'linear-gradient(135deg, #7C3AED, #9333EA)',
+            bg: 'bg-violet-500/8 border-violet-500/20 hover:border-violet-500/40',
+            onClick: () => setShowAppointmentModal(true),
+          },
+          {
+            label: 'Registrar progreso',
+            sub: 'Nueva medición',
+            icon: <TrendingUp size={20} />,
+            gradient: 'linear-gradient(135deg, #F59E0B, #EF4444)',
+            bg: 'bg-amber-500/8 border-amber-500/20 hover:border-amber-500/40',
+            onClick: () => setShowProgressModal(true),
+          },
+        ] as { label: string; sub: string; icon: React.ReactNode; gradient: string; bg: string; onClick: () => void }[]).map(action => (
+          <button
+            key={action.label}
+            type="button"
+            onClick={action.onClick}
+            className={cn(
+              'card border text-center p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover group',
+              action.bg,
+            )}
+          >
+            <div
+              className="w-11 h-11 rounded-xl mx-auto mb-3 flex items-center justify-center text-white shadow-glow-sm group-hover:scale-110 transition-transform duration-200"
+              style={{ background: action.gradient }}
+            >
+              {action.icon}
+            </div>
+            <div className="font-semibold text-sm text-white leading-tight">{action.label}</div>
+            <div className="text-[11px] text-slate-400 mt-0.5">{action.sub}</div>
+          </button>
+        ))}
       </div>
 
       {/* Tab nav */}

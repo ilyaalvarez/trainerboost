@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Dumbbell, Check, Play, ChevronDown, ChevronUp, Loader2, Download } from 'lucide-react'
+import { Dumbbell, Check, Play, ChevronDown, ChevronUp, Loader2, Download, Timer, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Routine, RoutineExercise } from '@/types/database'
 import { formatDate } from '@/lib/utils'
@@ -12,6 +12,17 @@ interface ExerciseWithCompletion extends RoutineExercise {
   completed: boolean
 }
 
+function categoryFor(name: string): { label: string; color: string } {
+  const n = name.toLowerCase()
+  if (/press|sentadilla|peso|curl|remo|dominada|fondo|hip thrust|peso muerto/.test(n)) {
+    return { label: 'Fuerza', color: '#0EA5E9' }
+  }
+  if (/cardio|corre|correr|bici|remo ergo|eliptica|elíptica|cinta|salto|hiit/.test(n)) {
+    return { label: 'Cardio', color: '#10B981' }
+  }
+  return { label: 'General', color: '#7C3AED' }
+}
+
 export default function ClientRoutinePage() {
   const supabase = useMemo(() => createClient(), [])
   const [routine, setRoutine]         = useState<Routine | null>(null)
@@ -19,6 +30,24 @@ export default function ClientRoutinePage() {
   const [loading, setLoading]         = useState(true)
   const [expanded, setExpanded]       = useState<string | null>(null)
   const [completing, setCompleting]   = useState<string | null>(null)
+  const [timer, setTimer]             = useState<{ exerciseId: string; remaining: number } | null>(null)
+
+  useEffect(() => {
+    if (!timer) return
+    const id = setInterval(() => {
+      setTimer(prev => {
+        if (!prev) return null
+        if (prev.remaining <= 1) {
+          clearInterval(id)
+          toast.success('¡Descanso completado! 💪')
+          return null
+        }
+        return { ...prev, remaining: prev.remaining - 1 }
+      })
+    }, 1000)
+    return () => clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timer?.exerciseId])
 
   const fetchRoutine = useCallback(async () => {
     setLoading(true)
@@ -105,7 +134,8 @@ export default function ClientRoutinePage() {
       <EmptyState
         icon={<Dumbbell className="w-8 h-8 text-slate-500" />}
         title="Sin rutina asignada"
-        description="Tu entrenador aún no te ha asignado una rutina. Escríbele un mensaje."
+        description="Tu entrenador aún no te ha asignado una rutina. Escríbele un mensaje para empezar."
+        action={{ label: 'Escribir a mi entrenador', onClick: () => { window.location.href = '/client/messages' } }}
       />
     )
   }
@@ -180,14 +210,49 @@ export default function ClientRoutinePage() {
               </button>
 
               <div className="flex-1 min-w-0">
-                <div className={`font-medium text-sm ${ex.completed ? 'line-through text-slate-400' : 'text-white'}`}>
-                  {ex.name}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`font-medium text-sm ${ex.completed ? 'line-through text-slate-400' : 'text-white'}`}>
+                    {ex.name}
+                  </span>
+                  {(() => {
+                    const cat = categoryFor(ex.name)
+                    return (
+                      <span
+                        className="text-[10px] font-semibold px-2 py-0.5 rounded-full border"
+                        style={{ background: `${cat.color}1A`, borderColor: `${cat.color}33`, color: cat.color }}
+                      >
+                        {cat.label}
+                      </span>
+                    )
+                  })()}
                 </div>
-                <div className="flex items-center gap-3 mt-0.5">
+                <div className="flex items-center gap-3 mt-1 flex-wrap">
                   {ex.sets && <span className="text-xs text-slate-400">{ex.sets} series</span>}
                   {ex.reps && <span className="text-xs text-slate-400">× {ex.reps} reps</span>}
                   {ex.rest_seconds && (
-                    <span className="text-xs text-slate-400">{ex.rest_seconds}s descanso</span>
+                    timer?.exerciseId === ex.id ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="relative inline-flex items-center justify-center">
+                          <span className="absolute inline-flex h-full w-full rounded-full bg-brand-primary/30 animate-pulse-ring" />
+                          <span className="relative font-mono text-xs font-bold text-brand-primary bg-brand-primary/10 border border-brand-primary/30 rounded-full px-2.5 py-1">
+                            {timer.remaining}s
+                          </span>
+                        </span>
+                        <button
+                          onClick={() => setTimer(null)}
+                          className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                        >
+                          <X className="w-3 h-3" /> Saltar
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setTimer({ exerciseId: ex.id, remaining: ex.rest_seconds! })}
+                        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-surface-2 border border-border text-slate-400 hover:text-brand-primary hover:border-brand-primary/40 transition-colors"
+                      >
+                        <Timer className="w-3 h-3" /> Descansar {ex.rest_seconds}s
+                      </button>
+                    )
                   )}
                 </div>
               </div>
@@ -215,9 +280,9 @@ export default function ClientRoutinePage() {
                     href={ex.video_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-xs text-brand-primary hover:underline"
+                    className="btn-secondary inline-flex items-center gap-2 text-xs w-fit"
                   >
-                    <Play className="w-3 h-3" /> Ver video demo
+                    <Play className="w-3.5 h-3.5" /> Ver video demo
                   </a>
                 )}
               </div>

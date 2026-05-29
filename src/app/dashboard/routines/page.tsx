@@ -59,38 +59,45 @@ export default function RoutinesPage() {
   const [showModal, setShowModal] = useState(false)
 
   const loadData = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    setTrainerId(user.id)
+    setLoading(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setTrainerId(user.id)
 
-    const [
-      { data: routinesData },
-      { data: exercisesData },
-      { data: tcData },
-    ] = await Promise.all([
-      supabase.from('routines').select('*')
-        .eq('trainer_id', user.id)
-        .order('created_at', { ascending: false }),
-      supabase.from('routine_exercises').select('*').order('order_index'),
-      supabase.from('trainer_clients')
-        .select('client_id, profile:client_id(id, full_name, avatar_url, phone, bio, specialties, role, created_at, updated_at)')
-        .eq('trainer_id', user.id),
-    ])
+      const [
+        { data: routinesData },
+        { data: exercisesData },
+        { data: tcData },
+      ] = await Promise.all([
+        supabase.from('routines').select('*')
+          .eq('trainer_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase.from('routine_exercises').select('*').order('order_index'),
+        supabase.from('trainer_clients')
+          .select('client_id, profile:client_id(id, full_name, avatar_url, phone, bio, specialties, role, created_at, updated_at)')
+          .eq('trainer_id', user.id),
+      ])
 
-    const clientProfiles: Profile[] = (tcData ?? []).map(tc => tc.profile as unknown as Profile).filter(Boolean)
-    setClients(clientProfiles)
+      const clientProfiles: Profile[] = (tcData ?? []).map(tc => tc.profile as unknown as Profile).filter(Boolean)
+      setClients(clientProfiles)
 
-    const clientMap = Object.fromEntries(clientProfiles.map(c => [c.id, c]))
+      const clientMap = Object.fromEntries(clientProfiles.map(c => [c.id, c]))
 
-    const enriched: RoutineWithExtras[] = (routinesData ?? []).map(r => ({
-      ...r,
-      status: r.status as RoutineStatus,
-      exercises: (exercisesData ?? []).filter(e => e.routine_id === r.id),
-      client: clientMap[r.client_id] ?? null,
-    }))
+      const enriched: RoutineWithExtras[] = (routinesData ?? []).map(r => ({
+        ...r,
+        status: r.status as RoutineStatus,
+        exercises: (exercisesData ?? []).filter(e => e.routine_id === r.id),
+        client: clientMap[r.client_id] ?? null,
+      }))
 
-    setRoutines(enriched)
-    setLoading(false)
+      setRoutines(enriched)
+    } catch (err: unknown) {
+      toast.error('Error al cargar las rutinas')
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { loadData() }, [loadData])

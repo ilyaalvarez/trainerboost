@@ -2,13 +2,36 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Plus, Loader2, Scale } from 'lucide-react'
+import { Plus, Loader2, Scale, Flame, TrendingDown, ClipboardList } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { ProgressLog } from '@/types/database'
 import { formatDate } from '@/lib/utils'
 import Modal from '@/components/ui/Modal'
 import EmptyState from '@/components/ui/EmptyState'
+import Milestones from '@/components/ui/Milestones'
 import ProgressChart from '../_components/ProgressChart'
+
+function computeStreak(dates: string[]): number {
+  const unique = Array.from(new Set(dates.map(d => d.slice(0, 10)))).sort((a, b) => (a < b ? 1 : -1))
+  if (unique.length === 0) return 0
+
+  const dayMs = 86400000
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const todayKey = today.toISOString().slice(0, 10)
+  const yesterdayKey = new Date(today.getTime() - dayMs).toISOString().slice(0, 10)
+
+  if (unique[0] !== todayKey && unique[0] !== yesterdayKey) return 0
+
+  let streak = 1
+  for (let i = 1; i < unique.length; i++) {
+    const prev = new Date(unique[i - 1] + 'T00:00:00')
+    const curr = new Date(unique[i] + 'T00:00:00')
+    if (prev.getTime() - curr.getTime() === dayMs) streak++
+    else break
+  }
+  return streak
+}
 
 export default function ClientProgressPage() {
   const supabase = useMemo(() => createClient(), [])
@@ -17,6 +40,7 @@ export default function ClientProgressPage() {
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving]       = useState(false)
   const [trainerId, setTrainerId] = useState<string | null>(null)
+  const [completedWorkouts, setCompletedWorkouts] = useState(0)
 
   const [form, setForm] = useState({
     weight_kg: '',
@@ -30,7 +54,7 @@ export default function ClientProgressPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const [{ data: l }, { data: tc }] = await Promise.all([
+    const [{ data: l }, { data: tc }, { count: workoutsCount }] = await Promise.all([
       supabase.from('progress_logs')
         .select('*')
         .eq('client_id', user.id)
@@ -40,10 +64,14 @@ export default function ClientProgressPage() {
         .eq('client_id', user.id)
         .eq('status', 'active')
         .single(),
+      supabase.from('exercise_completions')
+        .select('*', { count: 'exact', head: true })
+        .eq('client_id', user.id),
     ])
 
     setLogs(l || [])
     setTrainerId(tc?.trainer_id || null)
+    setCompletedWorkouts(workoutsCount || 0)
     setLoading(false)
   }, [supabase])
 
@@ -75,6 +103,11 @@ export default function ClientProgressPage() {
   }
 
   const latest = logs.at(-1)
+  const first  = logs.at(0)
+  const streakDays = computeStreak(logs.map(l => l.logged_at))
+  const weightChange = latest?.weight_kg != null && first?.weight_kg != null && logs.length >= 2
+    ? latest.weight_kg - first.weight_kg
+    : null
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -87,6 +120,62 @@ export default function ClientProgressPage() {
           <Plus className="w-4 h-4" /> Registrar medida
         </button>
       </div>
+
+      {/* Hero stats */}
+      {logs.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="card p-5 flex items-center gap-4"
+               style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.08), rgba(239,68,68,0.05))', borderColor: 'rgba(245,158,11,0.25)' }}>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                 style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(239,68,68,0.12))' }}>
+              <Flame className="w-6 h-6 text-amber-400" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold font-mono text-amber-400">{streakDays}</div>
+              <div className="text-xs text-slate-400">Racha actual ({streakDays === 1 ? 'día' : 'días'})</div>
+            </div>
+          </div>
+
+          <div className="card p-5 flex items-center gap-4"
+               style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.08), rgba(14,165,233,0.05))', borderColor: 'rgba(16,185,129,0.25)' }}>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                 style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.12))' }}>
+              <TrendingDown className="w-6 h-6 text-brand-accent" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold font-mono text-brand-accent">
+                {weightChange != null ? `${weightChange > 0 ? '+' : ''}${weightChange.toFixed(1)}` : '—'}
+              </div>
+              <div className="text-xs text-slate-400">Kg {weightChange != null && weightChange > 0 ? 'ganados' : 'perdidos'}</div>
+            </div>
+          </div>
+
+          <div className="card p-5 flex items-center gap-4"
+               style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.08), rgba(14,165,233,0.05))', borderColor: 'rgba(124,58,237,0.25)' }}>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                 style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(14,165,233,0.12))' }}>
+              <ClipboardList className="w-6 h-6 text-brand-secondary" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold font-mono text-brand-secondary">{logs.length}</div>
+              <div className="text-xs text-slate-400">Registros</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Milestones */}
+      {logs.length > 0 && (
+        <div>
+          <h2 className="font-semibold text-white mb-3">Logros</h2>
+          <Milestones
+            totalLogs={logs.length}
+            weightChange={weightChange}
+            streakDays={streakDays}
+            completedWorkouts={completedWorkouts}
+          />
+        </div>
+      )}
 
       {/* Latest values */}
       {latest && (

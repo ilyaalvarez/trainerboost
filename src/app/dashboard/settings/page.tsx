@@ -60,6 +60,7 @@ export default function SettingsPage() {
 
   // Auth + data
   const [userId,       setUserId]       = useState<string | null>(null)
+  const [userEmail,    setUserEmail]    = useState<string | null>(null)
   const [profile,      setProfile]      = useState<Profile | null>(null)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading,      setLoading]      = useState(true)
@@ -94,6 +95,7 @@ export default function SettingsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       setUserId(user.id)
+      setUserEmail(user.email ?? null)
 
       const [{ data: p }, { data: s }] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', user.id).single(),
@@ -176,12 +178,22 @@ export default function SettingsPage() {
     e.preventDefault()
     setPwdError(null)
 
+    if (!currentPwd) { setPwdError('Introduce tu contraseña actual'); return }
     if (!newPwd) { setPwdError('Escribe una nueva contraseña'); return }
     if (newPwd.length < 8) { setPwdError('Mínimo 8 caracteres'); return }
     if (newPwd !== confirmPwd) { setPwdError('Las contraseñas no coinciden'); return }
 
     setSavingPwd(true)
     try {
+      // Re-authenticate with the current password before changing it.
+      if (userEmail) {
+        const { error: authErr } = await supabase.auth.signInWithPassword({
+          email: userEmail,
+          password: currentPwd,
+        })
+        if (authErr) { setPwdError('La contraseña actual no es correcta'); setSavingPwd(false); return }
+      }
+
       const { error } = await supabase.auth.updateUser({ password: newPwd })
       if (error) throw error
 

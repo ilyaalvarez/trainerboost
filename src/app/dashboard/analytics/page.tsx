@@ -64,6 +64,8 @@ export default function AnalyticsPage() {
   const [metric, setMetric] = useState<'weight_kg' | 'body_fat_pct'>('weight_kg')
 
   const load = useCallback(async () => {
+    setLoading(true)
+    try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
@@ -74,10 +76,10 @@ export default function AnalyticsPage() {
       .eq('trainer_id', user.id)
       .eq('status', 'active')
 
-    if (error) { toast.error('Error al cargar clientes'); setLoading(false); return }
+    if (error) throw error
 
     const clientIds = (relations ?? []).map(r => r.client_id)
-    if (clientIds.length === 0) { setLoading(false); return }
+    if (clientIds.length === 0) { setClients([]); return }
 
     // Fetch all progress logs for all clients at once
     const { data: logs } = await supabase
@@ -131,7 +133,12 @@ export default function AnalyticsPage() {
     })
 
     setChartData(points)
-    setLoading(false)
+    } catch (err: unknown) {
+      toast.error('Error al cargar las analíticas')
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
   }, [supabase, metric])
 
   useEffect(() => { load() }, [load])

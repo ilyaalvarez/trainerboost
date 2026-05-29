@@ -3,6 +3,36 @@ import {
   Zap, Users, Dumbbell, UtensilsCrossed, CalendarDays,
   MessageSquare, ArrowRight, TrendingUp, CheckCircle2, Star,
 } from 'lucide-react'
+import { PLAN_CONFIG } from '@/lib/plans'
+
+const PRICING_TIERS = [
+  { key: 'starter' as const,   highlight: false },
+  { key: 'pro' as const,       highlight: true  },
+  { key: 'unlimited' as const, highlight: false },
+]
+
+const FAQS = [
+  {
+    q: '¿Necesito tarjeta de crédito para empezar?',
+    a: 'No. Puedes registrarte gratis y gestionar hasta 3 clientes sin introducir ningún dato de pago. Solo pagas cuando decides crecer.',
+  },
+  {
+    q: '¿Puedo cancelar cuando quiera?',
+    a: 'Sí. Cancelas desde tu panel en un clic y mantienes el acceso hasta el final del periodo ya pagado. Sin permanencia ni penalizaciones.',
+  },
+  {
+    q: '¿Mis datos y los de mis clientes están seguros?',
+    a: 'Totalmente. Ciframos la información, alojamos los datos en servidores europeos y cumplimos el RGPD. Cada entrenador solo accede a sus propios clientes.',
+  },
+  {
+    q: '¿Mis clientes necesitan pagar algo?',
+    a: 'No. Tus clientes acceden gratis a su portal (rutinas, nutrición, progreso y mensajes). La suscripción la pagas únicamente tú como entrenador.',
+  },
+  {
+    q: '¿Puedo cambiar de plan más adelante?',
+    a: 'Cuando quieras. Subes o bajas de plan desde el portal de facturación y el cambio se aplica al instante, con prorrateo automático.',
+  },
+]
 
 const FEATURES = [
   {
@@ -550,6 +580,85 @@ export default function LandingPage() {
               Ver portal del cliente <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
+        </div>
+      </section>
+
+      {/* ── Pricing ──────────────────────────────────────────────────────── */}
+      <section id="precios" className="max-w-6xl mx-auto px-6 py-24 border-t border-border/50">
+        <div className="text-center mb-14 animate-fade-in-up">
+          <div className="chip mb-4 mx-auto w-fit">Precios</div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Planes simples y transparentes</h2>
+          <p className="text-slate-400 max-w-lg mx-auto">Empieza gratis con 3 clientes. Crece cuando lo necesites. Sin permanencia.</p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5 items-stretch">
+          {PRICING_TIERS.map(({ key, highlight }, i) => {
+            const plan = PLAN_CONFIG[key]
+            return (
+              <div
+                key={key}
+                className={`relative card p-7 flex flex-col animate-fade-in-up ${i === 0 ? '' : i === 1 ? 'delay-150' : 'delay-300'} ${
+                  highlight ? 'border-brand-primary/40' : 'hover:border-border-bright'
+                } transition-all duration-300 hover:-translate-y-1`}
+                style={highlight ? { background: 'linear-gradient(160deg, rgba(14,165,233,0.08) 0%, #1E293B 55%)', boxShadow: '0 20px 50px -20px rgba(14,165,233,0.4)' } : undefined}
+              >
+                {highlight && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] font-bold px-3 py-1 rounded-full text-white whitespace-nowrap"
+                       style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
+                    Más popular
+                  </div>
+                )}
+                <div className="font-bold text-white text-lg">{plan.name}</div>
+                <div className="flex items-end gap-1 mt-3 mb-5">
+                  <span className="text-4xl font-bold text-white font-mono">{plan.price}€</span>
+                  <span className="text-sm text-slate-400 mb-1">/mes</span>
+                </div>
+                <ul className="space-y-2.5 flex-1 mb-6">
+                  {plan.features.map(f => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-slate-300">
+                      <CheckCircle2 className="w-4 h-4 text-brand-accent shrink-0 mt-0.5" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/register"
+                  className={`w-full justify-center ${highlight ? 'btn-gradient' : 'btn-secondary'}`}
+                >
+                  Empezar ahora
+                </Link>
+              </div>
+            )
+          })}
+        </div>
+
+        <p className="text-center text-xs text-slate-500 mt-8">
+          ¿Solo quieres probar? <Link href="/register" className="text-brand-primary hover:underline">Crea una cuenta gratis</Link> y gestiona hasta 3 clientes sin tarjeta.
+        </p>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
+      <section className="max-w-3xl mx-auto px-6 py-24 border-t border-border/50">
+        <div className="text-center mb-12 animate-fade-in-up">
+          <div className="chip mb-4 mx-auto w-fit">Preguntas frecuentes</div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">¿Tienes dudas?</h2>
+        </div>
+        <div className="space-y-3">
+          {FAQS.map((faq, i) => (
+            <details
+              key={faq.q}
+              className="group card p-0 overflow-hidden animate-fade-in-up"
+              style={{ animationDelay: `${i * 80}ms` }}
+            >
+              <summary className="flex items-center justify-between gap-4 cursor-pointer list-none px-5 py-4 text-sm font-semibold text-white hover:text-sky-300 transition-colors">
+                {faq.q}
+                <ArrowRight className="w-4 h-4 text-slate-500 shrink-0 transition-transform duration-300 group-open:rotate-90" />
+              </summary>
+              <div className="px-5 pb-4 text-sm text-slate-400 leading-relaxed">
+                {faq.a}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 

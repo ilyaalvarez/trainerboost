@@ -84,36 +84,43 @@ export default function NutritionPage() {
   // ── Load data ──────────────────────────────────────────────────────────────
 
   const loadData = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    setTrainerId(user.id)
+    setLoading(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setTrainerId(user.id)
 
-    const [
-      { data: plansData },
-      { data: mealsData },
-      { data: tcData },
-    ] = await Promise.all([
-      supabase.from('meal_plans').select('*')
-        .eq('trainer_id', user.id)
-        .order('created_at', { ascending: false }),
-      supabase.from('meals').select('*').order('order_index'),
-      supabase.from('trainer_clients')
-        .select('client_id, profile:client_id(id, full_name, avatar_url, phone, bio, specialties, role, created_at, updated_at)')
-        .eq('trainer_id', user.id),
-    ])
+      const [
+        { data: plansData },
+        { data: mealsData },
+        { data: tcData },
+      ] = await Promise.all([
+        supabase.from('meal_plans').select('*')
+          .eq('trainer_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase.from('meals').select('*').order('order_index'),
+        supabase.from('trainer_clients')
+          .select('client_id, profile:client_id(id, full_name, avatar_url, phone, bio, specialties, role, created_at, updated_at)')
+          .eq('trainer_id', user.id),
+      ])
 
-    const clientProfiles: Profile[] = (tcData ?? []).map(tc => tc.profile as unknown as Profile).filter(Boolean)
-    setClients(clientProfiles)
-    const clientMap = Object.fromEntries(clientProfiles.map(c => [c.id, c]))
+      const clientProfiles: Profile[] = (tcData ?? []).map(tc => tc.profile as unknown as Profile).filter(Boolean)
+      setClients(clientProfiles)
+      const clientMap = Object.fromEntries(clientProfiles.map(c => [c.id, c]))
 
-    const enriched: MealPlanWithExtras[] = (plansData ?? []).map(p => ({
-      ...p,
-      client: clientMap[p.client_id] ?? null,
-      meals: (mealsData ?? []).filter(m => m.meal_plan_id === p.id) as Meal[],
-    }))
+      const enriched: MealPlanWithExtras[] = (plansData ?? []).map(p => ({
+        ...p,
+        client: clientMap[p.client_id] ?? null,
+        meals: (mealsData ?? []).filter(m => m.meal_plan_id === p.id) as Meal[],
+      }))
 
-    setPlans(enriched)
-    setLoading(false)
+      setPlans(enriched)
+    } catch (err: unknown) {
+      toast.error('Error al cargar los planes de nutrición')
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { loadData() }, [loadData])

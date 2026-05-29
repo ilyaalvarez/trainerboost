@@ -83,7 +83,8 @@ export default function ClientNutritionPage() {
       <EmptyState
         icon={<UtensilsCrossed className="w-8 h-8 text-slate-500" />}
         title="Sin plan nutricional"
-        description="Tu entrenador todavía no te ha asignado un plan. Escríbele un mensaje."
+        description="Tu entrenador todavía no te ha asignado un plan. Escríbele un mensaje para empezar."
+        action={{ label: 'Escribir a mi entrenador', onClick: () => { window.location.href = '/client/messages' } }}
       />
     )
   }

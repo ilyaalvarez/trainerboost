@@ -7,12 +7,11 @@ import { toast } from 'sonner'
 import {
   User, Dumbbell, Apple, TrendingUp, CalendarDays, MessageSquare,
   Phone, Plus, ChevronDown, ChevronUp, ArrowLeft, Clock, Send,
-  Scale, Percent, Zap,
+  Scale, Percent, Zap, CheckCircle2,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
-import StatsCard from '@/components/ui/StatsCard'
 import EmptyState from '@/components/ui/EmptyState'
 import { cn, formatDate, formatRelative, timeAgo } from '@/lib/utils'
 import {
@@ -35,28 +34,6 @@ interface ClientData {
   progressLogs: ProgressLog[]
   appointments: Appointment[]
   messages: Message[]
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function TabButton({ tab: _tab, active, icon, label, onClick }: {
-  tab: Tab; active: boolean; icon: React.ReactNode; label: string; onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        'flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all duration-150',
-        active
-          ? 'bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-[#334155]/40',
-      )}
-    >
-      {icon}
-      {label}
-    </button>
-  )
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────────
@@ -193,7 +170,7 @@ export default function ClientDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 rounded-full border-2 border-[#0EA5E9] border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-brand-primary border-t-transparent animate-spin" />
       </div>
     )
   }
@@ -214,53 +191,167 @@ export default function ClientDetailPage() {
         <ArrowLeft size={16} /> Volver a clientes
       </button>
 
-      {/* Client header */}
-      <div className="card p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <Avatar name={profile.full_name} url={profile.avatar_url} size="xl" />
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-bold text-white">{profile.full_name}</h1>
-              <Badge status={relation.status} />
+      {/* Client hero */}
+      <div className="rounded-2xl overflow-hidden border border-border/80"
+           style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.06) 0%, rgba(124,58,237,0.04) 50%, #1E293B 100%)' }}>
+
+        {/* Cover gradient strip */}
+        <div className="h-20 relative overflow-hidden"
+             style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.18) 0%, rgba(124,58,237,0.14) 50%, rgba(16,185,129,0.1) 100%)' }}>
+          <div className="absolute inset-0 opacity-10"
+               style={{ backgroundImage: 'linear-gradient(#94a3b8 1px, transparent 1px), linear-gradient(90deg, #94a3b8 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+          {/* Decorative orbs */}
+          <div className="absolute -right-12 -top-12 w-32 h-32 rounded-full opacity-20"
+               style={{ background: 'radial-gradient(circle, #7C3AED 0%, transparent 70%)' }} />
+          <div className="absolute right-1/3 top-2 w-20 h-20 rounded-full opacity-15"
+               style={{ background: 'radial-gradient(circle, #0EA5E9 0%, transparent 70%)' }} />
+        </div>
+
+        <div className="px-6 pb-6 -mt-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="flex items-end gap-4">
+              {/* Avatar with ring */}
+              <div className="ring-4 ring-[#1E293B] rounded-full shadow-glow-sm shrink-0">
+                <Avatar name={profile.full_name} url={profile.avatar_url} size="xl" />
+              </div>
+              <div className="pb-1">
+                <div className="flex flex-wrap items-center gap-2.5 mb-1">
+                  <h1 className="text-2xl font-bold text-white">{profile.full_name}</h1>
+                  <Badge status={relation.status} />
+                </div>
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+                  {profile.phone && (
+                    <span className="flex items-center gap-1.5">
+                      <Phone size={12} /> {profile.phone}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1.5">
+                    <CalendarDays size={12} /> Cliente desde {formatDate(relation.started_at)}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-slate-400">
-              {profile.phone && (
-                <span className="flex items-center gap-1.5">
-                  <Phone size={14} /> {profile.phone}
-                </span>
-              )}
-              <span className="flex items-center gap-1.5">
-                <CalendarDays size={14} /> Cliente desde {formatDate(relation.started_at)}
-              </span>
+
+            {/* Quick actions */}
+            <div className="flex flex-wrap items-center gap-2 pb-1">
+              <button type="button" onClick={() => setTab('mensajes')} className="btn-secondary text-xs py-1.5 px-3">
+                <MessageSquare size={13} /> Mensaje
+              </button>
+              <button type="button" onClick={() => setShowAppointmentModal(true)} className="btn-secondary text-xs py-1.5 px-3">
+                <CalendarDays size={13} /> Cita
+              </button>
+              <button type="button" onClick={() => setShowRoutineModal(true)} className="btn-gradient text-xs py-1.5 px-3">
+                <Plus size={13} /> Rutina
+              </button>
             </div>
           </div>
+
+          {/* Quick stats strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+            {[
+              {
+                label: 'Rutinas activas',
+                value: routines.filter(r => r.status === 'active').length,
+                icon: <Dumbbell size={14} />,
+                color: 'text-sky-400',
+                bg: 'bg-sky-500/10 border-sky-500/20',
+              },
+              {
+                label: 'Planes nutrición',
+                value: mealPlans.filter(m => m.status === 'active').length,
+                icon: <Apple size={14} />,
+                color: 'text-emerald-400',
+                bg: 'bg-emerald-500/10 border-emerald-500/20',
+              },
+              {
+                label: 'Registros peso',
+                value: progressLogs.length,
+                icon: <TrendingUp size={14} />,
+                color: 'text-violet-400',
+                bg: 'bg-violet-500/10 border-violet-500/20',
+              },
+              {
+                label: 'Próximas citas',
+                value: appointments.length,
+                icon: <CalendarDays size={14} />,
+                color: 'text-amber-400',
+                bg: 'bg-amber-500/10 border-amber-500/20',
+              },
+            ].map(stat => (
+              <div key={stat.label} className={`rounded-xl border px-4 py-3 flex items-center gap-3 ${stat.bg} transition-all duration-200 hover:-translate-y-0.5`}>
+                <div className={`shrink-0 ${stat.color}`}>{stat.icon}</div>
+                <div>
+                  <div className="text-xl font-bold font-mono text-white leading-none">{stat.value}</div>
+                  <div className="text-xs text-slate-400 mt-0.5">{stat.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Latest measurements strip (if data exists) */}
+          {progressLogs.length > 0 && (() => {
+            const latest = [...progressLogs].sort((a, b) =>
+              new Date(b.logged_at).getTime() - new Date(a.logged_at).getTime()
+            )[0]
+            return (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Última medición:</span>
+                {latest.weight_kg != null && (
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-xs font-semibold text-sky-400">
+                    <Scale size={11} /> {latest.weight_kg} kg
+                  </span>
+                )}
+                {latest.body_fat_pct != null && (
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-semibold text-amber-400">
+                    <Percent size={11} /> {latest.body_fat_pct}% grasa
+                  </span>
+                )}
+                {latest.muscle_mass_kg != null && (
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
+                    <Zap size={11} /> {latest.muscle_mass_kg} kg músculo
+                  </span>
+                )}
+                <span className="text-xs text-slate-500">{timeAgo(latest.logged_at)}</span>
+              </div>
+            )
+          })()}
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-2">
+      {/* Tab nav */}
+      <div className="card p-1.5 flex flex-wrap gap-0.5 overflow-x-auto">
         {([
-          { id: 'resumen',   icon: <User size={15} />,          label: 'Resumen'   },
-          { id: 'rutinas',   icon: <Dumbbell size={15} />,      label: 'Rutinas'   },
-          { id: 'nutricion', icon: <Apple size={15} />,         label: 'Nutrición' },
-          { id: 'progreso',  icon: <TrendingUp size={15} />,    label: 'Progreso'  },
-          { id: 'citas',     icon: <CalendarDays size={15} />,  label: 'Citas'     },
-          { id: 'mensajes',  icon: <MessageSquare size={15} />, label: 'Mensajes'  },
+          { id: 'resumen',   icon: <User size={14} />,          label: 'Resumen'   },
+          { id: 'rutinas',   icon: <Dumbbell size={14} />,      label: 'Rutinas'   },
+          { id: 'nutricion', icon: <Apple size={14} />,         label: 'Nutrición' },
+          { id: 'progreso',  icon: <TrendingUp size={14} />,    label: 'Progreso'  },
+          { id: 'citas',     icon: <CalendarDays size={14} />,  label: 'Citas'     },
+          { id: 'mensajes',  icon: <MessageSquare size={14} />, label: 'Mensajes'  },
         ] as { id: Tab; icon: React.ReactNode; label: string }[]).map(t => (
-          <TabButton key={t.id} tab={t.id} active={tab === t.id} icon={t.icon} label={t.label} onClick={() => setTab(t.id)} />
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setTab(t.id)}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200',
+              tab === t.id
+                ? 'text-brand-primary shadow-glow-sm'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-surface-2',
+            )}
+            style={tab === t.id ? {
+              background: 'linear-gradient(135deg, rgba(14,165,233,0.15) 0%, rgba(124,58,237,0.08) 100%)',
+              boxShadow: '0 0 0 1px rgba(14,165,233,0.2)',
+            } : undefined}
+          >
+            {t.icon}
+            {t.label}
+          </button>
         ))}
       </div>
 
       {/* ── Tab: Resumen ── */}
       {tab === 'resumen' && (
         <div className="space-y-6 animate-fade-in">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatsCard label="Rutinas activas" value={routines.filter(r => r.status === 'active').length} icon={<Dumbbell className="w-5 h-5" />} color="primary" />
-            <StatsCard label="Planes de comida" value={mealPlans.filter(m => m.status === 'active').length} icon={<Apple className="w-5 h-5" />} color="accent" />
-            <StatsCard label="Registros de progreso" value={progressLogs.length} icon={<TrendingUp className="w-5 h-5" />} color="secondary" />
-            <StatsCard label="Próximas citas" value={appointments.length} icon={<CalendarDays className="w-5 h-5" />} color="warning" />
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Basic info */}
             <div className="card p-5 space-y-4">
@@ -272,6 +363,20 @@ export default function ClientDetailPage() {
                   { label: 'Estado',   value: <Badge status={relation.status} /> },
                   { label: 'Desde',    value: formatDate(relation.started_at) },
                   { label: 'Bio',      value: profile.bio ?? '—' },
+                  ...(routines.find(r => r.status === 'active')
+                    ? [{ label: 'Rutina activa', value: (
+                        <span className="flex items-center gap-1.5 text-sky-400">
+                          <Dumbbell size={12} /> {routines.find(r => r.status === 'active')?.title}
+                        </span>
+                      ) }]
+                    : []),
+                  ...(mealPlans.find(m => m.status === 'active')
+                    ? [{ label: 'Plan activo', value: (
+                        <span className="flex items-center gap-1.5 text-emerald-400">
+                          <Apple size={12} /> {mealPlans.find(m => m.status === 'active')?.title}
+                        </span>
+                      ) }]
+                    : []),
                 ].map(({ label, value }) => (
                   <div key={label} className="flex justify-between gap-4">
                     <dt className="text-slate-400 shrink-0">{label}</dt>
@@ -291,7 +396,9 @@ export default function ClientDetailPage() {
                 placeholder="Escribe notas sobre este cliente..."
                 className="input resize-none"
               />
-              <p className="text-xs text-slate-500">Guardado automáticamente</p>
+              <p className="text-xs text-slate-500 flex items-center gap-1.5">
+                <CheckCircle2 size={11} className="text-emerald-500" /> Se guarda automáticamente
+              </p>
             </div>
           </div>
         </div>
@@ -301,7 +408,10 @@ export default function ClientDetailPage() {
       {tab === 'rutinas' && (
         <div className="space-y-4 animate-fade-in">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-white">Rutinas ({routines.length})</h2>
+            <div>
+              <h2 className="font-semibold text-white">Rutinas</h2>
+              <p className="text-xs text-slate-500 mt-0.5">{routines.length} {routines.length === 1 ? 'rutina asignada' : 'rutinas asignadas'}</p>
+            </div>
             <button type="button" className="btn-primary" onClick={() => setShowRoutineModal(true)}>
               <Plus size={16} /> Nueva rutina
             </button>
@@ -313,10 +423,11 @@ export default function ClientDetailPage() {
               {routines.map(routine => {
                 const expanded = expandedRoutines.has(routine.id)
                 return (
-                  <div key={routine.id} className="card overflow-hidden">
+                  <div key={routine.id} className="card overflow-hidden transition-all duration-200 hover:border-border-bright">
                     <button
                       type="button"
-                      className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#334155]/20 transition-colors"
+                      className="w-full flex items-center gap-3 p-4 text-left transition-colors group"
+                      style={expanded ? { background: 'linear-gradient(90deg, rgba(14,165,233,0.06) 0%, transparent 60%)' } : {}}
                       onClick={() => setExpandedRoutines(prev => {
                         const next = new Set(prev)
                         if (next.has(routine.id)) next.delete(routine.id)
@@ -328,10 +439,14 @@ export default function ClientDetailPage() {
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-semibold text-white">{routine.title}</span>
                           <Badge status={routine.status} />
+                          {routine.exercises.length > 0 && (
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400">
+                              {routine.exercises.length} ejercicios
+                            </span>
+                          )}
                         </div>
                         <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-slate-400">
                           {routine.frequency && <span>{routine.frequency}</span>}
-                          <span>{routine.exercises.length} ejercicios</span>
                           <span>{formatDate(routine.created_at)}</span>
                         </div>
                       </div>
@@ -349,15 +464,16 @@ export default function ClientDetailPage() {
                             <table className="w-full text-sm">
                               <thead>
                                 <tr className="border-b border-[#334155]">
-                                  {['Ejercicio', 'Series', 'Reps', 'Descanso', 'Notas'].map(h => (
+                                  {['#', 'Ejercicio', 'Series', 'Reps', 'Descanso', 'Notas'].map(h => (
                                     <th key={h} className="text-left pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wide pr-4">{h}</th>
                                   ))}
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-[#334155]/50">
-                                {routine.exercises.map(ex => (
-                                  <tr key={ex.id}>
-                                    <td className="py-2 pr-4 font-medium text-slate-200">{ex.name}</td>
+                                {routine.exercises.map((ex, idx) => (
+                                  <tr key={ex.id} className="hover:bg-surface-2/30 transition-colors">
+                                    <td className="py-2 pr-4 text-xs text-slate-500 font-mono">{idx + 1}</td>
+                                    <td className="py-2 pr-4 font-bold text-slate-200">{ex.name}</td>
                                     <td className="py-2 pr-4 text-slate-400">{ex.sets ?? '—'}</td>
                                     <td className="py-2 pr-4 text-slate-400">{ex.reps ?? '—'}</td>
                                     <td className="py-2 pr-4 text-slate-400">{ex.rest_seconds ? `${ex.rest_seconds}s` : '—'}</td>
@@ -382,7 +498,10 @@ export default function ClientDetailPage() {
       {tab === 'nutricion' && (
         <div className="space-y-4 animate-fade-in">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-white">Planes de nutrición ({mealPlans.length})</h2>
+            <div>
+              <h2 className="font-semibold text-white">Planes de nutrición</h2>
+              <p className="text-xs text-slate-500 mt-0.5">{mealPlans.length} {mealPlans.length === 1 ? 'plan asignado' : 'planes asignados'}</p>
+            </div>
             <button type="button" className="btn-primary" onClick={() => setShowMealModal(true)}>
               <Plus size={16} /> Nuevo plan
             </button>
@@ -440,7 +559,10 @@ export default function ClientDetailPage() {
       {tab === 'progreso' && (
         <div className="space-y-6 animate-fade-in">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-white">Registros de progreso ({progressLogs.length})</h2>
+            <div>
+              <h2 className="font-semibold text-white">Registros de progreso</h2>
+              <p className="text-xs text-slate-500 mt-0.5">{progressLogs.length} {progressLogs.length === 1 ? 'registro guardado' : 'registros guardados'}</p>
+            </div>
             <button type="button" className="btn-primary" onClick={() => setShowProgressModal(true)}>
               <Plus size={16} /> Registrar medida
             </button>
@@ -450,6 +572,37 @@ export default function ClientDetailPage() {
             <EmptyState icon={<TrendingUp />} title="Sin registros" description="Empieza a registrar las medidas de progreso del cliente." action={{ label: 'Registrar medida', onClick: () => setShowProgressModal(true) }} />
           ) : (
             <>
+              {weightData.length >= 2 && (() => {
+                const first = weightData[0]
+                const last = weightData[weightData.length - 1]
+                const diff = (last.weight_kg ?? 0) - (first.weight_kg ?? 0)
+                const isLoss = diff < 0
+                return (
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="card p-4 text-center hover:-translate-y-0.5 transition-transform">
+                      <div className="text-xs text-slate-400 mb-1">Peso inicial</div>
+                      <div className="text-2xl font-bold font-mono text-white">{first.weight_kg} <span className="text-sm text-slate-400">kg</span></div>
+                      <div className="text-xs text-slate-500 mt-0.5">{formatDate(first.logged_at)}</div>
+                    </div>
+                    <div className="card p-4 text-center border-brand-primary/30 hover:-translate-y-0.5 transition-transform"
+                         style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.06), #1E293B)' }}>
+                      <div className="text-xs text-slate-400 mb-1">Variación total</div>
+                      <div className={`text-2xl font-bold font-mono ${isLoss ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {diff > 0 ? '+' : ''}{diff.toFixed(1)} <span className="text-sm">kg</span>
+                      </div>
+                      <div className={`text-xs mt-0.5 ${isLoss ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {isLoss ? '▼ Bajada' : '▲ Subida'} en {weightData.length} registros
+                      </div>
+                    </div>
+                    <div className="card p-4 text-center hover:-translate-y-0.5 transition-transform">
+                      <div className="text-xs text-slate-400 mb-1">Peso actual</div>
+                      <div className="text-2xl font-bold font-mono text-white">{last.weight_kg} <span className="text-sm text-slate-400">kg</span></div>
+                      <div className="text-xs text-slate-500 mt-0.5">{formatDate(last.logged_at)}</div>
+                    </div>
+                  </div>
+                )
+              })()}
+
               {weightData.length >= 2 && (
                 <div className="card p-5">
                   <h3 className="text-sm font-semibold text-slate-300 mb-4">Evolución del peso (kg)</h3>
@@ -502,7 +655,10 @@ export default function ClientDetailPage() {
       {tab === 'citas' && (
         <div className="space-y-4 animate-fade-in">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-white">Próximas citas ({appointments.length})</h2>
+            <div>
+              <h2 className="font-semibold text-white">Próximas citas</h2>
+              <p className="text-xs text-slate-500 mt-0.5">{appointments.length} {appointments.length === 1 ? 'cita programada' : 'citas programadas'}</p>
+            </div>
             <button type="button" className="btn-primary" onClick={() => setShowAppointmentModal(true)}>
               <Plus size={16} /> Agendar cita
             </button>
@@ -512,7 +668,12 @@ export default function ClientDetailPage() {
           ) : (
             <div className="space-y-3">
               {appointments.map(apt => (
-                <div key={apt.id} className="card p-4 flex items-center gap-4">
+                <div key={apt.id} className={cn(
+                  'card p-4 flex items-center gap-4',
+                  apt.type === 'presencial' ? 'border-l-4 border-l-violet-500' :
+                  apt.type === 'online'     ? 'border-l-4 border-l-sky-500' :
+                                             'border-l-4 border-l-teal-500',
+                )}>
                   <div className="w-10 h-10 rounded-lg bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 flex items-center justify-center shrink-0">
                     <Clock size={18} className="text-[#0EA5E9]" />
                   </div>
@@ -553,12 +714,15 @@ export default function ClientDetailPage() {
                       {!isMine && (
                         <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" className="shrink-0 mr-2 mt-0.5" />
                       )}
-                      <div className={cn(
-                        'max-w-[70%] rounded-2xl px-4 py-2.5 text-sm',
-                        isMine
-                          ? 'bg-[#0EA5E9] text-white rounded-br-sm'
-                          : 'bg-[#334155] text-slate-200 rounded-bl-sm',
-                      )}>
+                      <div
+                        className={cn(
+                          'max-w-[70%] rounded-2xl px-4 py-2.5 text-sm',
+                          isMine
+                            ? 'text-white rounded-br-sm'
+                            : 'bg-[#334155] text-slate-200 rounded-bl-sm',
+                        )}
+                        style={isMine ? { background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' } : undefined}
+                      >
                         <p>{msg.content}</p>
                         <p className={cn('text-[10px] mt-1', isMine ? 'text-sky-200/70 text-right' : 'text-slate-400')}>
                           {timeAgo(msg.created_at)}
@@ -583,7 +747,7 @@ export default function ClientDetailPage() {
                 type="button"
                 onClick={sendMessage}
                 disabled={!messageText.trim() || sendingMessage}
-                className="btn-primary shrink-0 px-4"
+                className="btn-gradient shrink-0 px-4"
               >
                 <Send size={16} />
               </button>

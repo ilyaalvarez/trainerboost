@@ -267,7 +267,7 @@ export default function ClientsPage() {
         <div className="space-y-4">
           {/* Client card grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 stagger-children">
-            {paginated.map((client, idx) => {
+            {paginated.map((client) => {
               const profile = client.profile
 
               const statusBar: Record<string, string> = {

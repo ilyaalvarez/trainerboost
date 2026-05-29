@@ -359,7 +359,7 @@ export default function MessagesPage() {
                     key={convo.partnerId}
                     onClick={() => openConversation(convo)}
                     className={cn(
-                      'w-full flex items-start gap-3 px-4 py-3 text-left transition-colors',
+                      'w-full flex items-start gap-3 px-4 py-3 text-left transition-all duration-150',
                       'border-b border-[#334155]/50',
                       isActive
                         ? 'bg-[#0EA5E9]/10 border-l-2 border-l-[#0EA5E9]'
@@ -473,7 +473,7 @@ export default function MessagesPage() {
                             <div className={cn('max-w-[70%] flex flex-col', isMine ? 'items-end' : 'items-start')}>
                               <div
                                 className={cn(
-                                  'px-3.5 py-2 rounded-2xl text-sm leading-relaxed',
+                                  'px-3.5 py-2 rounded-2xl text-sm leading-relaxed animate-message-in',
                                   isMine
                                     ? 'bg-[#0EA5E9] text-white rounded-br-sm'
                                     : 'bg-[#334155] text-slate-100 rounded-bl-sm'
@@ -522,7 +522,7 @@ export default function MessagesPage() {
                   <button
                     onClick={sendMessage}
                     disabled={!draft.trim() || sending}
-                    className="btn-primary h-10 w-10 p-0 rounded-xl shrink-0 disabled:opacity-40"
+                    className="btn-primary h-10 w-10 p-0 rounded-xl shrink-0 disabled:opacity-40 active:scale-90 transition-transform duration-100"
                     title="Enviar"
                   >
                     {sending

@@ -125,7 +125,7 @@ export default function LandingPage() {
             >
               <Zap className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-white text-base tracking-tight">TrainerBoost</span>
+            <span className="font-bold text-base tracking-tight gradient-text">TrainerBoost</span>
           </div>
           <div className="flex items-center gap-1 animate-fade-in">
             <Link href="/pricing" className="text-sm text-slate-400 hover:text-white transition-colors duration-150 hidden md:block px-3 py-2 rounded-lg hover:bg-surface/70">Precios</Link>
@@ -364,14 +364,11 @@ export default function LandingPage() {
           <p className="text-slate-400 max-w-lg mx-auto">Desde la primera sesión hasta el seguimiento a largo plazo.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {FEATURES.map((feat, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 stagger-children">
+          {FEATURES.map((feat) => (
             <div
               key={feat.title}
-              className={`card-hover p-6 group animate-fade-in-up ${
-                i === 0 ? '' : i === 1 ? 'delay-75' : i === 2 ? 'delay-150' :
-                i === 3 ? 'delay-200' : i === 4 ? 'delay-300' : 'delay-400'
-              }`}
+              className="card-hover p-6 group"
             >
               <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg ${feat.bg}`}
                    style={{ ['--hover-shadow' as string]: `0 0 20px ${feat.glow}` }}>

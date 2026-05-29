@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Users, CalendarDays, MessageSquare, TrendingUp, Plus, Clock } from 'lucide-react'
+import { Users, CalendarDays, MessageSquare, TrendingUp, Plus, Clock, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { formatRelative, formatDate } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
@@ -64,6 +64,23 @@ export default async function DashboardPage() {
           <Plus className="w-4 h-4" /> Añadir cliente
         </Link>
       </div>
+
+      {/* ── Free plan CTA ─────────────────────────────────────────────── */}
+      {(!subscription || subscription.status === 'inactive') && (
+        <div className="rounded-xl border p-4 flex items-center justify-between gap-4 animate-fade-in-up"
+             style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.06), rgba(124,58,237,0.04))', borderColor: 'rgba(14,165,233,0.2)' }}>
+          <div className="flex items-center gap-3">
+            <Zap className="w-5 h-5 text-brand-primary shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-white">Activa tu plan para empezar a usar TrainerBoost</p>
+              <p className="text-xs text-slate-400 mt-0.5">Gestiona hasta 10 clientes desde 9€/mes</p>
+            </div>
+          </div>
+          <Link href="/pricing" className="btn-gradient shrink-0 text-sm py-1.5 px-4 flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5" /> Ver planes
+          </Link>
+        </div>
+      )}
 
       {/* ── Limit warning ─────────────────────────────────────────────── */}
       {subscription?.status === 'active' && maxClients < 999999 && activeClients >= maxClients && (

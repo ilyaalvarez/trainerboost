@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   const publicPrefixes = ['/_next', '/favicon', '/api/webhooks', '/pricing', '/demo']
-  const publicExact = ['/', '/login', '/register', '/onboarding']
+  const publicExact = ['/', '/login', '/register', '/onboarding', '/forgot-password', '/reset-password']
   const isPublic = publicPrefixes.some(p => path.startsWith(p)) || publicExact.includes(path)
 
   if (!user && !isPublic) {

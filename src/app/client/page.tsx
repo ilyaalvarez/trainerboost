@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { CalendarDays, MessageSquare, Dumbbell, ChevronRight } from 'lucide-react'
+import { CalendarDays, MessageSquare, Dumbbell, ChevronRight, Flame, Apple, TrendingUp } from 'lucide-react'
 import { formatDate, formatRelative } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -60,14 +60,28 @@ export default async function ClientHomePage() {
     ? (latestLog.weight_kg - prevLog.weight_kg).toFixed(1)
     : null
 
+  const now = new Date()
+  const hour = now.getHours()
+  const greeting = hour < 13 ? 'Buenos días' : hour < 20 ? 'Buenas tardes' : 'Buenas noches'
+
+  // Weekly streak: count distinct days with logs in the current week (Mon–Sun)
+  const startOfWeek = new Date(now)
+  startOfWeek.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))
+  startOfWeek.setHours(0, 0, 0, 0)
+  const daysWithLogsThisWeek = new Set(
+    (progressLogs ?? [])
+      .filter(l => new Date(l.logged_at) >= startOfWeek)
+      .map(l => l.logged_at.slice(0, 10))
+  ).size
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Greeting */}
       <div>
         <h1 className="text-2xl font-bold text-white">
-          Hola, {profile?.full_name?.split(' ')[0]} 👋
+          {greeting}, {profile?.full_name?.split(' ')[0]} 💪
         </h1>
-        <p className="text-slate-400 text-sm mt-0.5">{formatDate(new Date(), "EEEE, d MMMM")}</p>
+        <p className="text-slate-400 text-sm mt-0.5 capitalize">{formatDate(now, "EEEE, d MMMM")}</p>
       </div>
 
       {/* Trainer info */}
@@ -93,6 +107,24 @@ export default async function ClientHomePage() {
           </Link>
         </div>
       )}
+
+      {/* Weekly streak */}
+      <div className="card p-4 flex items-center gap-4"
+           style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(14,165,233,0.04))', borderColor: 'rgba(16,185,129,0.2)' }}>
+        <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+             style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.1))' }}>
+          <Flame className="w-6 h-6 text-brand-accent" />
+        </div>
+        <div>
+          <div className="text-sm font-semibold text-white">Racha semanal</div>
+          <div className="text-xs text-slate-400 mt-0.5">
+            {daysWithLogsThisWeek > 0
+              ? `${daysWithLogsThisWeek} día${daysWithLogsThisWeek > 1 ? 's' : ''} con registro esta semana`
+              : 'Registra tu progreso hoy para empezar tu racha'}
+          </div>
+        </div>
+        <div className="ml-auto text-3xl font-bold text-brand-accent shrink-0">{daysWithLogsThisWeek}/7</div>
+      </div>
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -170,6 +202,32 @@ export default async function ClientHomePage() {
           <ChevronRight className="w-4 h-4 text-slate-500" />
         </Link>
       )}
+
+      {/* Quick links */}
+      <div>
+        <h2 className="text-sm font-semibold text-slate-400 mb-3 uppercase tracking-wide">Accesos rápidos</h2>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { href: '/client/routine',   label: 'Mi Rutina',    icon: <Dumbbell className="w-6 h-6" />,   color: '#10B981' },
+            { href: '/client/nutrition', label: 'Nutrición',    icon: <Apple className="w-6 h-6" />,       color: '#0EA5E9' },
+            { href: '/client/progress',  label: 'Mi Progreso',  icon: <TrendingUp className="w-6 h-6" />,  color: '#7C3AED' },
+          ].map(({ href, label, icon, color }) => (
+            <Link
+              key={href}
+              href={href}
+              className="card p-4 flex flex-col items-center gap-2 text-center hover:border-slate-600 transition-colors group"
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110"
+                style={{ background: `${color}18`, color }}
+              >
+                {icon}
+              </div>
+              <span className="text-xs font-medium text-slate-300 group-hover:text-white transition-colors">{label}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

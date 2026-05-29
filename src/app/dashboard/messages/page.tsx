@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { toast } from 'sonner'
-import { Send, MessageSquare, Loader2, Search } from 'lucide-react'
+import { Send, MessageSquare, Loader2, Search, ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn, timeAgo, formatDate } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
@@ -53,6 +53,9 @@ export default function MessagesPage() {
   const [activeConvo, setActiveConvo]   = useState<Conversation | null>(null)
   const [messages, setMessages]         = useState<MessageWithSender[]>([])
   const [threadLoading, setThreadLoading] = useState(false)
+
+  // Mobile panel view
+  const [mobilePanelView, setMobilePanelView] = useState<'list' | 'thread'>('list')
 
   // Compose
   const [draft, setDraft]       = useState('')
@@ -140,6 +143,7 @@ export default function MessagesPage() {
   const openConversation = useCallback(async (convo: Conversation) => {
     if (!userId) return
     setActiveConvo(convo)
+    setMobilePanelView('thread')
     setMessages([])
     setThreadLoading(true)
 
@@ -317,7 +321,7 @@ export default function MessagesPage() {
         {/* ═══════════════════════════════════════════════════════════════
             LEFT PANEL — Conversation list
         ═══════════════════════════════════════════════════════════════ */}
-        <div className="w-72 flex-shrink-0 flex flex-col border-r border-[#334155]">
+        <div className={cn("flex-shrink-0 flex flex-col border-r border-[#334155] w-full md:w-72", mobilePanelView === 'thread' ? 'hidden md:flex' : 'flex')}>
           {/* Header */}
           <div className="px-4 py-4 border-b border-[#334155]">
             <h2 className="font-semibold text-white text-base mb-3">Mensajes</h2>
@@ -395,11 +399,17 @@ export default function MessagesPage() {
         {/* ═══════════════════════════════════════════════════════════════
             RIGHT PANEL — Chat thread
         ═══════════════════════════════════════════════════════════════ */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className={cn("flex-1 flex flex-col min-w-0", mobilePanelView === 'list' ? 'hidden md:flex' : 'flex')}>
           {activeConvo ? (
             <>
               {/* Thread header */}
               <div className="px-5 py-3.5 border-b border-[#334155] flex items-center gap-3 shrink-0">
+                <button
+                  onClick={() => { setMobilePanelView('list'); setActiveConvo(null) }}
+                  className="md:hidden p-1 -ml-1 text-slate-400 hover:text-white transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </button>
                 <Avatar
                   name={activeConvo.partner.full_name}
                   url={activeConvo.partner.avatar_url}

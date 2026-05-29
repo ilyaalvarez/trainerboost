@@ -19,7 +19,8 @@ export default function ClientAppointmentsPage() {
   const [past,     setPast]     = useState<AptWithTrainer[]>([])
   const [loading,  setLoading]  = useState(true)
   const [tab,      setTab]      = useState<'upcoming' | 'past'>('upcoming')
-  const [acting,   setActing]   = useState<string | null>(null)
+  const [acting,        setActing]        = useState<string | null>(null)
+  const [confirmCancel, setConfirmCancel] = useState<string | null>(null)
 
   const fetchApts = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -59,7 +60,8 @@ export default function ClientAppointmentsPage() {
   }
 
   async function cancelApt(id: string) {
-    if (!confirm('¿Cancelar esta cita?')) return
+    if (confirmCancel !== id) { setConfirmCancel(id); return }
+    setConfirmCancel(null)
     setActing(id)
     const { error } = await supabase.from('appointments')
       .update({ status: 'cancelled' }).eq('id', id)
@@ -126,7 +128,7 @@ export default function ClientAppointmentsPage() {
                 <div className="flex flex-col items-end gap-2 shrink-0">
                   <Badge status={apt.status} />
                   {tab === 'upcoming' && apt.status === 'pending' && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                       <button
                         onClick={() => confirmApt(apt.id)}
                         disabled={acting === apt.id}
@@ -137,13 +139,32 @@ export default function ClientAppointmentsPage() {
                           : <CheckCircle className="w-3 h-3" />}
                         Confirmar
                       </button>
-                      <button
-                        onClick={() => cancelApt(apt.id)}
-                        disabled={acting === apt.id}
-                        className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors"
-                      >
-                        <X className="w-3 h-3" /> Cancelar
-                      </button>
+                      {confirmCancel === apt.id ? (
+                        <>
+                          <span className="text-xs font-medium text-amber-400">¿Seguro?</span>
+                          <button
+                            onClick={() => cancelApt(apt.id)}
+                            disabled={acting === apt.id}
+                            className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors font-semibold"
+                          >
+                            Sí, cancelar
+                          </button>
+                          <button
+                            onClick={() => setConfirmCancel(null)}
+                            className="flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors"
+                          >
+                            No
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => cancelApt(apt.id)}
+                          disabled={acting === apt.id}
+                          className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors"
+                        >
+                          <X className="w-3 h-3" /> Cancelar
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

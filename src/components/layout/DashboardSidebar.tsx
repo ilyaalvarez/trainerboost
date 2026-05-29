@@ -31,9 +31,10 @@ interface Props {
   profile: Profile
   subscription: Subscription | null
   unreadMessages?: number
+  onClose?: () => void
 }
 
-export default function DashboardSidebar({ profile, subscription, unreadMessages = 0 }: Props) {
+export default function DashboardSidebar({ profile, subscription, unreadMessages = 0, onClose }: Props) {
   const pathname = usePathname()
   const router   = useRouter()
   const supabase = createClient()
@@ -97,6 +98,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ease-smooth-out group relative',
                 isActive
@@ -139,6 +141,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ease-smooth-out group',
                 isActive ? 'bg-surface-2 text-white' : 'text-slate-400 hover:bg-surface-2 hover:text-slate-200'

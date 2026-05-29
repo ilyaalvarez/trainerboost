@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import DashboardSidebar from '@/components/layout/DashboardSidebar'
+import DashboardShell from '@/components/layout/DashboardShell'
 import type { Profile, Subscription } from '@/types/database'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -22,17 +22,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (profile.role !== 'trainer') redirect('/client')
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      <DashboardSidebar
-        profile={profile as Profile}
-        subscription={subscription as Subscription | null}
-        unreadMessages={unread ?? 0}
-      />
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto p-6 lg:p-8">
-          {children}
-        </div>
-      </main>
-    </div>
+    <DashboardShell
+      profile={profile as Profile}
+      subscription={subscription as Subscription | null}
+      unreadMessages={unread ?? 0}
+    >
+      {children}
+    </DashboardShell>
   )
 }

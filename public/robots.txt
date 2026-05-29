@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /client/
+Disallow: /api/
+Sitemap: https://app.trainerboost.es/sitemap.xml

@@ -17,26 +17,31 @@ const colorMap: Record<NonNullable<StatsCardProps['color']>, {
   wrapper: string
   icon: string
   accent: string
+  glow: string
 }> = {
   primary:   {
     wrapper: 'bg-sky-500/10 ring-sky-500/20',
     icon:    'text-sky-400',
     accent:  'linear-gradient(90deg, #0EA5E9, #7C3AED)',
+    glow:    'rgba(14,165,233,0.15)',
   },
   accent:    {
     wrapper: 'bg-emerald-500/10 ring-emerald-500/20',
     icon:    'text-emerald-400',
     accent:  'linear-gradient(90deg, #10B981, #0EA5E9)',
+    glow:    'rgba(16,185,129,0.15)',
   },
   secondary: {
     wrapper: 'bg-violet-500/10 ring-violet-500/20',
     icon:    'text-violet-400',
     accent:  'linear-gradient(90deg, #7C3AED, #EC4899)',
+    glow:    'rgba(124,58,237,0.15)',
   },
   warning:   {
     wrapper: 'bg-amber-500/10 ring-amber-500/20',
     icon:    'text-amber-400',
     accent:  'linear-gradient(90deg, #F59E0B, #EF4444)',
+    glow:    'rgba(245,158,11,0.15)',
   },
 }
 
@@ -48,19 +53,29 @@ export default function StatsCard({
   color = 'primary',
   className,
 }: StatsCardProps) {
-  const { wrapper, icon: iconText, accent } = colorMap[color]
+  const { wrapper, icon: iconText, accent, glow } = colorMap[color]
 
   return (
     <div
       className={cn(
-        'relative flex flex-col gap-3 overflow-hidden',
+        'relative flex flex-col gap-3 overflow-hidden group cursor-default',
         'rounded-xl border border-[#334155] bg-[#1E293B]',
         'px-5 py-4',
-        'shadow-card hover:shadow-card-hover',
-        'transition-shadow duration-200',
+        'shadow-card',
+        'transition-all duration-300 ease-smooth-out',
+        'hover:-translate-y-1 hover:border-[#475569]',
         className,
       )}
+      style={{
+        ['--glow' as string]: glow,
+      }}
     >
+      {/* Hover glow overlay */}
+      <div
+        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{ boxShadow: `0 12px 28px -4px rgba(0,0,0,0.5), 0 0 0 1px ${glow}` }}
+      />
+
       {/* Colored top accent line */}
       <div
         className="absolute top-0 left-0 right-0 h-0.5 rounded-t-xl"
@@ -77,6 +92,7 @@ export default function StatsCard({
           className={cn(
             'flex items-center justify-center',
             'w-9 h-9 rounded-lg shrink-0 ring-1',
+            'transition-all duration-300 group-hover:scale-110',
             wrapper,
             iconText,
             '[&>svg]:w-[18px] [&>svg]:h-[18px]',

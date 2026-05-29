@@ -69,7 +69,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
       {/* ── Plan badge ────────────────────────────────────────────────── */}
       {subscription?.status === 'active' && (
         <div
-          className="mx-4 mt-3 px-3 py-2 rounded-lg border"
+          className="mx-4 mt-3 px-3 py-2 rounded-lg border transition-all duration-200 hover:shadow-glow-sm"
           style={{
             background: 'linear-gradient(135deg, rgba(14,165,233,0.08) 0%, rgba(124,58,237,0.05) 100%)',
             borderColor: 'rgba(14,165,233,0.25)',
@@ -97,7 +97,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group relative',
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ease-smooth-out group relative',
                 isActive
                   ? 'text-brand-primary'
                   : 'text-slate-400 hover:bg-surface-2 hover:text-slate-200'
@@ -109,13 +109,13 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
               {/* Active indicator */}
               {isActive && (
                 <span
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full shadow-glow-sm"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full shadow-glow-sm animate-glow"
                   style={{ background: 'linear-gradient(180deg, #38BDF8, #7C3AED)' }}
                 />
               )}
 
               <item.icon className={cn(
-                'w-4 h-4 shrink-0',
+                'w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110',
                 isActive ? 'text-brand-primary' : 'text-slate-500 group-hover:text-slate-300'
               )} />
               <span>{item.label}</span>
@@ -139,11 +139,11 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group',
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ease-smooth-out group',
                 isActive ? 'bg-surface-2 text-white' : 'text-slate-400 hover:bg-surface-2 hover:text-slate-200'
               )}
             >
-              <item.icon className="w-4 h-4 shrink-0 text-slate-500 group-hover:text-slate-300" />
+              <item.icon className="w-4 h-4 shrink-0 text-slate-500 group-hover:text-slate-300 transition-transform duration-200 group-hover:scale-110" />
               {item.label}
             </Link>
           )

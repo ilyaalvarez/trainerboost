@@ -48,13 +48,14 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
     : 'Gratuito'
 
   return (
-    <aside className="w-64 bg-surface border-r border-border flex flex-col shrink-0 h-full">
+    <aside className="w-64 border-r border-border flex flex-col shrink-0 h-full"
+           style={{ background: 'linear-gradient(180deg, #192035 0%, #1E293B 100%)' }}>
 
       {/* ── Logo ──────────────────────────────────────────────────────── */}
-      <div className="p-5 border-b border-border">
+      <div className="p-5 border-b border-border/60">
         <div className="flex items-center gap-3">
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center shadow-glow-sm shrink-0"
+            className="w-9 h-9 rounded-xl flex items-center justify-center shadow-glow-sm shrink-0 transition-transform duration-200 hover:scale-105"
             style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
           >
             <Zap className="w-4 h-4 text-white" />
@@ -131,7 +132,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
       </nav>
 
       {/* ── Bottom items ──────────────────────────────────────────────── */}
-      <div className="p-3 border-t border-border space-y-0.5">
+      <div className="p-3 border-t border-border/60 space-y-0.5">
         {BOTTOM_ITEMS.map(item => {
           const isActive = pathname.startsWith(item.href)
           return (
@@ -161,10 +162,10 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
             </div>
             <button
               onClick={logout}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all duration-150 group"
               title="Cerrar sesión"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <LogOut className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
             </button>
           </div>
         </div>

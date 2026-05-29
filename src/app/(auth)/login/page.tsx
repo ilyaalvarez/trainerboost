@@ -43,11 +43,28 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+
+      {/* Animated background orbs */}
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full pointer-events-none animate-float"
+           style={{ background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 70%)', animationDuration: '8s' }} />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full pointer-events-none animate-float"
+           style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%)', animationDuration: '10s', animationDelay: '2s' }} />
+      <div className="absolute top-3/4 left-1/2 w-48 h-48 rounded-full pointer-events-none animate-float"
+           style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%)', animationDuration: '12s', animationDelay: '4s' }} />
+
+      {/* Subtle grid */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.025]"
+           style={{
+             backgroundImage: `linear-gradient(#94a3b8 1px, transparent 1px), linear-gradient(90deg, #94a3b8 1px, transparent 1px)`,
+             backgroundSize: '64px 64px',
+           }} />
+
+      <div className="relative w-full max-w-md animate-fade-in-up">
+
         {/* Back */}
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-white transition-colors mb-8 group">
-          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform duration-200" />
           Volver al inicio
         </Link>
 
@@ -57,10 +74,11 @@ export default function LoginPage() {
                style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
             <Zap className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xl font-bold text-white">TrainerBoost</span>
+          <span className="text-xl font-bold text-white tracking-tight">TrainerBoost</span>
         </div>
 
-        <div className="card p-8">
+        <div className="card p-8"
+             style={{ boxShadow: '0 20px 60px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)' }}>
           <h1 className="text-2xl font-bold text-white mb-1">Bienvenido de nuevo</h1>
           <p className="text-slate-400 text-sm mb-6">Inicia sesión en tu cuenta</p>
 
@@ -88,7 +106,7 @@ export default function LoginPage() {
             <div>
               <label className="label">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                 <input
                   type="email"
                   value={email}
@@ -104,7 +122,7 @@ export default function LoginPage() {
             <div>
               <label className="label">Contraseña</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                 <input
                   type="password"
                   value={password}
@@ -120,7 +138,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full"
+              className="btn-gradient w-full py-2.5"
             >
               {loading
                 ? <><Loader2 className="w-4 h-4 animate-spin" /> Iniciando sesión...</>
@@ -131,13 +149,13 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-slate-400 mt-6">
           ¿No tienes cuenta?{' '}
-          <Link href="/register" className="text-brand-primary hover:underline font-medium">
+          <Link href="/register" className="text-brand-primary hover:underline font-medium transition-colors">
             Regístrate gratis
           </Link>
         </p>
         <p className="text-center text-xs text-slate-500 mt-3">
           ¿Quieres verlo antes?{' '}
-          <Link href="/demo" className="text-slate-400 hover:text-white transition-colors underline underline-offset-2">
+          <Link href="/demo" className="text-slate-400 hover:text-white transition-colors">
             Explorar demo →
           </Link>
         </p>

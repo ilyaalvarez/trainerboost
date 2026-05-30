@@ -93,13 +93,11 @@ export default function NutritionPage() {
 
       const [
         { data: plansData },
-        { data: mealsData },
         { data: tcData },
       ] = await Promise.all([
         supabase.from('meal_plans').select('*')
           .eq('trainer_id', user.id)
           .order('created_at', { ascending: false }),
-        supabase.from('meals').select('*').order('order_index'),
         supabase.from('trainer_clients')
           .select('client_id, profile:client_id(id, full_name, avatar_url, phone, bio, specialties, role, created_at, updated_at)')
           .eq('trainer_id', user.id),
@@ -109,10 +107,21 @@ export default function NutritionPage() {
       setClients(clientProfiles)
       const clientMap = Object.fromEntries(clientProfiles.map(c => [c.id, c]))
 
+      const planIds = (plansData ?? []).map((p: { id: string }) => p.id)
+      let fetchedMeals: Meal[] = []
+      if (planIds.length > 0) {
+        const { data: mealsData } = await supabase
+          .from('meals')
+          .select('*')
+          .in('meal_plan_id', planIds)
+          .order('order_index')
+        fetchedMeals = (mealsData ?? []) as Meal[]
+      }
+
       const enriched: MealPlanWithExtras[] = (plansData ?? []).map(p => ({
         ...p,
         client: clientMap[p.client_id] ?? null,
-        meals: (mealsData ?? []).filter(m => m.meal_plan_id === p.id) as Meal[],
+        meals: fetchedMeals.filter(m => m.meal_plan_id === p.id),
       }))
 
       setPlans(enriched)

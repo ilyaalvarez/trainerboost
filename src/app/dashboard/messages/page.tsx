@@ -272,6 +272,13 @@ export default function MessagesPage() {
 
       if (error) throw error
 
+      // Fire push notification to receiver (fire-and-forget)
+      fetch('/api/push/notify-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ receiverId: activeConvo.partnerId, content }),
+      }).catch(() => {})
+
       // Replace optimistic
       setMessages(prev =>
         prev.map(m => m.id === optimistic.id ? (data as MessageWithSender) : m)

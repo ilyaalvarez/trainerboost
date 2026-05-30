@@ -22,7 +22,7 @@ export const FREE_MAX_CLIENTS = 3
 
 export const PLAN_CONFIG: Record<PlanKey, PlanConfig> = {
   starter: {
-    name: 'Pro',
+    name: 'Starter',
     price: 19,
     maxClients: 10,
     features: [
@@ -35,12 +35,12 @@ export const PLAN_CONFIG: Record<PlanKey, PlanConfig> = {
     ],
   },
   pro: {
-    name: 'Business',
+    name: 'Pro',
     price: 39,
     maxClients: 30,
     features: [
       'Hasta 30 clientes',
-      'Todo de Pro',
+      'Todo de Starter',
       'Analytics avanzados',
       'Exportar datos a PDF',
       'Soporte prioritario',
@@ -48,12 +48,12 @@ export const PLAN_CONFIG: Record<PlanKey, PlanConfig> = {
     ],
   },
   unlimited: {
-    name: 'Enterprise',
+    name: 'Business',
     price: 79,
     maxClients: 999999,
     features: [
       'Clientes ilimitados',
-      'Todo de Business',
+      'Todo de Pro',
       'API access',
       'Integraciones premium',
       'Onboarding dedicado',

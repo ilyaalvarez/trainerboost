@@ -215,6 +215,18 @@ export default function AppointmentsPage() {
         if (notifError) console.error('Error sending appointment notification:', notifError)
       })
 
+      // Fire push notification to client (fire-and-forget)
+      fetch('/api/push/notify-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: form.client_id,
+          title: 'Nueva cita programada',
+          body: `Tienes una cita el ${formattedDate}`,
+          url: '/client/appointments',
+        }),
+      }).catch(() => {})
+
       setAppointments(prev => [...prev, data as AppointmentWithProfiles])
       toast.success('Cita creada correctamente')
       setModalOpen(false)

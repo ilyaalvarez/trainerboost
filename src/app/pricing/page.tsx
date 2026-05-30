@@ -96,6 +96,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export default function PricingPage() {
   const router = useRouter()
   const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null)
+  const [annual, setAnnual] = useState(false)
 
   async function handleCheckout(plan: PlanKey) {
     setLoadingPlan(plan)
@@ -146,6 +147,26 @@ export default function PricingPage() {
             Sin tarjeta de crédito. Sin sorpresas. Cancela en 1 clic.
           </p>
         </div>
+
+        {/* ── Billing toggle ─────────────────────────────────────────────── */}
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <span className={`text-sm ${!annual ? 'text-white' : 'text-slate-400'}`}>Mensual</span>
+          <button
+            onClick={() => setAnnual(v => !v)}
+            className={`relative w-11 h-6 rounded-full transition-colors ${annual ? 'bg-sky-500' : 'bg-slate-700'}`}
+            aria-label="Cambiar período de facturación"
+          >
+            <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${annual ? 'translate-x-6' : 'translate-x-1'}`} />
+          </button>
+          <span className={`text-sm ${annual ? 'text-white' : 'text-slate-400'}`}>
+            Anual <span className="text-emerald-400 font-semibold">-20%</span>
+          </span>
+        </div>
+        {annual && (
+          <p className="text-center text-xs text-slate-500 -mt-4 mb-8">
+            La facturación anual estará disponible próximamente.
+          </p>
+        )}
 
         {/* ── Plans grid ─────────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch mb-10 animate-fade-in-up delay-100">
@@ -220,9 +241,16 @@ export default function PricingPage() {
                 <div className="mb-5">
                   <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{plan.name}</div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold font-mono text-white">{plan.price}€</span>
+                    <span className="text-4xl font-bold font-mono text-white">
+                      {annual ? Math.floor(plan.price * 0.8) : plan.price}€
+                    </span>
                     <span className="text-slate-400 text-sm">/mes</span>
                   </div>
+                  {annual && (
+                    <p className="text-xs text-emerald-400 mt-1">
+                      {Math.floor(plan.price * 0.8 * 12)}€/año · ahorras {Math.floor(plan.price * 0.2 * 12)}€
+                    </p>
+                  )}
                   <p className="text-xs text-slate-500 mt-2">
                     {key === 'unlimited' ? 'Clientes ilimitados' : `Hasta ${plan.maxClients} clientes`}
                   </p>
@@ -241,20 +269,37 @@ export default function PricingPage() {
                   ))}
                 </ul>
 
-                <button
-                  onClick={() => handleCheckout(key)}
-                  disabled={!!loadingPlan}
-                  className={cn(
-                    'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2',
-                    isPopular
-                      ? 'btn-gradient'
-                      : 'bg-surface-2 border border-border hover:border-border-bright text-white hover:bg-surface-3 hover:-translate-y-0.5',
-                  )}
-                >
-                  {loadingPlan === key
-                    ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Procesando...</>
-                    : `Empezar con ${plan.name}`}
-                </button>
+                {annual ? (
+                  <a
+                    href={`mailto:hola@trainerboost.es?subject=Facturación anual TrainerBoost – Plan ${plan.name}`}
+                    className={cn(
+                      'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2',
+                      isPopular
+                        ? 'btn-gradient'
+                        : 'bg-surface-2 border border-border hover:border-border-bright text-white hover:bg-surface-3 hover:-translate-y-0.5',
+                    )}
+                  >
+                    Notifícame
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => handleCheckout(key)}
+                    disabled={!!loadingPlan}
+                    className={cn(
+                      'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2',
+                      isPopular
+                        ? 'btn-gradient'
+                        : 'bg-surface-2 border border-border hover:border-border-bright text-white hover:bg-surface-3 hover:-translate-y-0.5',
+                    )}
+                  >
+                    {loadingPlan === key
+                      ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Procesando...</>
+                      : 'Probar 14 días gratis'}
+                  </button>
+                )}
+                <p className="text-xs text-slate-500 mt-1 text-center">
+                  {annual ? 'Próximamente · Sin compromiso' : '14 días gratis · Sin compromiso'}
+                </p>
               </div>
             )
           })}

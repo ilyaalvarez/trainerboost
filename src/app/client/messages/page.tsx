@@ -87,6 +87,14 @@ export default function ClientMessagesPage() {
 
     setSending(false)
     if (error) { toast.error(error.message); return }
+
+    // Fire push notification to trainer (fire-and-forget)
+    fetch('/api/push/notify-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ receiverId: trainer.id, content: input.trim() }),
+    }).catch(() => {})
+
     setInput('')
     fetchMessages(myId)
   }

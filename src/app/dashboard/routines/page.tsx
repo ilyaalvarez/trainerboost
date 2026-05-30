@@ -81,6 +81,11 @@ export default function RoutinesPage() {
   const [showLibraryForm, setShowLibraryForm] = useState(false)
   const [editingExercise, setEditingExercise] = useState<LibraryExercise | null>(null)
 
+  const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null)
+  const [prefillExercise, setPrefillExercise] = useState<{
+    name: string; sets: number | null; reps: string | null; rest_seconds: number | null; notes: string | null; video_url: string | null
+  } | null>(null)
+
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
@@ -90,14 +95,12 @@ export default function RoutinesPage() {
 
       const [
         { data: routinesData },
-        { data: exercisesData },
         { data: tcData },
         { data: libData },
       ] = await Promise.all([
         supabase.from('routines').select('*')
           .eq('trainer_id', user.id)
           .order('created_at', { ascending: false }),
-        supabase.from('routine_exercises').select('*').order('order_index'),
         supabase.from('trainer_clients')
           .select('client_id, profile:client_id(id, full_name, avatar_url, phone, bio, specialties, role, created_at, updated_at)')
           .eq('trainer_id', user.id),
@@ -111,10 +114,21 @@ export default function RoutinesPage() {
 
       const clientMap = Object.fromEntries(clientProfiles.map(c => [c.id, c]))
 
+      const routineIds = (routinesData ?? []).map((r: { id: string }) => r.id)
+      let fetchedExercises: RoutineExercise[] = []
+      if (routineIds.length > 0) {
+        const { data: exData } = await supabase
+          .from('routine_exercises')
+          .select('*')
+          .in('routine_id', routineIds)
+          .order('order_index')
+        fetchedExercises = (exData ?? []) as RoutineExercise[]
+      }
+
       const enriched: RoutineWithExtras[] = (routinesData ?? []).map(r => ({
         ...r,
         status: r.status as RoutineStatus,
-        exercises: (exercisesData ?? []).filter(e => e.routine_id === r.id),
+        exercises: fetchedExercises.filter(e => e.routine_id === r.id),
         client: clientMap[r.client_id] ?? null,
       }))
 
@@ -321,6 +335,7 @@ export default function RoutinesPage() {
                   onArchive={() => archiveRoutine(routine.id, routine.status)}
                   onDuplicate={() => duplicateRoutine(routine.id)}
                   isDuplicating={duplicating.has(routine.id)}
+                  onEdit={(r) => setEditingRoutine(r)}
                 />
               ))}
             </div>
@@ -341,16 +356,31 @@ export default function RoutinesPage() {
           onOpenEdit={(ex) => { setEditingExercise(ex); setShowLibraryForm(true) }}
           onCloseForm={() => { setShowLibraryForm(false); setEditingExercise(null) }}
           onSaved={(updated) => setLibraryExercises(updated)}
+          onUse={(ex) => {
+            setPrefillExercise({ name: ex.name, sets: ex.default_sets, reps: ex.default_reps, rest_seconds: ex.default_rest, notes: ex.description, video_url: ex.video_url })
+            setActiveTab('routines')
+            setShowModal(true)
+          }}
         />
       )}
 
-      {/* Modal */}
+      {/* New Routine Modal */}
       <NewRoutineModal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => { setShowModal(false); setPrefillExercise(null) }}
         trainerId={trainerId!}
         clients={clients}
-        onSuccess={() => { setShowModal(false); loadData() }}
+        onSuccess={() => { setShowModal(false); setPrefillExercise(null); loadData() }}
+        prefill={prefillExercise}
+      />
+
+      {/* Edit Routine Modal */}
+      <EditRoutineModal
+        routine={editingRoutine}
+        onClose={() => setEditingRoutine(null)}
+        trainerId={trainerId!}
+        clients={clients}
+        onSuccess={() => { setEditingRoutine(null); loadData() }}
       />
     </div>
   )
@@ -358,13 +388,14 @@ export default function RoutinesPage() {
 
 // ─── Routine Card ─────────────────────────────────────────────────────────────
 
-function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDuplicating }: {
+function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDuplicating, onEdit }: {
   routine: RoutineWithExtras
   expanded: boolean
   onToggle: () => void
   onArchive: () => void
   onDuplicate: () => void
   isDuplicating: boolean
+  onEdit: (routine: Routine) => void
 }) {
   return (
     <div className={cn('card overflow-hidden', routine.status === 'archived' && 'opacity-60')}>
@@ -459,6 +490,13 @@ function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDu
             </button>
             <button
               type="button"
+              onClick={() => onEdit(routine)}
+              className="btn-ghost text-xs py-1 px-2 flex items-center gap-1"
+            >
+              <Pencil className="w-3 h-3" /> Editar
+            </button>
+            <button
+              type="button"
               onClick={onDuplicate}
               disabled={isDuplicating}
               className="btn-ghost text-xs py-1 px-2 flex items-center gap-1"
@@ -474,12 +512,15 @@ function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDu
 
 // ─── New Routine Modal (Multi-step) ───────────────────────────────────────────
 
-function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
+function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefill }: {
   isOpen: boolean
   onClose: () => void
   trainerId: string
   clients: Profile[]
   onSuccess: () => void
+  prefill?: {
+    name: string; sets: number | null; reps: string | null; rest_seconds: number | null; notes: string | null; video_url: string | null
+  } | null
 }) {
   const supabase = createClient()
   const [step, setStep] = useState(1)
@@ -494,12 +535,36 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
   // Step 2 exercises
   const [exercises, setExercises] = useState<ExerciseDraft[]>([blankExercise()])
 
+  // When a prefill exercise is provided, inject it into step 2
+  useEffect(() => {
+    if (prefill) {
+      setExercises(prev => [...prev, {
+        id: crypto.randomUUID(),
+        name: prefill.name,
+        sets: prefill.sets?.toString() ?? '3',
+        reps: prefill.reps ?? '10',
+        rest_seconds: prefill.rest_seconds?.toString() ?? '60',
+        notes: prefill.notes ?? '',
+        video_url: prefill.video_url ?? '',
+      }])
+    }
+  }, [prefill])
+
   const resetAndClose = () => {
     setStep(1)
     setForm({ title: '', description: '', frequency: '', client_id: '', starts_at: '', ends_at: '' })
     setExercises([blankExercise()])
     onClose()
   }
+
+  // Reset exercises list when modal is closed/reopened so prefill is clean
+  useEffect(() => {
+    if (!isOpen) {
+      setStep(1)
+      setForm({ title: '', description: '', frequency: '', client_id: '', starts_at: '', ends_at: '' })
+      setExercises([blankExercise()])
+    }
+  }, [isOpen])
 
   const handleStep1 = (e: React.FormEvent) => {
     e.preventDefault()
@@ -720,6 +785,286 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
   )
 }
 
+// ─── Edit Routine Modal ───────────────────────────────────────────────────────
+
+function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
+  routine: Routine | null
+  onClose: () => void
+  trainerId?: string
+  clients: Profile[]
+  onSuccess: () => void
+}) {
+  const supabase = createClient()
+  const [step, setStep] = useState(1)
+  const [saving, setSaving] = useState(false)
+  const [loadingExercises, setLoadingExercises] = useState(false)
+
+  const [form, setForm] = useState({
+    title: '', description: '', frequency: '',
+    client_id: '', starts_at: '', ends_at: '',
+  })
+
+  const [exercises, setExercises] = useState<ExerciseDraft[]>([blankExercise()])
+
+  // When routine changes (modal opens), populate form and fetch exercises
+  useEffect(() => {
+    if (!routine) return
+    setStep(1)
+    setForm({
+      title:       routine.title,
+      description: routine.description ?? '',
+      frequency:   routine.frequency ?? '',
+      client_id:   routine.client_id,
+      starts_at:   routine.starts_at ?? '',
+      ends_at:     routine.ends_at ?? '',
+    })
+    setLoadingExercises(true)
+    supabase
+      .from('routine_exercises')
+      .select('*')
+      .eq('routine_id', routine.id)
+      .order('order_index')
+      .then(({ data, error }) => {
+        setLoadingExercises(false)
+        if (error) { toast.error('Error al cargar ejercicios: ' + error.message); return }
+        const loaded: ExerciseDraft[] = (data ?? []).map((ex: RoutineExercise) => ({
+          id: ex.id,
+          name: ex.name,
+          sets: ex.sets?.toString() ?? '',
+          reps: ex.reps ?? '',
+          rest_seconds: ex.rest_seconds?.toString() ?? '',
+          notes: ex.notes ?? '',
+          video_url: ex.video_url ?? '',
+        }))
+        setExercises(loaded.length > 0 ? loaded : [blankExercise()])
+      })
+  }, [routine]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleStep1 = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!form.title.trim()) { toast.error('El título es obligatorio'); return }
+    if (!form.client_id) { toast.error('Selecciona un cliente'); return }
+    setStep(2)
+  }
+
+  const handleSave = async () => {
+    if (!routine) return
+    setSaving(true)
+
+    const { error: updateError } = await supabase
+      .from('routines')
+      .update({
+        title:       form.title.trim(),
+        description: form.description.trim() || null,
+        frequency:   form.frequency || null,
+        client_id:   form.client_id,
+        starts_at:   form.starts_at || null,
+        ends_at:     form.ends_at || null,
+      })
+      .eq('id', routine.id)
+
+    if (updateError) {
+      toast.error('Error al actualizar rutina: ' + updateError.message)
+      setSaving(false)
+      return
+    }
+
+    // DELETE all existing exercises and re-INSERT
+    const { error: deleteError } = await supabase
+      .from('routine_exercises')
+      .delete()
+      .eq('routine_id', routine.id)
+
+    if (deleteError) {
+      toast.error('Error al actualizar ejercicios: ' + deleteError.message)
+      setSaving(false)
+      return
+    }
+
+    const validExercises = exercises.filter(e => e.name.trim())
+    if (validExercises.length > 0) {
+      const { error: insertError } = await supabase.from('routine_exercises').insert(
+        validExercises.map((ex, i) => ({
+          routine_id:   routine.id,
+          name:         ex.name.trim(),
+          sets:         ex.sets ? Number(ex.sets) : null,
+          reps:         ex.reps.trim() || null,
+          rest_seconds: ex.rest_seconds ? Number(ex.rest_seconds) : null,
+          notes:        ex.notes.trim() || null,
+          video_url:    ex.video_url.trim() || null,
+          order_index:  i,
+        }))
+      )
+      if (insertError) {
+        toast.error('Rutina actualizada pero error en ejercicios: ' + insertError.message)
+      }
+    }
+
+    setSaving(false)
+    toast.success('Rutina actualizada')
+    onClose()
+    onSuccess()
+  }
+
+  const addExercise = () => setExercises(prev => [...prev, blankExercise()])
+  const removeExercise = (id: string) => setExercises(prev => prev.filter(e => e.id !== id))
+  const updateExercise = (id: string, field: keyof ExerciseDraft, value: string) => {
+    setExercises(prev => prev.map(e => e.id === id ? { ...e, [field]: value } : e))
+  }
+  const moveExercise = (index: number, dir: -1 | 1) => {
+    setExercises(prev => {
+      const arr = [...prev]
+      const target = index + dir
+      if (target < 0 || target >= arr.length) return arr;
+      [arr[index], arr[target]] = [arr[target], arr[index]]
+      return arr
+    })
+  }
+
+  return (
+    <Modal isOpen={!!routine} onClose={onClose} title={`Editar rutina · Paso ${step} de 2`} size="lg">
+      {/* Step indicator */}
+      <div className="flex gap-2 mb-6">
+        {[1, 2].map(s => (
+          <div key={s} className={cn(
+            'flex-1 h-1.5 rounded-full transition-all',
+            s <= step ? 'bg-[#0EA5E9]' : 'bg-[#334155]',
+          )} />
+        ))}
+      </div>
+
+      {/* Step 1: Basic info */}
+      {step === 1 && (
+        <form onSubmit={handleStep1} className="space-y-4">
+          <div>
+            <label className="label">Título *</label>
+            <input className="input" placeholder="Ej: Programa fuerza 8 semanas" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} />
+          </div>
+          <div>
+            <label className="label">Descripción</label>
+            <textarea className="input resize-none" rows={2} placeholder="Objetivos, indicaciones generales..." value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} />
+          </div>
+          <div>
+            <label className="label">Frecuencia</label>
+            <select className="input" value={form.frequency} onChange={e => setForm(p => ({ ...p, frequency: e.target.value }))}>
+              <option value="">Seleccionar...</option>
+              {FREQUENCY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="label flex items-center gap-1"><Users size={11} /> Cliente *</label>
+            {clients.length === 0 ? (
+              <p className="text-sm text-slate-400 py-2">No tienes clientes activos.</p>
+            ) : (
+              <select className="input" value={form.client_id} onChange={e => setForm(p => ({ ...p, client_id: e.target.value }))}>
+                <option value="">Seleccionar cliente...</option>
+                {clients.map(c => <option key={c.id} value={c.id}>{c.full_name}</option>)}
+              </select>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Fecha inicio</label>
+              <input type="date" className="input" value={form.starts_at} onChange={e => setForm(p => ({ ...p, starts_at: e.target.value }))} />
+            </div>
+            <div>
+              <label className="label">Fecha fin</label>
+              <input type="date" className="input" value={form.ends_at} onChange={e => setForm(p => ({ ...p, ends_at: e.target.value }))} />
+            </div>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancelar</button>
+            <button type="submit" className="btn-primary flex-1">
+              Siguiente → Ejercicios
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* Step 2: Exercises builder */}
+      {step === 2 && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-300">Ejercicios de <span className="font-semibold text-white">&ldquo;{form.title}&rdquo;</span></p>
+            <span className="text-xs text-slate-500">{exercises.length} ejercicios</span>
+          </div>
+
+          {loadingExercises ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="w-6 h-6 rounded-full border-2 border-[#0EA5E9] border-t-transparent animate-spin" />
+            </div>
+          ) : (
+            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+              {exercises.map((ex, i) => (
+                <div key={ex.id} className="rounded-lg border border-[#334155] bg-[#0F172A]/40 p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-0.5">
+                      <button type="button" onClick={() => moveExercise(i, -1)} disabled={i === 0} className="text-slate-500 hover:text-slate-200 disabled:opacity-25 transition-colors">
+                        <ChevronUp size={14} />
+                      </button>
+                      <button type="button" onClick={() => moveExercise(i, 1)} disabled={i === exercises.length - 1} className="text-slate-500 hover:text-slate-200 disabled:opacity-25 transition-colors">
+                        <ChevronDown size={14} />
+                      </button>
+                    </div>
+                    <GripVertical size={15} className="text-slate-600" />
+                    <div className="flex-1 min-w-0">
+                      <input
+                        className="input text-sm"
+                        placeholder={`Ejercicio ${i + 1} (ej: Sentadilla)`}
+                        value={ex.name}
+                        onChange={e => updateExercise(ex.id, 'name', e.target.value)}
+                      />
+                    </div>
+                    <button type="button" onClick={() => removeExercise(ex.id)} className="text-slate-500 hover:text-red-400 transition-colors shrink-0">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="label text-[10px]">Series</label>
+                      <input type="number" className="input text-xs" placeholder="4" value={ex.sets} onChange={e => updateExercise(ex.id, 'sets', e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="label text-[10px]">Reps</label>
+                      <input className="input text-xs" placeholder="8-12" value={ex.reps} onChange={e => updateExercise(ex.id, 'reps', e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="label text-[10px]">Descanso (s)</label>
+                      <input type="number" className="input text-xs" placeholder="90" value={ex.rest_seconds} onChange={e => updateExercise(ex.id, 'rest_seconds', e.target.value)} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="label text-[10px]">Notas</label>
+                    <input className="input text-xs" placeholder="Indicaciones técnicas..." value={ex.notes} onChange={e => updateExercise(ex.id, 'notes', e.target.value)} />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <LinkIcon size={12} className="text-slate-500 shrink-0" />
+                    <input className="input text-xs" placeholder="URL vídeo (opcional)" value={ex.video_url} onChange={e => updateExercise(ex.id, 'video_url', e.target.value)} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button type="button" onClick={addExercise} className="btn-secondary w-full text-sm border-dashed">
+            <Plus size={15} /> Añadir ejercicio
+          </button>
+
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={() => setStep(1)} className="btn-secondary flex-1">← Atrás</button>
+            <button type="button" onClick={handleSave} disabled={saving} className="btn-primary flex-1">
+              {saving ? 'Guardando...' : 'Guardar cambios'}
+            </button>
+          </div>
+        </div>
+      )}
+    </Modal>
+  )
+}
+
 // ─── Exercise Library Panel ───────────────────────────────────────────────────
 
 const CATEGORY_OPTIONS = ['fuerza', 'cardio', 'flexibilidad', 'funcional'] as const
@@ -758,6 +1103,7 @@ function ExerciseLibraryPanel({
   onOpenEdit,
   onCloseForm,
   onSaved,
+  onUse,
 }: {
   exercises: LibraryExercise[]
   search: string
@@ -769,6 +1115,7 @@ function ExerciseLibraryPanel({
   onOpenEdit: (ex: LibraryExercise) => void
   onCloseForm: () => void
   onSaved: (updated: LibraryExercise[]) => void
+  onUse: (ex: LibraryExercise) => void
 }) {
   const supabase = createClient()
   const [saving, setSaving] = useState(false)
@@ -1021,10 +1368,7 @@ function ExerciseLibraryPanel({
               <div className="flex items-center gap-1 mt-auto pt-1 border-t border-[#334155]">
                 <button
                   type="button"
-                  onClick={() => toast.info(
-                    `Añadir: ${ex.name} · ${ex.default_sets ?? '?'} series × ${ex.default_reps ?? '?'} reps`,
-                    { duration: 4000 }
-                  )}
+                  onClick={() => onUse(ex)}
                   className="btn-secondary text-xs py-1 px-2 flex items-center gap-1"
                 >
                   <Plus size={12} /> Usar

@@ -7,6 +7,7 @@ import {
   Dumbbell, Plus, Search, ChevronDown, ChevronUp,
   Archive, RotateCcw, GripVertical,
   Link as LinkIcon, X, Users, Copy,
+  BookOpen, Pencil, Trash2,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -20,6 +21,20 @@ import type { Profile, Routine, RoutineExercise, RoutineStatus } from '@/types/d
 interface RoutineWithExtras extends Routine {
   exercises: RoutineExercise[]
   client: Profile | null
+}
+
+interface LibraryExercise {
+  id: string
+  trainer_id: string
+  name: string
+  description: string | null
+  category: string | null
+  muscle_group: string | null
+  video_url: string | null
+  default_sets: number | null
+  default_reps: string | null
+  default_rest: number | null
+  created_at: string
 }
 
 interface ExerciseDraft {
@@ -51,6 +66,8 @@ export default function RoutinesPage() {
   const [trainerId, setTrainerId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const [activeTab, setActiveTab] = useState<'routines' | 'library'>('routines')
+
   const [search, setSearch] = useState('')
   const [filterClient, setFilterClient] = useState('')
   const [filterStatus, setFilterStatus] = useState<RoutineStatus | ''>('')
@@ -58,6 +75,11 @@ export default function RoutinesPage() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [showModal, setShowModal] = useState(false)
   const [duplicating, setDuplicating] = useState<Set<string>>(new Set())
+
+  const [libraryExercises, setLibraryExercises] = useState<LibraryExercise[]>([])
+  const [librarySearch, setLibrarySearch] = useState('')
+  const [showLibraryForm, setShowLibraryForm] = useState(false)
+  const [editingExercise, setEditingExercise] = useState<LibraryExercise | null>(null)
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -70,6 +92,7 @@ export default function RoutinesPage() {
         { data: routinesData },
         { data: exercisesData },
         { data: tcData },
+        { data: libData },
       ] = await Promise.all([
         supabase.from('routines').select('*')
           .eq('trainer_id', user.id)
@@ -78,7 +101,10 @@ export default function RoutinesPage() {
         supabase.from('trainer_clients')
           .select('client_id, profile:client_id(id, full_name, avatar_url, phone, bio, specialties, role, created_at, updated_at)')
           .eq('trainer_id', user.id),
+        supabase.from('exercise_library').select('*').eq('trainer_id', user.id).order('name'),
       ])
+
+      setLibraryExercises((libData ?? []) as LibraryExercise[])
 
       const clientProfiles: Profile[] = (tcData ?? []).map(tc => tc.profile as unknown as Profile).filter(Boolean)
       setClients(clientProfiles)
@@ -194,72 +220,128 @@ export default function RoutinesPage() {
           <h1 className="text-2xl font-bold text-white">Rutinas</h1>
           <p className="text-slate-400 text-sm mt-0.5">Gestiona los programas de entrenamiento</p>
         </div>
-        <button type="button" className="btn-primary" onClick={() => setShowModal(true)}>
-          <Plus size={16} /> Nueva rutina
+        {activeTab === 'routines' && (
+          <button type="button" className="btn-primary" onClick={() => setShowModal(true)}>
+            <Plus size={16} /> Nueva rutina
+          </button>
+        )}
+        {activeTab === 'library' && (
+          <button type="button" className="btn-primary" onClick={() => { setEditingExercise(null); setShowLibraryForm(true) }}>
+            <Plus size={16} /> Nuevo ejercicio
+          </button>
+        )}
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-[#334155]">
+        <button
+          type="button"
+          onClick={() => setActiveTab('routines')}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
+            activeTab === 'routines'
+              ? 'border-[#0EA5E9] text-[#0EA5E9]'
+              : 'border-transparent text-slate-400 hover:text-slate-200',
+          )}
+        >
+          <Dumbbell size={15} /> Rutinas
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('library')}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
+            activeTab === 'library'
+              ? 'border-[#0EA5E9] text-[#0EA5E9]'
+              : 'border-transparent text-slate-400 hover:text-slate-200',
+          )}
+        >
+          <BookOpen size={15} /> Biblioteca de ejercicios
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[180px]">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            className="input pl-9"
-            placeholder="Buscar rutinas..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
-        <select
-          className="input w-auto"
-          value={filterClient}
-          onChange={e => setFilterClient(e.target.value)}
-        >
-          <option value="">Todos los clientes</option>
-          {clients.map(c => <option key={c.id} value={c.id}>{c.full_name}</option>)}
-        </select>
-        <select
-          className="input w-auto"
-          value={filterStatus}
-          onChange={e => setFilterStatus(e.target.value as RoutineStatus | '')}
-        >
-          <option value="">Todos los estados</option>
-          <option value="active">Activas</option>
-          <option value="archived">Archivadas</option>
-        </select>
-      </div>
+      {/* ── Routines tab ── */}
+      {activeTab === 'routines' && (
+        <>
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3">
+            <div className="relative flex-1 min-w-[180px]">
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                className="input pl-9"
+                placeholder="Buscar rutinas..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
+            <select
+              className="input w-auto"
+              value={filterClient}
+              onChange={e => setFilterClient(e.target.value)}
+            >
+              <option value="">Todos los clientes</option>
+              {clients.map(c => <option key={c.id} value={c.id}>{c.full_name}</option>)}
+            </select>
+            <select
+              className="input w-auto"
+              value={filterStatus}
+              onChange={e => setFilterStatus(e.target.value as RoutineStatus | '')}
+            >
+              <option value="">Todos los estados</option>
+              <option value="active">Activas</option>
+              <option value="archived">Archivadas</option>
+            </select>
+          </div>
 
-      {/* Stats */}
-      <div className="flex gap-4 text-sm">
-        <span className="text-slate-400">{filtered.length} rutinas</span>
-        <span className="text-slate-500">·</span>
-        <span className="text-slate-400">{routines.filter(r => r.status === 'active').length} activas</span>
-        <span className="text-slate-500">·</span>
-        <span className="text-slate-400">{routines.filter(r => r.status === 'archived').length} archivadas</span>
-      </div>
+          {/* Stats */}
+          <div className="flex gap-4 text-sm">
+            <span className="text-slate-400">{filtered.length} rutinas</span>
+            <span className="text-slate-500">·</span>
+            <span className="text-slate-400">{routines.filter(r => r.status === 'active').length} activas</span>
+            <span className="text-slate-500">·</span>
+            <span className="text-slate-400">{routines.filter(r => r.status === 'archived').length} archivadas</span>
+          </div>
 
-      {/* Grid */}
-      {filtered.length === 0 ? (
-        <EmptyState
-          icon={<Dumbbell />}
-          title={search || filterClient || filterStatus ? 'Sin resultados' : 'Sin rutinas todavía'}
-          description={search || filterClient || filterStatus ? 'Prueba con otros filtros.' : 'Crea la primera rutina para uno de tus clientes.'}
-          action={!search && !filterClient && !filterStatus ? { label: 'Nueva rutina', onClick: () => setShowModal(true) } : undefined}
-        />
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {filtered.map(routine => (
-            <RoutineCard
-              key={routine.id}
-              routine={routine}
-              expanded={expanded.has(routine.id)}
-              onToggle={() => toggleExpand(routine.id)}
-              onArchive={() => archiveRoutine(routine.id, routine.status)}
-              onDuplicate={() => duplicateRoutine(routine.id)}
-              isDuplicating={duplicating.has(routine.id)}
+          {/* Grid */}
+          {filtered.length === 0 ? (
+            <EmptyState
+              icon={<Dumbbell />}
+              title={search || filterClient || filterStatus ? 'Sin resultados' : 'Sin rutinas todavía'}
+              description={search || filterClient || filterStatus ? 'Prueba con otros filtros.' : 'Crea la primera rutina para uno de tus clientes.'}
+              action={!search && !filterClient && !filterStatus ? { label: 'Nueva rutina', onClick: () => setShowModal(true) } : undefined}
             />
-          ))}
-        </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {filtered.map(routine => (
+                <RoutineCard
+                  key={routine.id}
+                  routine={routine}
+                  expanded={expanded.has(routine.id)}
+                  onToggle={() => toggleExpand(routine.id)}
+                  onArchive={() => archiveRoutine(routine.id, routine.status)}
+                  onDuplicate={() => duplicateRoutine(routine.id)}
+                  isDuplicating={duplicating.has(routine.id)}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── Library tab ── */}
+      {activeTab === 'library' && (
+        <ExerciseLibraryPanel
+          exercises={libraryExercises}
+          search={librarySearch}
+          onSearchChange={setLibrarySearch}
+          showForm={showLibraryForm}
+          editingExercise={editingExercise}
+          trainerId={trainerId!}
+          onOpenCreate={() => { setEditingExercise(null); setShowLibraryForm(true) }}
+          onOpenEdit={(ex) => { setEditingExercise(ex); setShowLibraryForm(true) }}
+          onCloseForm={() => { setShowLibraryForm(false); setEditingExercise(null) }}
+          onSaved={(updated) => setLibraryExercises(updated)}
+        />
       )}
 
       {/* Modal */}
@@ -635,5 +717,337 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
         </div>
       )}
     </Modal>
+  )
+}
+
+// ─── Exercise Library Panel ───────────────────────────────────────────────────
+
+const CATEGORY_OPTIONS = ['fuerza', 'cardio', 'flexibilidad', 'funcional'] as const
+type Category = typeof CATEGORY_OPTIONS[number]
+
+const CATEGORY_COLORS: Record<Category, string> = {
+  fuerza:       'bg-[#0EA5E9]/15 text-[#0EA5E9]',
+  cardio:       'bg-[#F59E0B]/15 text-[#F59E0B]',
+  flexibilidad: 'bg-[#10B981]/15 text-[#10B981]',
+  funcional:    'bg-[#A78BFA]/15 text-[#A78BFA]',
+}
+
+interface LibraryFormState {
+  name: string
+  category: string
+  muscle_group: string
+  video_url: string
+  default_sets: string
+  default_reps: string
+  default_rest: string
+  description: string
+}
+
+function blankLibraryForm(): LibraryFormState {
+  return { name: '', category: '', muscle_group: '', video_url: '', default_sets: '', default_reps: '', default_rest: '', description: '' }
+}
+
+function ExerciseLibraryPanel({
+  exercises,
+  search,
+  onSearchChange,
+  showForm,
+  editingExercise,
+  trainerId,
+  onOpenCreate,
+  onOpenEdit,
+  onCloseForm,
+  onSaved,
+}: {
+  exercises: LibraryExercise[]
+  search: string
+  onSearchChange: (v: string) => void
+  showForm: boolean
+  editingExercise: LibraryExercise | null
+  trainerId: string
+  onOpenCreate: () => void
+  onOpenEdit: (ex: LibraryExercise) => void
+  onCloseForm: () => void
+  onSaved: (updated: LibraryExercise[]) => void
+}) {
+  const supabase = createClient()
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<LibraryFormState>(blankLibraryForm())
+
+  // Sync form when opening edit
+  useEffect(() => {
+    if (showForm) {
+      if (editingExercise) {
+        setForm({
+          name:          editingExercise.name,
+          category:      editingExercise.category ?? '',
+          muscle_group:  editingExercise.muscle_group ?? '',
+          video_url:     editingExercise.video_url ?? '',
+          default_sets:  editingExercise.default_sets?.toString() ?? '',
+          default_reps:  editingExercise.default_reps ?? '',
+          default_rest:  editingExercise.default_rest?.toString() ?? '',
+          description:   editingExercise.description ?? '',
+        })
+      } else {
+        setForm(blankLibraryForm())
+      }
+    }
+  }, [showForm, editingExercise])
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!form.name.trim()) { toast.error('El nombre es obligatorio'); return }
+    setSaving(true)
+
+    const payload = {
+      trainer_id:   trainerId,
+      name:         form.name.trim(),
+      category:     form.category || null,
+      muscle_group: form.muscle_group.trim() || null,
+      video_url:    form.video_url.trim() || null,
+      default_sets: form.default_sets ? Number(form.default_sets) : null,
+      default_reps: form.default_reps.trim() || null,
+      default_rest: form.default_rest ? Number(form.default_rest) : null,
+      description:  form.description.trim() || null,
+    }
+
+    let error: { message: string } | null = null
+    let newExercises: LibraryExercise[] = []
+
+    if (editingExercise) {
+      const { data, error: err } = await supabase
+        .from('exercise_library')
+        .update(payload)
+        .eq('id', editingExercise.id)
+        .select()
+      error = err
+      if (!err && data) {
+        newExercises = exercises.map(ex => ex.id === editingExercise.id ? (data[0] as LibraryExercise) : ex)
+        newExercises.sort((a, b) => a.name.localeCompare(b.name))
+      }
+    } else {
+      const { data, error: err } = await supabase
+        .from('exercise_library')
+        .insert(payload)
+        .select()
+      error = err
+      if (!err && data) {
+        newExercises = [...exercises, data[0] as LibraryExercise]
+        newExercises.sort((a, b) => a.name.localeCompare(b.name))
+      }
+    }
+
+    setSaving(false)
+    if (error) { toast.error('Error al guardar: ' + error.message); return }
+
+    toast.success(editingExercise ? 'Ejercicio actualizado' : 'Ejercicio creado')
+    onSaved(newExercises)
+    onCloseForm()
+  }
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from('exercise_library').delete().eq('id', id)
+    if (error) { toast.error('Error al eliminar: ' + error.message); return }
+    toast.success('Ejercicio eliminado')
+    onSaved(exercises.filter(ex => ex.id !== id))
+  }
+
+  const filtered = exercises.filter(ex =>
+    !search.trim() || ex.name.toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <div className="space-y-4">
+      {/* Search bar */}
+      <div className="relative">
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <input
+          className="input pl-9"
+          placeholder="Buscar ejercicio..."
+          value={search}
+          onChange={e => onSearchChange(e.target.value)}
+        />
+      </div>
+
+      {/* Stats */}
+      <div className="flex items-center gap-4 text-sm">
+        <span className="text-slate-400">{filtered.length} ejercicios</span>
+        {search && <span className="text-slate-500">de {exercises.length} en biblioteca</span>}
+      </div>
+
+      {/* Form modal */}
+      <Modal
+        isOpen={showForm}
+        onClose={onCloseForm}
+        title={editingExercise ? 'Editar ejercicio' : 'Nuevo ejercicio'}
+        size="lg"
+      >
+        <form onSubmit={handleSave} className="space-y-4">
+          <div>
+            <label className="label">Nombre *</label>
+            <input
+              className="input"
+              placeholder="Ej: Sentadilla con barra"
+              value={form.name}
+              onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Categoría</label>
+              <select
+                className="input"
+                value={form.category}
+                onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
+              >
+                <option value="">Seleccionar...</option>
+                {CATEGORY_OPTIONS.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="label">Grupo muscular</label>
+              <input
+                className="input"
+                placeholder="Ej: Cuádriceps, glúteos"
+                value={form.muscle_group}
+                onChange={e => setForm(p => ({ ...p, muscle_group: e.target.value }))}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="label">Series</label>
+              <input
+                type="number"
+                className="input"
+                placeholder="4"
+                value={form.default_sets}
+                onChange={e => setForm(p => ({ ...p, default_sets: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="label">Reps</label>
+              <input
+                className="input"
+                placeholder="8-12"
+                value={form.default_reps}
+                onChange={e => setForm(p => ({ ...p, default_reps: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="label">Descanso (s)</label>
+              <input
+                type="number"
+                className="input"
+                placeholder="90"
+                value={form.default_rest}
+                onChange={e => setForm(p => ({ ...p, default_rest: e.target.value }))}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="label flex items-center gap-1"><LinkIcon size={11} /> URL vídeo</label>
+            <input
+              className="input"
+              placeholder="https://youtube.com/..."
+              value={form.video_url}
+              onChange={e => setForm(p => ({ ...p, video_url: e.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="label">Descripción</label>
+            <textarea
+              className="input resize-none"
+              rows={3}
+              placeholder="Indicaciones técnicas, progresiones..."
+              value={form.description}
+              onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+            />
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onCloseForm} className="btn-secondary flex-1">Cancelar</button>
+            <button type="submit" disabled={saving} className="btn-primary flex-1">
+              {saving ? 'Guardando...' : editingExercise ? 'Guardar cambios' : 'Crear ejercicio'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Exercise grid */}
+      {filtered.length === 0 ? (
+        <EmptyState
+          icon={<BookOpen />}
+          title={search ? 'Sin resultados' : 'Biblioteca vacía'}
+          description={search ? 'Prueba con otro término de búsqueda.' : 'Crea tu primer ejercicio reutilizable.'}
+          action={!search ? { label: 'Nuevo ejercicio', onClick: onOpenCreate } : undefined}
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filtered.map(ex => (
+            <div key={ex.id} className="card p-4 flex flex-col gap-3">
+              {/* Card header */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-white truncate">{ex.name}</h3>
+                  {ex.muscle_group && (
+                    <p className="text-xs text-slate-400 mt-0.5 truncate">{ex.muscle_group}</p>
+                  )}
+                </div>
+                {ex.category && (
+                  <span className={cn(
+                    'shrink-0 text-xs font-medium px-2 py-0.5 rounded-full capitalize',
+                    CATEGORY_COLORS[ex.category as Category] ?? 'bg-slate-700 text-slate-300',
+                  )}>
+                    {ex.category}
+                  </span>
+                )}
+              </div>
+
+              {/* Sets / Reps */}
+              {(ex.default_sets ?? ex.default_reps ?? ex.default_rest) && (
+                <div className="flex gap-3 text-xs text-slate-400">
+                  {ex.default_sets && <span><span className="text-slate-200 font-medium">{ex.default_sets}</span> series</span>}
+                  {ex.default_reps && <span><span className="text-slate-200 font-medium">{ex.default_reps}</span> reps</span>}
+                  {ex.default_rest && <span><span className="text-slate-200 font-medium">{ex.default_rest}s</span> descanso</span>}
+                </div>
+              )}
+
+              {/* Description snippet */}
+              {ex.description && (
+                <p className="text-xs text-slate-500 line-clamp-2">{ex.description}</p>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center gap-1 mt-auto pt-1 border-t border-[#334155]">
+                <button
+                  type="button"
+                  onClick={() => toast.info(
+                    `Añadir: ${ex.name} · ${ex.default_sets ?? '?'} series × ${ex.default_reps ?? '?'} reps`,
+                    { duration: 4000 }
+                  )}
+                  className="btn-secondary text-xs py-1 px-2 flex items-center gap-1"
+                >
+                  <Plus size={12} /> Usar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onOpenEdit(ex)}
+                  className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 ml-auto"
+                >
+                  <Pencil size={12} /> Editar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(ex.id)}
+                  className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 text-red-400 hover:text-red-300"
+                >
+                  <Trash2 size={12} /> Eliminar
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }

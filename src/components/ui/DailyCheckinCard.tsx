@@ -2,12 +2,15 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { Zap, Smile, Moon, CheckCircle } from 'lucide-react'
+import { Zap, Smile, Moon, CheckCircle, Pencil } from 'lucide-react'
 
 interface Props {
   clientId: string
   existingCheckin: { energy: number | null; mood: number | null; sleep_hours: number | null } | null
 }
+
+const ENERGY_EMOJIS = ['😴', '🪫', '😐', '⚡', '🔥']
+const MOOD_EMOJIS   = ['😞', '😕', '😐', '😊', '😄']
 
 export function DailyCheckinCard({ clientId, existingCheckin }: Props) {
   const [energy, setEnergy] = useState<number>(existingCheckin?.energy ?? 0)
@@ -36,17 +39,49 @@ export function DailyCheckinCard({ clientId, existingCheckin }: Props) {
 
   if (done) {
     return (
-      <div className="card p-4 flex items-center gap-3 border-emerald-500/20" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02))' }}>
-        <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
-        <div>
-          <p className="text-sm font-semibold text-white">Check-in de hoy completado</p>
-          <p className="text-xs text-slate-400 mt-0.5">Energía {energy}/5 · Ánimo {mood}/5{sleep ? ` · ${sleep}h sueño` : ''}</p>
+      <div className="card p-4 border-emerald-500/20" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02))' }}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-white">Check-in de hoy completado</p>
+              <div className="flex items-center gap-3 mt-1">
+                {energy > 0 && (
+                  <span className="text-xs text-slate-400 flex items-center gap-1">
+                    <span className="text-base leading-none">{ENERGY_EMOJIS[energy - 1]}</span> Energía
+                  </span>
+                )}
+                {mood > 0 && (
+                  <span className="text-xs text-slate-400 flex items-center gap-1">
+                    <span className="text-base leading-none">{MOOD_EMOJIS[mood - 1]}</span> Ánimo
+                  </span>
+                )}
+                {sleep && (
+                  <span className="text-xs text-slate-400 flex items-center gap-1">
+                    <Moon className="w-3 h-3 text-violet-400" /> {sleep}h
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => setDone(false)}
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-surface-2 transition-all shrink-0"
+            title="Editar check-in"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     )
   }
 
-  const EmojiRow = ({ label, icon, value, onChange }: { label: string; icon: React.ReactNode; value: number; onChange: (v: number) => void }) => (
+  const EmojiRow = ({
+    label, icon, value, onChange, emojis,
+  }: {
+    label: string; icon: React.ReactNode; value: number
+    onChange: (v: number) => void; emojis: string[]
+  }) => (
     <div>
       <div className="flex items-center gap-1.5 mb-2">
         {icon}
@@ -55,8 +90,8 @@ export function DailyCheckinCard({ clientId, existingCheckin }: Props) {
       <div className="flex gap-2">
         {[1,2,3,4,5].map(v => (
           <button key={v} onClick={() => onChange(v)}
-            className={`w-9 h-9 rounded-xl text-base transition-all duration-150 ${value === v ? 'bg-sky-500 text-white scale-110 shadow-lg shadow-sky-500/30' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
-            {v === 1 ? '😴' : v === 2 ? '😕' : v === 3 ? '😐' : v === 4 ? '😊' : '🔥'}
+            className={`w-9 h-9 rounded-xl text-lg transition-all duration-150 ${value === v ? 'bg-sky-500/20 border border-sky-500/40 scale-110 shadow-lg shadow-sky-500/20' : 'bg-slate-800 hover:bg-slate-700'}`}>
+            {emojis[v - 1]}
           </button>
         ))}
       </div>
@@ -75,8 +110,8 @@ export function DailyCheckinCard({ clientId, existingCheckin }: Props) {
         </div>
       </div>
       <div className="space-y-4">
-        <EmojiRow label="Energía" icon={<Zap className="w-3.5 h-3.5 text-amber-400" />} value={energy} onChange={setEnergy} />
-        <EmojiRow label="Estado de ánimo" icon={<Smile className="w-3.5 h-3.5 text-sky-400" />} value={mood} onChange={setMood} />
+        <EmojiRow label="Energía" icon={<Zap className="w-3.5 h-3.5 text-amber-400" />} value={energy} onChange={setEnergy} emojis={ENERGY_EMOJIS} />
+        <EmojiRow label="Estado de ánimo" icon={<Smile className="w-3.5 h-3.5 text-sky-400" />} value={mood} onChange={setMood} emojis={MOOD_EMOJIS} />
         <div>
           <div className="flex items-center gap-1.5 mb-2">
             <Moon className="w-3.5 h-3.5 text-violet-400" />

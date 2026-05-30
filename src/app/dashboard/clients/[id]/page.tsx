@@ -609,8 +609,8 @@ export default function ClientDetailPage() {
                 </thead>
                 <tbody className="divide-y divide-border/30">
                   {checkins.map(c => {
-                    const energyEmoji = c.energy ? ['😴','😕','😐','😊','🔥'][c.energy - 1] : '—'
-                    const moodEmoji   = c.mood   ? ['😴','😕','😐','😊','🔥'][c.mood - 1]   : '—'
+                    const energyEmoji = c.energy ? ['😴','🪫','😐','⚡','🔥'][c.energy - 1] : '—'
+                    const moodEmoji   = c.mood   ? ['😞','😕','😐','😊','😄'][c.mood - 1]   : '—'
                     return (
                       <tr key={c.id} className="hover:bg-surface-2/40 transition-colors">
                         <td className="py-2 pr-4 text-slate-300">{new Date(c.checkin_date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</td>

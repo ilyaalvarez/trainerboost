@@ -7,7 +7,7 @@ import {
   Dumbbell, Plus, Search, ChevronDown, ChevronUp,
   Archive, RotateCcw, GripVertical,
   Link as LinkIcon, X, Users, Copy,
-  BookOpen, Pencil, Trash2,
+  BookOpen, Pencil, Trash2, FileDown,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -397,6 +397,16 @@ function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDu
   isDuplicating: boolean
   onEdit: (routine: Routine) => void
 }) {
+  const [exporting, setExporting] = useState(false)
+
+  async function handleExportPdf() {
+    setExporting(true)
+    try {
+      const { exportRoutinePdf } = await import('@/lib/exportPdf')
+      await exportRoutinePdf({ ...routine, exercises: routine.exercises }, routine.client?.full_name ?? '')
+    } catch { toast.error('Error al generar PDF') }
+    finally { setExporting(false) }
+  }
   return (
     <div className={cn('card overflow-hidden', routine.status === 'archived' && 'opacity-60')}>
       {/* Card header - clickable to expand */}
@@ -477,7 +487,7 @@ function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDu
           )}
 
           {/* Actions */}
-          <div className="flex gap-2 pt-1">
+          <div className="flex flex-wrap gap-2 pt-1">
             <button
               type="button"
               onClick={onArchive}
@@ -502,6 +512,14 @@ function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDu
               className="btn-ghost text-xs py-1 px-2 flex items-center gap-1"
             >
               <Copy className="w-3 h-3" />{isDuplicating ? '...' : 'Duplicar'}
+            </button>
+            <button
+              type="button"
+              onClick={handleExportPdf}
+              disabled={exporting}
+              className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 ml-auto disabled:opacity-50"
+            >
+              <FileDown className="w-3 h-3" />{exporting ? 'Generando...' : 'PDF'}
             </button>
           </div>
         </div>

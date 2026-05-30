@@ -676,6 +676,20 @@ export default function ClientDetailPage() {
                             </table>
                           </div>
                         )}
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const { exportRoutinePdf } = await import('@/lib/exportPdf')
+                                await exportRoutinePdf({ ...routine, exercises: routine.exercises }, profile.full_name)
+                              } catch { toast.error('Error al generar PDF') }
+                            }}
+                            className="btn-ghost text-xs py-1 px-2 flex items-center gap-1"
+                          >
+                            <FileDown size={13} /> Exportar PDF
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>

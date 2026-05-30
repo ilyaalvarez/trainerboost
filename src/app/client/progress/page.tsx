@@ -307,7 +307,7 @@ export default function ClientProgressPage() {
             <table className="w-full text-sm">
               <thead className="border-b border-border">
                 <tr>
-                  {['Fecha', 'Peso', 'Grasa %', 'Masa muscular', 'Notas', 'Fotos'].map(h => (
+                  {['Fecha', 'Peso', 'Grasa %', 'Músculo', 'Cintura', 'Pecho', 'Brazo', 'Notas', 'Fotos'].map(h => (
                     <th key={h} className="text-left p-4 text-xs font-semibold text-slate-400 uppercase tracking-wide">
                       {h}
                     </th>
@@ -318,9 +318,12 @@ export default function ClientProgressPage() {
                 {[...logs].reverse().map(log => (
                   <tr key={log.id} className="hover:bg-surface-2/50 transition-colors">
                     <td className="p-4 text-slate-300">{formatDate(log.logged_at)}</td>
-                    <td className="p-4 font-mono font-semibold text-white">{log.weight_kg ?? '—'} kg</td>
+                    <td className="p-4 font-mono font-semibold text-white">{log.weight_kg ?? '—'}{log.weight_kg ? ' kg' : ''}</td>
                     <td className="p-4 font-mono text-slate-300">{log.body_fat_pct ?? '—'}{log.body_fat_pct ? '%' : ''}</td>
                     <td className="p-4 font-mono text-slate-300">{log.muscle_mass_kg ?? '—'}{log.muscle_mass_kg ? ' kg' : ''}</td>
+                    <td className="p-4 font-mono text-violet-400 text-xs">{log.waist_cm ?? '—'}{log.waist_cm ? 'cm' : ''}</td>
+                    <td className="p-4 font-mono text-pink-400 text-xs">{log.chest_cm ?? '—'}{log.chest_cm ? 'cm' : ''}</td>
+                    <td className="p-4 font-mono text-cyan-400 text-xs">{log.arm_cm ?? '—'}{log.arm_cm ? 'cm' : ''}</td>
                     <td className="p-4 text-slate-400 text-xs max-w-xs truncate">{log.notes || '—'}</td>
                     <td className="p-4">
                       <PhotoUpload

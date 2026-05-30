@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import { toast } from 'sonner'
 import { Plus, Loader2, Scale, Flame, TrendingDown, ClipboardList } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -209,6 +210,77 @@ export default function ClientProgressPage() {
         </div>
       )}
 
+      {/* Body measurements */}
+      {latest && (latest.waist_cm != null || latest.chest_cm != null || latest.arm_cm != null || latest.thigh_cm != null || latest.hip_cm != null) && (() => {
+        const measures = [
+          { key: 'waist_cm' as const, label: 'Cintura', icon: '⬤' },
+          { key: 'chest_cm' as const, label: 'Pecho',   icon: '⬤' },
+          { key: 'arm_cm'   as const, label: 'Brazo',   icon: '⬤' },
+          { key: 'thigh_cm' as const, label: 'Muslo',   icon: '⬤' },
+          { key: 'hip_cm'   as const, label: 'Cadera',  icon: '⬤' },
+        ].filter(m => latest[m.key] != null)
+
+        return (
+          <div className="card p-5">
+            <h2 className="font-semibold text-white mb-3">Medidas corporales</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {measures.map(m => {
+                const current = latest[m.key] as number
+                const firstVal = first?.[m.key] as number | null | undefined
+                const delta = firstVal != null && logs.length >= 2 ? current - firstVal : null
+                return (
+                  <div key={m.key} className="card p-3 text-center" style={{ background: 'rgba(30,41,59,0.6)' }}>
+                    <div className="font-mono text-lg font-bold text-white">{current}</div>
+                    <div className="text-[10px] text-slate-500 uppercase tracking-wide mt-0.5">{m.label} cm</div>
+                    {delta != null && (
+                      <div className={`text-[10px] font-semibold mt-1 ${delta < 0 ? 'text-emerald-400' : delta > 0 ? 'text-red-400' : 'text-slate-400'}`}>
+                        {delta > 0 ? '+' : ''}{delta.toFixed(1)}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Before / After comparison */}
+      {(() => {
+        const withPhotos = logs.filter(l => (l.photos ?? []).length > 0)
+        if (withPhotos.length < 2) return null
+        const before = withPhotos[0]
+        const after  = withPhotos[withPhotos.length - 1]
+        return (
+          <div className="card p-5">
+            <h2 className="font-semibold text-white mb-4">Antes y ahora</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {[{ log: before, label: 'Antes' }, { log: after, label: 'Ahora' }].map(({ log, label }) => (
+                <div key={log.id} className="space-y-2">
+                  <div className="relative aspect-square rounded-xl overflow-hidden bg-surface-2 border border-border">
+                    <Image
+                      src={(log.photos ?? [])[0]}
+                      alt={label}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                      <p className="text-xs font-semibold text-white">{label}</p>
+                      <p className="text-[10px] text-slate-300">{formatDate(log.logged_at)}</p>
+                    </div>
+                  </div>
+                  {log.weight_kg != null && (
+                    <div className="text-center">
+                      <span className="font-mono text-sm font-bold text-white">{log.weight_kg} kg</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Chart */}
       {logs.length >= 2 && (
         <div className="card p-5">
@@ -306,15 +378,15 @@ export default function ClientProgressPage() {
               />
             </div>
           </div>
-          <details className="mt-3">
+          <details className="mt-1">
             <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-300">Medidas corporales (opcional)</summary>
             <div className="grid grid-cols-2 gap-3 mt-3">
               {([
                 { key: 'waist_cm', label: 'Cintura (cm)' },
                 { key: 'chest_cm', label: 'Pecho (cm)' },
-                { key: 'arm_cm', label: 'Brazo (cm)' },
+                { key: 'arm_cm',   label: 'Brazo (cm)' },
                 { key: 'thigh_cm', label: 'Muslo (cm)' },
-                { key: 'hip_cm', label: 'Cadera (cm)' },
+                { key: 'hip_cm',   label: 'Cadera (cm)' },
               ] as const).map(m => (
                 <div key={m.key}>
                   <label className="text-xs text-slate-500">{m.label}</label>

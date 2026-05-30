@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import {
   Users, Search, Copy, RefreshCw, ChevronLeft, ChevronRight,
   UserPlus, Loader2, Mail, ArrowRight, Dumbbell, Clock,
+  Tag, X,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn, formatDate, timeAgo } from '@/lib/utils'
@@ -28,6 +29,18 @@ const FILTER_TABS: { value: FilterTab; label: string }[] = [
   { value: 'ended',  label: 'Terminados'},
 ]
 
+const PRESET_TAGS = [
+  { label: 'Pérdida de peso',   color: 'bg-amber-500/20 text-amber-300 border border-amber-500/30' },
+  { label: 'Ganancia muscular', color: 'bg-sky-500/20 text-sky-300 border border-sky-500/30' },
+  { label: 'Resistencia',       color: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' },
+  { label: 'Rehabilitación',    color: 'bg-violet-500/20 text-violet-300 border border-violet-500/30' },
+  { label: 'Tonificación',      color: 'bg-pink-500/20 text-pink-300 border border-pink-500/30' },
+  { label: 'Principiante',      color: 'bg-slate-500/20 text-slate-300 border border-slate-500/40' },
+  { label: 'Senior',            color: 'bg-orange-500/20 text-orange-300 border border-orange-500/30' },
+  { label: 'Online',            color: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' },
+] as const
+const TAG_COLOR: Record<string, string> = Object.fromEntries(PRESET_TAGS.map(t => [t.label, t.color]))
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ClientRow extends ClientWithProfile {
@@ -49,6 +62,8 @@ export default function ClientsPage() {
   const [search, setSearch]       = useState('')
   const [filter, setFilter]       = useState<FilterTab>('all')
   const [page, setPage]           = useState(1)
+  const [tagFilter, setTagFilter]         = useState<string | null>(null)
+  const [editingTagsFor, setEditingTagsFor] = useState<string | null>(null) // client.id
 
   // Invite modal
   const [inviteOpen, setInviteOpen]       = useState(false)
@@ -124,6 +139,7 @@ export default function ClientsPage() {
   const filtered = useMemo(() => {
     let list = clients
     if (filter !== 'all') list = list.filter(c => c.status === filter)
+    if (tagFilter) list = list.filter(c => (c.tags ?? []).includes(tagFilter))
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(c =>
@@ -131,10 +147,16 @@ export default function ClientsPage() {
       )
     }
     return list
-  }, [clients, filter, search])
+  }, [clients, filter, search, tagFilter])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  const allTags = useMemo(() => {
+    const set = new Set<string>()
+    clients.forEach(c => (c.tags ?? []).forEach(t => set.add(t)))
+    return Array.from(set)
+  }, [clients])
 
   // Reset to page 1 when filters change
   useEffect(() => { setPage(1) }, [filter, search])
@@ -214,6 +236,11 @@ export default function ClientsPage() {
     }
   }
 
+  async function updateTags(clientId: string, tags: string[]) {
+    await supabase.from('trainer_clients').update({ tags }).eq('id', clientId)
+    setClients(prev => prev.map(c => c.id === clientId ? { ...c, tags } : c))
+  }
+
   // ── Render ───────────────────────────────────────────────────────────────
 
   return (
@@ -263,6 +290,26 @@ export default function ClientsPage() {
           ))}
         </div>
       </div>
+
+      {/* ── Tag filter row ── */}
+      {allTags.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {allTags.map(tag => (
+            <button
+              key={tag}
+              onClick={() => setTagFilter(t => t === tag ? null : tag)}
+              className={cn(
+                'text-xs px-3 py-1 rounded-full border transition-all',
+                TAG_COLOR[tag] ?? 'bg-slate-700 text-slate-300 border-slate-600',
+                tagFilter === tag ? 'ring-2 ring-white/30 scale-105' : 'opacity-70 hover:opacity-100'
+              )}
+            >
+              {tag}
+              {tagFilter === tag && <X className="w-3 h-3 ml-1 inline" />}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ── Table / empty ── */}
       {loading ? (
@@ -361,6 +408,57 @@ export default function ClientsPage() {
                           }
                         </div>
                       </div>
+                    </div>
+
+                    {/* Tags */}
+                    <div className="mb-3 relative">
+                      <div className="flex flex-wrap gap-1.5 items-center min-h-[24px]">
+                        {(client.tags ?? []).map(tag => (
+                          <span key={tag} className={cn('text-[10px] px-2 py-0.5 rounded-full', TAG_COLOR[tag] ?? 'bg-slate-700 text-slate-300 border border-slate-600')}>
+                            {tag}
+                          </span>
+                        ))}
+                        <button
+                          onClick={e => { e.stopPropagation(); setEditingTagsFor(editingTagsFor === client.id ? null : client.id) }}
+                          className="w-5 h-5 rounded-full border border-dashed border-slate-600 hover:border-sky-500 flex items-center justify-center text-slate-500 hover:text-sky-400 transition-colors"
+                          title="Editar etiquetas"
+                        >
+                          <Tag className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+
+                      {editingTagsFor === client.id && (
+                        <div className="absolute top-full left-0 right-0 mt-1 z-20 rounded-xl border border-border bg-surface-2 p-2 shadow-xl">
+                          <div className="flex flex-wrap gap-1.5">
+                            {PRESET_TAGS.map(({ label, color }) => {
+                              const active = (client.tags ?? []).includes(label)
+                              return (
+                                <button
+                                  key={label}
+                                  onClick={() => {
+                                    const cur = client.tags ?? []
+                                    const next = active ? cur.filter(t => t !== label) : [...cur, label]
+                                    updateTags(client.id, next)
+                                  }}
+                                  className={cn(
+                                    'text-[10px] px-2 py-0.5 rounded-full border transition-all',
+                                    color,
+                                    active ? 'ring-1 ring-white/40' : 'opacity-50 hover:opacity-100'
+                                  )}
+                                >
+                                  {active && '✓ '}{label}
+                                </button>
+                              )
+                            })}
+                          </div>
+                          <button
+                            onClick={() => setEditingTagsFor(null)}
+                            className="mt-2 text-[10px] text-slate-500 hover:text-white w-full text-center"
+                          >
+                            Cerrar
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     {/* CTA */}

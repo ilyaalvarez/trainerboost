@@ -82,6 +82,9 @@ export default function SettingsPage() {
   const [savingPwd,     setSavingPwd]     = useState(false)
   const [pwdError,      setPwdError]      = useState<string | null>(null)
 
+  // ── Active sessions ──────────────────────────────────────────────────────
+  const [signingOut,    setSigningOut]    = useState(false)
+
   // ── Delete account ───────────────────────────────────────────────────────
   const [deleteOpen,    setDeleteOpen]    = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState('')
@@ -207,6 +210,23 @@ export default function SettingsPage() {
       toast.error(msg)
     } finally {
       setSavingPwd(false)
+    }
+  }
+
+  // ── Sign out all devices ─────────────────────────────────────────────────
+
+  async function signOutAllDevices() {
+    setSigningOut(true)
+    try {
+      const { error } = await supabase.auth.signOut({ scope: 'global' })
+      if (error) throw error
+      toast.success('Sesión cerrada en todos los dispositivos')
+      window.location.href = '/login'
+    } catch (err: unknown) {
+      const msg = (err as { message?: string }).message ?? 'Error al cerrar las sesiones'
+      toast.error(msg)
+    } finally {
+      setSigningOut(false)
     }
   }
 
@@ -590,7 +610,22 @@ export default function SettingsPage() {
       </Section>
 
       {/* ══════════════════════════════════════════════════════
-          SECTION 4 — Danger zone
+          SECTION 4 — Active sessions
+      ══════════════════════════════════════════════════════ */}
+      <div className="card p-5">
+        <h3 className="text-sm font-semibold text-white mb-1">Sesiones activas</h3>
+        <p className="text-xs text-slate-400 mb-4">Cierra sesión en todos los dispositivos si crees que tu cuenta está comprometida.</p>
+        <button
+          onClick={signOutAllDevices}
+          disabled={signingOut}
+          className="btn-danger text-sm py-2 px-4"
+        >
+          {signingOut ? 'Cerrando...' : 'Cerrar todas las sesiones'}
+        </button>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════
+          SECTION 5 — Danger zone
       ══════════════════════════════════════════════════════ */}
       <section className="card p-6 border-red-500/30">
         <div className="flex items-start gap-3">

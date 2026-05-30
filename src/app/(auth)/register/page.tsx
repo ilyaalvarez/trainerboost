@@ -4,26 +4,52 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Mail, Lock, User, ArrowRight, Loader2, Users, Zap, ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { Mail, Lock, User, ArrowRight, Loader2, Users, Zap, ArrowLeft, CheckCircle2, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 type Step = 1 | 2
 type Role = 'trainer' | 'client'
 
+function passwordStrength(pwd: string): { score: number; label: string; color: string } {
+  let score = 0
+  if (pwd.length >= 8) score++
+  if (/[A-Z]/.test(pwd)) score++
+  if (/[0-9]/.test(pwd)) score++
+  if (/[^A-Za-z0-9]/.test(pwd)) score++
+  const labels = ['Muy débil', 'Débil', 'Regular', 'Fuerte', 'Muy fuerte']
+  const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-emerald-500', 'bg-emerald-600']
+  return { score, label: labels[score] ?? 'Débil', color: colors[score] ?? 'bg-red-500' }
+}
+
 export default function RegisterPage() {
   const router = useRouter()
   const supabase = createClient()
 
-  const [step, setStep]         = useState<Step>(1)
-  const [role, setRole]         = useState<Role>('trainer')
-  const [name, setName]         = useState('')
-  const [email, setEmail]       = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [step, setStep]             = useState<Step>(1)
+  const [role, setRole]             = useState<Role>('trainer')
+  const [name, setName]             = useState('')
+  const [email, setEmail]           = useState('')
+  const [password, setPassword]     = useState('')
+  const [loading, setLoading]       = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [pwdError, setPwdError]     = useState<string | null>(null)
+
+  const strength = passwordStrength(password)
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
-    if (password.length < 6) { toast.error('La contraseña debe tener al menos 6 caracteres'); return }
+    setPwdError(null)
+
+    if (password.length < 8) {
+      setPwdError('La contraseña debe tener al menos 8 caracteres')
+      return
+    }
+    if (!acceptedTerms) {
+      toast.error('Debes aceptar los Términos de servicio para continuar')
+      return
+    }
+
     setLoading(true)
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -206,18 +232,67 @@ export default function RegisterPage() {
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      className="input pl-9"
-                      placeholder="Mín. 6 caracteres"
+                      onChange={e => { setPassword(e.target.value); setPwdError(null) }}
+                      className="input pl-9 pr-10"
+                      placeholder="Mín. 8 caracteres"
                       required
                       autoComplete="new-password"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(prev => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                      tabIndex={-1}
+                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
+
+                  {/* Password strength indicator */}
+                  {password && (
+                    <div className="mt-1.5">
+                      <div className="flex gap-1 mb-1">
+                        {[0, 1, 2, 3].map(i => (
+                          <div
+                            key={i}
+                            className={`h-1 flex-1 rounded-full transition-colors ${i < strength.score ? strength.color : 'bg-slate-700'}`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-xs text-slate-500">{strength.label}</p>
+                    </div>
+                  )}
+
+                  {/* Inline password length error */}
+                  {pwdError && (
+                    <p className="text-xs text-red-400 mt-1.5">{pwdError}</p>
+                  )}
                 </div>
 
-                <button type="submit" disabled={loading} className="btn-gradient w-full py-2.5">
+                {/* Terms acceptance */}
+                <label className="flex items-start gap-2.5 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={e => setAcceptedTerms(e.target.checked)}
+                    className="w-4 h-4 mt-0.5 rounded border-border bg-surface accent-brand-primary cursor-pointer shrink-0"
+                  />
+                  <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors leading-snug">
+                    Acepto los{' '}
+                    <Link href="#" className="text-brand-primary hover:underline">Términos de servicio</Link>
+                    {' '}y la{' '}
+                    <Link href="#" className="text-brand-primary hover:underline">Política de privacidad</Link>
+                  </span>
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={loading || !acceptedTerms}
+                  className="btn-gradient w-full py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   {loading
                     ? <><Loader2 className="w-4 h-4 animate-spin" /> Creando cuenta...</>
                     : <><ArrowRight className="w-4 h-4" /> Crear cuenta</>}

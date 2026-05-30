@@ -2,6 +2,7 @@ import Link from 'next/link'
 import {
   Zap, Users, Dumbbell, UtensilsCrossed, CalendarDays,
   MessageSquare, ArrowRight, TrendingUp, CheckCircle2, Star,
+  Play, UserPlus,
 } from 'lucide-react'
 import { PLAN_CONFIG } from '@/lib/plans'
 
@@ -162,7 +163,7 @@ export default function LandingPage() {
             <Link href="/demo"    className="text-sm text-slate-400 hover:text-white transition-colors duration-150 hidden sm:block px-3 py-2 rounded-lg hover:bg-surface/70">Demo</Link>
             <div className="w-px h-4 bg-border mx-2 hidden sm:block" />
             <Link href="/login"   className="text-sm text-slate-400 hover:text-white transition-colors duration-150 px-3 py-2 rounded-lg hover:bg-surface/70 hidden sm:block">Entrar</Link>
-            <Link href="/register" className="btn-gradient text-sm py-2 px-4 ml-1">Empezar gratis</Link>
+            <Link href="/register" className="btn-gradient text-sm py-2 px-4 ml-1">Probar 14 días gratis</Link>
           </div>
         </div>
       </nav>
@@ -186,23 +187,22 @@ export default function LandingPage() {
             </div>
 
             <h1 className="text-5xl md:text-6xl font-bold text-white leading-[1.08] mb-6 text-balance tracking-tight animate-fade-in-up delay-75">
-              La plataforma que<br />
-              tu negocio de<br />
-              <span className="gradient-text">entrenamiento</span><br />
-              necesita
+              Deja de gestionar<br />
+              clientes por<br />
+              <span className="gradient-text">WhatsApp</span>
             </h1>
 
             <p className="text-lg text-slate-400 mb-8 leading-relaxed max-w-lg animate-fade-in-up delay-150">
-              Rutinas, nutrición, citas, mensajería y progreso de tus clientes. Todo en un solo sitio, pensado para entrenadores personales.
+              TrainerBoost centraliza rutinas, nutrición, citas y pagos de tus clientes en un solo lugar. En español, desde 19€/mes.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-8 animate-fade-in-up delay-200">
               <Link href="/register" className="btn-gradient text-base px-8 py-3">
-                <Zap className="w-4 h-4" /> Crear cuenta gratis
+                <Zap className="w-4 h-4" /> Probar 14 días gratis
               </Link>
-              <Link href="/demo" className="btn-secondary text-base px-6 py-3">
-                Ver demo <ArrowRight className="w-4 h-4" />
-              </Link>
+              <a href="/demo/trainer" className="btn-secondary flex items-center gap-2 py-3 px-6 text-base">
+                <Play className="w-4 h-4" /> Ver demo en vivo
+              </a>
             </div>
 
             <div className="flex flex-wrap gap-x-5 gap-y-2 animate-fade-in-up delay-300">
@@ -406,6 +406,30 @@ export default function LandingPage() {
               </div>
               <h3 className="font-semibold text-white mb-2 group-hover:text-slate-50 transition-colors">{feat.title}</h3>
               <p className="text-sm text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">{feat.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 3 pasos para empezar ─────────────────────────────────────────── */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center mb-12">
+          <h2 className="text-3xl font-bold text-white mb-3">Empieza en 3 minutos</h2>
+          <p className="text-slate-400">Sin tarjeta de crédito. Sin contrato.</p>
+        </div>
+        <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-8">
+          {[
+            { step: '1', title: 'Crea tu cuenta', desc: 'Regístrate gratis y configura tu perfil de entrenador en 2 minutos.', icon: UserPlus },
+            { step: '2', title: 'Invita a tus clientes', desc: 'Envía un enlace de invitación. Tus clientes acceden al instante.', icon: Users },
+            { step: '3', title: 'Gestiona todo', desc: 'Rutinas, nutrición, citas y mensajes en un solo lugar.', icon: Zap },
+          ].map(s => (
+            <div key={s.step} className="text-center">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center mx-auto mb-4">
+                <s.icon className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-4xl font-black text-slate-700 mb-2">{s.step}</div>
+              <h3 className="text-base font-semibold text-white mb-1">{s.title}</h3>
+              <p className="text-sm text-slate-400">{s.desc}</p>
             </div>
           ))}
         </div>
@@ -681,7 +705,7 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
             <Link href="/register" className="btn-gradient text-base px-10 py-3.5 text-lg">
-              <Zap className="w-5 h-5" /> Crear cuenta gratis
+              <Zap className="w-5 h-5" /> Probar 14 días gratis
             </Link>
             <Link href="/demo" className="btn-secondary text-base px-6 py-3.5">
               Ver demo primero →
@@ -700,59 +724,22 @@ export default function LandingPage() {
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────────────── */}
-      <footer className="border-t border-border/60 py-14">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
-            {/* Brand */}
-            <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                     style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
-                  <Zap className="w-3.5 h-3.5 text-white" />
-                </div>
-                <span className="font-bold text-white text-sm">TrainerBoost</span>
-              </div>
-              <p className="text-sm text-slate-500 leading-relaxed">
-                La plataforma todo-en-uno para entrenadores personales que quieren crecer.
-              </p>
+      <footer className="border-t border-border/40 py-10 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-sky-400" />
+              <span className="font-bold text-white">TrainerBoost</span>
             </div>
-
-            {/* Producto */}
-            <div>
-              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Producto</div>
-              <div className="space-y-2.5">
-                <Link href="/pricing"      className="block text-sm text-slate-500 hover:text-white transition-colors duration-150">Precios</Link>
-                <Link href="/demo"         className="block text-sm text-slate-500 hover:text-white transition-colors duration-150">Demo</Link>
-                <Link href="/demo/trainer" className="block text-sm text-slate-500 hover:text-white transition-colors duration-150">Demo entrenador</Link>
-                <Link href="/demo/client"  className="block text-sm text-slate-500 hover:text-white transition-colors duration-150">Demo cliente</Link>
-              </div>
-            </div>
-
-            {/* Cuenta */}
-            <div>
-              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Cuenta</div>
-              <div className="space-y-2.5">
-                <Link href="/register" className="block text-sm text-slate-500 hover:text-white transition-colors duration-150">Registrarse</Link>
-                <Link href="/login"    className="block text-sm text-slate-500 hover:text-white transition-colors duration-150">Iniciar sesión</Link>
-              </div>
-            </div>
-
-            {/* Soporte */}
-            <div>
-              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Soporte</div>
-              <div className="space-y-2.5">
-                <a href="mailto:hola@trainerboost.es" className="block text-sm text-slate-500 hover:text-white transition-colors duration-150">Contacto</a>
-                <a href="mailto:hola@trainerboost.es" className="block text-sm text-slate-500 hover:text-white transition-colors duration-150">Ayuda</a>
-              </div>
-            </div>
+            <nav className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500">
+              <a href="/pricing" className="hover:text-slate-300 transition-colors">Precios</a>
+              <a href="/demo/trainer" className="hover:text-slate-300 transition-colors">Demo</a>
+              <a href="mailto:hola@trainerboost.es" className="hover:text-slate-300 transition-colors">Contacto</a>
+              <a href="#" className="hover:text-slate-300 transition-colors">Política de privacidad</a>
+              <a href="#" className="hover:text-slate-300 transition-colors">Términos de servicio</a>
+            </nav>
           </div>
-
-          <div className="divider mb-6" />
-
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-            <span>© 2025 TrainerBoost. Todos los derechos reservados.</span>
-            <span>Hecho para entrenadores que se toman en serio su negocio</span>
-          </div>
+          <p className="text-center text-xs text-slate-600">© 2025 TrainerBoost · Hecho con ❤️ para entrenadores personales · Spain 🇪🇸</p>
         </div>
       </footer>
     </div>

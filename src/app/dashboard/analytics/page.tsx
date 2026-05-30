@@ -6,7 +6,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from 'recharts'
-import { TrendingDown, TrendingUp, Users, Activity } from 'lucide-react'
+import { TrendingDown, TrendingUp, Users, Activity, Calendar, MessageCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
@@ -18,6 +18,12 @@ const LINE_COLORS = [
   '#0EA5E9', '#10B981', '#F59E0B', '#EF4444',
   '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16',
 ]
+
+interface BusinessKpis {
+  sessionsThisMonth: number
+  activeClientsCount: number
+  totalMessages: number
+}
 
 interface ClientProgress {
   client: Profile
@@ -62,12 +68,33 @@ export default function AnalyticsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [metric, setMetric] = useState<'weight_kg' | 'body_fat_pct'>('weight_kg')
+  const [kpis, setKpis] = useState<BusinessKpis>({ sessionsThisMonth: 0, activeClientsCount: 0, totalMessages: 0 })
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
+
+    // Business KPIs — fetched in parallel
+    const thisMonthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+    const [
+      { count: sessionsThisMonth },
+      { count: activeClientsCount },
+      { count: totalMessages },
+    ] = await Promise.all([
+      supabase.from('appointments').select('*', { count: 'exact', head: true })
+        .eq('trainer_id', user.id).eq('status', 'done').gte('created_at', thisMonthStart),
+      supabase.from('trainer_clients').select('*', { count: 'exact', head: true })
+        .eq('trainer_id', user.id).eq('status', 'active'),
+      supabase.from('messages').select('*', { count: 'exact', head: true })
+        .eq('sender_id', user.id),
+    ])
+    setKpis({
+      sessionsThisMonth: sessionsThisMonth ?? 0,
+      activeClientsCount: activeClientsCount ?? 0,
+      totalMessages: totalMessages ?? 0,
+    })
 
     // Fetch all clients for this trainer
     const { data: relations, error } = await supabase
@@ -203,7 +230,56 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* KPIs */}
+      {/* Business KPIs */}
+      {(() => {
+        const businessKpis = [
+          {
+            label: 'Clientes activos',
+            value: kpis.activeClientsCount,
+            Icon: Users,
+            color: 'text-sky-400',
+            bg: 'rgba(14,165,233,0.15)',
+          },
+          {
+            label: 'Sesiones este mes',
+            value: kpis.sessionsThisMonth,
+            Icon: Calendar,
+            color: 'text-violet-400',
+            bg: 'rgba(124,58,237,0.15)',
+          },
+          {
+            label: 'Mensajes enviados',
+            value: kpis.totalMessages,
+            Icon: MessageCircle,
+            color: 'text-emerald-400',
+            bg: 'rgba(16,185,129,0.15)',
+          },
+          {
+            label: 'Tasa de retención',
+            value: '—',
+            Icon: Activity,
+            color: 'text-amber-400',
+            bg: 'rgba(245,158,11,0.15)',
+          },
+        ]
+        return (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {businessKpis.map(kpi => (
+              <div key={kpi.label} className="card p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">{kpi.label}</span>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: kpi.bg }}>
+                    <kpi.Icon className={`w-4 h-4 ${kpi.color}`} />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-white">{kpi.value}</p>
+              </div>
+            ))}
+          </div>
+        )
+      })()}
+
+      {/* Progress KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="card p-4">
           <p className="text-xs text-slate-400 mb-1">Clientes con datos</p>

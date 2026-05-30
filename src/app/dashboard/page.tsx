@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Users, CalendarDays, MessageSquare, TrendingUp, Plus, Clock, Zap, Calendar, ChevronRight, Rocket, CheckCircle2 } from 'lucide-react'
+import { Users, CalendarDays, MessageSquare, TrendingUp, Plus, Clock, Zap, Calendar, ChevronRight, Rocket, CheckCircle2, Dumbbell, Apple, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import { formatRelative, formatDate } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
@@ -170,30 +170,54 @@ export default async function DashboardPage() {
 
       {/* ── KPIs ──────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
-        <StatsCard
-          label="Clientes activos"
-          value={activeClients}
-          icon={<Users className="w-5 h-5" />}
-          color="primary"
-        />
-        <StatsCard
-          label="Citas hoy"
-          value={todayAppointments?.length ?? 0}
-          icon={<CalendarDays className="w-5 h-5" />}
-          color="accent"
-        />
-        <StatsCard
-          label="Mensajes sin leer"
-          value={unreadCount ?? 0}
-          icon={<MessageSquare className="w-5 h-5" />}
-          color="secondary"
-        />
+        <Link href="/dashboard/clients">
+          <StatsCard
+            label="Clientes activos"
+            value={activeClients}
+            icon={<Users className="w-5 h-5" />}
+            color="primary"
+          />
+        </Link>
+        <Link href="/dashboard/appointments">
+          <StatsCard
+            label="Citas hoy"
+            value={todayAppointments?.length ?? 0}
+            icon={<CalendarDays className="w-5 h-5" />}
+            color="accent"
+          />
+        </Link>
+        <Link href="/dashboard/messages">
+          <StatsCard
+            label="Mensajes sin leer"
+            value={unreadCount ?? 0}
+            icon={<MessageSquare className="w-5 h-5" />}
+            color="secondary"
+          />
+        </Link>
         <StatsCard
           label="Capacidad usada"
           value={maxClients > 0 ? `${Math.round((activeClients / maxClients) * 100)}%` : '—'}
           icon={<TrendingUp className="w-5 h-5" />}
           color="warning"
         />
+      </div>
+
+      {/* ── Acciones rápidas ──────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {([
+          { label: 'Nueva rutina',   icon: Dumbbell,  href: '/dashboard/routines',     color: 'text-violet-400', bg: 'rgba(124,58,237,0.15)' },
+          { label: 'Nuevo plan',     icon: Apple,     href: '/dashboard/nutrition',    color: 'text-emerald-400', bg: 'rgba(16,185,129,0.15)' },
+          { label: 'Nueva cita',     icon: Calendar,  href: '/dashboard/appointments', color: 'text-amber-400',  bg: 'rgba(245,158,11,0.15)' },
+          { label: 'Invitar cliente',icon: UserPlus,  href: '/dashboard/clients',      color: 'text-sky-400',    bg: 'rgba(14,165,233,0.15)' },
+        ] as const).map(action => (
+          <Link key={action.label} href={action.href}
+            className="card card-interactive p-4 flex flex-col items-center gap-2 text-center">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: action.bg }}>
+              <action.icon className={`w-5 h-5 ${action.color}`} />
+            </div>
+            <span className="text-xs font-medium text-slate-300">{action.label}</span>
+          </Link>
+        ))}
       </div>
 
       {/* ── Appointments + Messages ────────────────────────────────────── */}

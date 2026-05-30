@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, UtensilsCrossed, Download } from 'lucide-react'
+import { Check, Loader2, UtensilsCrossed, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { MealPlan, Meal, FoodItem } from '@/types/database'
 import EmptyState from '@/components/ui/EmptyState'
@@ -30,8 +30,9 @@ function MacroBar({ label, value, max, color }: {
 
 export default function ClientNutritionPage() {
   const supabase = useMemo(() => createClient(), [])
-  const [plan, setPlan]     = useState<MealPlanWithMeals | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [plan, setPlan]         = useState<MealPlanWithMeals | null>(null)
+  const [loading, setLoading]   = useState(true)
+  const [checkedFoods, setCheckedFoods] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     async function fetchPlan() {
@@ -57,6 +58,31 @@ export default function ClientNutritionPage() {
     }
     fetchPlan()
   }, [supabase])
+
+  // Load food tracking state from localStorage on mount / plan change
+  useEffect(() => {
+    if (!plan) return
+    const today = new Date().toISOString().split('T')[0]
+    const saved = localStorage.getItem(`food-tracking-${plan.id}-${today}`)
+    if (saved) {
+      try { setCheckedFoods(new Set(JSON.parse(saved) as string[])) } catch {}
+    } else {
+      setCheckedFoods(new Set())
+    }
+  }, [plan])
+
+  const toggleFood = (mealIdx: number, foodIdx: number) => {
+    const key = `${mealIdx}-${foodIdx}`
+    setCheckedFoods(prev => {
+      const n = new Set(prev)
+      if (n.has(key)) n.delete(key); else n.add(key)
+      const today = new Date().toISOString().split('T')[0]
+      if (plan) {
+        localStorage.setItem(`food-tracking-${plan.id}-${today}`, JSON.stringify(Array.from(n)))
+      }
+      return n
+    })
+  }
 
   // Calculate totals from all meals
   const totals = plan?.meals.reduce((acc, meal) => {
@@ -136,9 +162,38 @@ export default function ClientNutritionPage() {
         </div>
       </div>
 
+      {/* Daily tracking header */}
+      {(() => {
+        const todayLabel = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
+        const totalFoods = plan.meals.reduce((acc, m) => acc + (m.foods as FoodItem[]).length, 0)
+        const checkedCount = checkedFoods.size
+        const pct = totalFoods > 0 ? Math.round(checkedCount / totalFoods * 100) : 0
+        const circumference = 2 * Math.PI * 28
+        return (
+          <div className="card p-4 mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-white capitalize">{todayLabel}</p>
+              <p className="text-xs text-slate-400 mt-0.5">{checkedCount} de {totalFoods} alimentos completados</p>
+            </div>
+            <div className="w-16 h-16 relative">
+              <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="28" strokeWidth="4" className="stroke-slate-700" fill="none" />
+                <circle cx="32" cy="32" r="28" strokeWidth="4" className="stroke-emerald-400" fill="none"
+                  strokeDasharray={`${circumference}`}
+                  strokeDashoffset={`${circumference * (1 - checkedCount / Math.max(totalFoods, 1))}`}
+                  strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.3s' }} />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xs font-bold text-white">{pct}%</span>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Meals */}
       <div className="space-y-4">
-        {plan.meals.map(meal => {
+        {plan.meals.map((meal, mealIdx) => {
           const foods = meal.foods as FoodItem[]
           const mealCals = foods.reduce((s, f) => s + (f.calories || 0), 0)
           return (
@@ -151,20 +206,34 @@ export default function ClientNutritionPage() {
                 <span className="font-mono text-sm font-bold text-brand-primary">{mealCals} kcal</span>
               </div>
               <div className="space-y-2">
-                {foods.map((food, i) => (
-                  <div key={i} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
-                    <div>
-                      <span className="text-sm text-white">{food.name}</span>
-                      <span className="text-xs text-slate-500 ml-2">{food.grams}g</span>
+                {foods.map((food, foodIdx) => {
+                  const isChecked = checkedFoods.has(`${mealIdx}-${foodIdx}`)
+                  return (
+                    <div key={foodIdx} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
+                      <button
+                        onClick={() => toggleFood(mealIdx, foodIdx)}
+                        className={`w-5 h-5 rounded flex items-center justify-center border transition-all shrink-0 ${
+                          isChecked ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600 hover:border-slate-400'
+                        }`}
+                        aria-label={isChecked ? 'Desmarcar alimento' : 'Marcar alimento como comido'}
+                      >
+                        {isChecked && <Check className="w-3 h-3 text-white" />}
+                      </button>
+                      <div className="flex items-center justify-between flex-1">
+                        <div>
+                          <span className={`text-sm transition-colors ${isChecked ? 'text-slate-500 line-through' : 'text-white'}`}>{food.name}</span>
+                          <span className="text-xs text-slate-500 ml-2">{food.grams}g</span>
+                        </div>
+                        <div className="flex gap-4 text-xs text-slate-400 font-mono">
+                          <span>{food.calories}kcal</span>
+                          <span className="text-sky-400">{food.protein}p</span>
+                          <span className="text-amber-400">{food.carbs}c</span>
+                          <span className="text-violet-400">{food.fat}g</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex gap-4 text-xs text-slate-400 font-mono">
-                      <span>{food.calories}kcal</span>
-                      <span className="text-sky-400">{food.protein}p</span>
-                      <span className="text-amber-400">{food.carbs}c</span>
-                      <span className="text-violet-400">{food.fat}g</span>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
                 {foods.length === 0 && (
                   <p className="text-xs text-slate-500 italic">Sin alimentos configurados</p>
                 )}

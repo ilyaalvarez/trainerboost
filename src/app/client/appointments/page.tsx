@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Loader2, CalendarDays, CheckCircle, X } from 'lucide-react'
+import { Loader2, CalendarDays, CheckCircle, X, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import type { Appointment } from '@/types/database'
@@ -21,13 +21,21 @@ export default function ClientAppointmentsPage() {
   const [tab,      setTab]      = useState<'upcoming' | 'past'>('upcoming')
   const [acting,        setActing]        = useState<string | null>(null)
   const [confirmCancel, setConfirmCancel] = useState<string | null>(null)
+  const [userId,   setUserId]   = useState<string | null>(null)
+  const [trainerId, setTrainerId] = useState<string | null>(null)
+
+  const [showRequest, setShowRequest] = useState(false)
+  const [reqForm, setReqForm] = useState({ date: '', time: '', type: 'presencial' as 'presencial' | 'online' | 'llamada', notes: '' })
+  const [requesting, setRequesting] = useState(false)
 
   const fetchApts = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
+    setUserId(user.id)
+
     const now = new Date().toISOString()
-    const [{ data: up }, { data: p }] = await Promise.all([
+    const [{ data: up }, { data: p }, { data: tc }] = await Promise.all([
       supabase.from('appointments')
         .select('*, trainer:trainer_id(full_name)')
         .eq('client_id', user.id)
@@ -40,10 +48,16 @@ export default function ClientAppointmentsPage() {
         .or(`scheduled_at.lt.${now},status.eq.cancelled,status.eq.done`)
         .order('scheduled_at', { ascending: false })
         .limit(20),
+      supabase.from('trainer_clients')
+        .select('trainer_id')
+        .eq('client_id', user.id)
+        .eq('status', 'active')
+        .single(),
     ])
 
     setUpcoming((up || []) as AptWithTrainer[])
     setPast((p || []) as AptWithTrainer[])
+    setTrainerId(tc?.trainer_id ?? null)
     setLoading(false)
   }, [supabase])
 
@@ -71,6 +85,46 @@ export default function ClientAppointmentsPage() {
     fetchApts()
   }
 
+  async function submitRequest() {
+    if (!reqForm.date || !reqForm.time) {
+      toast.error('Selecciona fecha y hora')
+      return
+    }
+    if (!trainerId || !userId) {
+      toast.error('No se encontró tu entrenador asignado')
+      return
+    }
+    setRequesting(true)
+    const { error } = await supabase.from('appointments').insert({
+      trainer_id: trainerId,
+      client_id: userId,
+      scheduled_at: `${reqForm.date}T${reqForm.time}:00`,
+      duration_minutes: 60,
+      type: reqForm.type,
+      status: 'pending',
+      notes: reqForm.notes || null,
+    })
+    setRequesting(false)
+    if (error) { toast.error(error.message); return }
+    toast.success('Solicitud enviada. Tu entrenador la confirmará pronto.')
+    try {
+      await fetch('/api/push/notify-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          trainerId,
+          event: 'appointment_request',
+          message: 'Un cliente ha solicitado una nueva cita.',
+        }),
+      })
+    } catch {
+      // push notification is best-effort; don't block on failure
+    }
+    setShowRequest(false)
+    setReqForm({ date: '', time: '', type: 'presencial', notes: '' })
+    fetchApts()
+  }
+
   const currentList = tab === 'upcoming' ? upcoming : past
 
   return (
@@ -79,6 +133,96 @@ export default function ClientAppointmentsPage() {
         <h1 className="text-2xl font-bold text-white">Mis Citas</h1>
         <p className="text-slate-400 text-sm mt-0.5">Sesiones con tu entrenador</p>
       </div>
+
+      {/* Request new appointment */}
+      <button
+        onClick={() => setShowRequest(true)}
+        className="btn-gradient w-full flex items-center justify-center gap-2 py-3"
+      >
+        <Plus className="w-4 h-4" /> Solicitar nueva cita
+      </button>
+
+      {/* Request form modal */}
+      {showRequest && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="card w-full max-w-md p-6 space-y-4 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-white">Solicitar cita</h2>
+              <button
+                onClick={() => setShowRequest(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-surface-2 transition-all"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-slate-400 mb-1 block">Fecha</label>
+                <input
+                  type="date"
+                  value={reqForm.date}
+                  min={new Date().toISOString().split('T')[0]}
+                  onChange={e => setReqForm(f => ({ ...f, date: e.target.value }))}
+                  className="input w-full"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-slate-400 mb-1 block">Hora</label>
+                <input
+                  type="time"
+                  value={reqForm.time}
+                  onChange={e => setReqForm(f => ({ ...f, time: e.target.value }))}
+                  className="input w-full"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-slate-400 mb-1 block">Tipo de sesión</label>
+                <select
+                  value={reqForm.type}
+                  onChange={e => setReqForm(f => ({ ...f, type: e.target.value as 'presencial' | 'online' | 'llamada' }))}
+                  className="input w-full"
+                >
+                  <option value="presencial">Presencial</option>
+                  <option value="online">Online</option>
+                  <option value="llamada">Llamada</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-slate-400 mb-1 block">Notas (opcional)</label>
+                <textarea
+                  value={reqForm.notes}
+                  onChange={e => setReqForm(f => ({ ...f, notes: e.target.value }))}
+                  placeholder="Ej. quiero trabajar pierna, tengo molestia en la rodilla…"
+                  rows={3}
+                  className="input w-full resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-1">
+              <button
+                onClick={() => setShowRequest(false)}
+                className="btn-secondary flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={submitRequest}
+                disabled={requesting}
+                className="btn-gradient flex-1 flex items-center justify-center gap-2"
+              >
+                {requesting
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Enviando…</>
+                  : 'Enviar solicitud'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-1 p-1 bg-surface-2 rounded-xl w-fit">

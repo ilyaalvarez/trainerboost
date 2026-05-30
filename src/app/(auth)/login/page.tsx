@@ -4,22 +4,36 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Zap, Mail, Lock, ArrowRight, Loader2, ArrowLeft } from 'lucide-react'
+import { Zap, Mail, Lock, ArrowRight, Loader2, ArrowLeft, Eye, EyeOff, AlertTriangle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+
+function getAuthError(error: string): string {
+  if (error.includes('Invalid login credentials')) return 'Email o contraseña incorrectos'
+  if (error.includes('Email not confirmed')) return 'Confirma tu email antes de entrar'
+  if (error.includes('Too many requests')) return 'Demasiados intentos. Espera unos minutos'
+  return 'Error al iniciar sesión. Inténtalo de nuevo'
+}
 
 export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
-  const [email, setEmail]       = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [email, setEmail]             = useState('')
+  const [password, setPassword]       = useState('')
+  const [loading, setLoading]         = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [attempts, setAttempts]       = useState(0)
+  const [rememberMe, setRememberMe]   = useState(true)
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) { toast.error(error.message); return }
+      if (error) {
+        setAttempts(prev => prev + 1)
+        toast.error(getAuthError(error.message))
+        return
+      }
 
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
@@ -81,6 +95,16 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-white mb-1">Bienvenido de nuevo</h1>
           <p className="text-slate-400 text-sm mb-6">Inicia sesión en tu cuenta</p>
 
+          {/* Rate limiting warning */}
+          {attempts >= 3 && (
+            <div className="flex items-start gap-2.5 p-3 mb-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-300">
+                Demasiados intentos. Espera unos segundos antes de volver a intentarlo.
+              </p>
+            </div>
+          )}
+
           {/* Google OAuth */}
           <button
             onClick={handleGoogle}
@@ -128,16 +152,36 @@ export default function LoginPage() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="input pl-9"
+                  className="input pl-9 pr-10"
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(prev => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
+
+            {/* Remember me */}
+            <label className="flex items-center gap-2.5 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-border bg-surface accent-brand-primary cursor-pointer"
+              />
+              <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">Recordarme</span>
+            </label>
 
             <button
               type="submit"

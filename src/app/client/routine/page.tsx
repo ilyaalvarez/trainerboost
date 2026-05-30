@@ -13,6 +13,17 @@ interface ExerciseWithCompletion extends RoutineExercise {
   completed: boolean
 }
 
+function getYouTubeId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+  ]
+  for (const pattern of patterns) {
+    const match = url.match(pattern)
+    if (match) return match[1]
+  }
+  return null
+}
+
 function categoryFor(name: string): { label: string; color: string } {
   const n = name.toLowerCase()
   if (/press|sentadilla|peso|curl|remo|dominada|fondo|hip thrust|peso muerto/.test(n)) {
@@ -278,16 +289,25 @@ export default function ClientRoutinePage() {
                 {ex.notes && (
                   <p className="text-sm text-slate-400 italic">&ldquo;{ex.notes}&rdquo;</p>
                 )}
-                {ex.video_url && (
-                  <a
-                    href={ex.video_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-secondary inline-flex items-center gap-2 text-xs w-fit"
-                  >
-                    <Play className="w-3.5 h-3.5" /> Ver video demo
-                  </a>
-                )}
+                {ex.video_url && (() => {
+                  const ytId = getYouTubeId(ex.video_url)
+                  return ytId ? (
+                    <div className="mt-3 rounded-xl overflow-hidden aspect-video">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${ytId}`}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={ex.name}
+                      />
+                    </div>
+                  ) : (
+                    <a href={ex.video_url} target="_blank" rel="noopener noreferrer"
+                      className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 mt-2 w-fit">
+                      <Play className="w-3.5 h-3.5" /> Ver vídeo
+                    </a>
+                  )
+                })()}
               </div>
             )}
 

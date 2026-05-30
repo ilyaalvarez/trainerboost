@@ -6,7 +6,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from 'recharts'
-import { TrendingDown, TrendingUp, Users, Activity, Calendar, MessageCircle } from 'lucide-react'
+import { TrendingDown, TrendingUp, Users, Activity, Calendar, MessageCircle, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
@@ -170,6 +170,28 @@ export default function AnalyticsPage() {
 
   useEffect(() => { load() }, [load])
 
+  function exportCsv() {
+    const rows = ['Cliente,Fecha,Peso (kg),% Grasa,Masa muscular (kg)']
+    for (const cp of clients) {
+      for (const log of cp.logs) {
+        rows.push([
+          `"${cp.client.full_name}"`,
+          new Date(log.logged_at).toLocaleDateString('es-ES'),
+          log.weight_kg ?? '',
+          log.body_fat_pct ?? '',
+          log.muscle_mass_kg ?? '',
+        ].join(','))
+      }
+    }
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `progreso-clientes-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   function toggleClient(id: string) {
     setSelected(prev => {
       const next = new Set(prev)
@@ -214,7 +236,7 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-bold text-white">Analytics</h1>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setMetric('weight_kg')}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${metric === 'weight_kg' ? 'bg-brand-primary text-white' : 'text-slate-400 hover:text-white'}`}
@@ -226,6 +248,14 @@ export default function AnalyticsPage() {
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${metric === 'body_fat_pct' ? 'bg-brand-primary text-white' : 'text-slate-400 hover:text-white'}`}
           >
             % Grasa
+          </button>
+          <button
+            onClick={exportCsv}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-surface-2 transition-colors border border-border/60"
+            title="Exportar datos como CSV"
+          >
+            <Download className="w-3.5 h-3.5" />
+            CSV
           </button>
         </div>
       </div>

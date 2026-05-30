@@ -4,11 +4,12 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import Image from 'next/image'
 import {
   User, Dumbbell, Apple, TrendingUp, CalendarDays, MessageSquare,
   Phone, Plus, ChevronDown, ArrowLeft, Clock, Send,
   Scale, Percent, Zap, CheckCircle2, AlertTriangle, Bell,
-  Activity, MapPin, Video, FileDown,
+  Activity, MapPin, Video, FileDown, X, ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -72,6 +73,20 @@ export default function ClientDetailPage() {
 
   // PDF report export
   const [exporting, setExporting] = useState(false)
+
+  // Photo lightbox
+  const [lightbox, setLightbox] = useState<{ urls: string[]; idx: number } | null>(null)
+
+  useEffect(() => {
+    if (!lightbox) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightbox(null)
+      if (e.key === 'ArrowRight') setLightbox(lb => lb ? { ...lb, idx: (lb.idx + 1) % lb.urls.length } : null)
+      if (e.key === 'ArrowLeft') setLightbox(lb => lb ? { ...lb, idx: (lb.idx - 1 + lb.urls.length) % lb.urls.length } : null)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [lightbox])
 
   // ── Load data ──────────────────────────────────────────────────────────────
 
@@ -909,13 +924,52 @@ export default function ClientDetailPage() {
                 </div>
               )}
 
+              {/* Before / After */}
+              {(() => {
+                const withPhotos = progressLogs.filter(l => (l.photos ?? []).length > 0)
+                if (withPhotos.length < 2) return null
+                const before = withPhotos[0]
+                const after  = withPhotos[withPhotos.length - 1]
+                const allPhotos = progressLogs.flatMap(l => l.photos ?? [])
+                return (
+                  <div className="card p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #7C3AED, #0EA5E9)' }} />
+                      <h3 className="text-sm font-semibold text-white">Antes y ahora</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {[{ log: before, label: 'Antes' }, { log: after, label: 'Ahora' }].map(({ log, label }) => (
+                        <button key={log.id} onClick={() => {
+                          const url = (log.photos ?? [])[0]
+                          const idx = allPhotos.indexOf(url)
+                          setLightbox({ urls: allPhotos, idx: idx >= 0 ? idx : 0 })
+                        }} className="text-left group">
+                          <div className="relative aspect-square rounded-xl overflow-hidden bg-surface-2 border border-border group-hover:border-sky-500/50 transition-colors">
+                            <Image src={(log.photos ?? [])[0]} alt={label} fill className="object-cover" />
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                              <p className="text-xs font-semibold text-white">{label}</p>
+                              <p className="text-[10px] text-slate-300">{formatDate(log.logged_at)}</p>
+                            </div>
+                          </div>
+                          {log.weight_kg != null && (
+                            <div className="text-center mt-1">
+                              <span className="font-mono text-xs font-bold text-white">{log.weight_kg} kg</span>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+
               {/* Table */}
               <div className="card overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr style={{ background: 'rgba(51,65,85,0.25)' }}>
-                        {['Fecha', 'Peso (kg)', 'Grasa corp.', 'Masa musc.', 'Cintura', 'Pecho', 'Brazo', 'Notas'].map(h => (
+                        {['Fecha', 'Peso (kg)', 'Grasa corp.', 'Masa musc.', 'Cintura', 'Pecho', 'Brazo', 'Notas', 'Fotos'].map(h => (
                           <th key={h} className="text-left px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{h}</th>
                         ))}
                       </tr>
@@ -933,6 +987,24 @@ export default function ClientDetailPage() {
                           <td className="px-4 py-3 text-pink-400 font-mono text-xs">{log.chest_cm != null ? `${log.chest_cm}cm` : <span className="text-slate-600">—</span>}</td>
                           <td className="px-4 py-3 text-cyan-400 font-mono text-xs">{log.arm_cm != null ? `${log.arm_cm}cm` : <span className="text-slate-600">—</span>}</td>
                           <td className="px-4 py-3 text-slate-400 text-xs truncate max-w-[180px]">{log.notes ?? <span className="text-slate-600">—</span>}</td>
+                          <td className="px-4 py-3">
+                            {(log.photos ?? []).length > 0 ? (
+                              <div className="flex gap-1">
+                                {(log.photos ?? []).slice(0, 3).map((url, pi) => (
+                                  <button key={pi} onClick={() => {
+                                    const allPhotos = progressLogs.flatMap(l => l.photos ?? [])
+                                    const idx = allPhotos.indexOf(url)
+                                    setLightbox({ urls: allPhotos, idx: idx >= 0 ? idx : 0 })
+                                  }}>
+                                    <Image src={url} alt="Foto" width={32} height={32} className="object-cover rounded-lg border border-slate-700 hover:border-sky-500 transition-colors cursor-zoom-in" />
+                                  </button>
+                                ))}
+                                {(log.photos ?? []).length > 3 && (
+                                  <span className="w-8 h-8 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-[9px] text-slate-400">+{(log.photos ?? []).length - 3}</span>
+                                )}
+                              </div>
+                            ) : <span className="text-slate-600">—</span>}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -1113,6 +1185,33 @@ export default function ClientDetailPage() {
             onSuccess={() => { setShowAppointmentModal(false); loadData() }}
           />
         </>
+      )}
+
+      {/* ── Photo lightbox ──────────────────────────────────────────────── */}
+      {lightbox && (
+        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center"
+             onClick={() => setLightbox(null)}>
+          <button onClick={() => setLightbox(null)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+            <X className="w-5 h-5 text-white" />
+          </button>
+          {lightbox.urls.length > 1 && (
+            <>
+              <button onClick={e => { e.stopPropagation(); setLightbox(lb => lb ? { ...lb, idx: (lb.idx - 1 + lb.urls.length) % lb.urls.length } : null) }}
+                className="absolute left-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </button>
+              <button onClick={e => { e.stopPropagation(); setLightbox(lb => lb ? { ...lb, idx: (lb.idx + 1) % lb.urls.length } : null) }}
+                className="absolute right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+                <ChevronRight className="w-5 h-5 text-white" />
+              </button>
+            </>
+          )}
+          <div className="relative max-w-3xl max-h-[85vh] w-full mx-20" onClick={e => e.stopPropagation()}>
+            <Image src={lightbox.urls[lightbox.idx]} alt="Foto de progreso"
+              width={900} height={900} className="object-contain max-h-[85vh] w-full rounded-xl" />
+          </div>
+        </div>
       )}
     </div>
   )

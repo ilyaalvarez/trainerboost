@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import {
   Apple, Plus, Search, ChevronDown, ChevronUp,
-  Trash2, X, Clock, Flame, Users, Copy,
+  Trash2, X, Clock, Flame, Users, Copy, FileDown,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -283,6 +283,7 @@ export default function NutritionPage() {
               onMealAdded={loadData}
               onDuplicate={() => duplicatePlan(plan.id)}
               isDuplicating={duplicating.has(plan.id)}
+              clientName={plan.client?.full_name}
             />
           ))}
         </div>
@@ -328,7 +329,7 @@ export default function NutritionPage() {
 
 // ─── Plan Card ────────────────────────────────────────────────────────────────
 
-function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, onMealAdded: _onMealAdded, onDuplicate, isDuplicating }: {
+function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, onMealAdded: _onMealAdded, onDuplicate, isDuplicating, clientName }: {
   plan: MealPlanWithExtras
   expanded: boolean
   onToggle: () => void
@@ -338,7 +339,18 @@ function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, on
   onMealAdded: () => void
   onDuplicate: () => void
   isDuplicating: boolean
+  clientName?: string
 }) {
+  const [exporting, setExporting] = useState(false)
+
+  async function handleExportPdf() {
+    setExporting(true)
+    try {
+      const { exportNutritionPdf } = await import('@/lib/exportPdf')
+      await exportNutritionPdf({ ...plan, meals: plan.meals }, clientName ?? plan.client?.full_name ?? '')
+    } catch { toast.error('Error al generar PDF') }
+    finally { setExporting(false) }
+  }
   const p = plan.protein_target ?? 0
   const c = plan.carbs_target ?? 0
   const f = plan.fat_target ?? 0
@@ -419,7 +431,7 @@ function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, on
           )}
 
           {/* Actions */}
-          <div className="flex gap-2 pt-1 border-t border-[#334155]">
+          <div className="flex flex-wrap gap-2 pt-1 border-t border-[#334155]">
             <button type="button" onClick={onArchive} className="btn-secondary text-xs py-1.5 px-3">
               {plan.status === 'active' ? 'Archivar' : 'Restaurar'}
             </button>
@@ -430,6 +442,14 @@ function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, on
               className="btn-ghost text-xs py-1 px-2 flex items-center gap-1"
             >
               <Copy className="w-3 h-3" />{isDuplicating ? '...' : 'Duplicar'}
+            </button>
+            <button
+              type="button"
+              onClick={handleExportPdf}
+              disabled={exporting}
+              className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 disabled:opacity-50"
+            >
+              <FileDown className="w-3 h-3" />{exporting ? 'Generando...' : 'PDF'}
             </button>
             <button type="button" onClick={onDelete} className="btn-danger text-xs py-1.5 px-3 ml-auto">
               <Trash2 size={13} /> Eliminar

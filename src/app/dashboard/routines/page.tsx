@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import {
   Dumbbell, Plus, Search, ChevronDown, ChevronUp,
   Archive, RotateCcw, GripVertical,
-  Link as LinkIcon, X, Users,
+  Link as LinkIcon, X, Users, Copy,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -57,6 +57,7 @@ export default function RoutinesPage() {
 
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [showModal, setShowModal] = useState(false)
+  const [duplicating, setDuplicating] = useState<Set<string>>(new Set())
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -117,6 +118,52 @@ export default function RoutinesPage() {
     if (error) { toast.error('Error: ' + error.message); return }
     toast.success(newStatus === 'archived' ? 'Rutina archivada' : 'Rutina restaurada')
     setRoutines(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r))
+  }
+
+  const duplicateRoutine = async (id: string) => {
+    setDuplicating(prev => { const n = new Set(prev); n.add(id); return n })
+    try {
+      const original = routines.find(r => r.id === id)
+      if (!original) return
+
+      const { data: exercises, error: exFetchError } = await supabase
+        .from('routine_exercises')
+        .select('*')
+        .eq('routine_id', id)
+        .order('order_index')
+      if (exFetchError) { toast.error('Error al duplicar: ' + exFetchError.message); return }
+
+      const { data: newRoutine, error: insertError } = await supabase
+        .from('routines')
+        .insert({
+          trainer_id: original.trainer_id,
+          client_id: original.client_id,
+          title: `${original.title} (copia)`,
+          description: original.description,
+          frequency: original.frequency,
+          starts_at: original.starts_at,
+          ends_at: original.ends_at,
+          status: 'active',
+        })
+        .select()
+        .single()
+      if (insertError || !newRoutine) { toast.error('Error al duplicar: ' + (insertError?.message ?? 'Desconocido')); return }
+
+      if (exercises && exercises.length > 0) {
+        const { error: exInsertError } = await supabase.from('routine_exercises').insert(
+          exercises.map(({ id: _id, routine_id: _rid, ...rest }: RoutineExercise) => ({
+            ...rest,
+            routine_id: newRoutine.id,
+          }))
+        )
+        if (exInsertError) { toast.error('Rutina duplicada pero error en ejercicios: ' + exInsertError.message) }
+      }
+
+      toast.success('Rutina duplicada ✓')
+      loadData()
+    } finally {
+      setDuplicating(prev => { const n = new Set(prev); n.delete(id); return n })
+    }
   }
 
   // ── Filter logic ──────────────────────────────────────────────────────────
@@ -208,6 +255,8 @@ export default function RoutinesPage() {
               expanded={expanded.has(routine.id)}
               onToggle={() => toggleExpand(routine.id)}
               onArchive={() => archiveRoutine(routine.id, routine.status)}
+              onDuplicate={() => duplicateRoutine(routine.id)}
+              isDuplicating={duplicating.has(routine.id)}
             />
           ))}
         </div>
@@ -227,11 +276,13 @@ export default function RoutinesPage() {
 
 // ─── Routine Card ─────────────────────────────────────────────────────────────
 
-function RoutineCard({ routine, expanded, onToggle, onArchive }: {
+function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDuplicating }: {
   routine: RoutineWithExtras
   expanded: boolean
   onToggle: () => void
   onArchive: () => void
+  onDuplicate: () => void
+  isDuplicating: boolean
 }) {
   return (
     <div className={cn('card overflow-hidden', routine.status === 'archived' && 'opacity-60')}>
@@ -324,6 +375,14 @@ function RoutineCard({ routine, expanded, onToggle, onArchive }: {
                 : <><RotateCcw size={13} /> Restaurar</>
               }
             </button>
+            <button
+              type="button"
+              onClick={onDuplicate}
+              disabled={isDuplicating}
+              className="btn-ghost text-xs py-1 px-2 flex items-center gap-1"
+            >
+              <Copy className="w-3 h-3" />{isDuplicating ? '...' : 'Duplicar'}
+            </button>
           </div>
         </div>
       )}
@@ -408,6 +467,17 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
         toast.error('Rutina creada pero error en ejercicios: ' + exError.message)
       }
     }
+
+    // Notify the client — fire-and-forget, don't block UX on failure
+    supabase.from('notifications').insert({
+      user_id: form.client_id,
+      type: 'routine',
+      title: 'Nueva rutina asignada',
+      body: `Tu entrenador te ha asignado una nueva rutina: ${form.title.trim()}`,
+      link: '/client/routine',
+    }).then(({ error: notifError }) => {
+      if (notifError) console.error('Error sending routine notification:', notifError)
+    })
 
     setSaving(false)
     toast.success('Rutina creada correctamente')

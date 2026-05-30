@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Routine, RoutineExercise } from '@/types/database'
 import { formatDate } from '@/lib/utils'
 import EmptyState from '@/components/ui/EmptyState'
+import { SetLogger } from '@/components/ui/SetLogger'
 
 interface ExerciseWithCompletion extends RoutineExercise {
   completed: boolean
@@ -31,6 +32,7 @@ export default function ClientRoutinePage() {
   const [expanded, setExpanded]       = useState<string | null>(null)
   const [completing, setCompleting]   = useState<string | null>(null)
   const [timer, setTimer]             = useState<{ exerciseId: string; remaining: number } | null>(null)
+  const [userId, setUserId]           = useState<string | null>(null)
 
   useEffect(() => {
     if (!timer) return
@@ -54,6 +56,7 @@ export default function ClientRoutinePage() {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
+      setUserId(user.id)
 
       const today = new Date().toISOString().split('T')[0]
 
@@ -285,6 +288,17 @@ export default function ClientRoutinePage() {
                     <Play className="w-3.5 h-3.5" /> Ver video demo
                   </a>
                 )}
+              </div>
+            )}
+
+            {/* Per-set logging */}
+            {userId && (
+              <div className="px-4 pb-4">
+                <SetLogger
+                  exerciseId={ex.id}
+                  clientId={userId}
+                  defaultSets={ex.sets ?? 3}
+                />
               </div>
             )}
           </div>

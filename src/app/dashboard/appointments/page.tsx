@@ -199,6 +199,22 @@ export default function AppointmentsPage() {
 
       if (error) throw error
 
+      // Notify the client — fire-and-forget, don't block UX on failure
+      const formattedDate = new Date(scheduledAt).toLocaleDateString('es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      })
+      supabase.from('notifications').insert({
+        user_id: form.client_id,
+        type: 'appointment',
+        title: 'Nueva cita programada',
+        body: `Tienes una cita el ${formattedDate}`,
+        link: '/client/appointments',
+      }).then(({ error: notifError }) => {
+        if (notifError) console.error('Error sending appointment notification:', notifError)
+      })
+
       setAppointments(prev => [...prev, data as AppointmentWithProfiles])
       toast.success('Cita creada correctamente')
       setModalOpen(false)

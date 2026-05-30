@@ -7,11 +7,19 @@ import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import type { Profile } from '@/types/database'
 import ProgressChart from './_components/ProgressChart'
+import { DailyCheckinCard } from '@/components/ui/DailyCheckinCard'
 
 export default async function ClientHomePage() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  const today = new Date().toISOString().split('T')[0]
+  const checkinQuery = supabase.from('daily_checkins')
+    .select('energy,mood,sleep_hours')
+    .eq('client_id', user.id)
+    .eq('checkin_date', today)
+    .maybeSingle()
 
   const [
     { data: profile },
@@ -20,6 +28,7 @@ export default async function ClientHomePage() {
     { data: nextApt },
     { data: _unreadMessages },
     { data: activeRoutine },
+    { data: todayCheckin },
   ] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase.from('trainer_clients')
@@ -51,6 +60,7 @@ export default async function ClientHomePage() {
       .order('created_at', { ascending: false })
       .limit(1)
       .single(),
+    checkinQuery,
   ])
 
   const trainer = trainerRel?.trainer as Profile | null
@@ -83,6 +93,9 @@ export default async function ClientHomePage() {
         </h1>
         <p className="text-slate-400 text-sm mt-0.5 capitalize">{formatDate(now, "EEEE, d MMMM")}</p>
       </div>
+
+      {/* Daily check-in */}
+      <DailyCheckinCard clientId={user.id} existingCheckin={todayCheckin} />
 
       {/* Trainer info */}
       {trainer && (

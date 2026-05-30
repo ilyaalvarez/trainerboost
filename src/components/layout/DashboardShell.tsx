@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Zap } from 'lucide-react'
 import DashboardSidebar from './DashboardSidebar'
 import Avatar from '@/components/ui/Avatar'
+import NotificationBell from '@/components/ui/NotificationBell'
 import type { Profile, Subscription } from '@/types/database'
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
 
 export default function DashboardShell({ profile, subscription, unreadMessages, children }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -82,8 +84,15 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
             <span className="font-bold text-white text-sm tracking-tight">TrainerBoost</span>
           </div>
 
-          <div className="ring-2 ring-brand-primary/20 rounded-full">
-            <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
+          <div className="flex items-center gap-2">
+            <NotificationBell
+              userId={profile.id}
+              isOpen={notifOpen}
+              onToggle={() => setNotifOpen(v => !v)}
+            />
+            <div className="ring-2 ring-brand-primary/20 rounded-full">
+              <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
+            </div>
           </div>
         </div>
 

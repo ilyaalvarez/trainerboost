@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import {
   Apple, Plus, Search, ChevronDown, ChevronUp,
-  Trash2, X, Clock, Flame, Users,
+  Trash2, X, Clock, Flame, Users, Copy,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -80,6 +80,7 @@ export default function NutritionPage() {
   const [showNewPlanModal, setShowNewPlanModal] = useState(false)
   const [addMealForPlan, setAddMealForPlan] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [duplicating, setDuplicating] = useState<Set<string>>(new Set())
 
   // ── Load data ──────────────────────────────────────────────────────────────
 
@@ -154,6 +155,55 @@ export default function NutritionPage() {
     setPlans(prev => prev.filter(p => p.id !== id))
   }
 
+  // ── Duplicate plan ─────────────────────────────────────────────────────────
+
+  const duplicatePlan = async (id: string) => {
+    setDuplicating(prev => { const n = new Set(prev); n.add(id); return n })
+    try {
+      const original = plans.find(p => p.id === id)
+      if (!original) return
+
+      const { data: meals, error: mealFetchError } = await supabase
+        .from('meals')
+        .select('*')
+        .eq('meal_plan_id', id)
+        .order('order_index')
+      if (mealFetchError) { toast.error('Error al duplicar: ' + mealFetchError.message); return }
+
+      const { data: newPlan, error: insertError } = await supabase
+        .from('meal_plans')
+        .insert({
+          trainer_id: original.trainer_id,
+          client_id: original.client_id,
+          title: `${original.title} (copia)`,
+          calories_target: original.calories_target,
+          protein_target: original.protein_target,
+          carbs_target: original.carbs_target,
+          fat_target: original.fat_target,
+          notes: original.notes,
+          status: 'active',
+        })
+        .select()
+        .single()
+      if (insertError || !newPlan) { toast.error('Error al duplicar: ' + (insertError?.message ?? 'Desconocido')); return }
+
+      if (meals && meals.length > 0) {
+        const { error: mealInsertError } = await supabase.from('meals').insert(
+          meals.map(({ id: _id, meal_plan_id: _mpid, ...rest }: Meal) => ({
+            ...rest,
+            meal_plan_id: newPlan.id,
+          }))
+        )
+        if (mealInsertError) { toast.error('Plan duplicado pero error en comidas: ' + mealInsertError.message) }
+      }
+
+      toast.success('Plan duplicado ✓')
+      loadData()
+    } finally {
+      setDuplicating(prev => { const n = new Set(prev); n.delete(id); return n })
+    }
+  }
+
   // ── Filter ─────────────────────────────────────────────────────────────────
 
   const filtered = plans.filter(p => {
@@ -222,6 +272,8 @@ export default function NutritionPage() {
               onDelete={() => setDeleteConfirm(plan.id)}
               onAddMeal={() => { setAddMealForPlan(plan.id); setExpanded(prev => { const s = new Set(prev); s.add(plan.id); return s }) }}
               onMealAdded={loadData}
+              onDuplicate={() => duplicatePlan(plan.id)}
+              isDuplicating={duplicating.has(plan.id)}
             />
           ))}
         </div>
@@ -267,7 +319,7 @@ export default function NutritionPage() {
 
 // ─── Plan Card ────────────────────────────────────────────────────────────────
 
-function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, onMealAdded: _onMealAdded }: {
+function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, onMealAdded: _onMealAdded, onDuplicate, isDuplicating }: {
   plan: MealPlanWithExtras
   expanded: boolean
   onToggle: () => void
@@ -275,6 +327,8 @@ function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, on
   onDelete: () => void
   onAddMeal: () => void
   onMealAdded: () => void
+  onDuplicate: () => void
+  isDuplicating: boolean
 }) {
   const p = plan.protein_target ?? 0
   const c = plan.carbs_target ?? 0
@@ -359,6 +413,14 @@ function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, on
           <div className="flex gap-2 pt-1 border-t border-[#334155]">
             <button type="button" onClick={onArchive} className="btn-secondary text-xs py-1.5 px-3">
               {plan.status === 'active' ? 'Archivar' : 'Restaurar'}
+            </button>
+            <button
+              type="button"
+              onClick={onDuplicate}
+              disabled={isDuplicating}
+              className="btn-ghost text-xs py-1 px-2 flex items-center gap-1"
+            >
+              <Copy className="w-3 h-3" />{isDuplicating ? '...' : 'Duplicar'}
             </button>
             <button type="button" onClick={onDelete} className="btn-danger text-xs py-1.5 px-3 ml-auto">
               <Trash2 size={13} /> Eliminar
@@ -477,6 +539,18 @@ function NewPlanModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
     })
     setSaving(false)
     if (error) { toast.error('Error: ' + error.message); return }
+
+    // Notify the client — fire-and-forget, don't block UX on failure
+    supabase.from('notifications').insert({
+      user_id: form.client_id,
+      type: 'meal_plan',
+      title: 'Nuevo plan de nutrición',
+      body: `Tu entrenador te ha asignado un plan: ${form.title.trim()}`,
+      link: '/client/nutrition',
+    }).then(({ error: notifError }) => {
+      if (notifError) console.error('Error sending meal plan notification:', notifError)
+    })
+
     toast.success('Plan creado correctamente')
     setForm({ client_id: '', title: '', calories_target: '', protein_target: '', carbs_target: '', fat_target: '', notes: '' })
     onSuccess()

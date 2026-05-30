@@ -150,6 +150,51 @@ export interface Subscription {
   updated_at: string
 }
 
+export type NotificationType =
+  | 'message' | 'routine' | 'meal_plan' | 'appointment' | 'progress' | 'system'
+
+export interface Notification {
+  id: string
+  user_id: string
+  type: NotificationType
+  title: string
+  body: string | null
+  link: string | null
+  read_at: string | null
+  created_at: string
+}
+
+export interface SetLog {
+  id: string
+  exercise_id: string
+  client_id: string
+  set_number: number
+  weight_kg: number | null
+  reps: number | null
+  logged_at: string
+  created_at: string
+}
+
+export interface PushSubscriptionRow {
+  id: string
+  user_id: string
+  endpoint: string
+  p256dh: string
+  auth: string
+  created_at: string
+}
+
+export interface DailyCheckin {
+  id: string
+  client_id: string
+  checkin_date: string
+  energy: number | null
+  mood: number | null
+  sleep_hours: number | null
+  note: string | null
+  created_at: string
+}
+
 // Joined types for common queries
 export interface ClientWithProfile extends TrainerClient {
   profile: Profile

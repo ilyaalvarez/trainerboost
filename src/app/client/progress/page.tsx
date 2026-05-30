@@ -10,6 +10,7 @@ import Modal from '@/components/ui/Modal'
 import EmptyState from '@/components/ui/EmptyState'
 import Milestones from '@/components/ui/Milestones'
 import ProgressChart from '../_components/ProgressChart'
+import { PhotoUpload } from '@/components/ui/PhotoUpload'
 
 function computeStreak(dates: string[]): number {
   const unique = Array.from(new Set(dates.map(d => d.slice(0, 10)))).sort((a, b) => (a < b ? 1 : -1))
@@ -224,7 +225,7 @@ export default function ClientProgressPage() {
             <table className="w-full text-sm">
               <thead className="border-b border-border">
                 <tr>
-                  {['Fecha', 'Peso', 'Grasa %', 'Masa muscular', 'Notas'].map(h => (
+                  {['Fecha', 'Peso', 'Grasa %', 'Masa muscular', 'Notas', 'Fotos'].map(h => (
                     <th key={h} className="text-left p-4 text-xs font-semibold text-slate-400 uppercase tracking-wide">
                       {h}
                     </th>
@@ -239,6 +240,15 @@ export default function ClientProgressPage() {
                     <td className="p-4 font-mono text-slate-300">{log.body_fat_pct ?? '—'}{log.body_fat_pct ? '%' : ''}</td>
                     <td className="p-4 font-mono text-slate-300">{log.muscle_mass_kg ?? '—'}{log.muscle_mass_kg ? ' kg' : ''}</td>
                     <td className="p-4 text-slate-400 text-xs max-w-xs truncate">{log.notes || '—'}</td>
+                    <td className="p-4">
+                      <PhotoUpload
+                        logId={log.id}
+                        existing={log.photos ?? []}
+                        onUpdated={(urls) => {
+                          setLogs(prev => prev.map(l => l.id === log.id ? { ...l, photos: urls } : l))
+                        }}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>

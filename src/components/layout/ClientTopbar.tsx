@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -11,6 +12,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { Profile } from '@/types/database'
 import Avatar from '@/components/ui/Avatar'
+import NotificationBell from '@/components/ui/NotificationBell'
 
 const NAV_ITEMS = [
   { href: '/client',               icon: TrendingUp,      label: 'Progreso' },
@@ -25,9 +27,10 @@ interface Props {
 }
 
 export default function ClientTopbar({ profile }: Props) {
-  const pathname = usePathname()
-  const router   = useRouter()
-  const supabase = createClient()
+  const pathname    = usePathname()
+  const router      = useRouter()
+  const supabase    = createClient()
+  const [notifOpen, setNotifOpen] = useState(false)
 
   async function logout() {
     await supabase.auth.signOut()
@@ -100,6 +103,11 @@ export default function ClientTopbar({ profile }: Props) {
                   {profile.full_name.split(' ')[0]}
                 </span>
               </div>
+              <NotificationBell
+                userId={profile.id}
+                isOpen={notifOpen}
+                onToggle={() => setNotifOpen(v => !v)}
+              />
               <button
                 onClick={logout}
                 className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all duration-150 group"

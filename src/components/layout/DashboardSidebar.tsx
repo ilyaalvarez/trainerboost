@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, Users, Dumbbell, UtensilsCrossed,
@@ -11,6 +12,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { Profile, Subscription } from '@/types/database'
 import Avatar from '@/components/ui/Avatar'
+import NotificationBell from '@/components/ui/NotificationBell'
 
 const NAV_ITEMS = [
   { href: '/dashboard',              icon: LayoutDashboard, label: 'Panel' },
@@ -38,6 +40,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
   const pathname = usePathname()
   const router   = useRouter()
   const supabase = createClient()
+  const [notifOpen, setNotifOpen] = useState(false)
 
   async function logout() {
     await supabase.auth.signOut()
@@ -61,10 +64,15 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
           >
             <Zap className="w-4 h-4 text-white" />
           </div>
-          <div>
+          <div className="flex-1 min-w-0">
             <div className="font-bold text-white text-sm tracking-tight">TrainerBoost</div>
             <div className="text-xs text-slate-500 font-medium">Dashboard</div>
           </div>
+          <NotificationBell
+            userId={profile.id}
+            isOpen={notifOpen}
+            onToggle={() => setNotifOpen(v => !v)}
+          />
         </div>
       </div>
 

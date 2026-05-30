@@ -262,7 +262,12 @@ export default function ClientAppointmentsPage() {
                     <div className="font-semibold text-white">{formatRelative(apt.scheduled_at)}</div>
                     <div className="text-sm text-slate-400 mt-0.5">
                       {apt.trainer?.full_name} · {apt.duration_minutes}min · {apt.type}
-                      {apt.location && ` · ${apt.location}`}
+                      {apt.location && apt.type === 'online' && apt.location.startsWith('http') ? (
+                        <> · <a href={apt.location} target="_blank" rel="noopener noreferrer"
+                          className="text-sky-400 hover:text-sky-300 font-medium transition-colors">
+                          Unirse a videollamada
+                        </a></>
+                      ) : apt.location ? ` · ${apt.location}` : null}
                     </div>
                     {apt.notes && (
                       <div className="text-xs text-slate-500 mt-1 italic">{apt.notes}</div>

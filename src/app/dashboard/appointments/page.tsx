@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   CalendarDays, Plus, Loader2, Clock, MapPin, FileText,
-  CheckCircle2, XCircle, ChevronDown, List, ChevronLeft, ChevronRight,
+  CheckCircle2, XCircle, ChevronDown, List, ChevronLeft, ChevronRight, Video,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn, formatRelative } from '@/lib/utils'
@@ -393,10 +393,23 @@ export default function AppointmentsPage() {
                       {apt.location && (
                         <>
                           <span className="text-slate-600 text-xs">·</span>
-                          <span className="flex items-center gap-1 text-xs text-slate-400">
-                            <MapPin className="w-3 h-3" />
-                            {apt.location}
-                          </span>
+                          {apt.type === 'online' && apt.location.startsWith('http') ? (
+                            <a
+                              href={apt.location}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-xs text-sky-400 hover:text-sky-300 font-medium transition-colors"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              <Video className="w-3 h-3" />
+                              Unirse a videollamada
+                            </a>
+                          ) : (
+                            <span className="flex items-center gap-1 text-xs text-slate-400">
+                              <MapPin className="w-3 h-3" />
+                              {apt.location}
+                            </span>
+                          )}
                         </>
                       )}
                     </div>

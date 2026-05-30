@@ -735,8 +735,8 @@ export default function LandingPage() {
               <a href="/pricing" className="hover:text-slate-300 transition-colors">Precios</a>
               <a href="/demo/trainer" className="hover:text-slate-300 transition-colors">Demo</a>
               <a href="mailto:hola@trainerboost.es" className="hover:text-slate-300 transition-colors">Contacto</a>
-              <a href="#" className="hover:text-slate-300 transition-colors">Política de privacidad</a>
-              <a href="#" className="hover:text-slate-300 transition-colors">Términos de servicio</a>
+              <Link href="/privacy" className="hover:text-slate-300 transition-colors">Política de privacidad</Link>
+              <Link href="/terms" className="hover:text-slate-300 transition-colors">Términos de servicio</Link>
             </nav>
           </div>
           <p className="text-center text-xs text-slate-600">© 2025 TrainerBoost · Hecho con ❤️ para entrenadores personales · Spain 🇪🇸</p>

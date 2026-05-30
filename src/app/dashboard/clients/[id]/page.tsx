@@ -8,7 +8,7 @@ import {
   User, Dumbbell, Apple, TrendingUp, CalendarDays, MessageSquare,
   Phone, Plus, ChevronDown, ArrowLeft, Clock, Send,
   Scale, Percent, Zap, CheckCircle2, AlertTriangle, Bell,
-  Activity, MapPin, Video,
+  Activity, MapPin, Video, FileDown,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -68,6 +68,9 @@ export default function ClientDetailPage() {
   const [messageText,    setMessageText]    = useState('')
   const [sendingMessage, setSendingMessage] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // PDF report export
+  const [exporting, setExporting] = useState(false)
 
   // ── Load data ──────────────────────────────────────────────────────────────
 
@@ -163,6 +166,27 @@ export default function ClientDetailPage() {
       await loadData()
     }
     setSendingMessage(false)
+  }
+
+  const handleExportPdf = async () => {
+    if (!data) return
+    setExporting(true)
+    try {
+      const { exportProgressReportPdf } = await import('@/lib/exportPdf')
+      const activeMeal = data.mealPlans.find(m => m.status === 'active') ?? null
+      await exportProgressReportPdf(
+        data.profile,
+        data.relation,
+        data.progressLogs,
+        data.routines,
+        activeMeal,
+      )
+      toast.success('Informe PDF generado')
+    } catch {
+      toast.error('Error al generar el informe')
+    } finally {
+      setExporting(false)
+    }
   }
 
   // ── Loading state ──────────────────────────────────────────────────────────
@@ -276,6 +300,15 @@ export default function ClientDetailPage() {
                     <CalendarDays size={11} /> Desde {formatDate(relation.started_at)}
                   </span>
                 </div>
+                {(relation.tags ?? []).length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {(relation.tags ?? []).map(tag => (
+                      <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full border bg-sky-500/10 text-sky-300 border-sky-500/25">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -288,6 +321,10 @@ export default function ClientDetailPage() {
               <button type="button" onClick={() => setShowAppointmentModal(true)}
                       className="btn-secondary text-xs py-1.5 px-3 gap-1.5">
                 <CalendarDays size={13} /> Cita
+              </button>
+              <button type="button" onClick={handleExportPdf} disabled={exporting}
+                      className="btn-secondary text-xs py-1.5 px-3 gap-1.5 disabled:opacity-60">
+                <FileDown size={13} /> {exporting ? 'Generando...' : 'Informe PDF'}
               </button>
               <button type="button" onClick={() => setShowRoutineModal(true)}
                       className="btn-gradient text-xs py-1.5 px-3 gap-1.5">
@@ -811,7 +848,7 @@ export default function ClientDetailPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr style={{ background: 'rgba(51,65,85,0.25)' }}>
-                        {['Fecha', 'Peso (kg)', 'Grasa corp.', 'Masa musc.', 'Notas'].map(h => (
+                        {['Fecha', 'Peso (kg)', 'Grasa corp.', 'Masa musc.', 'Cintura', 'Pecho', 'Brazo', 'Notas'].map(h => (
                           <th key={h} className="text-left px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{h}</th>
                         ))}
                       </tr>
@@ -825,6 +862,9 @@ export default function ClientDetailPage() {
                           <td className="px-4 py-3 text-sky-400 font-mono font-semibold text-xs">{log.weight_kg != null ? `${log.weight_kg}` : <span className="text-slate-600">—</span>}</td>
                           <td className="px-4 py-3 text-amber-400 font-mono text-xs">{log.body_fat_pct != null ? `${log.body_fat_pct}%` : <span className="text-slate-600">—</span>}</td>
                           <td className="px-4 py-3 text-emerald-400 font-mono text-xs">{log.muscle_mass_kg != null ? `${log.muscle_mass_kg}` : <span className="text-slate-600">—</span>}</td>
+                          <td className="px-4 py-3 text-violet-400 font-mono text-xs">{log.waist_cm != null ? `${log.waist_cm}cm` : <span className="text-slate-600">—</span>}</td>
+                          <td className="px-4 py-3 text-pink-400 font-mono text-xs">{log.chest_cm != null ? `${log.chest_cm}cm` : <span className="text-slate-600">—</span>}</td>
+                          <td className="px-4 py-3 text-cyan-400 font-mono text-xs">{log.arm_cm != null ? `${log.arm_cm}cm` : <span className="text-slate-600">—</span>}</td>
                           <td className="px-4 py-3 text-slate-400 text-xs truncate max-w-[180px]">{log.notes ?? <span className="text-slate-600">—</span>}</td>
                         </tr>
                       ))}
@@ -1186,7 +1226,9 @@ function NewProgressModal({ isOpen, onClose, clientId, trainerId, onSuccess }: {
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
     logged_at: new Date().toISOString().split('T')[0],
-    weight_kg: '', body_fat_pct: '', muscle_mass_kg: '', notes: '',
+    weight_kg: '', body_fat_pct: '', muscle_mass_kg: '',
+    waist_cm: '', chest_cm: '', arm_cm: '', thigh_cm: '', hip_cm: '',
+    notes: '',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1199,13 +1241,18 @@ function NewProgressModal({ isOpen, onClose, clientId, trainerId, onSuccess }: {
       weight_kg:       form.weight_kg ? Number(form.weight_kg) : null,
       body_fat_pct:    form.body_fat_pct ? Number(form.body_fat_pct) : null,
       muscle_mass_kg:  form.muscle_mass_kg ? Number(form.muscle_mass_kg) : null,
+      waist_cm:        form.waist_cm ? Number(form.waist_cm) : null,
+      chest_cm:        form.chest_cm ? Number(form.chest_cm) : null,
+      arm_cm:          form.arm_cm ? Number(form.arm_cm) : null,
+      thigh_cm:        form.thigh_cm ? Number(form.thigh_cm) : null,
+      hip_cm:          form.hip_cm ? Number(form.hip_cm) : null,
       notes:           form.notes.trim() || null,
       photos:          [],
     })
     setSaving(false)
     if (error) { toast.error('Error: ' + error.message); return }
     toast.success('Registro guardado')
-    setForm({ logged_at: new Date().toISOString().split('T')[0], weight_kg: '', body_fat_pct: '', muscle_mass_kg: '', notes: '' })
+    setForm({ logged_at: new Date().toISOString().split('T')[0], weight_kg: '', body_fat_pct: '', muscle_mass_kg: '', waist_cm: '', chest_cm: '', arm_cm: '', thigh_cm: '', hip_cm: '', notes: '' })
     onSuccess()
   }
 
@@ -1230,6 +1277,24 @@ function NewProgressModal({ isOpen, onClose, clientId, trainerId, onSuccess }: {
             <input type="number" step="0.1" className="input" placeholder="35.0" value={form.muscle_mass_kg} onChange={e => setForm(p => ({ ...p, muscle_mass_kg: e.target.value }))} />
           </div>
         </div>
+        <details className="mt-1">
+          <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-300">Medidas corporales (opcional)</summary>
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            {([
+              { key: 'waist_cm', label: 'Cintura (cm)' },
+              { key: 'chest_cm', label: 'Pecho (cm)' },
+              { key: 'arm_cm',   label: 'Brazo (cm)' },
+              { key: 'thigh_cm', label: 'Muslo (cm)' },
+              { key: 'hip_cm',   label: 'Cadera (cm)' },
+            ] as const).map(m => (
+              <div key={m.key}>
+                <label className="text-xs text-slate-500">{m.label}</label>
+                <input type="number" step="0.1" className="input text-sm py-1.5"
+                  value={form[m.key]} onChange={e => setForm(p => ({ ...p, [m.key]: e.target.value }))} />
+              </div>
+            ))}
+          </div>
+        </details>
         <div>
           <label className="label">Notas</label>
           <textarea className="input resize-none" rows={2} placeholder="Observaciones..." value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />

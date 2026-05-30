@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -14,14 +14,6 @@ import type { Profile } from '@/types/database'
 import Avatar from '@/components/ui/Avatar'
 import NotificationBell from '@/components/ui/NotificationBell'
 
-const NAV_ITEMS = [
-  { href: '/client',               icon: TrendingUp,      label: 'Progreso' },
-  { href: '/client/routine',       icon: Dumbbell,        label: 'Mi Rutina' },
-  { href: '/client/nutrition',     icon: UtensilsCrossed, label: 'Nutrición' },
-  { href: '/client/appointments',  icon: CalendarDays,    label: 'Citas' },
-  { href: '/client/messages',      icon: MessageSquare,   label: 'Mensajes' },
-]
-
 interface Props {
   profile: Profile
 }
@@ -31,6 +23,36 @@ export default function ClientTopbar({ profile }: Props) {
   const router      = useRouter()
   const supabase    = createClient()
   const [notifOpen, setNotifOpen] = useState(false)
+  const [unreadMessages, setUnreadMessages] = useState(0)
+
+  useEffect(() => {
+    async function fetchUnread() {
+      const { count } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('receiver_id', profile.id)
+        .is('read_at', null)
+      setUnreadMessages(count ?? 0)
+    }
+    fetchUnread()
+
+    const channel = supabase.channel('client-topbar-unread')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${profile.id}` },
+        () => fetchUnread())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `receiver_id=eq.${profile.id}` },
+        () => fetchUnread())
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [supabase, profile.id])
+
+  const NAV_ITEMS = [
+    { href: '/client',               icon: TrendingUp,      label: 'Progreso',    badge: 0 },
+    { href: '/client/routine',       icon: Dumbbell,        label: 'Mi Rutina',   badge: 0 },
+    { href: '/client/nutrition',     icon: UtensilsCrossed, label: 'Nutrición',   badge: 0 },
+    { href: '/client/appointments',  icon: CalendarDays,    label: 'Citas',       badge: 0 },
+    { href: '/client/messages',      icon: MessageSquare,   label: 'Mensajes',    badge: unreadMessages },
+  ]
 
   async function logout() {
     await supabase.auth.signOut()
@@ -75,12 +97,19 @@ export default function ClientTopbar({ profile }: Props) {
                       background: 'linear-gradient(180deg, rgba(14,165,233,0.1) 0%, transparent 100%)',
                     } : undefined}
                   >
-                    <item.icon className={cn(
-                      'w-3.5 h-3.5 transition-all duration-200',
-                      isActive
-                        ? 'text-brand-primary'
-                        : 'text-slate-500 group-hover:text-slate-300 group-hover:scale-110',
-                    )} />
+                    <div className="relative">
+                      <item.icon className={cn(
+                        'w-3.5 h-3.5 transition-all duration-200',
+                        isActive
+                          ? 'text-brand-primary'
+                          : 'text-slate-500 group-hover:text-slate-300 group-hover:scale-110',
+                      )} />
+                      {item.badge > 0 && !isActive && (
+                        <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                          {item.badge > 9 ? '9+' : item.badge}
+                        </span>
+                      )}
+                    </div>
                     {item.label}
                     {isActive && (
                       <span
@@ -138,7 +167,14 @@ export default function ClientTopbar({ profile }: Props) {
                       : 'text-slate-400 hover:text-slate-200 hover:bg-surface-2',
                   )}
                 >
-                  <item.icon className="w-3.5 h-3.5" />
+                  <div className="relative">
+                    <item.icon className="w-3.5 h-3.5" />
+                    {item.badge > 0 && !isActive && (
+                      <span className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">
+                        {item.badge > 9 ? '9+' : item.badge}
+                      </span>
+                    )}
+                  </div>
                   {item.label}
                 </Link>
               )

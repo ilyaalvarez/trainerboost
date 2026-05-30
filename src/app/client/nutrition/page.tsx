@@ -114,6 +114,20 @@ export default function ClientNutritionPage() {
     return acc
   }, { calories: 0, protein: 0, carbs: 0, fat: 0 })
 
+  // Calculate consumed totals from checked foods only
+  const consumed = plan?.meals.reduce((acc, meal, mealIdx) => {
+    const foods = meal.foods as FoodItem[]
+    foods.forEach((f, foodIdx) => {
+      if (checkedFoods.has(`${mealIdx}-${foodIdx}`)) {
+        acc.calories += f.calories || 0
+        acc.protein  += f.protein  || 0
+        acc.carbs    += f.carbs    || 0
+        acc.fat      += f.fat      || 0
+      }
+    })
+    return acc
+  }, { calories: 0, protein: 0, carbs: 0, fat: 0 })
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -154,17 +168,24 @@ export default function ClientNutritionPage() {
 
       {/* Macros overview */}
       <div className="card p-5 space-y-4">
-        <h2 className="font-semibold text-white">Objetivos del día</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-white">Objetivos del día</h2>
+          {checkedFoods.size > 0 && (
+            <span className="text-xs text-slate-400">
+              Consumido: <span className="text-white font-semibold">{consumed?.calories ?? 0} kcal</span>
+            </span>
+          )}
+        </div>
         <div className="grid grid-cols-4 gap-3 mb-4">
           {[
-            { label: 'Calorías', value: totals?.calories ?? 0, target: plan.calories_target ?? 0, unit: 'kcal', color: 'text-white' },
-            { label: 'Proteína', value: totals?.protein ?? 0, target: plan.protein_target ?? 0, unit: 'g', color: 'text-sky-400' },
-            { label: 'Carbos', value: totals?.carbs ?? 0, target: plan.carbs_target ?? 0, unit: 'g', color: 'text-amber-400' },
-            { label: 'Grasa', value: totals?.fat ?? 0, target: plan.fat_target ?? 0, unit: 'g', color: 'text-violet-400' },
+            { label: 'Calorías', value: totals?.calories ?? 0, consumed: consumed?.calories ?? 0, target: plan.calories_target ?? 0, unit: 'kcal', color: 'text-white' },
+            { label: 'Proteína', value: totals?.protein ?? 0, consumed: consumed?.protein ?? 0, target: plan.protein_target ?? 0, unit: 'g', color: 'text-sky-400' },
+            { label: 'Carbos', value: totals?.carbs ?? 0, consumed: consumed?.carbs ?? 0, target: plan.carbs_target ?? 0, unit: 'g', color: 'text-amber-400' },
+            { label: 'Grasa', value: totals?.fat ?? 0, consumed: consumed?.fat ?? 0, target: plan.fat_target ?? 0, unit: 'g', color: 'text-violet-400' },
           ].map(m => (
             <div key={m.label} className="text-center p-3 rounded-xl bg-surface-2">
               <div className={`font-mono text-xl font-bold ${m.color}`}>
-                {m.value}
+                {checkedFoods.size > 0 ? m.consumed : m.value}
               </div>
               <div className="text-xs text-slate-500 mt-0.5">{m.label}</div>
               {m.target > 0 && (
@@ -174,9 +195,9 @@ export default function ClientNutritionPage() {
           ))}
         </div>
         <div className="space-y-3">
-          {plan.protein_target && <MacroBar label="Proteína" value={totals?.protein ?? 0} max={plan.protein_target} color="bg-sky-400" />}
-          {plan.carbs_target   && <MacroBar label="Carbos"   value={totals?.carbs ?? 0}   max={plan.carbs_target}   color="bg-amber-400" />}
-          {plan.fat_target     && <MacroBar label="Grasa"    value={totals?.fat ?? 0}     max={plan.fat_target}     color="bg-violet-400" />}
+          {plan.protein_target && <MacroBar label="Proteína" value={checkedFoods.size > 0 ? (consumed?.protein ?? 0) : (totals?.protein ?? 0)} max={plan.protein_target} color="bg-sky-400" />}
+          {plan.carbs_target   && <MacroBar label="Carbos"   value={checkedFoods.size > 0 ? (consumed?.carbs ?? 0) : (totals?.carbs ?? 0)}     max={plan.carbs_target}   color="bg-amber-400" />}
+          {plan.fat_target     && <MacroBar label="Grasa"    value={checkedFoods.size > 0 ? (consumed?.fat ?? 0) : (totals?.fat ?? 0)}         max={plan.fat_target}     color="bg-violet-400" />}
         </div>
       </div>
 

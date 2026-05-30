@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Zap } from 'lucide-react'
 import DashboardSidebar from './DashboardSidebar'
 import Avatar from '@/components/ui/Avatar'
 import NotificationBell from '@/components/ui/NotificationBell'
+import { createClient } from '@/lib/supabase/client'
+import { PushPrompt } from '@/components/ui/PushPrompt'
 import type { Profile, Subscription } from '@/types/database'
 
 interface Props {
@@ -17,6 +19,29 @@ interface Props {
 export default function DashboardShell({ profile, subscription, unreadMessages, children }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+  const [liveUnread, setLiveUnread] = useState(unreadMessages)
+
+  useEffect(() => {
+    const supabase = createClient()
+
+    async function fetchUnread() {
+      const { count } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('receiver_id', profile.id)
+        .is('read_at', null)
+      setLiveUnread(count ?? 0)
+    }
+
+    const channel = supabase.channel('shell-unread')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${profile.id}` },
+        () => fetchUnread())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `receiver_id=eq.${profile.id}` },
+        () => fetchUnread())
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [profile.id])
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -26,7 +51,7 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
         <DashboardSidebar
           profile={profile}
           subscription={subscription}
-          unreadMessages={unreadMessages}
+          unreadMessages={liveUnread}
         />
       </div>
 
@@ -43,7 +68,7 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
             <DashboardSidebar
               profile={profile}
               subscription={subscription}
-              unreadMessages={unreadMessages}
+              unreadMessages={liveUnread}
               onClose={() => setSidebarOpen(false)}
             />
           </div>
@@ -103,6 +128,8 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
           </div>
         </main>
       </div>
+
+      <PushPrompt userId={profile.id} />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ClientTopbar from '@/components/layout/ClientTopbar'
+import { PushPrompt } from '@/components/ui/PushPrompt'
 import type { Profile } from '@/types/database'
 
 export default async function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -21,6 +22,7 @@ export default async function ClientLayout({ children }: { children: React.React
       <main className="max-w-5xl mx-auto px-4 py-6">
         {children}
       </main>
+      <PushPrompt userId={user.id} />
     </div>
   )
 }

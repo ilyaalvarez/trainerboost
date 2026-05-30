@@ -1,98 +1,55 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
 # setup-vercel-env.sh
-# Sube todas las variables de .env.local a Vercel (entorno production).
+# Añade las variables necesarias para las nuevas funcionalidades a Vercel.
 # Ejecución: bash scripts/setup-vercel-env.sh
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
-ENV_FILE=".env.local"
-ENVIRONMENT="production"
-
 # ── Comprobaciones previas ────────────────────────────────────────────────────
 
 if ! command -v vercel &>/dev/null; then
-  echo "❌  Vercel CLI no encontrado. Instálalo con:"
-  echo "    npm i -g vercel"
+  echo "❌  Vercel CLI no encontrado. Instálalo con: npm i -g vercel"
   exit 1
 fi
-
-if [ ! -f "$ENV_FILE" ]; then
-  echo "❌  No se encontró el archivo $ENV_FILE en el directorio actual."
-  echo "    Ejecuta el script desde la raíz del proyecto."
-  exit 1
-fi
-
-# ── Verificar sesión ──────────────────────────────────────────────────────────
 
 if ! vercel whoami &>/dev/null; then
-  echo "⚠️   No estás autenticado en Vercel. Iniciando login..."
+  echo "⚠️  No estás autenticado. Iniciando login..."
   vercel login
 fi
 
 echo ""
-echo "🚀  Subiendo variables de $ENV_FILE a Vercel ($ENVIRONMENT)..."
+echo "🚀  Añadiendo variables de entorno a Vercel (production + preview + development)..."
 echo ""
 
-ADDED=0
-SKIPPED=0
-FAILED=0
+add_var() {
+  local KEY=$1
+  local VALUE=$2
+  for ENV in production preview development; do
+    vercel env rm "$KEY" "$ENV" --yes &>/dev/null 2>&1 || true
+    printf '%s' "$VALUE" | vercel env add "$KEY" "$ENV" --yes &>/dev/null 2>&1
+  done
+  echo "  ✅  $KEY"
+}
 
-# ── Leer y subir cada variable ────────────────────────────────────────────────
+echo "📦 Web Push (VAPID):"
+add_var "NEXT_PUBLIC_VAPID_PUBLIC_KEY" "BLn2kGh-Fu5IAlTTsR9FKIsbifigyejmnMOz_mxMNCpScKrBNcTMX06YdfVrRh7yky7pZXtKLSej0AsWSQUeaxw"
+add_var "VAPID_PRIVATE_KEY"           "cXEg6GMUJAvFcn2PDPV5zUeVWjhy5hkzg0djfR0dgFw"
+add_var "VAPID_EMAIL"                 "mailto:hola@trainerboost.es"
 
-while IFS= read -r line || [[ -n "$line" ]]; do
-  # Ignorar comentarios y líneas vacías
-  [[ "$line" =~ ^[[:space:]]*# ]] && continue
-  [[ -z "${line// }" ]]           && continue
-
-  # Separar clave y valor
-  key="${line%%=*}"
-  value="${line#*=}"
-
-  # Ignorar si la clave está vacía
-  [[ -z "$key" ]] && continue
-
-  # Quitar comillas del valor si las tiene
-  value="${value%\"}"
-  value="${value#\"}"
-  value="${value%\'}"
-  value="${value#\'}"
-
-  # Subir a Vercel (--yes acepta sin confirmación interactiva)
-  if printf '%s' "$value" | vercel env add "$key" "$ENVIRONMENT" --yes &>/dev/null 2>&1; then
-    echo "  ✅  $key"
-    ((ADDED++)) || true
-  else
-    # Si ya existe, intentar sobreescribir con rm + add
-    vercel env rm "$key" "$ENVIRONMENT" --yes &>/dev/null 2>&1 || true
-    if printf '%s' "$value" | vercel env add "$key" "$ENVIRONMENT" --yes &>/dev/null 2>&1; then
-      echo "  🔄  $key  (actualizada)"
-      ((ADDED++)) || true
-    else
-      echo "  ⚠️   $key  (no se pudo añadir — comprueba el valor)"
-      ((FAILED++)) || true
-    fi
-  fi
-
-done < "$ENV_FILE"
-
-# ── Resumen ───────────────────────────────────────────────────────────────────
+echo ""
+echo "🔐 Seguridad interna:"
+add_var "INTERNAL_API_SECRET" "de9d94fd9c6a41568ed01ff316dd15484f08eab524669b7f7ee1f02c1364c630"
 
 echo ""
 echo "────────────────────────────────────────"
-echo "  Variables subidas:  $ADDED"
-echo "  Con error:          $FAILED"
+echo "  NOTA: CRON_SECRET lo genera Vercel    "
+echo "  automáticamente — no hace falta       "
+echo "  añadirlo manualmente.                 "
 echo "────────────────────────────────────────"
-
-if [ "$FAILED" -gt 0 ]; then
-  echo ""
-  echo "⚠️   Algunas variables fallaron. Añádelas manualmente en:"
-  echo "    vercel.com → tu proyecto → Settings → Environment Variables"
-fi
-
 echo ""
-echo "✅  Lanzando redeploy en producción..."
+echo "✅  Variables añadidas. Lanzando redeploy en producción..."
 vercel --prod --yes
 
 echo ""
-echo "🎉  ¡Listo! Vercel está desplegando con las nuevas variables."
+echo "🎉  ¡Listo! TrainerBoost se está desplegando con todas las variables."

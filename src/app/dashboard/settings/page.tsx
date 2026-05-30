@@ -300,17 +300,23 @@ export default function SettingsPage() {
                   placeholder="https://..."
                   className="input"
                 />
-                {/* Hidden file input (no upload logic, just UI) */}
                 <input
                   ref={avatarInputRef}
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={e => {
+                  onChange={async e => {
                     const file = e.target.files?.[0]
-                    if (file) {
-                      toast.info('Para subir imágenes, actualiza tu plan.')
-                    }
+                    if (!file || !userId) return
+                    if (!file.type.startsWith('image/')) { toast.error('Solo se permiten imágenes'); return }
+                    if (file.size > 5 * 1024 * 1024) { toast.error('Imagen demasiado grande (máx 5MB)'); return }
+                    const ext = file.name.split('.').pop() ?? 'jpg'
+                    const path = `${userId}.${ext}`
+                    const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+                    if (error) { toast.error('Error al subir la imagen'); return }
+                    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+                    setAvatarUrl(publicUrl + '?t=' + Date.now())
+                    toast.success('Foto de perfil actualizada ✓')
                   }}
                 />
                 <button

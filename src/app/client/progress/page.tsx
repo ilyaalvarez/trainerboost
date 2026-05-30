@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Plus, Loader2, Scale, Flame, TrendingDown, ClipboardList } from 'lucide-react'
+import { Plus, Loader2, Scale, Flame, TrendingDown, ClipboardList, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { ProgressLog } from '@/types/database'
 import { formatDate } from '@/lib/utils'
@@ -43,6 +43,21 @@ export default function ClientProgressPage() {
   const [saving, setSaving]       = useState(false)
   const [trainerId, setTrainerId] = useState<string | null>(null)
   const [completedWorkouts, setCompletedWorkouts] = useState(0)
+
+  const [lightbox, setLightbox] = useState<{ urls: string[]; idx: number } | null>(null)
+
+  const allPhotos = useMemo(() => logs.flatMap(l => (l.photos ?? []).map(url => url)), [logs])
+
+  useEffect(() => {
+    if (!lightbox) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightbox(null)
+      if (e.key === 'ArrowRight') setLightbox(lb => lb ? { ...lb, idx: (lb.idx + 1) % lb.urls.length } : null)
+      if (e.key === 'ArrowLeft') setLightbox(lb => lb ? { ...lb, idx: (lb.idx - 1 + lb.urls.length) % lb.urls.length } : null)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [lightbox])
 
   const [form, setForm] = useState({
     weight_kg: '',
@@ -332,12 +347,60 @@ export default function ClientProgressPage() {
                         onUpdated={(urls) => {
                           setLogs(prev => prev.map(l => l.id === log.id ? { ...l, photos: urls } : l))
                         }}
+                        onPhotoClick={(url) => {
+                          const idx = allPhotos.indexOf(url)
+                          setLightbox({ urls: allPhotos, idx: idx >= 0 ? idx : 0 })
+                        }}
                       />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center"
+          onClick={() => setLightbox(null)}
+        >
+          <button onClick={() => setLightbox(null)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+            <X className="w-5 h-5 text-white" />
+          </button>
+          {lightbox.urls.length > 1 && (
+            <>
+              <button
+                onClick={e => { e.stopPropagation(); setLightbox(lb => lb ? { ...lb, idx: (lb.idx - 1 + lb.urls.length) % lb.urls.length } : null) }}
+                className="absolute left-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </button>
+              <button
+                onClick={e => { e.stopPropagation(); setLightbox(lb => lb ? { ...lb, idx: (lb.idx + 1) % lb.urls.length } : null) }}
+                className="absolute right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+                <ChevronRight className="w-5 h-5 text-white" />
+              </button>
+            </>
+          )}
+          <div className="relative max-w-3xl max-h-[85vh] w-full mx-8" onClick={e => e.stopPropagation()}>
+            <Image
+              src={lightbox.urls[lightbox.idx]}
+              alt="Foto de progreso"
+              width={900}
+              height={900}
+              className="object-contain max-h-[85vh] w-full rounded-xl"
+            />
+            {lightbox.urls.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {lightbox.urls.map((_, i) => (
+                  <button key={i} onClick={() => setLightbox(lb => lb ? { ...lb, idx: i } : null)}
+                    className={`w-2 h-2 rounded-full transition-colors ${i === lightbox.idx ? 'bg-white' : 'bg-white/30'}`} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

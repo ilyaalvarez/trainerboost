@@ -13,9 +13,10 @@ interface Props {
   logId: string
   existing: string[]
   onUpdated: (urls: string[]) => void
+  onPhotoClick?: (url: string) => void
 }
 
-export function PhotoUpload({ logId, existing, onUpdated }: Props) {
+export function PhotoUpload({ logId, existing, onUpdated, onPhotoClick }: Props) {
   const [uploading, setUploading] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
@@ -48,9 +49,11 @@ export function PhotoUpload({ logId, existing, onUpdated }: Props) {
       <div className="flex flex-wrap gap-2 mb-2">
         {existing.map(url => (
           <div key={url} className="relative group">
-            <Image src={url} alt="Progreso" width={80} height={80} className="object-cover rounded-xl border border-slate-700" />
+            <button onClick={() => onPhotoClick?.(url)} className="block focus:outline-none focus:ring-2 focus:ring-sky-500 rounded-xl">
+              <Image src={url} alt="Progreso" width={80} height={80} className="object-cover rounded-xl border border-slate-700 hover:border-sky-500 transition-colors cursor-zoom-in" />
+            </button>
             <button onClick={() => remove(url)}
-              className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
               <X className="w-3 h-3 text-white" />
             </button>
           </div>

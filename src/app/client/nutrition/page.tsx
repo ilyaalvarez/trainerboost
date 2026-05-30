@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Check, Loader2, UtensilsCrossed, Download } from 'lucide-react'
+import { Check, Loader2, UtensilsCrossed, Download, Droplets, Plus, Minus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { MealPlan, Meal, FoodItem } from '@/types/database'
 import EmptyState from '@/components/ui/EmptyState'
@@ -33,6 +33,8 @@ export default function ClientNutritionPage() {
   const [plan, setPlan]         = useState<MealPlanWithMeals | null>(null)
   const [loading, setLoading]   = useState(true)
   const [checkedFoods, setCheckedFoods] = useState<Set<string>>(new Set())
+  const [waterGlasses, setWaterGlasses] = useState(0)
+  const WATER_GOAL = 8
 
   useEffect(() => {
     async function fetchPlan() {
@@ -70,6 +72,22 @@ export default function ClientNutritionPage() {
       setCheckedFoods(new Set())
     }
   }, [plan])
+
+  // Load water tracking from localStorage
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0]
+    const saved = localStorage.getItem(`water-tracking-${today}`)
+    if (saved) setWaterGlasses(parseInt(saved, 10) || 0)
+  }, [])
+
+  const adjustWater = (delta: number) => {
+    setWaterGlasses(prev => {
+      const next = Math.max(0, Math.min(WATER_GOAL + 4, prev + delta))
+      const today = new Date().toISOString().split('T')[0]
+      localStorage.setItem(`water-tracking-${today}`, String(next))
+      return next
+    })
+  }
 
   const toggleFood = (mealIdx: number, foodIdx: number) => {
     const key = `${mealIdx}-${foodIdx}`
@@ -190,6 +208,52 @@ export default function ClientNutritionPage() {
           </div>
         )
       })()}
+
+      {/* Water tracking */}
+      <div className="card p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Droplets className="w-4 h-4 text-sky-400" />
+            <span className="font-semibold text-white text-sm">Hidratación</span>
+          </div>
+          <span className="text-xs text-slate-400 font-mono">{waterGlasses}/{WATER_GOAL} vasos</span>
+        </div>
+        <div className="flex gap-1.5 mb-3 flex-wrap">
+          {Array.from({ length: WATER_GOAL }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => adjustWater(i < waterGlasses ? -(waterGlasses - i) : (i + 1 - waterGlasses))}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                i < waterGlasses
+                  ? 'bg-sky-500/80 text-white'
+                  : 'bg-surface-2 text-slate-600 hover:text-slate-400 border border-border/50'
+              }`}
+              title={`${i + 1} vasos`}
+            >
+              <Droplets className="w-4 h-4" />
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => adjustWater(-1)} disabled={waterGlasses === 0}
+            className="btn-ghost py-1 px-2 text-xs disabled:opacity-30">
+            <Minus className="w-3.5 h-3.5" />
+          </button>
+          <div className="flex-1 h-1.5 bg-surface-2 rounded-full overflow-hidden">
+            <div className="h-full bg-sky-400 rounded-full transition-all duration-300"
+                 style={{ width: `${Math.min(100, (waterGlasses / WATER_GOAL) * 100)}%` }} />
+          </div>
+          <button onClick={() => adjustWater(1)} disabled={waterGlasses >= WATER_GOAL + 4}
+            className="btn-ghost py-1 px-2 text-xs disabled:opacity-30">
+            <Plus className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        {waterGlasses >= WATER_GOAL && (
+          <p className="text-emerald-400 text-xs font-semibold mt-2 text-center">
+            ¡Objetivo de hidratación alcanzado! 💧
+          </p>
+        )}
+      </div>
 
       {/* Meals */}
       <div className="space-y-4">

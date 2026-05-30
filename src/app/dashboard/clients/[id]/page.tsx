@@ -21,7 +21,7 @@ import {
 } from 'recharts'
 import type {
   Profile, TrainerClient, Routine, RoutineExercise,
-  MealPlan, ProgressLog, Appointment, Message,
+  MealPlan, ProgressLog, Appointment, Message, DailyCheckin,
 } from '@/types/database'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -36,6 +36,7 @@ interface ClientData {
   progressLogs: ProgressLog[]
   appointments: Appointment[]
   messages: Message[]
+  checkins: DailyCheckin[]
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────────
@@ -79,6 +80,7 @@ export default function ClientDetailPage() {
     if (!user) { router.push('/login'); return }
     setTrainerId(user.id)
 
+    const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]
     const [
       { data: profileData },
       { data: relationData },
@@ -88,6 +90,7 @@ export default function ClientDetailPage() {
       { data: progressData },
       { data: appointmentsData },
       { data: messagesData },
+      { data: checkinsData },
     ] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', clientId).single(),
       supabase.from('trainer_clients').select('*')
@@ -109,6 +112,10 @@ export default function ClientDetailPage() {
       supabase.from('messages').select('*')
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${clientId}),and(sender_id.eq.${clientId},receiver_id.eq.${user.id})`)
         .order('created_at'),
+      supabase.from('daily_checkins').select('*')
+        .eq('client_id', clientId)
+        .gte('checkin_date', sevenDaysAgo)
+        .order('checkin_date', { ascending: false }),
     ])
 
     if (!profileData || !relationData) { router.push('/dashboard/clients'); return }
@@ -126,6 +133,7 @@ export default function ClientDetailPage() {
       progressLogs: (progressData ?? []) as ProgressLog[],
       appointments: (appointmentsData ?? []) as Appointment[],
       messages:     (messagesData ?? []) as Message[],
+      checkins:     (checkinsData ?? []) as DailyCheckin[],
     })
     setNotes(relationData.notes ?? '')
     setLoading(false)
@@ -205,7 +213,7 @@ export default function ClientDetailPage() {
 
   if (!data) return null
 
-  const { profile, relation, routines, mealPlans, progressLogs, appointments, messages } = data
+  const { profile, relation, routines, mealPlans, progressLogs, appointments, messages, checkins } = data
   const weightData = progressLogs.filter(l => l.weight_kg != null)
 
   // ── Smart alerts ───────────────────────────────────────────────────────────
@@ -489,7 +497,8 @@ export default function ClientDetailPage() {
           TAB: RESUMEN
       ═══════════════════════════════════════════════════════════ */}
       {tab === 'resumen' && (
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 animate-fade-in">
+        <div className="space-y-5 animate-fade-in">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
           {/* Left: Info */}
           <div className="lg:col-span-2 space-y-4">
             <div className="card p-5">
@@ -565,6 +574,50 @@ export default function ClientDetailPage() {
               className="input resize-none flex-1 text-sm leading-relaxed"
             />
           </div>
+        </div>
+
+        {/* Check-ins de la última semana */}
+        {checkins.length > 0 && (
+          <div className="card p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #F59E0B, #EF4444)' }} />
+              <h2 className="font-semibold text-white text-sm">Check-ins (últimos 7 días)</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border/50">
+                    {['Fecha', 'Energía', 'Ánimo', 'Sueño'].map(h => (
+                      <th key={h} className="text-left pb-2 text-slate-500 font-medium uppercase tracking-wide pr-4">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/30">
+                  {checkins.map(c => {
+                    const energyEmoji = c.energy ? ['😴','😕','😐','😊','🔥'][c.energy - 1] : '—'
+                    const moodEmoji   = c.mood   ? ['😴','😕','😐','😊','🔥'][c.mood - 1]   : '—'
+                    return (
+                      <tr key={c.id} className="hover:bg-surface-2/40 transition-colors">
+                        <td className="py-2 pr-4 text-slate-300">{new Date(c.checkin_date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</td>
+                        <td className="py-2 pr-4">
+                          <span className="mr-1">{energyEmoji}</span>
+                          {c.energy != null && <span className="font-mono text-white">{c.energy}/5</span>}
+                        </td>
+                        <td className="py-2 pr-4">
+                          <span className="mr-1">{moodEmoji}</span>
+                          {c.mood != null && <span className="font-mono text-white">{c.mood}/5</span>}
+                        </td>
+                        <td className="py-2 pr-4 font-mono text-slate-300">
+                          {c.sleep_hours != null ? `${c.sleep_hours}h` : '—'}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
         </div>
       )}
 

@@ -47,6 +47,11 @@ export default function ClientProgressPage() {
     weight_kg: '',
     body_fat_pct: '',
     muscle_mass_kg: '',
+    waist_cm: '',
+    chest_cm: '',
+    arm_cm: '',
+    thigh_cm: '',
+    hip_cm: '',
     notes: '',
   })
 
@@ -92,6 +97,11 @@ export default function ClientProgressPage() {
       weight_kg: parseFloat(form.weight_kg),
       body_fat_pct: form.body_fat_pct ? parseFloat(form.body_fat_pct) : null,
       muscle_mass_kg: form.muscle_mass_kg ? parseFloat(form.muscle_mass_kg) : null,
+      waist_cm: form.waist_cm ? parseFloat(form.waist_cm) : null,
+      chest_cm: form.chest_cm ? parseFloat(form.chest_cm) : null,
+      arm_cm: form.arm_cm ? parseFloat(form.arm_cm) : null,
+      thigh_cm: form.thigh_cm ? parseFloat(form.thigh_cm) : null,
+      hip_cm: form.hip_cm ? parseFloat(form.hip_cm) : null,
       notes: form.notes || null,
     })
 
@@ -99,7 +109,7 @@ export default function ClientProgressPage() {
     if (error) { toast.error(error.message); return }
     toast.success('Medida registrada ✓')
     setShowModal(false)
-    setForm({ weight_kg: '', body_fat_pct: '', muscle_mass_kg: '', notes: '' })
+    setForm({ weight_kg: '', body_fat_pct: '', muscle_mass_kg: '', waist_cm: '', chest_cm: '', arm_cm: '', thigh_cm: '', hip_cm: '', notes: '' })
     fetchLogs()
   }
 
@@ -296,6 +306,29 @@ export default function ClientProgressPage() {
               />
             </div>
           </div>
+          <details className="mt-3">
+            <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-300">Medidas corporales (opcional)</summary>
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              {([
+                { key: 'waist_cm', label: 'Cintura (cm)' },
+                { key: 'chest_cm', label: 'Pecho (cm)' },
+                { key: 'arm_cm', label: 'Brazo (cm)' },
+                { key: 'thigh_cm', label: 'Muslo (cm)' },
+                { key: 'hip_cm', label: 'Cadera (cm)' },
+              ] as const).map(m => (
+                <div key={m.key}>
+                  <label className="text-xs text-slate-500">{m.label}</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    className="input text-sm py-1.5"
+                    value={form[m.key]}
+                    onChange={e => setForm(f => ({ ...f, [m.key]: e.target.value }))}
+                  />
+                </div>
+              ))}
+            </div>
+          </details>
           <div>
             <label className="label">Notas</label>
             <textarea

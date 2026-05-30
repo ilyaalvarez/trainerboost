@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   CalendarDays, Plus, Loader2, Clock, MapPin, FileText,
-  CheckCircle2, XCircle, ChevronDown,
+  CheckCircle2, XCircle, ChevronDown, List, ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn, formatRelative } from '@/lib/utils'
@@ -66,6 +66,47 @@ export default function AppointmentsPage() {
 
   // Tabs
   const [tab, setTab] = useState<TabValue>('upcoming')
+
+  // View: list ↔ calendar
+  const [view, setView] = useState<'list' | 'calendar'>('list')
+  const [highlightedId, setHighlightedId] = useState<string | null>(null)
+
+  // Week navigation (calendar view) — start on Monday of the current week
+  const [weekStart, setWeekStart] = useState(() => {
+    const d = new Date()
+    const day = d.getDay()
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1) // Monday
+    return new Date(d.setDate(diff))
+  })
+
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart)
+    d.setDate(weekStart.getDate() + i)
+    return d
+  })
+
+  const prevWeek = () => setWeekStart(d => { const n = new Date(d); n.setDate(d.getDate() - 7); return n })
+  const nextWeek = () => setWeekStart(d => { const n = new Date(d); n.setDate(d.getDate() + 7); return n })
+  const goToday = () => {
+    const d = new Date()
+    const day = d.getDay()
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+    setWeekStart(new Date(d.setDate(diff)))
+  }
+
+  // Open an appointment from the calendar → switch to the list view,
+  // select the right tab and scroll/highlight the matching card.
+  function openAppointment(apt: AppointmentWithProfiles) {
+    const isHistory = apt.scheduled_at < new Date().toISOString()
+      || apt.status === 'done' || apt.status === 'cancelled'
+    setTab(isHistory ? 'history' : 'upcoming')
+    setView('list')
+    setHighlightedId(apt.id)
+    requestAnimationFrame(() => {
+      document.getElementById(`apt-${apt.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+    window.setTimeout(() => setHighlightedId(null), 2000)
+  }
 
   // Modal
   const [modalOpen, setModalOpen]   = useState(false)
@@ -258,6 +299,22 @@ export default function AppointmentsPage() {
         </button>
       </div>
 
+      {/* View toggle */}
+      <div className="inline-flex rounded-lg border border-border/60 p-1 bg-surface">
+        <button onClick={() => setView('list')}
+          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'list' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}>
+          <List className="w-4 h-4 inline mr-1.5" />Lista
+        </button>
+        <button onClick={() => setView('calendar')}
+          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'calendar' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}>
+          <CalendarDays className="w-4 h-4 inline mr-1.5" />Calendario
+        </button>
+      </div>
+
+      {/* ── List view ── */}
+      {view === 'list' && (
+        <div className="space-y-6">
+
       {/* Tabs */}
       <div className="flex gap-1 border-b border-[#334155]">
         {([
@@ -309,7 +366,11 @@ export default function AppointmentsPage() {
             return (
               <div
                 key={apt.id}
-                className="card px-5 py-4 flex items-center gap-4 flex-wrap"
+                id={`apt-${apt.id}`}
+                className={cn(
+                  'card px-5 py-4 flex items-center gap-4 flex-wrap transition-shadow',
+                  highlightedId === apt.id && 'ring-2 ring-sky-500'
+                )}
               >
                 {/* Avatar + name */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -413,6 +474,85 @@ export default function AppointmentsPage() {
               </div>
             )
           })}
+        </div>
+      )}
+
+        </div>
+      )}
+
+      {/* ── Calendar view ── */}
+      {view === 'calendar' && (
+        <div className="card p-4">
+          {dataLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
+            </div>
+          ) : (
+            <>
+              {/* Week navigation */}
+              <div className="flex items-center justify-between mb-4">
+                <button onClick={prevWeek} className="btn-ghost p-2" aria-label="Semana anterior">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-white">
+                    {weekDays[0].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} - {weekDays[6].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                  </p>
+                  <button onClick={goToday} className="text-xs text-sky-400 hover:text-sky-300">Hoy</button>
+                </div>
+                <button onClick={nextWeek} className="btn-ghost p-2" aria-label="Semana siguiente">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Days grid */}
+              <div className="overflow-x-auto">
+                <div className="grid grid-cols-7 gap-2 min-w-[700px]">
+                  {weekDays.map(day => {
+                    const dayApts = appointments
+                      .filter(a => new Date(a.scheduled_at).toDateString() === day.toDateString())
+                      .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
+                    const isToday = day.toDateString() === new Date().toDateString()
+                    return (
+                      <div key={day.toISOString()} className="min-h-[120px]">
+                        <div className={cn('text-center mb-2 pb-2 border-b', isToday ? 'border-sky-500' : 'border-border/40')}>
+                          <p className="text-xs text-slate-500 uppercase">{day.toLocaleDateString('es-ES', { weekday: 'short' })}</p>
+                          <p className={cn('text-lg font-bold', isToday ? 'text-sky-400' : 'text-white')}>{day.getDate()}</p>
+                        </div>
+                        <div className="space-y-1.5">
+                          {dayApts.map(apt => {
+                            const colorMap: Record<AppointmentType, string> = {
+                              presencial: 'rgba(14,165,233,0.15)',
+                              online:     'rgba(124,58,237,0.15)',
+                              llamada:    'rgba(245,158,11,0.15)',
+                            }
+                            const borderMap: Record<AppointmentType, string> = {
+                              presencial: '#0EA5E9',
+                              online:     '#7C3AED',
+                              llamada:    '#F59E0B',
+                            }
+                            return (
+                              <button
+                                key={apt.id}
+                                onClick={() => openAppointment(apt)}
+                                className="w-full text-left p-2 rounded-lg text-xs transition-transform hover:scale-[1.02]"
+                                style={{ background: colorMap[apt.type], borderLeft: `2px solid ${borderMap[apt.type]}` }}
+                              >
+                                <p className="font-semibold text-white truncate">
+                                  {new Date(apt.scheduled_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                                <p className="text-slate-300 truncate">{apt.client?.full_name ?? '—'}</p>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 

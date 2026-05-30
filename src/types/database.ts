@@ -27,6 +27,7 @@ export interface TrainerClient {
   status: ClientStatus
   started_at: string
   notes: string | null
+  tags: string[]
 }
 
 export interface Invitation {
@@ -111,6 +112,11 @@ export interface ProgressLog {
   weight_kg: number | null
   body_fat_pct: number | null
   muscle_mass_kg: number | null
+  waist_cm: number | null
+  chest_cm: number | null
+  arm_cm: number | null
+  thigh_cm: number | null
+  hip_cm: number | null
   notes: string | null
   photos: string[]
 }

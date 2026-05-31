@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   TrendingUp, Dumbbell, UtensilsCrossed, CalendarDays,
-  MessageSquare, Zap, LogOut,
+  MessageSquare, Zap, LogOut, Settings,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -52,6 +52,7 @@ export default function ClientTopbar({ profile }: Props) {
     { href: '/client/nutrition',     icon: UtensilsCrossed, label: 'Nutrición',   badge: 0 },
     { href: '/client/appointments',  icon: CalendarDays,    label: 'Citas',       badge: 0 },
     { href: '/client/messages',      icon: MessageSquare,   label: 'Mensajes',    badge: unreadMessages },
+    { href: '/client/settings',      icon: Settings,        label: 'Perfil',      badge: 0 },
   ]
 
   async function logout() {

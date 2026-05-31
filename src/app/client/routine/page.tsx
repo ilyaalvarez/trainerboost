@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Dumbbell, Check, Play, ChevronDown, ChevronUp, Loader2, Download, Timer, X } from 'lucide-react'
+import { Dumbbell, Check, Play, ChevronDown, ChevronUp, Loader2, Download, Timer, X, Clock, Pause } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Routine, RoutineExercise } from '@/types/database'
 import { formatDate } from '@/lib/utils'
@@ -44,6 +44,23 @@ export default function ClientRoutinePage() {
   const [completing, setCompleting]   = useState<string | null>(null)
   const [timer, setTimer]             = useState<{ exerciseId: string; remaining: number } | null>(null)
   const [userId, setUserId]           = useState<string | null>(null)
+  const [sessionSeconds, setSessionSeconds] = useState(0)
+  const [sessionRunning, setSessionRunning] = useState(false)
+
+  useEffect(() => {
+    if (!sessionRunning) return
+    const id = setInterval(() => setSessionSeconds(s => s + 1), 1000)
+    return () => clearInterval(id)
+  }, [sessionRunning])
+
+  function formatSessionTime(secs: number) {
+    const h = Math.floor(secs / 3600)
+    const m = Math.floor((secs % 3600) / 60)
+    const s = secs % 60
+    return h > 0
+      ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+      : `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  }
 
   useEffect(() => {
     if (!timer) return
@@ -179,11 +196,27 @@ export default function ClientRoutinePage() {
         </button>
       </div>
 
-      {/* Progress bar */}
-      <div className="card p-5">
-        <div className="flex items-center justify-between mb-3">
+      {/* Progress bar + session timer */}
+      <div className="card p-5 space-y-3">
+        <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-white">Progreso de hoy</span>
-          <span className="font-mono text-sm font-bold text-brand-primary">{completedCount}/{exercises.length}</span>
+          <div className="flex items-center gap-3">
+            {/* Session timer */}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setSessionRunning(r => !r)}
+                className={`p-1 rounded-md transition-colors ${sessionRunning ? 'text-brand-accent hover:text-emerald-300' : 'text-slate-500 hover:text-slate-300'}`}
+                title={sessionRunning ? 'Pausar cronómetro' : 'Iniciar cronómetro'}
+              >
+                {sessionRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              </button>
+              <span className={`font-mono text-sm font-bold ${sessionRunning ? 'text-brand-accent' : 'text-slate-500'}`}>
+                <Clock className="w-3 h-3 inline mr-1 -mt-0.5" />
+                {formatSessionTime(sessionSeconds)}
+              </span>
+            </div>
+            <span className="font-mono text-sm font-bold text-brand-primary">{completedCount}/{exercises.length}</span>
+          </div>
         </div>
         <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
           <div
@@ -192,8 +225,8 @@ export default function ClientRoutinePage() {
           />
         </div>
         {progress === 100 && (
-          <p className="text-emerald-400 text-sm font-semibold mt-3 text-center">
-            🎉 ¡Sesión completada! Gran trabajo hoy.
+          <p className="text-emerald-400 text-sm font-semibold text-center">
+            🎉 ¡Sesión completada en {formatSessionTime(sessionSeconds)}! Gran trabajo hoy.
           </p>
         )}
       </div>

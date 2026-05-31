@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Plus, Loader2, Scale, Flame, TrendingDown, ClipboardList, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Loader2, Scale, Flame, TrendingDown, ClipboardList, X, ChevronLeft, ChevronRight, Target, Pencil } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { ProgressLog } from '@/types/database'
 import { formatDate } from '@/lib/utils'
 import Modal from '@/components/ui/Modal'
 import EmptyState from '@/components/ui/EmptyState'
 import Milestones from '@/components/ui/Milestones'
+import { ActivityHeatmap } from '@/components/ui/ActivityHeatmap'
 import ProgressChart from '../_components/ProgressChart'
 import { PhotoUpload } from '@/components/ui/PhotoUpload'
 
@@ -45,6 +46,28 @@ export default function ClientProgressPage() {
   const [completedWorkouts, setCompletedWorkouts] = useState(0)
 
   const [lightbox, setLightbox] = useState<{ urls: string[]; idx: number } | null>(null)
+  const [showGoalModal, setShowGoalModal] = useState(false)
+  const [goalWeight, setGoalWeight]       = useState('')
+  const [goalBodyFat, setGoalBodyFat]     = useState('')
+  const [savedGoal, setSavedGoal]         = useState<{ weight: number | null; bodyFat: number | null }>({ weight: null, bodyFat: null })
+
+  useEffect(() => {
+    const raw = localStorage.getItem('progress-goals')
+    if (raw) {
+      try { setSavedGoal(JSON.parse(raw)) } catch {}
+    }
+  }, [])
+
+  function saveGoal() {
+    const goal = {
+      weight:  goalWeight  ? parseFloat(goalWeight)  : null,
+      bodyFat: goalBodyFat ? parseFloat(goalBodyFat) : null,
+    }
+    setSavedGoal(goal)
+    localStorage.setItem('progress-goals', JSON.stringify(goal))
+    setShowGoalModal(false)
+    toast.success('Objetivo guardado ✓')
+  }
 
   const allPhotos = useMemo(() => logs.flatMap(l => (l.photos ?? []).map(url => url)), [logs])
 
@@ -188,6 +211,99 @@ export default function ClientProgressPage() {
               <div className="text-xs text-slate-400">Registros</div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Goal progress */}
+      {latest && (savedGoal.weight || savedGoal.bodyFat) && (
+        <div className="card p-5 space-y-4"
+             style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.05), rgba(124,58,237,0.03))', borderColor: 'rgba(14,165,233,0.2)' }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Target className="w-4 h-4 text-brand-primary" />
+              <h2 className="font-semibold text-white text-sm">Mi Objetivo</h2>
+            </div>
+            <button onClick={() => { setGoalWeight(String(savedGoal.weight ?? '')); setGoalBodyFat(String(savedGoal.bodyFat ?? '')); setShowGoalModal(true) }}
+              className="text-slate-500 hover:text-slate-300 transition-colors p-1">
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <div className="space-y-3">
+            {savedGoal.weight && latest.weight_kg != null && first?.weight_kg != null && (
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-slate-400">Peso</span>
+                  <span className="text-white font-semibold">{latest.weight_kg} / {savedGoal.weight} kg</span>
+                </div>
+                {(() => {
+                  const start = first.weight_kg!
+                  const current = latest.weight_kg!
+                  const goal = savedGoal.weight!
+                  const totalDelta = Math.abs(goal - start)
+                  const done = totalDelta === 0 ? 100 : Math.min(100, Math.round(Math.abs(current - start) / totalDelta * 100))
+                  const reached = (goal < start && current <= goal) || (goal > start && current >= goal)
+                  return (
+                    <>
+                      <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-500"
+                             style={{ width: `${done}%`, background: reached ? '#10B981' : '#0EA5E9' }} />
+                      </div>
+                      <p className="text-[10px] text-slate-500 mt-0.5">{reached ? '✓ Objetivo alcanzado' : `${done}% completado · faltan ${Math.abs(current - goal).toFixed(1)} kg`}</p>
+                    </>
+                  )
+                })()}
+              </div>
+            )}
+            {savedGoal.bodyFat && latest.body_fat_pct != null && first?.body_fat_pct != null && (
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-slate-400">Grasa corporal</span>
+                  <span className="text-white font-semibold">{latest.body_fat_pct}% / objetivo {savedGoal.bodyFat}%</span>
+                </div>
+                {(() => {
+                  const start = first.body_fat_pct!
+                  const current = latest.body_fat_pct!
+                  const goal = savedGoal.bodyFat!
+                  const totalDelta = Math.abs(goal - start)
+                  const done = totalDelta === 0 ? 100 : Math.min(100, Math.round(Math.abs(current - start) / totalDelta * 100))
+                  const reached = (goal < start && current <= goal) || (goal > start && current >= goal)
+                  return (
+                    <>
+                      <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-500"
+                             style={{ width: `${done}%`, background: reached ? '#10B981' : '#EF4444' }} />
+                      </div>
+                      <p className="text-[10px] text-slate-500 mt-0.5">{reached ? '✓ Objetivo alcanzado' : `${done}% completado · faltan ${Math.abs(current - goal).toFixed(1)}%`}</p>
+                    </>
+                  )
+                })()}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Set goal CTA (when no goal is set yet and there are logs) */}
+      {latest && !savedGoal.weight && !savedGoal.bodyFat && (
+        <button
+          onClick={() => setShowGoalModal(true)}
+          className="w-full card p-4 flex items-center gap-3 hover:border-brand-primary/40 transition-colors group text-left"
+        >
+          <div className="w-10 h-10 rounded-xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center shrink-0 group-hover:bg-brand-primary/15">
+            <Target className="w-5 h-5 text-brand-primary" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-white">Añadir un objetivo</p>
+            <p className="text-xs text-slate-400 mt-0.5">Establece tu peso o % de grasa meta y ve tu progreso hacia él.</p>
+          </div>
+        </button>
+      )}
+
+      {/* Activity heatmap */}
+      {logs.length > 0 && (
+        <div className="card p-5">
+          <h2 className="font-semibold text-white mb-3">Historial de actividad</h2>
+          <ActivityHeatmap logDates={logs.map(l => l.logged_at)} />
         </div>
       )}
 
@@ -487,6 +603,44 @@ export default function ClientProgressPage() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* Goal modal */}
+      <Modal isOpen={showGoalModal} onClose={() => setShowGoalModal(false)} title="Establecer objetivo">
+        <div className="space-y-4">
+          <p className="text-sm text-slate-400">Define tu meta y verás un indicador de progreso en esta página.</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Peso objetivo (kg)</label>
+              <input
+                type="number"
+                step="0.1"
+                value={goalWeight}
+                onChange={e => setGoalWeight(e.target.value)}
+                className="input"
+                placeholder="70.0"
+              />
+            </div>
+            <div>
+              <label className="label">% Grasa objetivo</label>
+              <input
+                type="number"
+                step="0.1"
+                value={goalBodyFat}
+                onChange={e => setGoalBodyFat(e.target.value)}
+                className="input"
+                placeholder="15.0"
+              />
+            </div>
+          </div>
+          {savedGoal.weight || savedGoal.bodyFat ? (
+            <p className="text-xs text-slate-500">Deja un campo vacío para eliminar ese objetivo.</p>
+          ) : null}
+          <div className="flex gap-3 pt-1">
+            <button onClick={() => setShowGoalModal(false)} className="btn-secondary flex-1">Cancelar</button>
+            <button onClick={saveGoal} className="btn-primary flex-1">Guardar objetivo</button>
+          </div>
+        </div>
       </Modal>
     </div>
   )

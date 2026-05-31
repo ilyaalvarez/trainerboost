@@ -44,6 +44,7 @@ export default function ClientRoutinePage() {
   const [completing, setCompleting]   = useState<string | null>(null)
   const [timer, setTimer]             = useState<{ exerciseId: string; remaining: number } | null>(null)
   const [userId, setUserId]           = useState<string | null>(null)
+  const [trainerId, setTrainerId]     = useState<string | null>(null)
   const [sessionSeconds, setSessionSeconds] = useState(0)
   const [sessionRunning, setSessionRunning] = useState(false)
   const [recentWorkoutDays, setRecentWorkoutDays] = useState<string[]>([])
@@ -114,6 +115,7 @@ export default function ClientRoutinePage() {
 
       if (r) {
         setRoutine(r)
+        setTrainerId((r as { trainer_id: string }).trainer_id ?? null)
         const completedIds = new Set((comps || []).map((c: { exercise_id: string }) => c.exercise_id))
         const exList = ((r as { exercises: RoutineExercise[] }).exercises || [])
           .sort((a: RoutineExercise, b: RoutineExercise) => a.order_index - b.order_index)
@@ -151,10 +153,23 @@ export default function ClientRoutinePage() {
           completed_at: today,
         })
         if (error) { toast.error('Error al registrar'); return }
-        setExercises(prev => prev.map(ex => ex.id === exercise.id ? { ...ex, completed: true } : ex))
-        toast.success('¡Ejercicio completado! 💪')
+        const updatedExercises = exercises.map(ex => ex.id === exercise.id ? { ...ex, completed: true } : ex)
+        setExercises(updatedExercises)
+        // Check if this was the last exercise to complete
+        const allDone = updatedExercises.every(ex => ex.completed)
+        if (allDone && trainerId && userId) {
+          supabase.from('notifications').insert({
+            user_id: trainerId,
+            type: 'routine',
+            title: '¡Sesión completada!',
+            body: `Tu cliente completó todos los ejercicios de "${routine?.title ?? 'su rutina'}"`,
+            link: `/dashboard/clients/${userId}`,
+          }).then(() => {})
+          setSessionRunning(false)
+        }
+        toast.success(allDone ? '¡Sesión completada! 🎉' : '¡Ejercicio completado! 💪')
         // Auto-start timer on first exercise completion
-        setSessionRunning(prev => { if (!prev && sessionSeconds === 0) return true; return prev })
+        setSessionRunning(prev => { if (!prev && sessionSeconds === 0 && !allDone) return true; return prev })
       }
     } finally {
       setCompleting(null)

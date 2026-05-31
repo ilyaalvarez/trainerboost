@@ -23,6 +23,7 @@ interface BusinessKpis {
   sessionsThisMonth: number
   activeClientsCount: number
   totalMessages: number
+  retentionRate: number | null
 }
 
 interface ClientProgress {
@@ -68,7 +69,7 @@ export default function AnalyticsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [metric, setMetric] = useState<'weight_kg' | 'body_fat_pct'>('weight_kg')
-  const [kpis, setKpis] = useState<BusinessKpis>({ sessionsThisMonth: 0, activeClientsCount: 0, totalMessages: 0 })
+  const [kpis, setKpis] = useState<BusinessKpis>({ sessionsThisMonth: 0, activeClientsCount: 0, totalMessages: 0, retentionRate: null })
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -90,11 +91,12 @@ export default function AnalyticsPage() {
       supabase.from('messages').select('*', { count: 'exact', head: true })
         .eq('sender_id', user.id),
     ])
-    setKpis({
+    setKpis(prev => ({
+      ...prev,
       sessionsThisMonth: sessionsThisMonth ?? 0,
       activeClientsCount: activeClientsCount ?? 0,
       totalMessages: totalMessages ?? 0,
-    })
+    }))
 
     // Fetch all clients for this trainer
     const { data: relations, error } = await supabase
@@ -132,6 +134,15 @@ export default function AnalyticsPage() {
         : null
       return { client: profile, logs: clientLogs, latest, change }
     }).filter(cp => cp.logs.length > 0)
+
+    // Compute retention rate: % of active clients with a log in last 30 days
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString()
+    const activeWithRecentLog = new Set(
+      (logs ?? []).filter(l => l.logged_at >= thirtyDaysAgo).map(l => l.client_id)
+    ).size
+    const total = clientIds.length
+    const retentionRate = total > 0 ? Math.round((activeWithRecentLog / total) * 100) : null
+    setKpis(prev => ({ ...prev, retentionRate }))
 
     setClients(clientProgress)
     // Select all by default
@@ -285,8 +296,8 @@ export default function AnalyticsPage() {
             bg: 'rgba(16,185,129,0.15)',
           },
           {
-            label: 'Tasa de retención',
-            value: '—',
+            label: 'Retención 30d',
+            value: kpis.retentionRate != null ? `${kpis.retentionRate}%` : '—',
             Icon: Activity,
             color: 'text-amber-400',
             bg: 'rgba(245,158,11,0.15)',

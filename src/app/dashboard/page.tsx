@@ -48,12 +48,21 @@ export default async function DashboardPage() {
     supabase.from('profiles').select('bio, phone, specialties').eq('id', user.id).single(),
   ])
 
-  const { count: pendingApts } = await supabase
-    .from('appointments')
-    .select('*', { count: 'exact', head: true })
-    .eq('trainer_id', user.id)
-    .eq('status', 'pending')
-    .gte('scheduled_at', new Date().toISOString())
+  const [{ count: pendingApts }, { data: todayActivity }] = await Promise.all([
+    supabase
+      .from('appointments')
+      .select('*', { count: 'exact', head: true })
+      .eq('trainer_id', user.id)
+      .eq('status', 'pending')
+      .gte('scheduled_at', new Date().toISOString()),
+    supabase
+      .from('progress_logs')
+      .select('client_id, logged_at, weight_kg, profiles!client_id(full_name, avatar_url)')
+      .eq('trainer_id', user.id)
+      .gte('logged_at', `${todayStr}T00:00:00`)
+      .order('logged_at', { ascending: false })
+      .limit(5),
+  ])
 
   // Get active client IDs
   const activeClientsList = (clients ?? []) as Array<{ client_id: string; status: string }>
@@ -349,6 +358,37 @@ export default async function DashboardPage() {
                 <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-slate-400 transition-colors" />
               </Link>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Today's client activity ───────────────────────────────────── */}
+      {todayActivity && todayActivity.length > 0 && (
+        <div className="card p-6 animate-fade-in-up">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-1 h-5 rounded-full bg-gradient-to-b from-brand-accent to-brand-primary shrink-0" />
+            <h2 className="font-semibold text-white">Actividad de hoy</h2>
+          </div>
+          <div className="space-y-2">
+            {todayActivity.map((log, i) => {
+              const p = (Array.isArray(log.profiles) ? log.profiles[0] : log.profiles) as { full_name: string; avatar_url: string | null } | null
+              return (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-surface-2 hover:bg-surface-3 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-4 h-4 text-brand-accent" />
+                  </div>
+                  <Avatar name={p?.full_name ?? '?'} url={p?.avatar_url} size="sm" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium text-white">{p?.full_name ?? '—'}</span>
+                    <span className="text-xs text-slate-400 ml-2">registró progreso</span>
+                    {log.weight_kg != null && (
+                      <span className="text-xs text-brand-primary ml-2 font-mono">{log.weight_kg} kg</span>
+                    )}
+                  </div>
+                  <span className="text-xs text-slate-500">hoy</span>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

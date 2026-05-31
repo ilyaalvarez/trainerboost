@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Camera, Loader2, Save, KeyRound, LogOut } from 'lucide-react'
+import { Camera, Loader2, Save, KeyRound, LogOut, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Avatar from '@/components/ui/Avatar'
@@ -25,6 +25,7 @@ export default function ClientSettingsPage() {
   const [confirmPwd,  setConfirmPwd]  = useState('')
   const [savingPwd,   setSavingPwd]   = useState(false)
   const [pwdError,    setPwdError]    = useState<string | null>(null)
+  const [showPwd,     setShowPwd]     = useState(false)
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -167,18 +168,28 @@ export default function ClientSettingsPage() {
         <form onSubmit={changePassword} className="space-y-4">
           <div>
             <label className="label">Contraseña actual</label>
-            <input type="password" value={currentPwd} onChange={e => { setCurrentPwd(e.target.value); setPwdError(null) }}
-              className="input" placeholder="••••••••" autoComplete="current-password" />
+            <div className="relative">
+              <input type={showPwd ? 'text' : 'password'} value={currentPwd} onChange={e => { setCurrentPwd(e.target.value); setPwdError(null) }}
+                className="input pr-10" placeholder="••••••••" autoComplete="current-password" />
+              <button type="button" onClick={() => setShowPwd(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
           <div>
             <label className="label">Nueva contraseña</label>
-            <input type="password" value={newPwd} onChange={e => { setNewPwd(e.target.value); setPwdError(null) }}
-              className="input" placeholder="Mínimo 8 caracteres" autoComplete="new-password" minLength={8} />
+            <div className="relative">
+              <input type={showPwd ? 'text' : 'password'} value={newPwd} onChange={e => { setNewPwd(e.target.value); setPwdError(null) }}
+                className="input pr-10" placeholder="Mínimo 8 caracteres" autoComplete="new-password" minLength={8} />
+            </div>
           </div>
           <div>
             <label className="label">Confirmar contraseña</label>
-            <input type="password" value={confirmPwd} onChange={e => { setConfirmPwd(e.target.value); setPwdError(null) }}
-              className="input" placeholder="Repite la nueva contraseña" autoComplete="new-password" />
+            <div className="relative">
+              <input type={showPwd ? 'text' : 'password'} value={confirmPwd} onChange={e => { setConfirmPwd(e.target.value); setPwdError(null) }}
+                className="input pr-10" placeholder="Repite la nueva contraseña" autoComplete="new-password" />
+            </div>
           </div>
           {newPwd && confirmPwd && (
             <p className={`text-xs font-medium ${newPwd === confirmPwd ? 'text-emerald-400' : 'text-red-400'}`}>

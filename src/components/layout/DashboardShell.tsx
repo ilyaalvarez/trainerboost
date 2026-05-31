@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Zap } from 'lucide-react'
+import { Zap, Search } from 'lucide-react'
 import DashboardSidebar from './DashboardSidebar'
 import Avatar from '@/components/ui/Avatar'
 import NotificationBell from '@/components/ui/NotificationBell'
+import CommandPalette from '@/components/ui/CommandPalette'
 import { createClient } from '@/lib/supabase/client'
 import { PushPrompt } from '@/components/ui/PushPrompt'
 import type { Profile, Subscription } from '@/types/database'
@@ -17,10 +18,12 @@ interface Props {
 }
 
 export default function DashboardShell({ profile, subscription, unreadMessages, children }: Props) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [notifOpen, setNotifOpen] = useState(false)
-  const [liveUnread, setLiveUnread] = useState(unreadMessages)
+  const [sidebarOpen, setSidebarOpen]   = useState(false)
+  const [notifOpen, setNotifOpen]       = useState(false)
+  const [paletteOpen, setPaletteOpen]   = useState(false)
+  const [liveUnread, setLiveUnread]     = useState(unreadMessages)
 
+  // Realtime unread count
   useEffect(() => {
     const supabase = createClient()
 
@@ -43,6 +46,18 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
     return () => { supabase.removeChannel(channel) }
   }, [profile.id])
 
+  // Cmd+K / Ctrl+K to open command palette
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setPaletteOpen(v => !v)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
+
   return (
     <div className="flex h-screen bg-background overflow-hidden">
 
@@ -58,12 +73,10 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
       {/* ── Mobile overlay sidebar ────────────────────────────────────── */}
       {sidebarOpen && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
-          {/* Drawer */}
           <div className="fixed left-0 top-0 h-full z-50 md:hidden animate-slide-right">
             <DashboardSidebar
               profile={profile}
@@ -110,6 +123,13 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPaletteOpen(true)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-surface-2 transition-all duration-150"
+              aria-label="Búsqueda rápida"
+            >
+              <Search className="w-4 h-4" />
+            </button>
             <NotificationBell
               userId={profile.id}
               isOpen={notifOpen}
@@ -129,6 +149,7 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
         </main>
       </div>
 
+      <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} />
       <PushPrompt userId={profile.id} />
     </div>
   )

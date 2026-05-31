@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, Users, Dumbbell, UtensilsCrossed,
-  CalendarDays, MessageSquare, Settings, LogOut, CreditCard, Zap, BarChart2,
+  CalendarDays, MessageSquare, Settings, LogOut, CreditCard, Zap, BarChart2, Search,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -96,6 +96,22 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
           </div>
         </div>
       )}
+
+      {/* ── Quick search ─────────────────────────────────────────────── */}
+      <div className="px-3 pt-3">
+        <button
+          onClick={() => {
+            const e = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
+            window.dispatchEvent(e)
+          }}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border/60 text-slate-500 text-xs hover:border-slate-600 hover:text-slate-400 transition-all group"
+          style={{ background: 'rgba(15,23,42,0.4)' }}
+        >
+          <Search className="w-3.5 h-3.5 shrink-0" />
+          <span className="flex-1 text-left">Buscar...</span>
+          <kbd className="hidden md:flex items-center gap-0.5 text-[10px] font-mono opacity-60 group-hover:opacity-100 transition-opacity">⌘K</kbd>
+        </button>
+      </div>
 
       {/* ── Nav ───────────────────────────────────────────────────────── */}
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">

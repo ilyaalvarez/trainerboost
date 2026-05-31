@@ -6,6 +6,46 @@ import { Send, Loader2, MessageSquare } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Message, Profile } from '@/types/database'
 import { timeAgo } from '@/lib/utils'
+
+function groupMessagesByDay(messages: MessageWithSender[]): { label: string; msgs: MessageWithSender[] }[] {
+  const today     = new Date()
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+
+  const toDateKey = (iso: string) => iso.slice(0, 10)
+
+  const todayKey     = toDateKey(today.toISOString())
+  const yesterdayKey = toDateKey(yesterday.toISOString())
+
+  const buckets = new Map<string, MessageWithSender[]>()
+
+  for (const msg of messages) {
+    const key = toDateKey(msg.created_at)
+    const bucket = buckets.get(key)
+    if (bucket) {
+      bucket.push(msg)
+    } else {
+      buckets.set(key, [msg])
+    }
+  }
+
+  return Array.from(buckets.entries()).map(([key, msgs]) => {
+    let label: string
+    if (key === todayKey) {
+      label = 'Hoy'
+    } else if (key === yesterdayKey) {
+      label = 'Ayer'
+    } else {
+      const raw = new Date(key + 'T00:00:00').toLocaleDateString('es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      })
+      label = raw.charAt(0).toUpperCase() + raw.slice(1)
+    }
+    return { label, msgs }
+  })
+}
 import Avatar from '@/components/ui/Avatar'
 import EmptyState from '@/components/ui/EmptyState'
 
@@ -138,26 +178,42 @@ export default function ClientMessagesPage() {
             Empieza la conversación con tu entrenador
           </div>
         ) : (
-          messages.map(msg => {
-            const isMine = msg.sender_id === myId
-            return (
-              <div key={msg.id} className={`flex gap-2 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
-                {!isMine && (
-                  <Avatar name={msg.sender?.full_name || '?'} url={msg.sender?.avatar_url} size="sm" />
-                )}
-                <div className={`max-w-[70%] ${isMine ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-                  <div className={`px-4 py-2.5 rounded-2xl text-sm ${
-                    isMine
-                      ? 'bg-brand-primary text-white rounded-tr-none'
-                      : 'bg-surface-2 text-slate-200 rounded-tl-none'
-                  }`}>
-                    {msg.content}
-                  </div>
-                  <span className="text-xs text-slate-500 px-1">{timeAgo(msg.created_at)}</span>
-                </div>
+          groupMessagesByDay(messages).map(group => (
+            <div key={group.label}>
+              <div className="flex items-center gap-3 my-2">
+                <div className="flex-1 h-px bg-border/40" />
+                <span className="text-[10px] text-slate-500 font-medium px-2 capitalize">{group.label}</span>
+                <div className="flex-1 h-px bg-border/40" />
               </div>
-            )
-          })
+              {group.msgs.map(msg => {
+                const isMine = msg.sender_id === myId
+                return (
+                  <div key={msg.id} className={`flex gap-2 ${isMine ? 'flex-row-reverse' : 'flex-row'} mb-3`}>
+                    {!isMine && (
+                      <Avatar name={msg.sender?.full_name || '?'} url={msg.sender?.avatar_url} size="sm" />
+                    )}
+                    <div className={`max-w-[70%] ${isMine ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+                      <div className={`px-4 py-2.5 rounded-2xl text-sm ${
+                        isMine
+                          ? 'bg-brand-primary text-white rounded-tr-none'
+                          : 'bg-surface-2 text-slate-200 rounded-tl-none'
+                      }`}>
+                        {msg.content}
+                      </div>
+                      <span className="text-xs text-slate-500 px-1 flex items-center gap-1">
+                        {timeAgo(msg.created_at)}
+                        {isMine && (
+                          msg.read_at !== null
+                            ? <span className="text-[9px] text-sky-400">✓✓</span>
+                            : <span className="text-[9px] text-slate-500">✓</span>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ))
         )}
         <div ref={bottomRef} />
       </div>

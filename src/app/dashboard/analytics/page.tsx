@@ -71,6 +71,7 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true)
   const [metric, setMetric] = useState<'weight_kg' | 'body_fat_pct'>('weight_kg')
   const [kpis, setKpis] = useState<BusinessKpis>({ sessionsThisMonth: 0, activeClientsCount: 0, totalMessages: 0, retentionRate: null })
+  const [clientCheckins, setClientCheckins] = useState<Array<{ clientId: string; name: string; avatarUrl: string | null; avgEnergy: number | null; avgMood: number | null; avgSleep: number | null; checkinsCount: number }>>([])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -140,6 +141,37 @@ export default function AnalyticsPage() {
 
     const clientIds = (relations ?? []).map(r => r.client_id)
     if (clientIds.length === 0) { setClients([]); return }
+
+    // Fetch daily check-ins for the last 30 days
+    const thirtyDaysAgoStr = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0]
+    const { data: checkinData } = await supabase
+      .from('daily_checkins')
+      .select('client_id, energy, mood, sleep_hours')
+      .in('client_id', clientIds)
+      .gte('checkin_date', thirtyDaysAgoStr)
+
+    const checkinsByClient: Record<string, Array<{ energy: number | null; mood: number | null; sleep_hours: number | null }>> = {}
+    for (const c of checkinData ?? []) {
+      if (!checkinsByClient[c.client_id]) checkinsByClient[c.client_id] = []
+      checkinsByClient[c.client_id].push({ energy: c.energy, mood: c.mood, sleep_hours: c.sleep_hours })
+    }
+    const wellbeingData = (relations ?? []).map(r => {
+      const profile = r.profiles as unknown as Profile
+      const entries = checkinsByClient[r.client_id] ?? []
+      const withEnergy = entries.filter(e => e.energy != null)
+      const withMood = entries.filter(e => e.mood != null)
+      const withSleep = entries.filter(e => e.sleep_hours != null)
+      return {
+        clientId: r.client_id,
+        name: profile.full_name,
+        avatarUrl: profile.avatar_url,
+        avgEnergy: withEnergy.length > 0 ? Math.round(withEnergy.reduce((s, e) => s + (e.energy ?? 0), 0) / withEnergy.length * 10) / 10 : null,
+        avgMood: withMood.length > 0 ? Math.round(withMood.reduce((s, e) => s + (e.mood ?? 0), 0) / withMood.length * 10) / 10 : null,
+        avgSleep: withSleep.length > 0 ? Math.round(withSleep.reduce((s, e) => s + (e.sleep_hours ?? 0), 0) / withSleep.length * 10) / 10 : null,
+        checkinsCount: entries.length,
+      }
+    }).filter(w => w.checkinsCount > 0).sort((a, b) => (a.avgEnergy ?? 99) - (b.avgEnergy ?? 99))
+    setClientCheckins(wellbeingData)
 
     // Fetch all progress logs for all clients at once
     const { data: logs } = await supabase
@@ -417,6 +449,53 @@ export default function AnalyticsPage() {
             </BarChart>
           </ResponsiveContainer>
           <p className="text-[10px] text-slate-600 mt-1">Azul = semana actual · Morado = semanas anteriores</p>
+        </div>
+      )}
+
+      {/* Bienestar de clientes */}
+      {clientCheckins.length > 0 && (
+        <div className="card p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-sm font-semibold text-white">Bienestar de clientes</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Promedios de check-in — últimos 30 días</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {clientCheckins.map(c => (
+              <div key={c.clientId} className="flex items-center gap-4">
+                <Avatar name={c.name} url={c.avatarUrl} size="sm" />
+                <span className="text-sm text-white flex-1 min-w-0 truncate">{c.name}</span>
+                <div className="flex items-center gap-4 text-xs shrink-0">
+                  {c.avgEnergy != null && (
+                    <div className="flex items-center gap-1">
+                      <span>⚡</span>
+                      <div className="w-20 h-1.5 bg-surface-2 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full bg-amber-400" style={{ width: `${(c.avgEnergy / 5) * 100}%` }} />
+                      </div>
+                      <span className="text-slate-400 w-6">{c.avgEnergy}</span>
+                    </div>
+                  )}
+                  {c.avgMood != null && (
+                    <div className="flex items-center gap-1">
+                      <span>😊</span>
+                      <div className="w-20 h-1.5 bg-surface-2 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full bg-sky-400" style={{ width: `${(c.avgMood / 5) * 100}%` }} />
+                      </div>
+                      <span className="text-slate-400 w-6">{c.avgMood}</span>
+                    </div>
+                  )}
+                  {c.avgSleep != null && (
+                    <div className="flex items-center gap-1 text-slate-400">
+                      <span>🌙</span>
+                      <span>{c.avgSleep}h</span>
+                    </div>
+                  )}
+                  <span className="text-slate-600 text-[10px]">{c.checkinsCount} check-ins</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

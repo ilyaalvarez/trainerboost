@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import { Search, Users, CalendarDays, MessageSquare, Dumbbell, Apple, TrendingUp, Settings, BarChart2, X } from 'lucide-react'
@@ -71,15 +71,15 @@ export default function CommandPalette({ isOpen, onClose }: Props) {
     setTimeout(() => inputRef.current?.focus(), 50)
   }, [isOpen])
 
-  const filteredNav = NAV_ITEMS.filter(i =>
+  const filteredNav = useMemo(() => NAV_ITEMS.filter(i =>
     !query || i.label.toLowerCase().includes(query.toLowerCase()) || i.keywords.includes(query.toLowerCase())
-  )
+  ), [query])
 
-  const filteredClients = clients.filter(c =>
+  const filteredClients = useMemo(() => clients.filter(c =>
     !query || c.name.toLowerCase().includes(query.toLowerCase())
-  )
+  ), [clients, query])
 
-  const allItems: Item[] = [...filteredNav, ...filteredClients]
+  const allItems: Item[] = useMemo(() => [...filteredNav, ...filteredClients], [filteredNav, filteredClients])
 
   useEffect(() => { setActive(0) }, [query])
 

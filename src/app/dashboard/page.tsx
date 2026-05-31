@@ -72,15 +72,32 @@ export default async function DashboardPage() {
   const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 3600000).toISOString()
   let inactiveClientsCount = 0
 
+  let todayCheckins: Array<{ client_id: string; energy: number | null; mood: number | null; sleep_hours: number | null; profile: { full_name: string; avatar_url: string | null } | null }> = []
+
   if (activeClientIds.length > 0) {
-    const { data: recentLogs } = await supabase
-      .from('progress_logs')
-      .select('client_id')
-      .in('client_id', activeClientIds)
-      .gte('logged_at', fourteenDaysAgo)
+    const [{ data: recentLogs }, { data: checkinData }] = await Promise.all([
+      supabase
+        .from('progress_logs')
+        .select('client_id')
+        .in('client_id', activeClientIds)
+        .gte('logged_at', fourteenDaysAgo),
+      supabase
+        .from('daily_checkins')
+        .select('client_id, energy, mood, sleep_hours, profiles!client_id(full_name, avatar_url)')
+        .in('client_id', activeClientIds)
+        .eq('checkin_date', todayStr),
+    ])
 
     const clientsWithRecentLogs = new Set((recentLogs ?? []).map((l: { client_id: string }) => l.client_id))
     inactiveClientsCount = activeClientIds.filter(id => !clientsWithRecentLogs.has(id)).length
+
+    todayCheckins = (checkinData ?? []).map(c => ({
+      client_id: c.client_id,
+      energy: c.energy,
+      mood: c.mood,
+      sleep_hours: c.sleep_hours,
+      profile: (Array.isArray(c.profiles) ? c.profiles[0] : c.profiles) as { full_name: string; avatar_url: string | null } | null,
+    }))
   }
 
   const activeClients = clients?.length ?? 0
@@ -358,6 +375,46 @@ export default async function DashboardPage() {
                 <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-slate-400 transition-colors" />
               </Link>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Today's check-ins ────────────────────────────────────────── */}
+      {todayCheckins.length > 0 && (
+        <div className="card p-6 animate-fade-in-up">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-1 h-5 rounded-full bg-gradient-to-b from-amber-400 to-brand-primary shrink-0" />
+            <h2 className="font-semibold text-white">Check-ins de hoy</h2>
+            <span className="ml-auto text-xs text-slate-500">{todayCheckins.length} {todayCheckins.length === 1 ? 'cliente' : 'clientes'}</span>
+          </div>
+          <div className="space-y-2">
+            {todayCheckins.map(c => {
+              const energyEmojis = ['😴','🪫','😐','⚡','🔥']
+              const moodEmojis   = ['😞','😕','😐','😊','😄']
+              return (
+                <div key={c.client_id} className="flex items-center gap-3 p-3 rounded-xl bg-surface-2 hover:bg-surface-3 transition-colors">
+                  <Avatar name={c.profile?.full_name ?? '?'} url={c.profile?.avatar_url} size="sm" />
+                  <span className="text-sm font-medium text-white flex-1 min-w-0 truncate">{c.profile?.full_name ?? '—'}</span>
+                  <div className="flex items-center gap-3 text-xs shrink-0">
+                    {c.energy != null && (
+                      <span className="flex items-center gap-1" title={`Energía: ${c.energy}/5`}>
+                        <span>{energyEmojis[c.energy - 1]}</span>
+                        <span className="text-slate-400 font-mono">{c.energy}/5</span>
+                      </span>
+                    )}
+                    {c.mood != null && (
+                      <span className="flex items-center gap-1" title={`Ánimo: ${c.mood}/5`}>
+                        <span>{moodEmojis[c.mood - 1]}</span>
+                        <span className="text-slate-400 font-mono">{c.mood}/5</span>
+                      </span>
+                    )}
+                    {c.sleep_hours != null && (
+                      <span className="text-slate-500">🌙 {c.sleep_hours}h</span>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

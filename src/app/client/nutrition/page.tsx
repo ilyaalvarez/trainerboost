@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Check, Loader2, UtensilsCrossed, Download, Droplets, Plus, Minus } from 'lucide-react'
+import { Check, Loader2, UtensilsCrossed, Download, Droplets, Plus, Minus, Trophy } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { MealPlan, Meal, FoodItem } from '@/types/database'
 import EmptyState from '@/components/ui/EmptyState'
@@ -207,26 +207,45 @@ export default function ClientNutritionPage() {
         const totalFoods = plan.meals.reduce((acc, m) => acc + (m.foods as FoodItem[]).length, 0)
         const checkedCount = checkedFoods.size
         const pct = totalFoods > 0 ? Math.round(checkedCount / totalFoods * 100) : 0
+        const allDone = totalFoods > 0 && checkedCount >= totalFoods
         const circumference = 2 * Math.PI * 28
         return (
-          <div className="card p-4 mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-white capitalize">{todayLabel}</p>
-              <p className="text-xs text-slate-400 mt-0.5">{checkedCount} de {totalFoods} alimentos completados</p>
-            </div>
-            <div className="w-16 h-16 relative">
-              <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
-                <circle cx="32" cy="32" r="28" strokeWidth="4" className="stroke-slate-700" fill="none" />
-                <circle cx="32" cy="32" r="28" strokeWidth="4" className="stroke-emerald-400" fill="none"
-                  strokeDasharray={`${circumference}`}
-                  strokeDashoffset={`${circumference * (1 - checkedCount / Math.max(totalFoods, 1))}`}
-                  strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.3s' }} />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs font-bold text-white">{pct}%</span>
+          <>
+            <div className={`card p-4 mb-4 flex items-center justify-between transition-colors ${allDone ? 'border-emerald-500/30' : ''}`}
+                 style={allDone ? { background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02))' } : {}}>
+              <div>
+                <p className="text-sm font-semibold text-white capitalize">{todayLabel}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{checkedCount} de {totalFoods} alimentos completados</p>
+              </div>
+              <div className="w-16 h-16 relative">
+                <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
+                  <circle cx="32" cy="32" r="28" strokeWidth="4" className="stroke-slate-700" fill="none" />
+                  <circle cx="32" cy="32" r="28" strokeWidth="4" fill="none"
+                    className={allDone ? 'stroke-emerald-400' : 'stroke-brand-primary'}
+                    strokeDasharray={`${circumference}`}
+                    strokeDashoffset={`${circumference * (1 - checkedCount / Math.max(totalFoods, 1))}`}
+                    strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.3s' }} />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {allDone
+                    ? <Trophy className="w-5 h-5 text-emerald-400" />
+                    : <span className="text-xs font-bold text-white">{pct}%</span>}
+                </div>
               </div>
             </div>
-          </div>
+            {allDone && (
+              <div className="rounded-xl p-4 flex items-center gap-3 mb-4 animate-fade-in"
+                   style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(14,165,233,0.06))', border: '1px solid rgba(16,185,129,0.25)' }}>
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
+                  <Trophy className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">¡Plan completado! 🎉</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Has completado todos los alimentos del día. ¡Excelente disciplina!</p>
+                </div>
+              </div>
+            )}
+          </>
         )
       })()}
 

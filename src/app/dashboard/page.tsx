@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Users, CalendarDays, MessageSquare, TrendingUp, Plus, Clock, Zap, Calendar, ChevronRight, Rocket, CheckCircle2, Dumbbell, Apple, UserPlus } from 'lucide-react'
 import Link from 'next/link'
-import { formatRelative, formatDate } from '@/lib/utils'
+import { formatRelative, formatDate, timeAgo } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import StatsCard from '@/components/ui/StatsCard'
@@ -330,11 +330,14 @@ export default async function DashboardPage() {
                         <span className="font-medium text-sm text-white truncate">
                           {sender?.full_name}
                         </span>
+                        <span className="text-[10px] text-slate-500 shrink-0">{timeAgo(msg.created_at)}</span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <div className="text-xs text-slate-400 truncate flex-1">{msg.content}</div>
                         {!msg.read_at && (
-                          <span className="w-2 h-2 rounded-full bg-brand-primary shrink-0" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
                         )}
                       </div>
-                      <div className="text-xs text-slate-400 truncate mt-0.5">{msg.content}</div>
                     </div>
                   </Link>
                 )

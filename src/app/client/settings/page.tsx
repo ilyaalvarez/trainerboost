@@ -15,6 +15,7 @@ export default function ClientSettingsPage() {
 
   const [profile,       setProfile]       = useState<Profile | null>(null)
   const [fullName,      setFullName]      = useState('')
+  const [phone,         setPhone]         = useState('')
   const [avatarUrl,     setAvatarUrl]     = useState('')
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [savingProfile, setSavingProfile] = useState(false)
@@ -32,6 +33,7 @@ export default function ClientSettingsPage() {
     if (data) {
       setProfile(data as Profile)
       setFullName(data.full_name ?? '')
+      setPhone(data.phone ?? '')
       setAvatarUrl(data.avatar_url ?? '')
     }
   }, [supabase, router])
@@ -59,7 +61,7 @@ export default function ClientSettingsPage() {
     e.preventDefault()
     if (!profile || !fullName.trim()) { toast.error('El nombre no puede estar vacío'); return }
     setSavingProfile(true)
-    const { error } = await supabase.from('profiles').update({ full_name: fullName.trim() }).eq('id', profile.id)
+    const { error } = await supabase.from('profiles').update({ full_name: fullName.trim(), phone: phone.trim() || null }).eq('id', profile.id)
     setSavingProfile(false)
     if (error) { toast.error(error.message); return }
     toast.success('Perfil actualizado ✓')
@@ -128,7 +130,7 @@ export default function ClientSettingsPage() {
         <input ref={avatarRef} type="file" accept="image/*" className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) uploadAvatar(f); e.target.value = '' }} />
 
-        {/* Name */}
+        {/* Name + phone */}
         <form onSubmit={saveProfile} className="space-y-4">
           <div>
             <label className="label">Nombre completo</label>
@@ -138,6 +140,16 @@ export default function ClientSettingsPage() {
               onChange={e => setFullName(e.target.value)}
               className="input"
               required
+            />
+          </div>
+          <div>
+            <label className="label">Teléfono <span className="text-slate-600">(opcional)</span></label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              className="input"
+              placeholder="+34 600 000 000"
             />
           </div>
           <button type="submit" disabled={savingProfile} className="btn-primary">

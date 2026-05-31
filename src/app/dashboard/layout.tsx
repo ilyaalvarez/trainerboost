@@ -9,13 +9,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   if (!user) redirect('/login')
 
-  const [{ data: profile }, { data: subscription }, { count: unread }] = await Promise.all([
+  const [{ data: profile }, { data: subscription }, { count: unread }, { count: pendingApts }] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase.from('subscriptions').select('*').eq('user_id', user.id).single(),
     supabase.from('messages')
       .select('*', { count: 'exact', head: true })
       .eq('receiver_id', user.id)
       .is('read_at', null),
+    supabase.from('appointments')
+      .select('*', { count: 'exact', head: true })
+      .eq('trainer_id', user.id)
+      .eq('status', 'pending')
+      .gte('scheduled_at', new Date().toISOString()),
   ])
 
   if (!profile) redirect('/onboarding')
@@ -26,6 +31,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       profile={profile as Profile}
       subscription={subscription as Subscription | null}
       unreadMessages={unread ?? 0}
+      pendingApts={pendingApts ?? 0}
     >
       {children}
     </DashboardShell>

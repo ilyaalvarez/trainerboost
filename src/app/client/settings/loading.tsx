@@ -18,6 +18,8 @@ export default function ClientSettingsLoading() {
         <div className="space-y-3">
           <Skeleton className="h-4 w-28" />
           <Skeleton className="h-10 w-full rounded-lg" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-10 w-full rounded-lg" />
           <Skeleton className="h-10 w-40 rounded-lg" />
         </div>
       </div>

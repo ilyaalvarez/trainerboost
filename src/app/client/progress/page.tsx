@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Plus, Loader2, Scale, Flame, TrendingDown, ClipboardList, X, ChevronLeft, ChevronRight, Target, Pencil } from 'lucide-react'
+import { Plus, Loader2, Scale, Flame, TrendingDown, ClipboardList, X, ChevronLeft, ChevronRight, Target, Pencil, Medal } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { ProgressLog } from '@/types/database'
 import { formatDate } from '@/lib/utils'
@@ -45,6 +45,7 @@ export default function ClientProgressPage() {
   const [trainerId, setTrainerId] = useState<string | null>(null)
   const [completedWorkouts, setCompletedWorkouts] = useState(0)
 
+  const [personalRecords, setPersonalRecords] = useState<Array<{ name: string; maxWeight: number; reps: number | null; date: string }>>([])
   const [lightbox, setLightbox] = useState<{ urls: string[]; idx: number } | null>(null)
   const [showGoalModal, setShowGoalModal] = useState(false)
   const [goalWeight, setGoalWeight]       = useState('')
@@ -99,7 +100,7 @@ export default function ClientProgressPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const [{ data: l }, { data: tc }, { count: workoutsCount }] = await Promise.all([
+    const [{ data: l }, { data: tc }, { count: workoutsCount }, { data: setLogsData }] = await Promise.all([
       supabase.from('progress_logs')
         .select('*')
         .eq('client_id', user.id)
@@ -112,11 +113,33 @@ export default function ClientProgressPage() {
       supabase.from('exercise_completions')
         .select('*', { count: 'exact', head: true })
         .eq('client_id', user.id),
+      supabase.from('set_logs')
+        .select('weight_kg, reps, logged_at, routine_exercises!exercise_id(name)')
+        .eq('client_id', user.id)
+        .not('weight_kg', 'is', null)
+        .gt('weight_kg', 0),
     ])
 
     setLogs(l || [])
     setTrainerId(tc?.trainer_id || null)
     setCompletedWorkouts(workoutsCount || 0)
+
+    // Compute personal records (max weight per exercise)
+    const recordsMap = new Map<string, { maxWeight: number; reps: number | null; date: string }>()
+    for (const log of setLogsData ?? []) {
+      const exerciseName = (log.routine_exercises as unknown as { name: string } | null)?.name
+      if (!exerciseName || !log.weight_kg) continue
+      const existing = recordsMap.get(exerciseName)
+      if (!existing || log.weight_kg > existing.maxWeight) {
+        recordsMap.set(exerciseName, { maxWeight: log.weight_kg, reps: log.reps, date: log.logged_at })
+      }
+    }
+    const records = Array.from(recordsMap.entries())
+      .map(([name, v]) => ({ name, ...v }))
+      .sort((a, b) => b.maxWeight - a.maxWeight)
+      .slice(0, 8)
+    setPersonalRecords(records)
+
     setLoading(false)
   }, [supabase])
 
@@ -317,6 +340,28 @@ export default function ClientProgressPage() {
             streakDays={streakDays}
             completedWorkouts={completedWorkouts}
           />
+        </div>
+      )}
+
+      {/* Personal Records */}
+      {personalRecords.length > 0 && (
+        <div className="card p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Medal className="w-4 h-4 text-amber-400" />
+            <h2 className="font-semibold text-white">Récords personales</h2>
+            <span className="ml-auto text-xs text-slate-500">Máximo peso levantado</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {personalRecords.map(pr => (
+              <div key={pr.name} className="rounded-xl p-3 text-center"
+                   style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.06), rgba(239,68,68,0.04))', border: '1px solid rgba(245,158,11,0.15)' }}>
+                <div className="font-mono text-xl font-bold text-amber-400">{pr.maxWeight}<span className="text-xs text-slate-400 font-normal ml-0.5">kg</span></div>
+                {pr.reps && <div className="text-xs text-slate-400 mt-0.5">{pr.reps} reps</div>}
+                <div className="text-[10px] font-medium text-slate-300 mt-1 truncate" title={pr.name}>{pr.name}</div>
+                <div className="text-[10px] text-slate-600 mt-0.5">{formatDate(pr.date, 'dd MMM yy')}</div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

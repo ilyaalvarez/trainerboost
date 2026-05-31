@@ -14,10 +14,11 @@ interface Props {
   profile: Profile
   subscription: Subscription | null
   unreadMessages: number
+  pendingApts?: number
   children: React.ReactNode
 }
 
-export default function DashboardShell({ profile, subscription, unreadMessages, children }: Props) {
+export default function DashboardShell({ profile, subscription, unreadMessages, pendingApts = 0, children }: Props) {
   const [sidebarOpen, setSidebarOpen]   = useState(false)
   const [notifOpen, setNotifOpen]       = useState(false)
   const [paletteOpen, setPaletteOpen]   = useState(false)
@@ -67,6 +68,7 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
           profile={profile}
           subscription={subscription}
           unreadMessages={liveUnread}
+          pendingApts={pendingApts}
         />
       </div>
 
@@ -82,6 +84,7 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
               profile={profile}
               subscription={subscription}
               unreadMessages={liveUnread}
+              pendingApts={pendingApts}
               onClose={() => setSidebarOpen(false)}
             />
           </div>

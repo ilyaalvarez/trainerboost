@@ -211,7 +211,20 @@ export default function ClientRoutinePage() {
       {/* Progress bar + session timer */}
       <div className="card p-5 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-white">Progreso de hoy</span>
+          <div>
+            <span className="text-sm font-medium text-white">Progreso de hoy</span>
+            {exercises.length > 0 && (() => {
+              const totalSets = exercises.reduce((s, ex) => s + (ex.sets ?? 3), 0)
+              const estSecs = exercises.reduce((s, ex) => {
+                const sets = ex.sets ?? 3
+                return s + sets * 30 + (sets - 1) * (ex.rest_seconds ?? 60)
+              }, 0)
+              const estMins = Math.ceil(estSecs / 60)
+              return (
+                <p className="text-xs text-slate-500 mt-0.5">{exercises.length} ejercicios · {totalSets} series · ~{estMins} min</p>
+              )
+            })()}
+          </div>
           <div className="flex items-center gap-3">
             {/* Session timer */}
             <div className="flex items-center gap-1.5">
@@ -232,14 +245,24 @@ export default function ClientRoutinePage() {
         </div>
         <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
           <div
-            className="h-full bg-brand-primary rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${progress}%`,
+              background: progress === 100
+                ? 'linear-gradient(90deg, #10B981, #0EA5E9)'
+                : '#0EA5E9',
+            }}
           />
         </div>
         {progress === 100 && (
-          <p className="text-emerald-400 text-sm font-semibold text-center">
-            🎉 ¡Sesión completada en {formatSessionTime(sessionSeconds)}! Gran trabajo hoy.
-          </p>
+          <div className="rounded-xl p-3 flex items-center gap-3 animate-fade-in"
+               style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(14,165,233,0.06))', border: '1px solid rgba(16,185,129,0.25)' }}>
+            <span className="text-2xl">🎉</span>
+            <div>
+              <p className="text-sm font-semibold text-emerald-400">¡Sesión completada!</p>
+              <p className="text-xs text-slate-400">{formatSessionTime(sessionSeconds)} · {exercises.length} ejercicios</p>
+            </div>
+          </div>
         )}
       </div>
 

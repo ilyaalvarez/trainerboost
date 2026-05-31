@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import {
   Users, Search, Copy, RefreshCw, ChevronLeft, ChevronRight,
   UserPlus, Loader2, Mail, ArrowRight, Dumbbell, Clock,
-  Tag, X,
+  Tag, X, FileDown,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn, formatDate, timeAgo } from '@/lib/utils'
@@ -241,6 +241,28 @@ export default function ClientsPage() {
     setClients(prev => prev.map(c => c.id === clientId ? { ...c, tags } : c))
   }
 
+  function exportCsv() {
+    const rows = [
+      ['Nombre', 'Teléfono', 'Estado', 'Etiquetas', 'Cliente desde', 'Última rutina'],
+      ...filtered.map(c => [
+        c.profile?.full_name ?? '',
+        c.profile?.phone ?? '',
+        c.status,
+        (c.tags ?? []).join('; '),
+        c.started_at ? new Date(c.started_at).toLocaleDateString('es-ES') : '',
+        c.lastRoutine ? new Date(c.lastRoutine).toLocaleDateString('es-ES') : '',
+      ]),
+    ]
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `clientes_${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   // ── Render ───────────────────────────────────────────────────────────────
 
   return (
@@ -254,10 +276,18 @@ export default function ClientsPage() {
             {loading ? '…' : `${clients.length} cliente${clients.length !== 1 ? 's' : ''} en total`}
           </p>
         </div>
-        <button onClick={openInviteModal} className="btn-primary">
-          <UserPlus className="w-4 h-4" />
-          Invitar cliente
-        </button>
+        <div className="flex items-center gap-2">
+          {clients.length > 0 && (
+            <button onClick={exportCsv} className="btn-secondary text-sm" title="Exportar como CSV">
+              <FileDown className="w-4 h-4" />
+              <span className="hidden sm:inline">CSV</span>
+            </button>
+          )}
+          <button onClick={openInviteModal} className="btn-primary">
+            <UserPlus className="w-4 h-4" />
+            Invitar cliente
+          </button>
+        </div>
       </div>
 
       {/* ── Search + filters ── */}

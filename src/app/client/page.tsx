@@ -100,26 +100,44 @@ export default async function ClientHomePage() {
       <DailyCheckinCard clientId={user.id} trainerId={trainerId} existingCheckin={todayCheckin} />
 
       {/* Trainer info */}
-      {trainer && (
-        <div className="card p-5 flex items-center gap-4">
-          <Avatar name={trainer.full_name} url={trainer.avatar_url} size="lg" />
-          <div className="flex-1 min-w-0">
-            <div className="text-xs text-slate-400 mb-0.5">Tu entrenador</div>
-            <div className="font-semibold text-white">{trainer.full_name}</div>
-            {trainer.specialties?.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                {trainer.specialties.slice(0, 3).map(s => (
-                  <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-surface-2 border border-border text-slate-400">
-                    {s}
-                  </span>
-                ))}
-              </div>
-            )}
+      {trainer ? (
+        <div className="card p-5">
+          <div className="flex items-center gap-4">
+            <Avatar name={trainer.full_name} url={trainer.avatar_url} size="lg" />
+            <div className="flex-1 min-w-0">
+              <div className="text-xs text-slate-400 mb-0.5">Tu entrenador</div>
+              <div className="font-semibold text-white">{trainer.full_name}</div>
+              {trainer.specialties?.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {trainer.specialties.slice(0, 3).map(s => (
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-surface-2 border border-border text-slate-400">
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <Link href="/client/messages" className="btn-secondary text-xs py-1.5 px-3 shrink-0">
+              <MessageSquare className="w-3.5 h-3.5" />
+              Mensaje
+            </Link>
           </div>
-          <Link href="/client/messages" className="btn-secondary text-xs py-1.5 px-3 shrink-0">
-            <MessageSquare className="w-3.5 h-3.5" />
-            Mensaje
-          </Link>
+          {trainer.bio && (
+            <p className="mt-3 text-xs text-slate-400 leading-relaxed line-clamp-2 border-t border-border/40 pt-3">
+              {trainer.bio}
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="card p-5 flex items-center gap-4 opacity-70"
+             style={{ borderStyle: 'dashed', borderColor: 'rgba(71,85,105,0.6)' }}>
+          <div className="w-12 h-12 rounded-full bg-surface-2 border border-border flex items-center justify-center shrink-0">
+            <MessageSquare className="w-5 h-5 text-slate-600" />
+          </div>
+          <div>
+            <div className="text-sm font-medium text-slate-400">Sin entrenador asignado</div>
+            <div className="text-xs text-slate-600 mt-0.5">Cuando tu entrenador te añada, aparecerá aquí.</div>
+          </div>
         </div>
       )}
 

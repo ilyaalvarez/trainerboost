@@ -72,6 +72,9 @@ export default function ClientDetailPage() {
   const [sendingMessage, setSendingMessage] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  // Appointments view toggle
+  const [aptView, setAptView] = useState<'upcoming' | 'past'>('upcoming')
+
   // PDF report export
   const [exporting, setExporting] = useState(false)
 
@@ -123,7 +126,6 @@ export default function ClientDetailPage() {
         .eq('client_id', clientId).eq('trainer_id', user.id).order('logged_at', { ascending: true }),
       supabase.from('appointments').select('*')
         .eq('client_id', clientId).eq('trainer_id', user.id)
-        .gte('scheduled_at', new Date().toISOString())
         .order('scheduled_at'),
       supabase.from('messages').select('*')
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${clientId}),and(sender_id.eq.${clientId},receiver_id.eq.${user.id})`)
@@ -233,13 +235,15 @@ export default function ClientDetailPage() {
   const weightData = progressLogs.filter(l => l.weight_kg != null)
 
   // ── Smart alerts ───────────────────────────────────────────────────────────
+  const nowIso         = new Date().toISOString()
+  const upcomingApts   = appointments.filter(a => a.scheduled_at >= nowIso).sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))
   const activeRoutine  = routines.find(r => r.status === 'active')
   const activeMealPlan = mealPlans.find(m => m.status === 'active')
   const lastLog        = progressLogs.length > 0 ? progressLogs[progressLogs.length - 1] : null
   const daysSinceLastLog = lastLog
     ? Math.floor((Date.now() - new Date(lastLog.logged_at).getTime()) / 86400000)
     : null
-  const nextAppt       = appointments[0] ?? null
+  const nextAppt        = upcomingApts[0] ?? null
   const hoursToNextAppt = nextAppt
     ? Math.floor((new Date(nextAppt.scheduled_at).getTime() - Date.now()) / 3600000)
     : null
@@ -251,7 +255,7 @@ export default function ClientDetailPage() {
     ...(daysSinceLastLog !== null && daysSinceLastLog > 30
       ? [{ type: 'warn' as const, msg: `Sin registrar progreso hace ${daysSinceLastLog} días` }]
       : []),
-    ...(appointments.length === 0 ? [{ type: 'info' as const, msg: 'No hay citas próximas' }] : []),
+    ...(upcomingApts.length === 0 ? [{ type: 'info' as const, msg: 'No hay citas próximas' }] : []),
     ...(hoursToNextAppt !== null && hoursToNextAppt >= 0 && hoursToNextAppt <= 24
       ? [{ type: 'good' as const, msg: `Cita hoy en ${hoursToNextAppt < 1 ? 'menos de 1h' : hoursToNextAppt + 'h'}: ${formatRelative(nextAppt!.scheduled_at)}` }]
       : []),
@@ -363,7 +367,7 @@ export default function ClientDetailPage() {
               { label: 'Rutinas activas',  value: routines.filter(r => r.status === 'active').length,   icon: <Dumbbell size={15} />,   color: '#0EA5E9', bg: 'rgba(14,165,233,0.1)',   border: 'rgba(14,165,233,0.2)' },
               { label: 'Planes nutric.',   value: mealPlans.filter(m => m.status === 'active').length,  icon: <Apple size={15} />,       color: '#10B981', bg: 'rgba(16,185,129,0.1)',   border: 'rgba(16,185,129,0.2)' },
               { label: 'Registros peso',   value: progressLogs.length,                                  icon: <Activity size={15} />,    color: '#7C3AED', bg: 'rgba(124,58,237,0.1)',  border: 'rgba(124,58,237,0.2)' },
-              { label: 'Próximas citas',   value: appointments.length,                                  icon: <CalendarDays size={15} />, color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',  border: 'rgba(245,158,11,0.2)' },
+              { label: 'Próximas citas',   value: upcomingApts.length,                                  icon: <CalendarDays size={15} />, color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',  border: 'rgba(245,158,11,0.2)' },
             ].map(stat => (
               <div key={stat.label}
                    className="rounded-xl px-4 py-3 flex items-center gap-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
@@ -1034,60 +1038,82 @@ export default function ClientDetailPage() {
       {/* ═══════════════════════════════════════════════════════════
           TAB: CITAS
       ═══════════════════════════════════════════════════════════ */}
-      {tab === 'citas' && (
-        <div className="space-y-4 animate-fade-in">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-semibold text-white">Próximas citas</h2>
-              <p className="text-xs text-slate-500 mt-0.5">{appointments.length} {appointments.length === 1 ? 'cita programada' : 'citas programadas'}</p>
-            </div>
-            <button type="button" className="btn-primary" onClick={() => setShowAppointmentModal(true)}>
-              <Plus size={15} /> Agendar cita
-            </button>
-          </div>
+      {tab === 'citas' && (() => {
+        const now = new Date().toISOString()
+        const upcomingApts = appointments.filter(a => a.scheduled_at >= now).sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))
+        const pastApts = appointments.filter(a => a.scheduled_at < now).sort((a, b) => b.scheduled_at.localeCompare(a.scheduled_at))
+        const visibleApts = aptView === 'upcoming' ? upcomingApts : pastApts
 
-          {appointments.length === 0 ? (
-            <EmptyState icon={<CalendarDays />} title="Sin citas programadas"
-                        description="Agenda la próxima sesión con este cliente."
-                        action={{ label: 'Agendar cita', onClick: () => setShowAppointmentModal(true) }} />
-          ) : (
-            <div className="space-y-3">
-              {appointments.map((apt, idx) => {
-                const typeColor = apt.type === 'presencial'
-                  ? { color: '#7C3AED', bg: 'rgba(124,58,237,0.12)', border: 'rgba(124,58,237,0.25)', icon: <MapPin size={14} /> }
-                  : apt.type === 'online'
-                  ? { color: '#0EA5E9', bg: 'rgba(14,165,233,0.12)',  border: 'rgba(14,165,233,0.25)',  icon: <Video size={14} /> }
-                  : { color: '#10B981', bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.25)', icon: <Phone size={14} /> }
-                return (
-                  <div key={apt.id}
-                       className="card overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover flex"
-                       style={idx === 0 ? { borderColor: 'rgba(14,165,233,0.2)' } : undefined}>
-                    {/* Left accent */}
-                    <div className="w-1 shrink-0 rounded-l-2xl" style={{ background: typeColor.color }} />
-                    <div className="flex-1 p-4 flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 hover:scale-105"
-                           style={{ background: typeColor.bg, color: typeColor.color }}>
-                        {typeColor.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-white text-sm">{formatRelative(apt.scheduled_at)}</div>
-                        <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
-                          <Clock size={10} /> {apt.duration_minutes} min
-                          {apt.location && <><span className="text-slate-600">·</span> <MapPin size={10} /> {apt.location}</>}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <Badge status={apt.type} />
-                        <Badge status={apt.status} />
-                      </div>
-                    </div>
+        function AptCard({ apt, idx }: { apt: Appointment; idx: number }) {
+          const typeColor = apt.type === 'presencial'
+            ? { color: '#7C3AED', bg: 'rgba(124,58,237,0.12)', icon: <MapPin size={14} /> }
+            : apt.type === 'online'
+            ? { color: '#0EA5E9', bg: 'rgba(14,165,233,0.12)', icon: <Video size={14} /> }
+            : { color: '#10B981', bg: 'rgba(16,185,129,0.12)', icon: <Phone size={14} /> }
+          return (
+            <div className={cn('card overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover flex', aptView === 'past' && 'opacity-70')}
+                 style={idx === 0 && aptView === 'upcoming' ? { borderColor: 'rgba(14,165,233,0.2)' } : undefined}>
+              <div className="w-1 shrink-0 rounded-l-2xl" style={{ background: aptView === 'past' ? '#475569' : typeColor.color }} />
+              <div className="flex-1 p-4 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                     style={{ background: aptView === 'past' ? 'rgba(71,85,105,0.3)' : typeColor.bg, color: aptView === 'past' ? '#64748B' : typeColor.color }}>
+                  {typeColor.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-white text-sm">{formatRelative(apt.scheduled_at)}</div>
+                  <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
+                    <Clock size={10} /> {apt.duration_minutes} min
+                    {apt.location && <><span className="text-slate-600">·</span> <MapPin size={10} /> {apt.location}</>}
                   </div>
-                )
-              })}
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Badge status={apt.type} />
+                  <Badge status={apt.status} />
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-      )}
+          )
+        }
+
+        return (
+          <div className="space-y-4 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setAptView('upcoming')}
+                  className={cn('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors', aptView === 'upcoming' ? 'bg-brand-primary text-white' : 'text-slate-400 hover:text-white')}
+                >
+                  Próximas {upcomingApts.length > 0 && <span className="ml-1 text-xs opacity-80">({upcomingApts.length})</span>}
+                </button>
+                <button
+                  onClick={() => setAptView('past')}
+                  className={cn('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors', aptView === 'past' ? 'bg-surface-2 text-white' : 'text-slate-400 hover:text-white')}
+                >
+                  Historial {pastApts.length > 0 && <span className="ml-1 text-xs opacity-80">({pastApts.length})</span>}
+                </button>
+              </div>
+              <button type="button" className="btn-primary" onClick={() => setShowAppointmentModal(true)}>
+                <Plus size={15} /> Agendar cita
+              </button>
+            </div>
+
+            {visibleApts.length === 0 ? (
+              aptView === 'upcoming' ? (
+                <EmptyState icon={<CalendarDays />} title="Sin citas programadas"
+                            description="Agenda la próxima sesión con este cliente."
+                            action={{ label: 'Agendar cita', onClick: () => setShowAppointmentModal(true) }} />
+              ) : (
+                <EmptyState icon={<CalendarDays />} title="Sin historial de citas"
+                            description="Las citas pasadas aparecerán aquí." />
+              )
+            ) : (
+              <div className="space-y-3">
+                {visibleApts.map((apt, idx) => <AptCard key={apt.id} apt={apt} idx={idx} />)}
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       {/* ═══════════════════════════════════════════════════════════
           TAB: MENSAJES

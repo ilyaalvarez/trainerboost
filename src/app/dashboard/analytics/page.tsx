@@ -453,14 +453,25 @@ export default function AnalyticsPage() {
       )}
 
       {/* Bienestar de clientes */}
-      {clientCheckins.length > 0 && (
-        <div className="card p-6">
-          <div className="flex items-center justify-between mb-5">
+      <div className="card p-6">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h2 className="text-sm font-semibold text-white">Bienestar de clientes</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Promedios de check-in — últimos 30 días</p>
+          </div>
+        </div>
+        {clientCheckins.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center gap-3">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                 style={{ background: 'rgba(51,65,85,0.5)' }}>
+              <Activity className="w-6 h-6 text-slate-500" />
+            </div>
             <div>
-              <h2 className="text-sm font-semibold text-white">Bienestar de clientes</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Promedios de check-in — últimos 30 días</p>
+              <p className="text-sm font-medium text-slate-400">Sin datos de bienestar aún</p>
+              <p className="text-xs text-slate-600 mt-1 max-w-xs">Anima a tus clientes a completar el check-in diario para ver sus niveles de energía, ánimo y sueño.</p>
             </div>
           </div>
+        ) : (
           <div className="space-y-3">
             {clientCheckins.map(c => (
               <div key={c.clientId} className="flex items-center gap-4">
@@ -496,8 +507,8 @@ export default function AnalyticsPage() {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Client progress chart */}
       <div className="card p-6">

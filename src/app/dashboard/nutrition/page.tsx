@@ -395,12 +395,14 @@ function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, on
         </div>
 
         {/* Macro bars preview */}
-        {totalMacroCal > 0 && (
+        {totalMacroCal > 0 ? (
           <div className="mt-4 space-y-2">
             <MacroBar label="Proteína" value={p} pct={pPct} color="bg-sky-500" />
             <MacroBar label="Carbohidratos" value={c} pct={cPct} color="bg-amber-500" />
             <MacroBar label="Grasa" value={f} pct={fPct} color="bg-violet-500" />
           </div>
+        ) : (
+          <p className="mt-3 text-[11px] text-slate-600 italic">Sin objetivos de macros definidos</p>
         )}
       </button>
 

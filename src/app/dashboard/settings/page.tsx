@@ -73,6 +73,7 @@ export default function SettingsPage() {
   const [customSpec,  setCustomSpec]  = useState('')
   const [avatarUrl,   setAvatarUrl]   = useState('')
   const [savingProfile, setSavingProfile] = useState(false)
+  const [avatarUploading, setAvatarUploading] = useState(false)
   const avatarInputRef = useRef<HTMLInputElement>(null)
 
   // ── Password form ────────────────────────────────────────────────────────
@@ -312,7 +313,9 @@ export default function SettingsPage() {
                     if (file.size > 5 * 1024 * 1024) { toast.error('Imagen demasiado grande (máx 5MB)'); return }
                     const ext = file.name.split('.').pop() ?? 'jpg'
                     const path = `${userId}.${ext}`
+                    setAvatarUploading(true)
                     const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+                    setAvatarUploading(false)
                     if (error) { toast.error('Error al subir la imagen'); return }
                     const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
                     setAvatarUrl(publicUrl + '?t=' + Date.now())
@@ -322,10 +325,13 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => avatarInputRef.current?.click()}
-                  className="btn-secondary shrink-0 px-3"
+                  disabled={avatarUploading}
+                  className="btn-secondary shrink-0 px-3 disabled:opacity-60"
                   title="Subir imagen"
                 >
-                  <Camera className="w-4 h-4" />
+                  {avatarUploading
+                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                    : <Camera className="w-4 h-4" />}
                 </button>
               </div>
             </div>
@@ -379,7 +385,7 @@ export default function SettingsPage() {
               placeholder="Cuéntanos sobre ti y tu experiencia..."
               maxLength={500}
             />
-            <p className="text-xs text-slate-600 text-right mt-1">{bio.length}/500</p>
+            <p className={cn('text-xs text-right mt-1', bio.length > 450 ? 'text-amber-400' : 'text-slate-600')}>{bio.length}/500</p>
           </div>
 
           {/* Specialties */}

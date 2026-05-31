@@ -533,6 +533,9 @@ export default function AppointmentsPage() {
                           <p className={cn('text-lg font-bold', isToday ? 'text-sky-400' : 'text-white')}>{day.getDate()}</p>
                         </div>
                         <div className="space-y-1.5">
+                          {dayApts.length === 0 && (
+                            <p className="text-[10px] text-slate-700 text-center pt-2">Sin citas</p>
+                          )}
                           {dayApts.map(apt => {
                             const colorMap: Record<AppointmentType, string> = {
                               presencial: 'rgba(14,165,233,0.15)',

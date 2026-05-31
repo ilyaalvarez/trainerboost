@@ -175,7 +175,7 @@ export default async function ClientHomePage() {
       {/* Progress chart */}
       {progressLogs && progressLogs.length >= 2 && (
         <div className="card p-5">
-          <h2 className="font-semibold text-white mb-4">Evolución de peso</h2>
+          <h2 className="font-semibold text-white mb-4">Evolución</h2>
           <ProgressChart logs={progressLogs} />
         </div>
       )}

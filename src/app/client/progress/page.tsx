@@ -304,6 +304,7 @@ export default function ClientProgressPage() {
         </div>
       )}
 
+
       {/* Table */}
       {loading ? (
         <div className="flex justify-center py-12">

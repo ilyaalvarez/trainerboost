@@ -603,7 +603,7 @@ export default function ClientDetailPage() {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-border/50">
-                    {['Fecha', 'Energía', 'Ánimo', 'Sueño'].map(h => (
+                    {['Fecha', 'Energía', 'Ánimo', 'Sueño', 'Nota'].map(h => (
                       <th key={h} className="text-left pb-2 text-slate-500 font-medium uppercase tracking-wide pr-4">{h}</th>
                     ))}
                   </tr>
@@ -614,7 +614,7 @@ export default function ClientDetailPage() {
                     const moodEmoji   = c.mood   ? ['😞','😕','😐','😊','😄'][c.mood - 1]   : '—'
                     return (
                       <tr key={c.id} className="hover:bg-surface-2/40 transition-colors">
-                        <td className="py-2 pr-4 text-slate-300">{new Date(c.checkin_date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</td>
+                        <td className="py-2 pr-4 text-slate-300 whitespace-nowrap">{new Date(c.checkin_date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</td>
                         <td className="py-2 pr-4">
                           <span className="mr-1">{energyEmoji}</span>
                           {c.energy != null && <span className="font-mono text-white">{c.energy}/5</span>}
@@ -625,6 +625,9 @@ export default function ClientDetailPage() {
                         </td>
                         <td className="py-2 pr-4 font-mono text-slate-300">
                           {c.sleep_hours != null ? `${c.sleep_hours}h` : '—'}
+                        </td>
+                        <td className="py-2 text-slate-400 italic max-w-[200px] truncate">
+                          {c.note ?? '—'}
                         </td>
                       </tr>
                     )

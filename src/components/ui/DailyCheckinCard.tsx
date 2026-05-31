@@ -6,13 +6,14 @@ import { Zap, Smile, Moon, CheckCircle, Pencil } from 'lucide-react'
 
 interface Props {
   clientId: string
+  trainerId?: string | null
   existingCheckin: { energy: number | null; mood: number | null; sleep_hours: number | null; note?: string | null } | null
 }
 
 const ENERGY_EMOJIS = ['😴', '🪫', '😐', '⚡', '🔥']
 const MOOD_EMOJIS   = ['😞', '😕', '😐', '😊', '😄']
 
-export function DailyCheckinCard({ clientId, existingCheckin }: Props) {
+export function DailyCheckinCard({ clientId, trainerId, existingCheckin }: Props) {
   const [energy, setEnergy] = useState<number>(existingCheckin?.energy ?? 0)
   const [mood, setMood] = useState<number>(existingCheckin?.mood ?? 0)
   const [sleep, setSleep] = useState<string>(existingCheckin?.sleep_hours?.toString() ?? '')
@@ -36,6 +37,16 @@ export function DailyCheckinCard({ clientId, existingCheckin }: Props) {
     setSaving(false)
     if (error) { toast.error('Error al guardar'); return }
     toast.success('¡Check-in guardado! 🎯')
+    // Notify trainer if a note was written
+    if (note.trim() && trainerId) {
+      supabase.from('notifications').insert({
+        user_id: trainerId,
+        type: 'system',
+        title: 'Nota de check-in',
+        body: note.trim().slice(0, 100),
+        link: `/dashboard/clients/${clientId}`,
+      }).then(() => {})
+    }
     setDone(true)
   }
 

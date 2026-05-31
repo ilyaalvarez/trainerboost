@@ -1139,6 +1139,7 @@ function ExerciseLibraryPanel({
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<LibraryFormState>(blankLibraryForm())
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [muscleFilter, setMuscleFilter] = useState<string>('')
 
   // Sync form when opening edit
   useEffect(() => {
@@ -1220,9 +1221,15 @@ function ExerciseLibraryPanel({
     onSaved(exercises.filter(ex => ex.id !== id))
   }
 
-  const filtered = exercises.filter(ex =>
-    !search.trim() || ex.name.toLowerCase().includes(search.toLowerCase())
-  )
+  const uniqueMuscleGroups = Array.from(
+    new Set(exercises.map(ex => ex.muscle_group).filter(Boolean) as string[])
+  ).sort()
+
+  const filtered = exercises.filter(ex => {
+    const matchesSearch = !search.trim() || ex.name.toLowerCase().includes(search.toLowerCase())
+    const matchesMuscle = !muscleFilter || ex.muscle_group === muscleFilter
+    return matchesSearch && matchesMuscle
+  })
 
   return (
     <div className="space-y-4">
@@ -1237,10 +1244,43 @@ function ExerciseLibraryPanel({
         />
       </div>
 
+      {/* Muscle group chips */}
+      {uniqueMuscleGroups.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => setMuscleFilter('')}
+            className={cn(
+              'text-xs px-2.5 py-1 rounded-full border transition-all',
+              !muscleFilter
+                ? 'bg-sky-500/20 border-sky-500/40 text-sky-300'
+                : 'border-border/60 text-slate-500 hover:text-slate-300'
+            )}
+          >
+            Todos
+          </button>
+          {uniqueMuscleGroups.map(mg => (
+            <button
+              key={mg}
+              type="button"
+              onClick={() => setMuscleFilter(f => f === mg ? '' : mg)}
+              className={cn(
+                'text-xs px-2.5 py-1 rounded-full border transition-all',
+                muscleFilter === mg
+                  ? 'bg-violet-500/20 border-violet-500/40 text-violet-300'
+                  : 'border-border/60 text-slate-500 hover:text-slate-300'
+              )}
+            >
+              {mg}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Stats */}
       <div className="flex items-center gap-4 text-sm">
         <span className="text-slate-400">{filtered.length} ejercicios</span>
-        {search && <span className="text-slate-500">de {exercises.length} en biblioteca</span>}
+        {(search || muscleFilter) && <span className="text-slate-500">de {exercises.length} en biblioteca</span>}
       </div>
 
       {/* Form modal */}

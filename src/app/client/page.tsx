@@ -97,7 +97,7 @@ export default async function ClientHomePage() {
       </div>
 
       {/* Daily check-in */}
-      <DailyCheckinCard clientId={user.id} existingCheckin={todayCheckin} />
+      <DailyCheckinCard clientId={user.id} trainerId={trainerId} existingCheckin={todayCheckin} />
 
       {/* Trainer info */}
       {trainer && (

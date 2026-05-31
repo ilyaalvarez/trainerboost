@@ -8,6 +8,7 @@ import Badge from '@/components/ui/Badge'
 import type { Profile } from '@/types/database'
 import ProgressChart from './_components/ProgressChart'
 import { DailyCheckinCard } from '@/components/ui/DailyCheckinCard'
+import { QuickLogButton } from './_components/QuickLogButton'
 
 export default async function ClientHomePage() {
   const supabase = createClient()
@@ -64,6 +65,7 @@ export default async function ClientHomePage() {
   ])
 
   const trainer = trainerRel?.trainer as Profile | null
+  const trainerId = (trainerRel as { trainer_id?: string } | null)?.trainer_id ?? null
   const latestLog = progressLogs?.at(-1)
   const prevLog   = progressLogs?.at(-2)
   const weightChange = latestLog && prevLog && latestLog.weight_kg && prevLog.weight_kg
@@ -160,16 +162,17 @@ export default async function ClientHomePage() {
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="card p-4 text-center">
+        <div className="card p-4 text-center flex flex-col items-center gap-1">
           <div className="font-mono text-2xl font-bold text-white">
             {latestLog?.weight_kg ?? '—'}
           </div>
-          <div className="text-xs text-slate-400 mt-0.5">Peso (kg)</div>
-          {weightChange && (
-            <div className={`text-xs font-semibold mt-1 ${parseFloat(weightChange) < 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+          <div className="text-xs text-slate-400">Peso (kg)</div>
+          {weightChange ? (
+            <div className={`text-xs font-semibold ${parseFloat(weightChange) < 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
               {parseFloat(weightChange) > 0 ? '+' : ''}{weightChange} kg
             </div>
-          )}
+          ) : null}
+          <QuickLogButton clientId={user.id} trainerId={trainerId} />
         </div>
         <div className="card p-4 text-center">
           <div className="font-mono text-2xl font-bold text-white">

@@ -46,6 +46,7 @@ export default function ClientRoutinePage() {
   const [userId, setUserId]           = useState<string | null>(null)
   const [sessionSeconds, setSessionSeconds] = useState(0)
   const [sessionRunning, setSessionRunning] = useState(false)
+  const [recentWorkoutDays, setRecentWorkoutDays] = useState<string[]>([])
 
   useEffect(() => {
     if (!sessionRunning) return
@@ -88,7 +89,8 @@ export default function ClientRoutinePage() {
 
       const today = new Date().toISOString().split('T')[0]
 
-      const [{ data: r }, { data: comps }] = await Promise.all([
+      const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]
+      const [{ data: r }, { data: comps }, { data: recentComps }] = await Promise.all([
         supabase.from('routines')
           .select('*, exercises:routine_exercises(*)')
           .eq('client_id', user.id)
@@ -100,7 +102,15 @@ export default function ClientRoutinePage() {
           .select('exercise_id')
           .eq('client_id', user.id)
           .eq('completed_at', today),
+        supabase.from('exercise_completions')
+          .select('completed_at')
+          .eq('client_id', user.id)
+          .gte('completed_at', sevenDaysAgo)
+          .order('completed_at', { ascending: false }),
       ])
+
+      const uniqueDays = Array.from(new Set((recentComps ?? []).map((c: { completed_at: string }) => c.completed_at)))
+      setRecentWorkoutDays(uniqueDays)
 
       if (r) {
         setRoutine(r)
@@ -359,6 +369,42 @@ export default function ClientRoutinePage() {
           </div>
         ))}
       </div>
+
+      {/* Recent workout days (last 7 days) */}
+      {recentWorkoutDays.length > 0 && (
+        <div className="card p-5">
+          <h2 className="font-semibold text-white text-sm mb-3">Últimos 7 días</h2>
+          <div className="flex gap-2 flex-wrap">
+            {(() => {
+              const today = new Date()
+              return Array.from({ length: 7 }, (_, i) => {
+                const d = new Date(today)
+                d.setDate(today.getDate() - (6 - i))
+                const dateStr = d.toISOString().split('T')[0]
+                const hasWorkout = recentWorkoutDays.includes(dateStr)
+                const isToday = dateStr === today.toISOString().split('T')[0]
+                const label = d.toLocaleString('es-ES', { weekday: 'short' })
+                return (
+                  <div key={dateStr} className="flex flex-col items-center gap-1">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                      hasWorkout
+                        ? 'bg-brand-accent text-white'
+                        : isToday
+                          ? 'bg-surface-2 border-2 border-brand-primary/40 text-brand-primary'
+                          : 'bg-surface-2 text-slate-600'
+                    }`}>
+                      {hasWorkout ? <Check className="w-4 h-4" /> : <span className="text-xs font-bold">{d.getDate()}</span>}
+                    </div>
+                    <span className={`text-[10px] capitalize ${isToday ? 'text-brand-primary' : 'text-slate-600'}`}>
+                      {label}
+                    </span>
+                  </div>
+                )
+              })
+            })()}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

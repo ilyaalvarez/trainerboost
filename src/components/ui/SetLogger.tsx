@@ -36,7 +36,14 @@ export function SetLogger({ exerciseId, clientId, defaultSets }: Props) {
     if (todayRes.data && todayRes.data.length > 0) {
       setEntries(todayRes.data.map((s) => ({ set_number: s.set_number, weight_kg: s.weight_kg?.toString() ?? '', reps: s.reps?.toString() ?? '' })))
     } else {
-      setEntries(Array.from({ length: defaultSets || 3 }, (_, i) => ({ set_number: i + 1, weight_kg: '', reps: '' })))
+      // Pre-fill from last session if available, so users have a baseline to work from
+      const lastSessionLogs = histRes.data ?? []
+      const lastDate = lastSessionLogs.length > 0 ? lastSessionLogs[0].logged_at : null
+      const lastSets = lastDate ? lastSessionLogs.filter(s => s.logged_at === lastDate) : []
+      setEntries(Array.from({ length: defaultSets || 3 }, (_, i) => {
+        const prev = lastSets[i]
+        return { set_number: i + 1, weight_kg: prev?.weight_kg?.toString() ?? '', reps: prev?.reps?.toString() ?? '' }
+      }))
     }
     if (histRes.data) setHistory(histRes.data as SetLog[])
   }, [exerciseId, clientId, defaultSets, supabase])
@@ -74,17 +81,34 @@ export function SetLogger({ exerciseId, clientId, defaultSets }: Props) {
   const lastSessionDate = history.length > 0 ? history[0].logged_at : null
   const lastSession = lastSessionDate ? history.filter(s => s.logged_at === lastSessionDate) : []
 
+  const copyLastSession = () => {
+    if (!lastSession.length) return
+    setEntries(prev => prev.map((e, i) => {
+      const prev2 = lastSession[i]
+      return prev2 ? { ...e, weight_kg: prev2.weight_kg?.toString() ?? e.weight_kg, reps: prev2.reps?.toString() ?? e.reps } : e
+    }))
+    toast.success('Datos de la última sesión copiados')
+  }
+
   return (
     <div className="mt-3 border-t border-slate-700/50 pt-3">
       <button onClick={() => setOpen(v => !v)} className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-sky-400 transition-colors">
         <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
         Registrar sets
-        {open && lastSession.length > 0 && (
-          <span className="ml-2 flex items-center gap-1 text-violet-400"><History className="w-3 h-3" />Última sesión: {lastSession.map(s => `${s.weight_kg ?? '?'}kg×${s.reps ?? '?'}`).join(', ')}</span>
-        )}
       </button>
       {open && (
         <div className="mt-3 space-y-2">
+          {lastSession.length > 0 && (
+            <div className="flex items-center justify-between px-1 mb-2">
+              <span className="flex items-center gap-1 text-[11px] text-violet-400">
+                <History className="w-3 h-3" />
+                Última: {lastSession.map(s => `${s.weight_kg ?? '?'}kg×${s.reps ?? '?'}`).join(' · ')}
+              </span>
+              <button onClick={copyLastSession} className="text-[10px] text-violet-400 hover:text-violet-300 transition-colors font-medium">
+                Copiar →
+              </button>
+            </div>
+          )}
           <div className="grid grid-cols-[auto,1fr,1fr,auto] gap-2 text-xs text-slate-500 px-1 mb-1">
             <span>Set</span><span>Kg</span><span>Reps</span><span />
           </div>

@@ -143,6 +143,8 @@ export default function ClientRoutinePage() {
         if (error) { toast.error('Error al registrar'); return }
         setExercises(prev => prev.map(ex => ex.id === exercise.id ? { ...ex, completed: true } : ex))
         toast.success('¡Ejercicio completado! 💪')
+        // Auto-start timer on first exercise completion
+        setSessionRunning(prev => { if (!prev && sessionSeconds === 0) return true; return prev })
       }
     } finally {
       setCompleting(null)

@@ -54,7 +54,7 @@ export default async function ClientHomePage() {
       .eq('receiver_id', user.id)
       .is('read_at', null),
     supabase.from('routines')
-      .select('*, exercises:routine_exercises(count)')
+      .select('*, exercises:routine_exercises(id, name, sets, reps, order_index)')
       .eq('client_id', user.id)
       .eq('status', 'active')
       .order('created_at', { ascending: false })
@@ -122,22 +122,41 @@ export default async function ClientHomePage() {
       )}
 
       {/* Weekly streak */}
-      <div className="card p-4 flex items-center gap-4"
-           style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(14,165,233,0.04))', borderColor: 'rgba(16,185,129,0.2)' }}>
-        <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-             style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.1))' }}>
-          <Flame className="w-6 h-6 text-brand-accent" />
-        </div>
-        <div>
-          <div className="text-sm font-semibold text-white">Racha semanal</div>
-          <div className="text-xs text-slate-400 mt-0.5">
-            {daysWithLogsThisWeek > 0
-              ? `${daysWithLogsThisWeek} día${daysWithLogsThisWeek > 1 ? 's' : ''} con registro esta semana`
-              : 'Registra tu progreso hoy para empezar tu racha'}
+      {(() => {
+        const motivations = [
+          'Registra tu progreso hoy para empezar tu racha',
+          '¡Un día es el inicio de algo grande!',
+          '¡Buen comienzo! Sigue así 💪',
+          '¡Vas por buen camino! No pares ahora',
+          '¡A mitad de semana, increíble!',
+          '¡Casi perfecto, sigue fuerte! 🔥',
+          '¡Semana impecable! 🏆 Eres imparable',
+          '¡7/7 — Semana perfecta! 🌟',
+        ]
+        const msg = motivations[Math.min(daysWithLogsThisWeek, motivations.length - 1)]
+        const streakPct = Math.round((daysWithLogsThisWeek / 7) * 100)
+        return (
+          <div className="card p-4 space-y-3"
+               style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(14,165,233,0.04))', borderColor: 'rgba(16,185,129,0.2)' }}>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                   style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.1))' }}>
+                <Flame className={`w-6 h-6 ${daysWithLogsThisWeek >= 5 ? 'text-amber-400' : 'text-brand-accent'}`} />
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-white">Racha semanal</div>
+                <div className="text-xs text-slate-400 mt-0.5">{msg}</div>
+              </div>
+              <div className="ml-auto text-3xl font-bold text-brand-accent shrink-0">{daysWithLogsThisWeek}/7</div>
+            </div>
+            {/* Progress bar */}
+            <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
+              <div className="h-full rounded-full transition-all duration-700"
+                   style={{ width: `${streakPct}%`, background: daysWithLogsThisWeek >= 7 ? '#F59E0B' : 'linear-gradient(90deg, #10B981, #0EA5E9)' }} />
+            </div>
           </div>
-        </div>
-        <div className="ml-auto text-3xl font-bold text-brand-accent shrink-0">{daysWithLogsThisWeek}/7</div>
-      </div>
+        )
+      })()}
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -201,20 +220,42 @@ export default async function ClientHomePage() {
       )}
 
       {/* Active routine preview */}
-      {activeRoutine && (
-        <Link href="/client/routine" className="card p-5 flex items-center gap-4 hover:border-brand-primary/30 transition-colors block">
-          <div className="w-12 h-12 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center">
-            <Dumbbell className="w-5 h-5 text-brand-accent" />
-          </div>
-          <div className="flex-1">
-            <div className="font-medium text-white">{activeRoutine.title}</div>
-            <div className="text-sm text-slate-400">
-              {(activeRoutine.exercises as { count: number }[])?.[0]?.count ?? 0} ejercicios · {activeRoutine.frequency}
+      {activeRoutine && (() => {
+        const exList = (activeRoutine.exercises as { id: string; name: string; sets: number | null; reps: string | null; order_index: number }[])
+          .sort((a, b) => a.order_index - b.order_index)
+        const preview = exList.slice(0, 3)
+        const remaining = exList.length - 3
+        return (
+          <Link href="/client/routine" className="card p-5 hover:border-brand-accent/30 transition-colors block space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center shrink-0">
+                <Dumbbell className="w-5 h-5 text-brand-accent" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-white text-sm">{activeRoutine.title}</div>
+                <div className="text-xs text-slate-400">{exList.length} ejercicios{activeRoutine.frequency ? ` · ${activeRoutine.frequency}` : ''}</div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-500 shrink-0" />
             </div>
-          </div>
-          <ChevronRight className="w-4 h-4 text-slate-500" />
-        </Link>
-      )}
+            {preview.length > 0 && (
+              <div className="space-y-1.5">
+                {preview.map((ex, i) => (
+                  <div key={ex.id} className="flex items-center gap-2 text-xs text-slate-400">
+                    <span className="w-5 h-5 rounded-md bg-surface-2 border border-border flex items-center justify-center text-[10px] font-bold text-slate-500 shrink-0">{i + 1}</span>
+                    <span className="flex-1 truncate">{ex.name}</span>
+                    {ex.sets && ex.reps && (
+                      <span className="text-slate-600 shrink-0">{ex.sets}×{ex.reps}</span>
+                    )}
+                  </div>
+                ))}
+                {remaining > 0 && (
+                  <p className="text-xs text-slate-600 pl-7">+{remaining} más…</p>
+                )}
+              </div>
+            )}
+          </Link>
+        )
+      })()}
 
       {/* Quick links */}
       <div>

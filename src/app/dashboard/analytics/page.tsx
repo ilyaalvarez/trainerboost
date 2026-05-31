@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { toast } from 'sonner'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Legend,
+  ResponsiveContainer, Legend, BarChart, Bar, Cell,
 } from 'recharts'
 import { TrendingDown, TrendingUp, Users, Activity, Calendar, MessageCircle, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -66,6 +66,7 @@ export default function AnalyticsPage() {
   const supabase = createClient()
   const [clients, setClients] = useState<ClientProgress[]>([])
   const [chartData, setChartData] = useState<ChartPoint[]>([])
+  const [weeklySessions, setWeeklySessions] = useState<{ week: string; sessions: number; current: boolean }[]>([])
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [metric, setMetric] = useState<'weight_kg' | 'body_fat_pct'>('weight_kg')
@@ -79,10 +80,13 @@ export default function AnalyticsPage() {
 
     // Business KPIs — fetched in parallel
     const thisMonthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+    const twelveWeeksAgo = new Date(Date.now() - 12 * 7 * 86400000).toISOString()
+
     const [
       { count: sessionsThisMonth },
       { count: activeClientsCount },
       { count: totalMessages },
+      { data: recentSessions },
     ] = await Promise.all([
       supabase.from('appointments').select('*', { count: 'exact', head: true })
         .eq('trainer_id', user.id).eq('status', 'done').gte('created_at', thisMonthStart),
@@ -90,7 +94,34 @@ export default function AnalyticsPage() {
         .eq('trainer_id', user.id).eq('status', 'active'),
       supabase.from('messages').select('*', { count: 'exact', head: true })
         .eq('sender_id', user.id),
+      supabase.from('appointments').select('scheduled_at')
+        .eq('trainer_id', user.id).eq('status', 'done')
+        .gte('scheduled_at', twelveWeeksAgo)
+        .order('scheduled_at'),
     ])
+
+    // Build weekly sessions chart data (last 12 weeks)
+    const weekMap: Record<string, number> = {}
+    const now = new Date()
+    for (let w = 11; w >= 0; w--) {
+      const weekStart = new Date(now)
+      weekStart.setDate(now.getDate() - now.getDay() + 1 - w * 7) // Monday
+      const label = weekStart.toLocaleString('es-ES', { month: 'short', day: 'numeric' })
+      weekMap[label] = 0
+    }
+    for (const s of recentSessions ?? []) {
+      const d = new Date(s.scheduled_at)
+      const monday = new Date(d)
+      monday.setDate(d.getDate() - d.getDay() + 1)
+      const label = monday.toLocaleString('es-ES', { month: 'short', day: 'numeric' })
+      if (label in weekMap) weekMap[label]++
+    }
+    const currentWeekMonday = new Date(now)
+    currentWeekMonday.setDate(now.getDate() - now.getDay() + 1)
+    const currentWeekLabel = currentWeekMonday.toLocaleString('es-ES', { month: 'short', day: 'numeric' })
+    setWeeklySessions(Object.entries(weekMap).map(([week, sessions]) => ({
+      week, sessions, current: week === currentWeekLabel,
+    })))
     setKpis(prev => ({
       ...prev,
       sessionsThisMonth: sessionsThisMonth ?? 0,
@@ -358,7 +389,38 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Chart */}
+      {/* Weekly sessions bar chart */}
+      {weeklySessions.length > 0 && (
+        <div className="card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-white">Sesiones completadas por semana</h2>
+            <span className="text-xs text-slate-500">Últimas 12 semanas</span>
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart data={weeklySessions} margin={{ top: 0, right: 0, bottom: 0, left: -20 }} barSize={18} barCategoryGap="30%">
+              <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" vertical={false} />
+              <XAxis dataKey="week" tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} interval={1} />
+              <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ background: '#1E293B', border: '1px solid #334155', borderRadius: '8px', fontSize: 12 }}
+                formatter={(v) => [v, 'Sesiones']}
+                cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+              />
+              <Bar dataKey="sessions" radius={[4, 4, 0, 0]}>
+                {weeklySessions.map((entry, index) => (
+                  <Cell
+                    key={index}
+                    fill={entry.current ? '#0EA5E9' : entry.sessions > 0 ? '#7C3AED' : '#1E293B'}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <p className="text-[10px] text-slate-600 mt-1">Azul = semana actual · Morado = semanas anteriores</p>
+        </div>
+      )}
+
+      {/* Client progress chart */}
       <div className="card p-6">
         <h2 className="text-sm font-semibold text-white mb-4">
           {metric === 'weight_kg' ? 'Evolución del peso' : 'Evolución % grasa corporal'}

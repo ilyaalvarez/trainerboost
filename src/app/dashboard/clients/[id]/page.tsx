@@ -15,6 +15,7 @@ import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
 import EmptyState from '@/components/ui/EmptyState'
+import { ActivityHeatmap } from '@/components/ui/ActivityHeatmap'
 import { cn, formatDate, formatRelative, timeAgo } from '@/lib/utils'
 import {
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -921,6 +922,17 @@ export default function ClientDetailPage() {
                             activeDot={{ r: 5, fill: '#0EA5E9', stroke: '#0F172A', strokeWidth: 2 }} />
                     </AreaChart>
                   </ResponsiveContainer>
+                </div>
+              )}
+
+              {/* Activity heatmap */}
+              {progressLogs.length > 0 && (
+                <div className="card p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #10B981, #0EA5E9)' }} />
+                    <h3 className="text-sm font-semibold text-white">Historial de actividad</h3>
+                  </div>
+                  <ActivityHeatmap logDates={progressLogs.map(l => l.logged_at)} />
                 </div>
               )}
 

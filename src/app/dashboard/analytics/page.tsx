@@ -504,30 +504,37 @@ export default function AnalyticsPage() {
         <h2 className="text-sm font-semibold text-white mb-4">
           {metric === 'weight_kg' ? 'Evolución del peso' : 'Evolución % grasa corporal'}
         </h2>
-        <ResponsiveContainer width="100%" height={320}>
-          <LineChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-            <XAxis dataKey="date" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend
-              wrapperStyle={{ fontSize: 12, paddingTop: 16 }}
-              formatter={(value) => <span style={{ color: '#94A3B8' }}>{value}</span>}
-            />
-            {activeClients.map((cp, i) => (
-              <Line
-                key={cp.client.id}
-                type="monotone"
-                dataKey={cp.client.full_name}
-                stroke={LINE_COLORS[i % LINE_COLORS.length]}
-                strokeWidth={2}
-                dot={{ r: 3, fill: LINE_COLORS[i % LINE_COLORS.length] }}
-                activeDot={{ r: 5 }}
-                connectNulls
+        {activeClients.length === 0 ? (
+          <div className="h-40 flex flex-col items-center justify-center gap-2 text-center">
+            <Activity className="w-8 h-8 text-slate-600" />
+            <p className="text-slate-500 text-sm">Selecciona al menos un cliente para ver la gráfica</p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={320}>
+            <LineChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+              <XAxis dataKey="date" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                wrapperStyle={{ fontSize: 12, paddingTop: 16 }}
+                formatter={(value) => <span style={{ color: '#94A3B8' }}>{value}</span>}
               />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
+              {activeClients.map((cp, i) => (
+                <Line
+                  key={cp.client.id}
+                  type="monotone"
+                  dataKey={cp.client.full_name}
+                  stroke={LINE_COLORS[i % LINE_COLORS.length]}
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: LINE_COLORS[i % LINE_COLORS.length] }}
+                  activeDot={{ r: 5 }}
+                  connectNulls
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
       {/* Client selector + table */}

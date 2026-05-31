@@ -34,21 +34,32 @@ export default function ClientNutritionPage() {
   const [loading, setLoading]   = useState(true)
   const [checkedFoods, setCheckedFoods] = useState<Set<string>>(new Set())
   const [waterGlasses, setWaterGlasses] = useState(0)
+  const [userId, setUserId]     = useState<string | null>(null)
+  const [trainerId, setTrainerId] = useState<string | null>(null)
   const WATER_GOAL = 8
 
   useEffect(() => {
     async function fetchPlan() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
+      setUserId(user.id)
 
-      const { data } = await supabase.from('meal_plans')
-        .select('*, meals(*)')
-        .eq('client_id', user.id)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
+      const [{ data }, { data: tc }] = await Promise.all([
+        supabase.from('meal_plans')
+          .select('*, meals(*)')
+          .eq('client_id', user.id)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single(),
+        supabase.from('trainer_clients')
+          .select('trainer_id')
+          .eq('client_id', user.id)
+          .eq('status', 'active')
+          .single(),
+      ])
 
+      if (tc) setTrainerId(tc.trainer_id)
       if (data) {
         const sorted = {
           ...data,
@@ -128,6 +139,25 @@ export default function ClientNutritionPage() {
     return acc
   }, { calories: 0, protein: 0, carbs: 0, fat: 0 })
 
+  const totalFoodsCount = plan?.meals.reduce((acc, m) => acc + (m.foods as FoodItem[]).length, 0) ?? 0
+  const allMealsDone = totalFoodsCount > 0 && checkedFoods.size >= totalFoodsCount
+
+  // Notify trainer once per day when all meals are completed
+  useEffect(() => {
+    if (!allMealsDone || !trainerId || !userId || !plan) return
+    const today = new Date().toISOString().split('T')[0]
+    const key = `nutrition-notif-${plan.id}-${today}`
+    if (localStorage.getItem(key)) return
+    localStorage.setItem(key, '1')
+    supabase.from('notifications').insert({
+      user_id: trainerId,
+      type: 'system',
+      title: '¡Plan de nutrición completado!',
+      body: 'Tu cliente ha completado todos los alimentos del día.',
+      link: `/dashboard/clients/${userId}`,
+    }).then(() => {})
+  }, [allMealsDone, trainerId, userId, plan, supabase])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -204,10 +234,10 @@ export default function ClientNutritionPage() {
       {/* Daily tracking header */}
       {(() => {
         const todayLabel = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
-        const totalFoods = plan.meals.reduce((acc, m) => acc + (m.foods as FoodItem[]).length, 0)
+        const totalFoods = totalFoodsCount
         const checkedCount = checkedFoods.size
         const pct = totalFoods > 0 ? Math.round(checkedCount / totalFoods * 100) : 0
-        const allDone = totalFoods > 0 && checkedCount >= totalFoods
+        const allDone = allMealsDone
         const circumference = 2 * Math.PI * 28
         return (
           <>

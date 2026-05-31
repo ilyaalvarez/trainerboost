@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import {
   Users, Search, Copy, RefreshCw, ChevronLeft, ChevronRight,
-  UserPlus, Loader2, Mail, ArrowRight, Dumbbell, Clock,
+  UserPlus, Loader2, Mail, ArrowRight, Clock,
   Tag, X, FileDown,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -45,6 +45,7 @@ const TAG_COLOR: Record<string, string> = Object.fromEntries(PRESET_TAGS.map(t =
 
 interface ClientRow extends ClientWithProfile {
   lastRoutine?: string | null
+  lastProgressLog?: string | null
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -97,17 +98,25 @@ export default function ClientsPage() {
       if (error) throw error
       setMaxClients(subData?.max_clients ?? 0)
 
-      // Fetch last routine for each client
+      // Fetch last routine + last progress log for each client
       const clientIds = (data ?? []).map((c: ClientWithProfile) => c.client_id)
       const routineMap: Record<string, string | null> = {}
+      const progressMap: Record<string, string | null> = {}
 
       if (clientIds.length > 0) {
-        const { data: routines } = await supabase
-          .from('routines')
-          .select('client_id, created_at')
-          .in('client_id', clientIds)
-          .eq('status', 'active')
-          .order('created_at', { ascending: false })
+        const [{ data: routines }, { data: progressLogs }] = await Promise.all([
+          supabase
+            .from('routines')
+            .select('client_id, created_at')
+            .in('client_id', clientIds)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false }),
+          supabase
+            .from('progress_logs')
+            .select('client_id, logged_at')
+            .in('client_id', clientIds)
+            .order('logged_at', { ascending: false }),
+        ])
 
         if (routines) {
           for (const r of routines) {
@@ -116,12 +125,20 @@ export default function ClientsPage() {
             }
           }
         }
+        if (progressLogs) {
+          for (const l of progressLogs) {
+            if (!progressMap[l.client_id]) {
+              progressMap[l.client_id] = l.logged_at
+            }
+          }
+        }
       }
 
       setClients(
         (data ?? []).map((c: ClientWithProfile) => ({
           ...c,
-          lastRoutine: routineMap[c.client_id] ?? null,
+          lastRoutine:     routineMap[c.client_id]  ?? null,
+          lastProgressLog: progressMap[c.client_id] ?? null,
         }))
       )
     } catch (err: unknown) {
@@ -243,7 +260,7 @@ export default function ClientsPage() {
 
   function exportCsv() {
     const rows = [
-      ['Nombre', 'Teléfono', 'Estado', 'Etiquetas', 'Cliente desde', 'Última rutina'],
+      ['Nombre', 'Teléfono', 'Estado', 'Etiquetas', 'Cliente desde', 'Última rutina', 'Último progreso'],
       ...filtered.map(c => [
         c.profile?.full_name ?? '',
         c.profile?.phone ?? '',
@@ -251,6 +268,7 @@ export default function ClientsPage() {
         (c.tags ?? []).join('; '),
         c.started_at ? new Date(c.started_at).toLocaleDateString('es-ES') : '',
         c.lastRoutine ? new Date(c.lastRoutine).toLocaleDateString('es-ES') : '',
+        c.lastProgressLog ? new Date(c.lastProgressLog).toLocaleDateString('es-ES') : '',
       ]),
     ]
     const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
@@ -420,6 +438,16 @@ export default function ClientsPage() {
                     </div>
 
                     {/* Mini stats */}
+                    {(() => {
+                      const daysSinceProg = client.lastProgressLog
+                        ? Math.floor((Date.now() - new Date(client.lastProgressLog).getTime()) / 86400000)
+                        : null
+                      const actDot =
+                        daysSinceProg === null ? 'bg-slate-600' :
+                        daysSinceProg <= 7     ? 'bg-emerald-400' :
+                        daysSinceProg <= 14    ? 'bg-amber-400' :
+                                                 'bg-red-400'
+                      return (
                     <div className="grid grid-cols-2 gap-2 mb-4">
                       <div className="rounded-lg px-3 py-2.5" style={{ background: 'rgba(30,41,59,0.8)' }}>
                         <div className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">
@@ -429,16 +457,19 @@ export default function ClientsPage() {
                       </div>
                       <div className="rounded-lg px-3 py-2.5" style={{ background: 'rgba(30,41,59,0.8)' }}>
                         <div className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">
-                          <Dumbbell className="w-2.5 h-2.5" /> Última rutina
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${actDot}`} />
+                          Último progreso
                         </div>
                         <div className="text-sm font-semibold text-slate-200">
-                          {client.lastRoutine
-                            ? timeAgo(client.lastRoutine)
-                            : <span className="text-slate-500 font-normal text-xs">Sin asignar</span>
+                          {client.lastProgressLog
+                            ? timeAgo(client.lastProgressLog)
+                            : <span className="text-slate-500 font-normal text-xs">Sin registros</span>
                           }
                         </div>
                       </div>
                     </div>
+                      )
+                    })()}
 
                     {/* Tags */}
                     <div className="mb-3 relative">

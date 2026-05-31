@@ -17,7 +17,7 @@ export default async function ClientHomePage() {
 
   const today = new Date().toISOString().split('T')[0]
   const checkinQuery = supabase.from('daily_checkins')
-    .select('energy,mood,sleep_hours')
+    .select('energy,mood,sleep_hours,note')
     .eq('client_id', user.id)
     .eq('checkin_date', today)
     .maybeSingle()

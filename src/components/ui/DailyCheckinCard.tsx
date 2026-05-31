@@ -6,7 +6,7 @@ import { Zap, Smile, Moon, CheckCircle, Pencil } from 'lucide-react'
 
 interface Props {
   clientId: string
-  existingCheckin: { energy: number | null; mood: number | null; sleep_hours: number | null } | null
+  existingCheckin: { energy: number | null; mood: number | null; sleep_hours: number | null; note?: string | null } | null
 }
 
 const ENERGY_EMOJIS = ['😴', '🪫', '😐', '⚡', '🔥']
@@ -16,6 +16,7 @@ export function DailyCheckinCard({ clientId, existingCheckin }: Props) {
   const [energy, setEnergy] = useState<number>(existingCheckin?.energy ?? 0)
   const [mood, setMood] = useState<number>(existingCheckin?.mood ?? 0)
   const [sleep, setSleep] = useState<string>(existingCheckin?.sleep_hours?.toString() ?? '')
+  const [note, setNote]   = useState<string>(existingCheckin?.note ?? '')
   const [saving, setSaving] = useState(false)
   const [done, setDone] = useState(!!existingCheckin)
   const supabase = createClient()
@@ -30,6 +31,7 @@ export function DailyCheckinCard({ clientId, existingCheckin }: Props) {
       energy,
       mood,
       sleep_hours: sleep ? parseFloat(sleep) : null,
+      note: note.trim() || null,
     }, { onConflict: 'client_id,checkin_date' })
     setSaving(false)
     if (error) { toast.error('Error al guardar'); return }
@@ -62,6 +64,9 @@ export function DailyCheckinCard({ clientId, existingCheckin }: Props) {
                   </span>
                 )}
               </div>
+              {note && (
+                <p className="text-xs text-slate-400 mt-1.5 italic">&ldquo;{note}&rdquo;</p>
+              )}
             </div>
           </div>
           <button
@@ -119,6 +124,19 @@ export function DailyCheckinCard({ clientId, existingCheckin }: Props) {
           </div>
           <input type="number" min="0" max="24" step="0.5" value={sleep} onChange={e => setSleep(e.target.value)}
             placeholder="e.g. 7.5" className="input w-24 text-sm py-1.5 px-2" />
+        </div>
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-slate-400 font-medium">Nota para tu entrenador</span>
+            <span className="text-[10px] text-slate-600">{note.length}/200</span>
+          </div>
+          <textarea
+            value={note}
+            onChange={e => setNote(e.target.value.slice(0, 200))}
+            placeholder="¿Cómo te has sentido hoy? ¿Algo que quieras comentar?"
+            rows={2}
+            className="input text-sm py-1.5 px-2 resize-none w-full"
+          />
         </div>
       </div>
       <button onClick={submit} disabled={saving} className="btn-primary w-full mt-4 text-sm py-2">

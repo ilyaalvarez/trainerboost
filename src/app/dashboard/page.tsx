@@ -88,7 +88,7 @@ export default async function DashboardPage() {
   const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 3600000).toISOString()
   let inactiveClientsCount = 0
 
-  let todayCheckins: Array<{ client_id: string; energy: number | null; mood: number | null; sleep_hours: number | null; profile: { full_name: string; avatar_url: string | null } | null }> = []
+  let todayCheckins: Array<{ client_id: string; energy: number | null; mood: number | null; sleep_hours: number | null; note: string | null; profile: { full_name: string; avatar_url: string | null } | null }> = []
 
   if (activeClientIds.length > 0) {
     const [{ data: recentLogs }, { data: checkinData }] = await Promise.all([
@@ -99,7 +99,7 @@ export default async function DashboardPage() {
         .gte('logged_at', fourteenDaysAgo),
       supabase
         .from('daily_checkins')
-        .select('client_id, energy, mood, sleep_hours, profiles!client_id(full_name, avatar_url)')
+        .select('client_id, energy, mood, sleep_hours, note, profiles!client_id(full_name, avatar_url)')
         .in('client_id', activeClientIds)
         .eq('checkin_date', todayStr),
     ])
@@ -112,6 +112,7 @@ export default async function DashboardPage() {
       energy: c.energy,
       mood: c.mood,
       sleep_hours: c.sleep_hours,
+      note: c.note as string | null ?? null,
       profile: (Array.isArray(c.profiles) ? c.profiles[0] : c.profiles) as { full_name: string; avatar_url: string | null } | null,
     }))
   }
@@ -424,26 +425,31 @@ export default async function DashboardPage() {
               const energyEmojis = ['😴','🪫','😐','⚡','🔥']
               const moodEmojis   = ['😞','😕','😐','😊','😄']
               return (
-                <div key={c.client_id} className="flex items-center gap-3 p-3 rounded-xl bg-surface-2 hover:bg-surface-3 transition-colors">
-                  <Avatar name={c.profile?.full_name ?? '?'} url={c.profile?.avatar_url} size="sm" />
-                  <span className="text-sm font-medium text-white flex-1 min-w-0 truncate">{c.profile?.full_name ?? '—'}</span>
-                  <div className="flex items-center gap-3 text-xs shrink-0">
-                    {c.energy != null && (
-                      <span className="flex items-center gap-1" title={`Energía: ${c.energy}/5`}>
-                        <span>{energyEmojis[c.energy - 1]}</span>
-                        <span className="text-slate-400 font-mono">{c.energy}/5</span>
-                      </span>
-                    )}
-                    {c.mood != null && (
-                      <span className="flex items-center gap-1" title={`Ánimo: ${c.mood}/5`}>
-                        <span>{moodEmojis[c.mood - 1]}</span>
-                        <span className="text-slate-400 font-mono">{c.mood}/5</span>
-                      </span>
-                    )}
-                    {c.sleep_hours != null && (
-                      <span className="text-slate-500">🌙 {c.sleep_hours}h</span>
-                    )}
+                <div key={c.client_id} className="flex flex-col gap-1.5 p-3 rounded-xl bg-surface-2 hover:bg-surface-3 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <Avatar name={c.profile?.full_name ?? '?'} url={c.profile?.avatar_url} size="sm" />
+                    <span className="text-sm font-medium text-white flex-1 min-w-0 truncate">{c.profile?.full_name ?? '—'}</span>
+                    <div className="flex items-center gap-3 text-xs shrink-0">
+                      {c.energy != null && (
+                        <span className="flex items-center gap-1" title={`Energía: ${c.energy}/5`}>
+                          <span>{energyEmojis[c.energy - 1]}</span>
+                          <span className="text-slate-400 font-mono">{c.energy}/5</span>
+                        </span>
+                      )}
+                      {c.mood != null && (
+                        <span className="flex items-center gap-1" title={`Ánimo: ${c.mood}/5`}>
+                          <span>{moodEmojis[c.mood - 1]}</span>
+                          <span className="text-slate-400 font-mono">{c.mood}/5</span>
+                        </span>
+                      )}
+                      {c.sleep_hours != null && (
+                        <span className="text-slate-500">🌙 {c.sleep_hours}h</span>
+                      )}
+                    </div>
                   </div>
+                  {c.note && (
+                    <p className="text-xs text-slate-400 italic pl-9">&ldquo;{c.note}&rdquo;</p>
+                  )}
                 </div>
               )
             })}

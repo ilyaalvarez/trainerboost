@@ -16,6 +16,10 @@ export default async function DashboardPage() {
   const today    = new Date()
   const todayStr = today.toISOString().split('T')[0]
 
+  const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString()
+  const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1).toISOString()
+  const lastMonthEnd   = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59).toISOString()
+
   const [
     { data: clients },
     { data: todayAppointments },
@@ -23,6 +27,10 @@ export default async function DashboardPage() {
     { data: recentMessages },
     { data: subscription },
     { data: profile },
+    { count: thisMonthNewClients },
+    { count: lastMonthNewClients },
+    { count: thisMonthApts },
+    { count: lastMonthApts },
   ] = await Promise.all([
     supabase.from('trainer_clients')
       .select('*, profile:client_id(id, full_name, avatar_url)')
@@ -46,6 +54,14 @@ export default async function DashboardPage() {
       .limit(5),
     supabase.from('subscriptions').select('*').eq('user_id', user.id).single(),
     supabase.from('profiles').select('bio, phone, specialties').eq('id', user.id).single(),
+    supabase.from('trainer_clients').select('*', { count: 'exact', head: true })
+      .eq('trainer_id', user.id).gte('started_at', thisMonthStart),
+    supabase.from('trainer_clients').select('*', { count: 'exact', head: true })
+      .eq('trainer_id', user.id).gte('started_at', lastMonthStart).lte('started_at', lastMonthEnd),
+    supabase.from('appointments').select('*', { count: 'exact', head: true })
+      .eq('trainer_id', user.id).gte('scheduled_at', thisMonthStart).neq('status', 'cancelled'),
+    supabase.from('appointments').select('*', { count: 'exact', head: true })
+      .eq('trainer_id', user.id).gte('scheduled_at', lastMonthStart).lte('scheduled_at', lastMonthEnd).neq('status', 'cancelled'),
   ])
 
   const [{ count: pendingApts }, { data: todayActivity }] = await Promise.all([
@@ -102,6 +118,17 @@ export default async function DashboardPage() {
 
   const activeClients = clients?.length ?? 0
   const maxClients    = subscription?.max_clients ?? 0
+
+  // Month-over-month trend helpers
+  const clientChangeValue = thisMonthNewClients !== null
+    ? { value: `+${thisMonthNewClients} este mes`, positive: (thisMonthNewClients ?? 0) >= (lastMonthNewClients ?? 0) }
+    : undefined
+
+  const aptDiff = (thisMonthApts ?? 0) - (lastMonthApts ?? 0)
+  const aptChangePct = lastMonthApts ? Math.round((aptDiff / lastMonthApts) * 100) : null
+  const aptChangeValue = aptChangePct !== null
+    ? { value: `${aptDiff >= 0 ? '+' : ''}${aptChangePct}%`, positive: aptDiff >= 0 }
+    : undefined
 
   // Compute onboarding steps
   const hasProfile = !!(profile?.bio || profile?.phone || (profile?.specialties && (profile.specialties as unknown[]).length > 0))
@@ -202,6 +229,7 @@ export default async function DashboardPage() {
             value={activeClients}
             icon={<Users className="w-5 h-5" />}
             color="primary"
+            change={clientChangeValue}
           />
         </Link>
         <Link href="/dashboard/appointments">
@@ -210,6 +238,7 @@ export default async function DashboardPage() {
             value={todayAppointments?.length ?? 0}
             icon={<CalendarDays className="w-5 h-5" />}
             color="accent"
+            change={aptChangeValue}
           />
         </Link>
         <Link href="/dashboard/messages">

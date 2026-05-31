@@ -1138,6 +1138,7 @@ function ExerciseLibraryPanel({
   const supabase = createClient()
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<LibraryFormState>(blankLibraryForm())
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
 
   // Sync form when opening edit
   useEffect(() => {
@@ -1211,9 +1212,11 @@ function ExerciseLibraryPanel({
   }
 
   const handleDelete = async (id: string) => {
+    if (confirmDelete !== id) { setConfirmDelete(id); return }
     const { error } = await supabase.from('exercise_library').delete().eq('id', id)
     if (error) { toast.error('Error al eliminar: ' + error.message); return }
     toast.success('Ejercicio eliminado')
+    setConfirmDelete(null)
     onSaved(exercises.filter(ex => ex.id !== id))
   }
 
@@ -1398,13 +1401,32 @@ function ExerciseLibraryPanel({
                 >
                   <Pencil size={12} /> Editar
                 </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(ex.id)}
-                  className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 text-red-400 hover:text-red-300"
-                >
-                  <Trash2 size={12} /> Eliminar
-                </button>
+                {confirmDelete === ex.id ? (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(ex.id)}
+                      className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 text-red-400 hover:text-red-300"
+                    >
+                      Confirmar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDelete(null)}
+                      className="btn-ghost text-xs py-1 px-2 text-slate-400"
+                    >
+                      No
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(ex.id)}
+                    className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 text-red-400 hover:text-red-300"
+                  >
+                    <Trash2 size={12} /> Eliminar
+                  </button>
+                )}
               </div>
             </div>
           ))}

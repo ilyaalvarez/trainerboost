@@ -14,6 +14,7 @@ export default function ClientSettingsPage() {
   const avatarRef  = useRef<HTMLInputElement>(null)
 
   const [profile,       setProfile]       = useState<Profile | null>(null)
+  const [userEmail,     setUserEmail]     = useState<string | null>(null)
   const [fullName,      setFullName]      = useState('')
   const [phone,         setPhone]         = useState('')
   const [avatarUrl,     setAvatarUrl]     = useState('')
@@ -30,6 +31,7 @@ export default function ClientSettingsPage() {
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/login'); return }
+    setUserEmail(user.email ?? null)
     const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     if (data) {
       setProfile(data as Profile)
@@ -70,10 +72,15 @@ export default function ClientSettingsPage() {
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault()
-    if (newPwd !== confirmPwd) { setPwdError('Las contraseñas no coinciden'); return }
+    if (!currentPwd) { setPwdError('Introduce tu contraseña actual'); return }
     if (newPwd.length < 8)    { setPwdError('Mínimo 8 caracteres'); return }
+    if (newPwd !== confirmPwd) { setPwdError('Las contraseñas no coinciden'); return }
     setSavingPwd(true)
     setPwdError(null)
+    if (userEmail) {
+      const { error: authErr } = await supabase.auth.signInWithPassword({ email: userEmail, password: currentPwd })
+      if (authErr) { setPwdError('La contraseña actual no es correcta'); setSavingPwd(false); return }
+    }
     const { error } = await supabase.auth.updateUser({ password: newPwd })
     setSavingPwd(false)
     if (error) { setPwdError(error.message); return }
@@ -172,6 +179,7 @@ export default function ClientSettingsPage() {
               <input type={showPwd ? 'text' : 'password'} value={currentPwd} onChange={e => { setCurrentPwd(e.target.value); setPwdError(null) }}
                 className="input pr-10" placeholder="••••••••" autoComplete="current-password" />
               <button type="button" onClick={() => setShowPwd(v => !v)}
+                aria-label={showPwd ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
                 {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>

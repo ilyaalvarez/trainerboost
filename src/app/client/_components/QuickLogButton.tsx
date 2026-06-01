@@ -70,7 +70,7 @@ export function QuickLogButton({ clientId, trainerId }: Props) {
                 <Scale className="w-4 h-4 text-brand-primary" />
                 <h3 className="font-semibold text-white text-sm">Registro rápido</h3>
               </div>
-              <button onClick={handleClose} className="p-1 rounded-lg text-slate-500 hover:text-white hover:bg-surface-2 transition-all">
+              <button onClick={handleClose} aria-label="Cerrar" className="p-1 rounded-lg text-slate-500 hover:text-white hover:bg-surface-2 transition-all">
                 <X className="w-4 h-4" />
               </button>
             </div>

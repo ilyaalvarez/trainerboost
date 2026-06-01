@@ -119,7 +119,7 @@ export function SetLogger({ exerciseId, clientId, defaultSets }: Props) {
                 placeholder="0" className="input text-sm py-1 px-2 text-center" />
               <input type="number" min="0" value={e.reps} onChange={ev => setEntries(prev => prev.map((x, idx) => idx === i ? { ...x, reps: ev.target.value } : x))}
                 placeholder="0" className="input text-sm py-1 px-2 text-center" />
-              <button onClick={() => removeSet(i)} className="p-1 text-slate-600 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+              <button onClick={() => removeSet(i)} aria-label="Eliminar set" className="p-1 text-slate-600 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
             </div>
           ))}
           <div className="flex gap-2 mt-3">

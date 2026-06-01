@@ -528,17 +528,17 @@ export default async function DashboardPage() {
                   return (
                     <tr key={c.id} className="group hover:bg-surface-2/50 transition-colors rounded-lg">
                       <td className="py-3">
-                        <div className="flex items-center gap-3">
+                        <Link href={`/dashboard/clients/${clientProfile?.id}`} className="flex items-center gap-3 hover:text-brand-primary transition-colors">
                           <Avatar name={clientProfile?.full_name || '?'} url={clientProfile?.avatar_url} size="sm" />
-                          <span className="font-medium text-white">{clientProfile?.full_name}</span>
-                        </div>
+                          <span className="font-medium text-white group-hover:text-brand-primary transition-colors">{clientProfile?.full_name}</span>
+                        </Link>
                       </td>
                       <td className="py-3"><Badge status={c.status} /></td>
                       <td className="py-3 text-slate-400 hidden sm:table-cell">{formatDate(c.started_at)}</td>
                       <td className="py-3 text-right">
                         <Link
                           href={`/dashboard/clients/${clientProfile?.id}`}
-                          className="text-xs text-brand-primary opacity-0 group-hover:opacity-100 hover:underline transition-opacity font-medium"
+                          className="text-xs text-brand-primary hover:underline font-medium opacity-60 group-hover:opacity-100 transition-opacity"
                         >
                           Ver perfil →
                         </Link>

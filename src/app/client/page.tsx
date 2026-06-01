@@ -281,11 +281,12 @@ export default async function ClientHomePage() {
       {/* Quick links */}
       <div>
         <h2 className="text-sm font-semibold text-slate-400 mb-3 uppercase tracking-wide">Accesos rápidos</h2>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { href: '/client/routine',   label: 'Mi Rutina',    icon: <Dumbbell className="w-6 h-6" />,   color: '#10B981' },
-            { href: '/client/nutrition', label: 'Nutrición',    icon: <Apple className="w-6 h-6" />,       color: '#0EA5E9' },
-            { href: '/client/progress',  label: 'Mi Progreso',  icon: <TrendingUp className="w-6 h-6" />,  color: '#7C3AED' },
+            { href: '/client/routine',      label: 'Mi Rutina',    icon: <Dumbbell className="w-6 h-6" />,     color: '#10B981' },
+            { href: '/client/nutrition',    label: 'Nutrición',    icon: <Apple className="w-6 h-6" />,         color: '#0EA5E9' },
+            { href: '/client/progress',     label: 'Mi Progreso',  icon: <TrendingUp className="w-6 h-6" />,    color: '#7C3AED' },
+            { href: '/client/appointments', label: 'Mis Citas',    icon: <CalendarDays className="w-6 h-6" />,  color: '#F59E0B' },
           ].map(({ href, label, icon, color }) => (
             <Link
               key={href}

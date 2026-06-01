@@ -2,7 +2,7 @@ import Link from 'next/link'
 import {
   Zap, Users, Dumbbell, UtensilsCrossed, CalendarDays,
   MessageSquare, ArrowRight, TrendingUp, CheckCircle2, Star,
-  Play, UserPlus,
+  Play,
 } from 'lucide-react'
 import { PLAN_CONFIG } from '@/lib/plans'
 
@@ -406,30 +406,6 @@ export default function LandingPage() {
               </div>
               <h3 className="font-semibold text-white mb-2 group-hover:text-slate-50 transition-colors">{feat.title}</h3>
               <p className="text-sm text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">{feat.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── 3 pasos para empezar ─────────────────────────────────────────── */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center mb-12">
-          <h2 className="text-3xl font-bold text-white mb-3">Empieza en 3 minutos</h2>
-          <p className="text-slate-400">Sin tarjeta de crédito. Sin contrato.</p>
-        </div>
-        <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-8">
-          {[
-            { step: '1', title: 'Crea tu cuenta', desc: 'Regístrate gratis y configura tu perfil de entrenador en 2 minutos.', icon: UserPlus },
-            { step: '2', title: 'Invita a tus clientes', desc: 'Envía un enlace de invitación. Tus clientes acceden al instante.', icon: Users },
-            { step: '3', title: 'Gestiona todo', desc: 'Rutinas, nutrición, citas y mensajes en un solo lugar.', icon: Zap },
-          ].map(s => (
-            <div key={s.step} className="text-center">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center mx-auto mb-4">
-                <s.icon className="w-6 h-6 text-white" />
-              </div>
-              <div className="text-4xl font-black text-slate-700 mb-2">{s.step}</div>
-              <h3 className="text-base font-semibold text-white mb-1">{s.title}</h3>
-              <p className="text-sm text-slate-400">{s.desc}</p>
             </div>
           ))}
         </div>

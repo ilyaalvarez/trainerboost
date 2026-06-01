@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Lock, ArrowRight, Loader2, Zap, CheckCircle2 } from 'lucide-react'
+import { Lock, ArrowRight, Loader2, Zap, CheckCircle2, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 export default function ResetPasswordPage() {
@@ -15,6 +15,7 @@ export default function ResetPasswordPage() {
   const [confirm, setConfirm]     = useState('')
   const [loading, setLoading]     = useState(false)
   const [done, setDone]           = useState(false)
+  const [showPwd, setShowPwd]     = useState(false)
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -27,7 +28,7 @@ export default function ResetPasswordPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (newPwd.length < 6) { toast.error('La contraseña debe tener al menos 6 caracteres'); return }
+    if (newPwd.length < 8) { toast.error('La contraseña debe tener al menos 8 caracteres'); return }
     if (newPwd !== confirm) { toast.error('Las contraseñas no coinciden'); return }
     setLoading(true)
     try {
@@ -98,14 +99,18 @@ export default function ResetPasswordPage() {
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                     <input
-                      type="password"
+                      type={showPwd ? 'text' : 'password'}
                       value={newPwd}
                       onChange={e => setNewPwd(e.target.value)}
-                      className="input pl-9"
-                      placeholder="Mín. 6 caracteres"
+                      className="input pl-9 pr-10"
+                      placeholder="Mínimo 8 caracteres"
                       required
                       autoComplete="new-password"
                     />
+                    <button type="button" onClick={() => setShowPwd(v => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                      {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
                 <div>
@@ -113,7 +118,7 @@ export default function ResetPasswordPage() {
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                     <input
-                      type="password"
+                      type={showPwd ? 'text' : 'password'}
                       value={confirm}
                       onChange={e => setConfirm(e.target.value)}
                       className="input pl-9"
@@ -123,6 +128,11 @@ export default function ResetPasswordPage() {
                     />
                   </div>
                 </div>
+                {newPwd && confirm && (
+                  <p className={`text-xs font-medium ${newPwd === confirm ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {newPwd === confirm ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas no coinciden'}
+                  </p>
+                )}
 
                 <button type="submit" disabled={loading} className="btn-gradient w-full py-2.5">
                   {loading

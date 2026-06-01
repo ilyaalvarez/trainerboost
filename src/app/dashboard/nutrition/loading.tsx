@@ -18,7 +18,7 @@ export default function NutritionLoading() {
               </div>
               <Skeleton className="h-6 w-16 rounded-full" />
             </div>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {Array.from({ length: 4 }).map((_, j) => (
                 <div key={j} className="text-center space-y-1">
                   <Skeleton className="h-4 w-8 mx-auto" />

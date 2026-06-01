@@ -881,7 +881,7 @@ export default function ClientDetailPage() {
                 const diff  = (last.weight_kg ?? 0) - (first.weight_kg ?? 0)
                 const isLoss = diff < 0
                 return (
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
                       { label: 'Peso inicial', value: `${first.weight_kg} kg`, sub: formatDate(first.logged_at), accent: '#94A3B8', bg: 'rgba(148,163,184,0.06)', border: 'rgba(148,163,184,0.15)' },
                       { label: 'Variación total', value: `${diff > 0 ? '+' : ''}${diff.toFixed(1)} kg`, sub: `${isLoss ? '▼ Bajada' : '▲ Subida'} en ${weightData.length} registros`, accent: isLoss ? '#10B981' : '#EF4444', bg: isLoss ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)', border: isLoss ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)' },

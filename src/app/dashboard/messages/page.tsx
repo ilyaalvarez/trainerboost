@@ -519,6 +519,7 @@ export default function MessagesPage() {
                       'scrollbar-thin'
                     )}
                     style={{ height: 'auto' }}
+                    maxLength={1000}
                     onInput={(e) => {
                       const el = e.currentTarget
                       el.style.height = 'auto'

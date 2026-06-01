@@ -226,6 +226,7 @@ export default function ClientMessagesPage() {
           className="input flex-1"
           placeholder="Escribe un mensaje..."
           autoComplete="off"
+          maxLength={1000}
         />
         <button type="submit" disabled={sending || !input.trim()} className="btn-primary px-4">
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}

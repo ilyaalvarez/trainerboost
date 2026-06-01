@@ -348,7 +348,7 @@ export default function PricingPage() {
         </div>
 
         {/* ── Stats row ──────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-3 gap-4 mb-16 text-center animate-fade-in-up delay-400">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-16 text-center animate-fade-in-up delay-400">
           {[
             { icon: Users,      value: '500+',  label: 'Entrenadores activos' },
             { icon: TrendingUp, value: '8k+',   label: 'Clientes gestionados' },

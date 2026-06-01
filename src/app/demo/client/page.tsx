@@ -966,7 +966,7 @@ export default function ClientDemoPage() {
           <div className="card p-6 w-full max-w-sm animate-fade-in">
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-bold text-white text-lg">Registrar medidas</h3>
-              <button onClick={() => setShowMM(false)} className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-surface-2 transition-all">
+              <button onClick={() => setShowMM(false)} aria-label="Cerrar" className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-surface-2 transition-all">
                 <X className="w-4 h-4" />
               </button>
             </div>

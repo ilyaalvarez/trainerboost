@@ -844,7 +844,7 @@ export default function TrainerDemoPage() {
                     {selConv ? (
                       <>
                         <div className="p-4 border-b border-border flex items-center gap-3 bg-surface shrink-0">
-                          <button onClick={() => setMobileShowChat(false)} className="lg:hidden text-slate-400 hover:text-white mr-1"><ArrowLeft className="w-4 h-4" /></button>
+                          <button onClick={() => setMobileShowChat(false)} aria-label="Volver a conversaciones" className="lg:hidden text-slate-400 hover:text-white mr-1"><ArrowLeft className="w-4 h-4" /></button>
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${selConv.colorClass}`}>{selConv.initials}</div>
                           <div>
                             <div className="text-sm font-semibold text-white">{selConv.name}</div>
@@ -987,7 +987,7 @@ export default function TrainerDemoPage() {
           <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-surface border-l border-border z-50 flex flex-col overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between p-5 border-b border-border shrink-0">
               <h2 className="font-semibold text-white">Perfil del cliente</h2>
-              <button onClick={() => setSelectedClient(null)} className="w-7 h-7 rounded-lg bg-surface-2 hover:bg-surface-3 flex items-center justify-center transition-colors"><X className="w-4 h-4 text-slate-400" /></button>
+              <button onClick={() => setSelectedClient(null)} aria-label="Cerrar perfil" className="w-7 h-7 rounded-lg bg-surface-2 hover:bg-surface-3 flex items-center justify-center transition-colors"><X className="w-4 h-4 text-slate-400" /></button>
             </div>
             <div className="p-5 space-y-5 flex-1">
               {/* Header */}
@@ -1109,7 +1109,7 @@ export default function TrainerDemoPage() {
                   <input value={ex.sets} onChange={e => updateEx(i,'sets',e.target.value)} className="input text-sm text-center" placeholder="Ser." />
                   <input value={ex.reps} onChange={e => updateEx(i,'reps',e.target.value)} className="input text-sm text-center" placeholder="Rep." />
                   <input value={ex.rest} onChange={e => updateEx(i,'rest',e.target.value)} className="input text-sm text-center" placeholder="Des." />
-                  <button type="button" onClick={() => removeEx(i)} className="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button type="button" onClick={() => removeEx(i)} aria-label="Eliminar ejercicio" className="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               ))}
               <div className="grid grid-cols-[1fr_60px_60px_60px_32px] gap-2 text-[10px] text-slate-500 px-1">

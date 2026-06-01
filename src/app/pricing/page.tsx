@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import {
-  Check, Zap, Loader2, ArrowLeft, Sparkles, ChevronDown,
+  Check, Zap, Loader2, Sparkles, ChevronDown,
   Shield, Clock, TrendingUp, Users, Award,
 } from 'lucide-react'
 import { PLANS, type PlanKey } from '@/lib/stripe'
@@ -127,11 +127,32 @@ export default function PricingPage() {
       <div className="fixed bottom-0 right-0 w-[400px] h-[400px] pointer-events-none z-0"
            style={{ background: 'radial-gradient(ellipse at 100% 100%, rgba(124,58,237,0.05) 0%, transparent 70%)' }} />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-6 py-16">
+      {/* Nav */}
+      <nav className="relative z-10 border-b border-border/50 bg-background/85 backdrop-blur-xl sticky top-0">
+        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-glow-sm"
+                 style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
+              <Zap className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-bold text-base tracking-tight gradient-text">TrainerBoost</span>
+          </Link>
+          <div className="flex items-center gap-1">
+            <Link href="/contact" className="text-sm text-slate-400 hover:text-white transition-colors duration-150 hidden sm:block px-3 py-2 rounded-lg hover:bg-surface/70">
+              Contacto
+            </Link>
+            <div className="w-px h-4 bg-border mx-2 hidden sm:block" />
+            <Link href="/login" className="text-sm text-slate-400 hover:text-white transition-colors duration-150 px-3 py-2 rounded-lg hover:bg-surface/70 hidden sm:block">
+              Entrar
+            </Link>
+            <Link href="/register" className="btn-gradient text-sm py-2 px-4 ml-1">
+              Probar gratis
+            </Link>
+          </div>
+        </div>
+      </nav>
 
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white mb-12 transition-colors group">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" /> Volver al inicio
-        </Link>
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-16">
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="text-center mb-16 animate-fade-in-up">

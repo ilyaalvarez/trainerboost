@@ -161,9 +161,10 @@ export default function LandingPage() {
           <div className="flex items-center gap-1 animate-fade-in">
             <Link href="/pricing" className="text-sm text-slate-400 hover:text-white transition-colors duration-150 hidden md:block px-3 py-2 rounded-lg hover:bg-surface/70">Precios</Link>
             <Link href="/demo"    className="text-sm text-slate-400 hover:text-white transition-colors duration-150 hidden sm:block px-3 py-2 rounded-lg hover:bg-surface/70">Demo</Link>
+            <Link href="/contact" className="text-sm text-slate-400 hover:text-white transition-colors duration-150 hidden md:block px-3 py-2 rounded-lg hover:bg-surface/70">Contacto</Link>
             <div className="w-px h-4 bg-border mx-2 hidden sm:block" />
             <Link href="/login"   className="text-sm text-slate-400 hover:text-white transition-colors duration-150 px-3 py-2 rounded-lg hover:bg-surface/70 hidden sm:block">Entrar</Link>
-            <Link href="/register" className="btn-gradient text-sm py-2 px-4 ml-1">Probar 14 días gratis</Link>
+            <Link href="/register" className="btn-gradient text-sm py-2 px-4 ml-1">Probar gratis</Link>
           </div>
         </div>
       </nav>
@@ -710,7 +711,7 @@ export default function LandingPage() {
             <nav className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500">
               <Link href="/pricing" className="hover:text-slate-300 transition-colors">Precios</Link>
               <Link href="/demo/trainer" className="hover:text-slate-300 transition-colors">Demo</Link>
-              <a href="mailto:hola@trainerboost.es" className="hover:text-slate-300 transition-colors">Contacto</a>
+              <Link href="/contact" className="hover:text-slate-300 transition-colors">Contacto</Link>
               <Link href="/privacy" className="hover:text-slate-300 transition-colors">Política de privacidad</Link>
               <Link href="/terms" className="hover:text-slate-300 transition-colors">Términos de servicio</Link>
             </nav>

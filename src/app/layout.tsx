@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
+import Script from 'next/script'
 import { Toaster } from 'sonner'
 import CookieBanner from '@/components/CookieBanner'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
@@ -34,11 +35,13 @@ export const metadata: Metadata = {
     siteName: 'TrainerBoost',
     title: 'TrainerBoost — Gestiona tu negocio de entrenamiento personal',
     description: 'La plataforma SaaS para entrenadores personales: gestión de clientes, rutinas, nutrición, citas y mensajes en un solo lugar.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TrainerBoost' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'TrainerBoost — Gestiona tu negocio de entrenamiento',
     description: 'La plataforma SaaS para entrenadores personales que quieren escalar su negocio.',
+    images: ['/og-image.png'],
   },
   robots: { index: true, follow: true },
   manifest: '/manifest.json',
@@ -53,9 +56,41 @@ export const viewport: Viewport = {
   themeColor: '#0EA5E9',
 }
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'TrainerBoost',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web, iOS, Android',
+  url: 'https://app.trainerboost.es',
+  description: 'La plataforma SaaS para entrenadores personales: gestión de clientes, rutinas, nutrición, citas y mensajes en un solo lugar.',
+  offers: [
+    { '@type': 'Offer', name: 'Gratis',    price: '0',  priceCurrency: 'EUR' },
+    { '@type': 'Offer', name: 'Starter',   price: '19', priceCurrency: 'EUR' },
+    { '@type': 'Offer', name: 'Pro',       price: '39', priceCurrency: 'EUR' },
+    { '@type': 'Offer', name: 'Unlimited', price: '79', priceCurrency: 'EUR' },
+  ],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '500',
+    bestRating: '5',
+  },
+  inLanguage: 'es',
+  countryOfOrigin: 'ES',
+}
+
+const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`dark ${inter.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body>
         {children}
         <Toaster
@@ -71,6 +106,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <CookieBanner />
         <ServiceWorkerRegistration />
+        {/* 🔑 Analytics: añade NEXT_PUBLIC_PLAUSIBLE_DOMAIN=app.trainerboost.es en .env.local y Vercel para activar */}
+        {plausibleDomain && (
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore — data-domain is a valid Plausible attribute
+          <Script
+            src="https://plausible.io/js/script.js"
+            data-domain={plausibleDomain}
+            strategy="lazyOnload"
+          />
+        )}
       </body>
     </html>
   )

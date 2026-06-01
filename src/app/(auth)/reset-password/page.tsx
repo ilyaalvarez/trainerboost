@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import { Lock, ArrowRight, Loader2, Zap, CheckCircle2, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -83,9 +84,9 @@ export default function ResetPasswordPage() {
               <p className="text-slate-400 text-sm">Verificando enlace de recuperación...</p>
               <p className="text-xs text-slate-500 mt-2">
                 Si este mensaje no desaparece, el enlace puede haber expirado.{' '}
-                <a href="/forgot-password" className="text-brand-primary hover:underline">
+                <Link href="/forgot-password" className="text-brand-primary hover:underline">
                   Solicitar uno nuevo
-                </a>
+                </Link>
               </p>
             </div>
           ) : (

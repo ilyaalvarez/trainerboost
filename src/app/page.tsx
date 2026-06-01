@@ -200,9 +200,9 @@ export default function LandingPage() {
               <Link href="/register" className="btn-gradient text-base px-8 py-3">
                 <Zap className="w-4 h-4" /> Probar 14 días gratis
               </Link>
-              <a href="/demo/trainer" className="btn-secondary flex items-center gap-2 py-3 px-6 text-base">
+              <Link href="/demo/trainer" className="btn-secondary flex items-center gap-2 py-3 px-6 text-base">
                 <Play className="w-4 h-4" /> Ver demo en vivo
-              </a>
+              </Link>
             </div>
 
             <div className="flex flex-wrap gap-x-5 gap-y-2 animate-fade-in-up delay-300">
@@ -708,8 +708,8 @@ export default function LandingPage() {
               <span className="font-bold text-white">TrainerBoost</span>
             </div>
             <nav className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500">
-              <a href="/pricing" className="hover:text-slate-300 transition-colors">Precios</a>
-              <a href="/demo/trainer" className="hover:text-slate-300 transition-colors">Demo</a>
+              <Link href="/pricing" className="hover:text-slate-300 transition-colors">Precios</Link>
+              <Link href="/demo/trainer" className="hover:text-slate-300 transition-colors">Demo</Link>
               <a href="mailto:hola@trainerboost.es" className="hover:text-slate-300 transition-colors">Contacto</a>
               <Link href="/privacy" className="hover:text-slate-300 transition-colors">Política de privacidad</Link>
               <Link href="/terms" className="hover:text-slate-300 transition-colors">Términos de servicio</Link>

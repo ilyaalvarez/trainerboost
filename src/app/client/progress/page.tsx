@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Plus, Loader2, Scale, Flame, TrendingDown, ClipboardList, X, ChevronLeft, ChevronRight, Target, Pencil, Medal } from 'lucide-react'
+import { Plus, Loader2, Scale, Flame, TrendingDown, TrendingUp, ClipboardList, X, ChevronLeft, ChevronRight, Target, Pencil, Medal } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { ProgressLog } from '@/types/database'
 import { formatDate } from '@/lib/utils'
@@ -213,13 +213,17 @@ export default function ClientProgressPage() {
                style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.08), rgba(14,165,233,0.05))', borderColor: 'rgba(16,185,129,0.25)' }}>
             <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                  style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.12))' }}>
-              <TrendingDown className="w-6 h-6 text-brand-accent" />
+              {weightChange != null && weightChange > 0
+                ? <TrendingUp className="w-6 h-6 text-amber-400" />
+                : <TrendingDown className="w-6 h-6 text-brand-accent" />}
             </div>
             <div>
               <div className="text-2xl font-bold font-mono text-brand-accent">
                 {weightChange != null ? `${weightChange > 0 ? '+' : ''}${weightChange.toFixed(1)}` : '—'}
               </div>
-              <div className="text-xs text-slate-400">Kg {weightChange != null && weightChange > 0 ? 'ganados' : 'perdidos'}</div>
+              <div className="text-xs text-slate-400">
+                {weightChange == null ? 'Variación de peso' : weightChange > 0 ? 'kg ganados' : weightChange < 0 ? 'kg perdidos' : 'sin cambio'}
+              </div>
             </div>
           </div>
 

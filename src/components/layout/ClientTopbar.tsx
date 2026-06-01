@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
-  TrendingUp, Dumbbell, UtensilsCrossed, CalendarDays,
+  Home, Dumbbell, UtensilsCrossed, CalendarDays,
   MessageSquare, Zap, LogOut, Settings,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -47,7 +47,7 @@ export default function ClientTopbar({ profile }: Props) {
   }, [supabase, profile.id])
 
   const NAV_ITEMS = [
-    { href: '/client',               icon: TrendingUp,      label: 'Progreso',    badge: 0 },
+    { href: '/client',               icon: Home,            label: 'Inicio',      badge: 0 },
     { href: '/client/routine',       icon: Dumbbell,        label: 'Mi Rutina',   badge: 0 },
     { href: '/client/nutrition',     icon: UtensilsCrossed, label: 'Nutrición',   badge: 0 },
     { href: '/client/appointments',  icon: CalendarDays,    label: 'Citas',       badge: 0 },

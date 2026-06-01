@@ -66,6 +66,12 @@ export default function RegisterPage() {
           full_name: name,
           role,
         })
+        // Fire-and-forget welcome email (non-blocking)
+        fetch('/api/email/welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, role }),
+        }).catch(() => undefined)
         toast.success('¡Cuenta creada! Completa tu perfil')
         router.push('/onboarding')
       }
@@ -282,9 +288,9 @@ export default function RegisterPage() {
                   />
                   <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors leading-snug">
                     Acepto los{' '}
-                    <Link href="#" className="text-brand-primary hover:underline">Términos de servicio</Link>
+                    <Link href="/terms" className="text-brand-primary hover:underline" target="_blank">Términos de servicio</Link>
                     {' '}y la{' '}
-                    <Link href="#" className="text-brand-primary hover:underline">Política de privacidad</Link>
+                    <Link href="/privacy" className="text-brand-primary hover:underline" target="_blank">Política de privacidad</Link>
                   </span>
                 </label>
 

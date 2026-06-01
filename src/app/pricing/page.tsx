@@ -185,7 +185,7 @@ export default function PricingPage() {
         </div>
         {annual && (
           <p className="text-center text-xs text-slate-500 -mt-4 mb-8">
-            La facturación anual estará disponible próximamente.
+            Escríbenos y te aplicamos el descuento anual en tu próxima factura.
           </p>
         )}
 
@@ -291,8 +291,8 @@ export default function PricingPage() {
                 </ul>
 
                 {annual ? (
-                  <a
-                    href={`mailto:hola@trainerboost.es?subject=Facturación anual TrainerBoost – Plan ${plan.name}`}
+                  <Link
+                    href="/contact"
                     className={cn(
                       'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2',
                       isPopular
@@ -300,8 +300,8 @@ export default function PricingPage() {
                         : 'bg-surface-2 border border-border hover:border-border-bright text-white hover:bg-surface-3 hover:-translate-y-0.5',
                     )}
                   >
-                    Notifícame
-                  </a>
+                    Avísame del precio anual
+                  </Link>
                 ) : (
                   <button
                     onClick={() => handleCheckout(key)}
@@ -319,7 +319,7 @@ export default function PricingPage() {
                   </button>
                 )}
                 <p className="text-xs text-slate-500 mt-1 text-center">
-                  {annual ? 'Próximamente · Sin compromiso' : '14 días gratis · Sin compromiso'}
+                  {annual ? 'Te contactamos en 24h · Sin compromiso' : '14 días gratis · Sin compromiso'}
                 </p>
               </div>
             )

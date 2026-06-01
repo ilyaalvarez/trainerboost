@@ -34,13 +34,11 @@ export const metadata: Metadata = {
     siteName: 'TrainerBoost',
     title: 'TrainerBoost — Gestiona tu negocio de entrenamiento personal',
     description: 'La plataforma SaaS para entrenadores personales: gestión de clientes, rutinas, nutrición, citas y mensajes en un solo lugar.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TrainerBoost — Software para entrenadores personales' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'TrainerBoost — Gestiona tu negocio de entrenamiento',
     description: 'La plataforma SaaS para entrenadores personales que quieren escalar su negocio.',
-    images: ['/og-image.png'],
   },
   robots: { index: true, follow: true },
   manifest: '/manifest.json',

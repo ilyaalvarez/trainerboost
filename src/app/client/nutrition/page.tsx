@@ -206,7 +206,7 @@ export default function ClientNutritionPage() {
             </span>
           )}
         </div>
-        <div className="grid grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
           {[
             { label: 'Calorías', value: totals?.calories ?? 0, consumed: consumed?.calories ?? 0, target: plan.calories_target ?? 0, unit: 'kcal', color: 'text-white' },
             { label: 'Proteína', value: totals?.protein ?? 0, consumed: consumed?.protein ?? 0, target: plan.protein_target ?? 0, unit: 'g', color: 'text-sky-400' },

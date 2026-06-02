@@ -2,7 +2,8 @@ import Link from 'next/link'
 import {
   Zap, Users, Dumbbell, UtensilsCrossed, CalendarDays,
   MessageSquare, ArrowRight, TrendingUp, CheckCircle2, Star,
-  Play,
+  Play, Sparkles, Shield, Clock, BarChart3, ChevronRight,
+  Smartphone, X,
 } from 'lucide-react'
 import { PLAN_CONFIG } from '@/lib/plans'
 
@@ -38,79 +39,55 @@ const FAQS = [
 const FEATURES = [
   {
     icon: Users,
-    bg: 'bg-sky-500/10 border-sky-500/20',
-    text: 'text-sky-400',
-    glow: 'rgba(14,165,233,0.15)',
+    color: 'sky',
     title: 'Gestión de clientes',
     desc: 'Perfil completo, historial de entrenamiento y seguimiento personalizado de cada cliente.',
   },
   {
     icon: Dumbbell,
-    bg: 'bg-violet-500/10 border-violet-500/20',
-    text: 'text-violet-400',
-    glow: 'rgba(124,58,237,0.15)',
+    color: 'violet',
     title: 'Rutinas personalizadas',
     desc: 'Crea, asigna y ajusta rutinas con ejercicios, series y notas de coaching.',
   },
   {
     icon: UtensilsCrossed,
-    bg: 'bg-emerald-500/10 border-emerald-500/20',
-    text: 'text-emerald-400',
-    glow: 'rgba(16,185,129,0.15)',
+    color: 'emerald',
     title: 'Planes nutricionales',
     desc: 'Diseña menús con macros, calorías y seguimiento diario desde el móvil.',
   },
   {
     icon: CalendarDays,
-    bg: 'bg-amber-500/10 border-amber-500/20',
-    text: 'text-amber-400',
-    glow: 'rgba(245,158,11,0.15)',
+    color: 'amber',
     title: 'Gestión de citas',
     desc: 'Agenda presencial, online o videollamada. Recordatorios automáticos incluidos.',
   },
   {
     icon: MessageSquare,
-    bg: 'bg-pink-500/10 border-pink-500/20',
-    text: 'text-pink-400',
-    glow: 'rgba(236,72,153,0.15)',
+    color: 'pink',
     title: 'Mensajería integrada',
     desc: 'Chat directo con cada cliente. Sin WhatsApp, sin correos sueltos.',
   },
   {
     icon: TrendingUp,
-    bg: 'bg-teal-500/10 border-teal-500/20',
-    text: 'text-teal-400',
-    glow: 'rgba(20,184,166,0.15)',
+    color: 'teal',
     title: 'Progreso y analytics',
     desc: 'Gráficas de evolución, fotos de progreso y métricas que tus clientes verán.',
   },
 ]
 
-const STATS = [
-  { value: '500+',   label: 'Entrenadores activos' },
-  { value: '8.000+', label: 'Clientes gestionados' },
-  { value: '4.9★',   label: 'Valoración media' },
-]
+const FEATURE_COLORS: Record<string, { bg: string; text: string; border: string; glow: string }> = {
+  sky:     { bg: 'bg-sky-500/10',     text: 'text-sky-400',     border: 'border-sky-500/20',     glow: '14,165,233' },
+  violet:  { bg: 'bg-violet-500/10',  text: 'text-violet-400',  border: 'border-violet-500/20',  glow: '124,58,237' },
+  emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', glow: '16,185,129' },
+  amber:   { bg: 'bg-amber-500/10',   text: 'text-amber-400',   border: 'border-amber-500/20',   glow: '245,158,11' },
+  pink:    { bg: 'bg-pink-500/10',    text: 'text-pink-400',    border: 'border-pink-500/20',    glow: '236,72,153' },
+  teal:    { bg: 'bg-teal-500/10',    text: 'text-teal-400',    border: 'border-teal-500/20',    glow: '20,184,166' },
+}
 
-const STEPS = [
-  {
-    n: '01',
-    title: 'Regístrate en 2 minutos',
-    desc: 'Crea tu cuenta gratis. Sin tarjeta de crédito, sin configuraciones complejas.',
-    gradient: '#0EA5E9, #7C3AED',
-  },
-  {
-    n: '02',
-    title: 'Añade tus clientes',
-    desc: 'Invítalos por email o enlace. Configura rutinas y planes desde el primer día.',
-    gradient: '#7C3AED, #10B981',
-  },
-  {
-    n: '03',
-    title: 'Gestiona todo en uno',
-    desc: 'Citas, nutrición, mensajes y seguimiento de progreso desde un solo panel.',
-    gradient: '#10B981, #0EA5E9',
-  },
+const STATS = [
+  { value: '500+',   label: 'Entrenadores activos', icon: Users },
+  { value: '8.000+', label: 'Clientes gestionados',  icon: BarChart3 },
+  { value: '4.9★',   label: 'Valoración media',      icon: Star },
 ]
 
 const TESTIMONIALS = [
@@ -142,14 +119,45 @@ const TESTIMONIALS = [
 
 const TRUST = ['Sin tarjeta de crédito', 'Soporte incluido', 'Cancela cuando quieras']
 
+const PAIN_POINTS = [
+  'Capturas de WhatsApp para enviar rutinas',
+  'PDFs en email que los clientes no abren',
+  'Hojas de Excel sin sincronización',
+  'Pagos gestionados por Bizum/transferencia',
+  'Sin forma de ver el progreso del cliente',
+]
+
+const SOLUTION_POINTS = [
+  'Rutinas asignadas con un clic, visibles al momento',
+  'Portal web y móvil que tus clientes usan cada día',
+  'Dashboard en tiempo real con todos los datos',
+  'Cobro automático con Stripe, sin gestionar nada',
+  'Gráficas de evolución, fotos y métricas en un lugar',
+]
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-slate-100 overflow-x-hidden">
 
+      {/* ── Announcement bar ────────────────────────────────────────────── */}
+      <div className="relative overflow-hidden"
+           style={{ background: 'linear-gradient(90deg, rgba(14,165,233,0.15) 0%, rgba(124,58,237,0.15) 50%, rgba(14,165,233,0.15) 100%)' }}>
+        <div className="max-w-6xl mx-auto px-6 py-2.5 flex items-center justify-center gap-2 text-center">
+          <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+          <span className="text-xs text-slate-300">
+            <span className="font-semibold text-white">Nuevo:</span>{' '}
+            Mensajería en tiempo real + notificaciones push en todos los planes
+          </span>
+          <Link href="/register" className="text-xs text-sky-400 font-semibold hover:text-sky-300 flex items-center gap-0.5 shrink-0">
+            Probar gratis <ChevronRight className="w-3 h-3" />
+          </Link>
+        </div>
+      </div>
+
       {/* ── Nav ─────────────────────────────────────────────────────────── */}
       <nav className="border-b border-border/50 bg-background/85 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 animate-fade-in">
+          <div className="flex items-center gap-2.5">
             <div
               className="w-8 h-8 rounded-xl flex items-center justify-center shadow-glow-sm"
               style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
@@ -158,7 +166,7 @@ export default function LandingPage() {
             </div>
             <span className="font-bold text-base tracking-tight gradient-text">TrainerBoost</span>
           </div>
-          <div className="flex items-center gap-1 animate-fade-in">
+          <div className="flex items-center gap-1">
             <Link href="/pricing" className="text-sm text-slate-400 hover:text-white transition-colors duration-150 hidden md:block px-3 py-2 rounded-lg hover:bg-surface/70">Precios</Link>
             <Link href="/demo"    className="text-sm text-slate-400 hover:text-white transition-colors duration-150 hidden sm:block px-3 py-2 rounded-lg hover:bg-surface/70">Demo</Link>
             <Link href="/contact" className="text-sm text-slate-400 hover:text-white transition-colors duration-150 hidden md:block px-3 py-2 rounded-lg hover:bg-surface/70">Contacto</Link>
@@ -170,16 +178,16 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ────────────────────────────────────────────────────────── */}
-      <section className="relative max-w-6xl mx-auto px-6 pt-24 pb-20">
+      <section className="relative max-w-6xl mx-auto px-6 pt-20 pb-16">
         {/* Ambient glows */}
-        <div className="absolute top-0 left-0 w-[700px] h-[500px] pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse at 20% 40%, rgba(14,165,233,0.09) 0%, transparent 65%)' }} />
-        <div className="absolute top-0 right-0 w-[500px] h-[400px] pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.07) 0%, transparent 60%)' }} />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] pointer-events-none"
+        <div className="absolute top-0 left-0 w-[800px] h-[600px] pointer-events-none"
+             style={{ background: 'radial-gradient(ellipse at 15% 35%, rgba(14,165,233,0.1) 0%, transparent 60%)' }} />
+        <div className="absolute top-0 right-0 w-[600px] h-[500px] pointer-events-none"
+             style={{ background: 'radial-gradient(ellipse at 85% 20%, rgba(124,58,237,0.08) 0%, transparent 55%)' }} />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] pointer-events-none"
              style={{ background: 'radial-gradient(ellipse at 50% 100%, rgba(16,185,129,0.04) 0%, transparent 60%)' }} />
 
-        <div className="relative grid lg:grid-cols-2 gap-16 items-center">
+        <div className="relative grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
           {/* Left: copy */}
           <div>
             <div className="chip mb-6 w-fit animate-fade-in-up">
@@ -187,17 +195,43 @@ export default function LandingPage() {
               Gratis para empezar · Sin tarjeta
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-bold text-white leading-[1.08] mb-6 text-balance tracking-tight animate-fade-in-up delay-75">
+            <h1 className="text-5xl md:text-[3.75rem] font-bold text-white leading-[1.05] mb-5 text-balance tracking-tight animate-fade-in-up delay-75">
               Deja de gestionar<br />
-              clientes por<br />
-              <span className="gradient-text">WhatsApp</span>
+              <span className="gradient-text">clientes por</span><br />
+              WhatsApp
             </h1>
 
-            <p className="text-lg text-slate-400 mb-8 leading-relaxed max-w-lg animate-fade-in-up delay-150">
-              TrainerBoost centraliza rutinas, nutrición, citas y pagos de tus clientes en un solo lugar. En español, desde 19€/mes.
+            <p className="text-lg text-slate-400 mb-7 leading-relaxed max-w-lg animate-fade-in-up delay-150">
+              TrainerBoost centraliza rutinas, nutrición, citas y pagos en un solo lugar.
+              Tus clientes lo usan cada día. En español, desde <strong className="text-white">19€/mes</strong>.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 mb-8 animate-fade-in-up delay-200">
+            {/* Social proof inline */}
+            <div className="flex items-center gap-3 mb-7 animate-fade-in-up delay-200">
+              <div className="flex -space-x-2">
+                {['CM', 'SL', 'JR', 'MP', 'AR'].map((initials, i) => (
+                  <div key={initials}
+                       className="w-8 h-8 rounded-full border-2 border-background flex items-center justify-center text-[10px] font-bold"
+                       style={{ background: ['#0EA5E9','#7C3AED','#10B981','#F59E0B','#EC4899'][i] + '33',
+                                color: ['#38BDF8','#A78BFA','#34D399','#FCD34D','#F9A8D4'][i],
+                                borderColor: '#0F172A' }}>
+                    {initials}
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="w-3 h-3 text-amber-400 fill-amber-400" />
+                  ))}
+                </div>
+                <div className="text-xs text-slate-400 mt-0.5">
+                  <span className="text-white font-semibold">500+ entrenadores</span> ya confían en nosotros
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 mb-7 animate-fade-in-up delay-250">
               <Link href="/register" className="btn-gradient text-base px-8 py-3">
                 <Zap className="w-4 h-4" /> Probar 14 días gratis
               </Link>
@@ -219,7 +253,7 @@ export default function LandingPage() {
           {/* Right: App preview */}
           <div className="relative hidden lg:block animate-slide-right delay-200">
             <div className="absolute inset-0 blur-3xl pointer-events-none"
-                 style={{ background: 'radial-gradient(ellipse at 60% 40%, rgba(14,165,233,0.15) 0%, rgba(124,58,237,0.08) 50%, transparent 70%)' }} />
+                 style={{ background: 'radial-gradient(ellipse at 60% 40%, rgba(14,165,233,0.18) 0%, rgba(124,58,237,0.1) 50%, transparent 70%)' }} />
             <div className="relative rounded-2xl overflow-hidden border border-border/80 shadow-card-elevated"
                  style={{ background: '#1E293B' }}>
               {/* Browser chrome */}
@@ -235,25 +269,26 @@ export default function LandingPage() {
               </div>
 
               {/* App content */}
-              <div className="flex" style={{ height: '360px' }}>
+              <div className="flex" style={{ height: '380px' }}>
                 {/* Sidebar */}
                 <div className="w-36 bg-surface/60 border-r border-border/60 p-2.5 flex flex-col gap-0.5 shrink-0">
-                  <div className="flex items-center gap-1.5 px-2 py-2 mb-1">
+                  <div className="flex items-center gap-1.5 px-2 py-2 mb-2">
                     <div className="w-5 h-5 rounded-md shrink-0"
                          style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }} />
                     <span className="text-[9px] font-bold text-white">TrainerBoost</span>
                   </div>
                   {[
-                    { label: 'Panel',     active: true },
-                    { label: 'Clientes',  active: false },
-                    { label: 'Rutinas',   active: false },
-                    { label: 'Nutrición', active: false },
-                    { label: 'Citas',     active: false },
-                    { label: 'Mensajes',  active: false },
+                    { label: 'Panel',     active: true,  icon: '⊞' },
+                    { label: 'Clientes',  active: false, icon: '◎' },
+                    { label: 'Rutinas',   active: false, icon: '⬡' },
+                    { label: 'Nutrición', active: false, icon: '◈' },
+                    { label: 'Citas',     active: false, icon: '⊕' },
+                    { label: 'Mensajes',  active: false, icon: '◉' },
                   ].map(item => (
                     <div key={item.label}
-                         className={`text-[9px] px-2 py-1.5 rounded-md transition-colors ${item.active ? 'text-sky-400 font-semibold' : 'text-slate-500'}`}
+                         className={`text-[9px] px-2 py-1.5 rounded-md transition-colors flex items-center gap-1.5 ${item.active ? 'text-sky-400 font-semibold' : 'text-slate-500'}`}
                          style={item.active ? { background: 'linear-gradient(90deg, rgba(14,165,233,0.15), transparent)' } : {}}>
+                      <span className="opacity-60">{item.icon}</span>
                       {item.label}
                     </div>
                   ))}
@@ -266,66 +301,86 @@ export default function LandingPage() {
                       <div className="text-[11px] font-bold text-white">Panel principal</div>
                       <div className="text-[9px] text-slate-500">Jueves, 29 Mayo 2025</div>
                     </div>
-                    <div className="h-5 w-16 rounded-md text-[8px] bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 font-semibold">
+                    <div className="h-5 w-16 rounded-md text-[8px] flex items-center justify-center text-sky-400 font-semibold"
+                         style={{ background: 'rgba(14,165,233,0.15)', border: '1px solid rgba(14,165,233,0.25)' }}>
                       + Añadir
                     </div>
                   </div>
 
+                  {/* Stats grid */}
                   <div className="grid grid-cols-2 gap-1.5">
                     {[
-                      { label: 'Clientes', value: '24', accent: 'border-sky-500/25 bg-sky-500/8' },
-                      { label: 'Citas hoy', value: '6',  accent: 'border-violet-500/25 bg-violet-500/8' },
-                      { label: 'Mensajes',  value: '8',  accent: 'border-emerald-500/25 bg-emerald-500/8' },
-                      { label: 'Este mes',  value: '2.8k€', accent: 'border-amber-500/25 bg-amber-500/8' },
+                      { label: 'Clientes activos', value: '24', delta: '+2', color: '14,165,233' },
+                      { label: 'Citas hoy',         value: '6',  delta: '+1', color: '124,58,237' },
+                      { label: 'Mensajes nuevos',   value: '8',  delta: '+3', color: '16,185,129' },
+                      { label: 'Este mes',           value: '2.8k€', delta: '+12%', color: '245,158,11' },
                     ].map(s => (
-                      <div key={s.label} className={`rounded-lg border p-2 transition-colors ${s.accent}`}>
+                      <div key={s.label} className="rounded-lg border p-2"
+                           style={{ background: `rgba(${s.color},0.06)`, borderColor: `rgba(${s.color},0.2)` }}>
                         <div className="text-[8px] text-slate-500 mb-0.5">{s.label}</div>
-                        <div className="text-[12px] font-bold text-white font-mono">{s.value}</div>
+                        <div className="flex items-end justify-between">
+                          <div className="text-[12px] font-bold text-white font-mono">{s.value}</div>
+                          <div className="text-[8px] font-semibold" style={{ color: `rgb(${s.color})` }}>{s.delta}</div>
+                        </div>
                       </div>
                     ))}
                   </div>
 
+                  {/* Appointments */}
                   <div className="rounded-lg bg-surface/50 border border-border/60 p-2">
-                    <div className="text-[8px] font-semibold text-white mb-1.5">Próximas citas</div>
+                    <div className="text-[8px] font-semibold text-white mb-1.5 flex items-center justify-between">
+                      Próximas citas
+                      <span className="text-sky-400 font-normal">Ver todas →</span>
+                    </div>
                     {[
-                      { time: '09:00', name: 'Ana García',      type: 'Online' },
-                      { time: '11:30', name: 'Pedro López',     type: 'Presencial' },
-                      { time: '16:00', name: 'María Fernández', type: 'Online' },
+                      { time: '09:00', name: 'Ana García',      type: 'Online',    dot: '#0EA5E9' },
+                      { time: '11:30', name: 'Pedro López',     type: 'Presencial', dot: '#7C3AED' },
+                      { time: '16:00', name: 'María Fernández', type: 'Online',    dot: '#0EA5E9' },
                     ].map(a => (
                       <div key={a.name} className="flex items-center gap-2 py-0.5">
                         <span className="text-[8px] text-slate-500 font-mono w-8 shrink-0">{a.time}</span>
+                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: a.dot }} />
                         <span className="text-[8px] text-slate-300 flex-1 truncate">{a.name}</span>
-                        <span className="text-[7px] text-sky-400 shrink-0">{a.type}</span>
+                        <span className="text-[7px] shrink-0" style={{ color: a.dot }}>{a.type}</span>
                       </div>
                     ))}
                   </div>
 
+                  {/* Progress bar */}
                   <div className="rounded-lg bg-surface/50 border border-border/60 p-2">
-                    <div className="text-[8px] font-semibold text-white mb-1.5">Clientes activos</div>
-                    {[
-                      { i: 'AG', name: 'Ana García',  c: 'bg-sky-500/25 text-sky-300' },
-                      { i: 'PL', name: 'Pedro López', c: 'bg-violet-500/25 text-violet-300' },
-                      { i: 'MF', name: 'María Fdez.', c: 'bg-emerald-500/25 text-emerald-300' },
-                    ].map(c => (
-                      <div key={c.name} className="flex items-center gap-1.5 py-0.5">
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold shrink-0 ${c.c}`}>{c.i}</div>
-                        <span className="text-[8px] text-slate-300 flex-1">{c.name}</span>
-                        <span className="text-[7px] text-emerald-400">Activo</span>
-                      </div>
-                    ))}
+                    <div className="text-[8px] font-semibold text-white mb-2">Progreso semanal</div>
+                    <div className="space-y-1.5">
+                      {[
+                        { label: 'Rutinas completadas', pct: 75, color: '#0EA5E9' },
+                        { label: 'Planes nutricionales', pct: 60, color: '#10B981' },
+                        { label: 'Seguimiento activo',  pct: 90, color: '#7C3AED' },
+                      ].map(p => (
+                        <div key={p.label}>
+                          <div className="flex justify-between mb-0.5">
+                            <span className="text-[7px] text-slate-400">{p.label}</span>
+                            <span className="text-[7px] font-semibold" style={{ color: p.color }}>{p.pct}%</span>
+                          </div>
+                          <div className="h-1 bg-surface-2 rounded-full overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${p.pct}%`, background: p.color }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Bottom fade */}
-              <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
-                   style={{ background: 'linear-gradient(to top, #0F172A, transparent)' }} />
+              <div className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
+                   style={{ background: 'linear-gradient(to top, #1E293B, transparent)' }} />
             </div>
 
-            {/* Floating badges — animated */}
-            <div className="absolute -left-6 top-16 bg-surface border border-border rounded-xl px-3 py-2 shadow-card-elevated flex items-center gap-2 animate-float">
-              <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
-                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+            {/* Floating badges */}
+            <div className="absolute -left-8 top-12 rounded-xl px-3 py-2.5 shadow-card-elevated flex items-center gap-2.5 animate-float"
+                 style={{ background: '#1E293B', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+                   style={{ background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.3)' }}>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               </div>
               <div>
                 <div className="text-[9px] font-semibold text-white">Cita confirmada</div>
@@ -333,23 +388,36 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="absolute -right-4 bottom-20 bg-surface border border-border rounded-xl px-3 py-2 shadow-card-elevated animate-float"
-                 style={{ animationDelay: '1.5s' }}>
-              <div className="text-[8px] text-slate-400 mb-0.5">Nuevos clientes</div>
-              <div className="text-[14px] font-bold text-white font-mono">+12 <span className="text-emerald-400 text-[9px]">este mes</span></div>
+            <div className="absolute -right-6 top-28 rounded-xl px-3 py-2.5 shadow-card-elevated animate-float"
+                 style={{ animationDelay: '1s', background: '#1E293B', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="text-[8px] text-slate-400 mb-0.5">Ingresos del mes</div>
+              <div className="text-[15px] font-bold text-white font-mono">2.840€ <span className="text-emerald-400 text-[9px]">↑12%</span></div>
+            </div>
+
+            <div className="absolute -right-4 bottom-16 rounded-xl px-3 py-2.5 shadow-card-elevated animate-float"
+                 style={{ animationDelay: '2s', background: '#1E293B', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-violet-500/20 flex items-center justify-center">
+                  <span className="text-[9px] font-bold text-violet-300">JR</span>
+                </div>
+                <div>
+                  <div className="text-[8px] text-slate-300">Nuevo mensaje</div>
+                  <div className="text-[7px] text-slate-500">hace 2 min</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── Stats strip ──────────────────────────────────────────────────── */}
-      <div className="border-y border-border/50 py-12 bg-surface/10">
+      <div className="border-y border-border/50 py-10 bg-surface/10">
         <div className="max-w-4xl mx-auto px-6">
           <div className="grid grid-cols-3 gap-6 text-center">
             {STATS.map((stat, i) => (
               <div key={stat.value}
-                   className={`animate-fade-in-up ${i === 1 ? 'delay-100' : i === 2 ? 'delay-200' : ''} ${i > 0 ? 'border-l border-border/50' : ''}`}>
-                <div className="text-3xl md:text-4xl font-bold font-mono gradient-text mb-1.5">{stat.value}</div>
+                   className={`${i > 0 ? 'border-l border-border/50' : ''}`}>
+                <div className="text-3xl md:text-4xl font-bold font-mono gradient-text mb-1">{stat.value}</div>
                 <div className="text-sm text-slate-400">{stat.label}</div>
               </div>
             ))}
@@ -357,63 +425,246 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Cómo funciona ────────────────────────────────────────────────── */}
+      {/* ── Problem / Solution ──────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-6 py-24">
-        <div className="text-center mb-16 animate-fade-in-up">
-          <div className="chip-accent mb-4 mx-auto w-fit">Proceso simple</div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Empieza en 3 pasos</h2>
-          <p className="text-slate-400 max-w-lg mx-auto">Sin configuraciones complejas. En minutos ya tienes tu panel de control listo.</p>
+        <div className="text-center mb-14 animate-fade-in-up">
+          <div className="chip mb-4 mx-auto w-fit">El problema</div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
+            ¿Sigues gestionando tu negocio<br />
+            <span className="gradient-text-warm">así?</span>
+          </h2>
+          <p className="text-slate-400 max-w-lg mx-auto">
+            Cada entrenador empieza igual. Pero llega un punto en que esto ya no escala.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 relative">
-          {/* Connecting line (desktop) */}
-          <div className="absolute top-[3.25rem] left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px hidden md:block"
-               style={{ background: 'linear-gradient(90deg, rgba(14,165,233,0.4), rgba(124,58,237,0.4))' }} />
-
-          {STEPS.map((step, i) => (
-            <div key={step.n} className={`relative animate-fade-in-up ${i === 1 ? 'delay-150' : i === 2 ? 'delay-300' : ''}`}>
-              <div className="card p-8 text-center h-full flex flex-col items-center hover:-translate-y-1 transition-transform duration-300">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 text-white font-bold text-xl font-mono relative z-10 shadow-glow-sm"
-                  style={{ background: `linear-gradient(135deg, ${step.gradient})` }}
-                >
-                  {step.n}
-                </div>
-                <h3 className="font-bold text-white mb-3 text-lg">{step.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{step.desc}</p>
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Before */}
+          <div className="card p-6 border-red-500/20 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-red-500/30" />
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-7 h-7 rounded-lg bg-red-500/15 border border-red-500/25 flex items-center justify-center">
+                <X className="w-3.5 h-3.5 text-red-400" />
               </div>
+              <span className="text-sm font-bold text-red-400">Antes de TrainerBoost</span>
             </div>
-          ))}
+            <ul className="space-y-3">
+              {PAIN_POINTS.map(p => (
+                <li key={p} className="flex items-start gap-2.5 text-sm text-slate-400">
+                  <div className="w-4 h-4 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <X className="w-2.5 h-2.5 text-red-400" />
+                  </div>
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* After */}
+          <div className="card p-6 border-emerald-500/25 relative overflow-hidden"
+               style={{ background: 'linear-gradient(160deg, rgba(16,185,129,0.06) 0%, #1E293B 60%)' }}>
+            <div className="absolute top-0 left-0 right-0 h-0.5"
+                 style={{ background: 'linear-gradient(90deg, #10B981, #0EA5E9)' }} />
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              </div>
+              <span className="text-sm font-bold text-emerald-400">Con TrainerBoost</span>
+            </div>
+            <ul className="space-y-3">
+              {SOLUTION_POINTS.map(p => (
+                <li key={p} className="flex items-start gap-2.5 text-sm text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Cómo funciona ────────────────────────────────────────────────── */}
+      <section className="border-t border-border/50 py-24"
+               style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(14,165,233,0.04) 0%, transparent 60%)' }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <div className="chip-accent mb-4 mx-auto w-fit">Proceso simple</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Empieza en 3 pasos</h2>
+            <p className="text-slate-400 max-w-lg mx-auto">Sin configuraciones complejas. En minutos ya tienes tu panel listo.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 relative">
+            <div className="absolute top-[3.5rem] left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px hidden md:block"
+                 style={{ background: 'linear-gradient(90deg, rgba(14,165,233,0.35), rgba(124,58,237,0.35))' }} />
+
+            {[
+              { n: '01', title: 'Regístrate en 2 minutos', desc: 'Crea tu cuenta gratis. Sin tarjeta, sin configuraciones complejas.', gradient: '#0EA5E9, #7C3AED' },
+              { n: '02', title: 'Añade tus clientes', desc: 'Invítalos por email o enlace. Configura rutinas y planes desde el primer día.', gradient: '#7C3AED, #10B981' },
+              { n: '03', title: 'Gestiona todo en uno', desc: 'Citas, nutrición, mensajes y seguimiento desde un solo panel.', gradient: '#10B981, #0EA5E9' },
+            ].map((step, i) => (
+              <div key={step.n} className={`relative animate-fade-in-up ${i === 1 ? 'delay-150' : i === 2 ? 'delay-300' : ''}`}>
+                <div className="card p-8 text-center h-full flex flex-col items-center hover:-translate-y-1 transition-transform duration-300">
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 text-white font-bold text-xl font-mono relative z-10 shadow-glow-sm"
+                    style={{ background: `linear-gradient(135deg, ${step.gradient})` }}
+                  >
+                    {step.n}
+                  </div>
+                  <h3 className="font-bold text-white mb-3 text-lg">{step.title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── Features ─────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-6 pb-24">
+      <section className="max-w-6xl mx-auto px-6 py-24 border-t border-border/50">
         <div className="text-center mb-16 animate-fade-in-up">
           <div className="chip mb-4 mx-auto w-fit">Funcionalidades</div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Todo lo que necesitas para crecer</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
+            Todo lo que necesitas para<br />
+            <span className="gradient-text">gestionar y hacer crecer</span> tu negocio
+          </h2>
           <p className="text-slate-400 max-w-lg mx-auto">Desde la primera sesión hasta el seguimiento a largo plazo.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 stagger-children">
-          {FEATURES.map((feat) => (
-            <div
-              key={feat.title}
-              className="card-hover p-6 group"
-            >
-              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg ${feat.bg}`}
-                   style={{ ['--hover-shadow' as string]: `0 0 20px ${feat.glow}` }}>
-                <feat.icon className={`w-5 h-5 ${feat.text} transition-transform duration-300 group-hover:scale-110`} />
+          {FEATURES.map((feat) => {
+            const c = FEATURE_COLORS[feat.color]
+            return (
+              <div key={feat.title} className="card-hover p-6 group">
+                <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg ${c.bg} ${c.border}`}
+                     style={{ ['--hover-shadow' as string]: `0 0 20px rgba(${c.glow},0.25)` }}>
+                  <feat.icon className={`w-5 h-5 ${c.text}`} />
+                </div>
+                <h3 className="font-semibold text-white mb-2 group-hover:text-slate-50 transition-colors">{feat.title}</h3>
+                <p className="text-sm text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">{feat.desc}</p>
               </div>
-              <h3 className="font-semibold text-white mb-2 group-hover:text-slate-50 transition-colors">{feat.title}</h3>
-              <p className="text-sm text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">{feat.desc}</p>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* ── Mobile preview ───────────────────────────────────────────────── */}
+      <section className="py-24 border-t border-border/50"
+               style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(124,58,237,0.05) 0%, transparent 60%)' }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="animate-fade-in-up">
+              <div className="chip-purple mb-5 w-fit">Portal del cliente</div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-5 tracking-tight">
+                Tus clientes lo llevan<br />
+                <span className="gradient-text">en el bolsillo</span>
+              </h2>
+              <p className="text-slate-400 mb-8 leading-relaxed">
+                Cada cliente tiene su propio portal web y móvil donde puede ver sus rutinas,
+                registrar el progreso, consultar su plan nutricional y hablar contigo.
+                Sin apps adicionales, funciona desde el navegador.
+              </p>
+              <ul className="space-y-3">
+                {[
+                  { icon: Dumbbell,      label: 'Rutinas del día con vídeos de ejercicios' },
+                  { icon: TrendingUp,    label: 'Historial de progreso y fotos de evolución' },
+                  { icon: UtensilsCrossed, label: 'Plan nutricional con macros diarios' },
+                  { icon: MessageSquare, label: 'Chat directo con el entrenador' },
+                  { icon: Smartphone,   label: 'Notificaciones push de nuevas rutinas o citas' },
+                ].map(item => (
+                  <li key={item.label} className="flex items-center gap-3 text-sm text-slate-300">
+                    <item.icon className="w-4 h-4 text-violet-400 shrink-0" />
+                    {item.label}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 flex gap-3">
+                <Link href="/demo/client" className="btn-secondary flex items-center gap-2">
+                  Ver portal del cliente <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
-          ))}
+
+            {/* Mobile mockup */}
+            <div className="relative flex justify-center animate-slide-right delay-150">
+              <div className="relative" style={{ width: '260px' }}>
+                {/* Phone frame */}
+                <div className="rounded-[2rem] overflow-hidden border-2 border-slate-700 shadow-2xl"
+                     style={{ background: '#0F172A', boxShadow: '0 40px 80px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)' }}>
+                  {/* Status bar */}
+                  <div className="bg-surface px-5 pt-3 pb-2 flex justify-between items-center">
+                    <span className="text-[10px] text-slate-400 font-medium">9:41</span>
+                    <div className="flex gap-1">
+                      <span className="text-[10px] text-slate-400">▮▮▮▮</span>
+                    </div>
+                  </div>
+                  {/* App header */}
+                  <div className="px-4 pb-3 border-b border-border"
+                       style={{ background: 'linear-gradient(180deg, #1E293B, #1E293B)' }}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <div className="text-[12px] font-bold text-white">Hola, Ana 👋</div>
+                        <div className="text-[9px] text-slate-400">Lunes · Día de pecho</div>
+                      </div>
+                      <div className="w-7 h-7 rounded-full bg-sky-500/25 flex items-center justify-center text-[9px] font-bold text-sky-300">AG</div>
+                    </div>
+                    {/* Tabs */}
+                    <div className="flex gap-1 overflow-hidden">
+                      {['Hoy', 'Rutinas', 'Nutrición', 'Progreso', 'Chat'].map((tab, i) => (
+                        <div key={tab}
+                             className={`text-[8px] px-2 py-1 rounded-full whitespace-nowrap ${i === 0 ? 'font-semibold' : 'text-slate-500'}`}
+                             style={i === 0 ? { background: 'rgba(14,165,233,0.2)', color: '#38BDF8' } : {}}>
+                          {tab}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Content */}
+                  <div className="p-3 space-y-2" style={{ minHeight: '320px' }}>
+                    <div className="text-[9px] font-semibold text-white mb-1">Fuerza · Pecho y tríceps</div>
+                    {[
+                      { name: 'Press banca', sets: '4×10 · 70kg', done: true },
+                      { name: 'Press inclinado', sets: '3×10 · 55kg', done: true },
+                      { name: 'Aperturas cable', sets: '3×15', done: false },
+                      { name: 'Fondos', sets: '3×12', done: false },
+                      { name: 'Extensión tríceps', sets: '4×15', done: false },
+                    ].map(ex => (
+                      <div key={ex.name} className="flex items-center gap-2 p-2 rounded-lg border"
+                           style={{ background: ex.done ? 'rgba(16,185,129,0.06)' : 'rgba(255,255,255,0.02)', borderColor: ex.done ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.06)' }}>
+                        <div className="w-4 h-4 rounded-md flex items-center justify-center text-[8px] shrink-0"
+                             style={{ background: ex.done ? 'rgba(16,185,129,0.2)' : 'transparent', border: `1px solid ${ex.done ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.1)'}`, color: '#34D399' }}>
+                          {ex.done ? '✓' : ''}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className={`text-[8px] truncate ${ex.done ? 'line-through text-slate-500' : 'text-slate-300'}`}>{ex.name}</div>
+                          <div className="text-[7px] text-slate-500">{ex.sets}</div>
+                        </div>
+                      </div>
+                    ))}
+                    {/* Progress ring */}
+                    <div className="mt-3 p-2 rounded-lg flex items-center gap-3"
+                         style={{ background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.15)' }}>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-[9px] font-bold text-sky-400"
+                           style={{ background: 'conic-gradient(#0EA5E9 40%, rgba(14,165,233,0.1) 40%)', boxShadow: '0 0 10px rgba(14,165,233,0.2)' }}>
+                        2/5
+                      </div>
+                      <div>
+                        <div className="text-[8px] font-semibold text-white">40% completado</div>
+                        <div className="text-[7px] text-slate-400">3 ejercicios más</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Glow beneath phone */}
+                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-48 h-12 blur-2xl pointer-events-none"
+                     style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.4), transparent)' }} />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ── Testimonials ─────────────────────────────────────────────────── */}
-      <section className="py-24 border-y border-border/50"
+      <section className="py-24 border-t border-border/50"
                style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(14,165,233,0.03) 0%, transparent 70%)' }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-14 animate-fade-in-up">
@@ -428,16 +679,19 @@ export default function LandingPage() {
                    className={`card p-6 flex flex-col gap-5 hover:-translate-y-1 hover:border-border-bright transition-all duration-300 animate-fade-in-up ${
                      i === 0 ? '' : i === 1 ? 'delay-150' : 'delay-300'
                    }`}>
-                <div className="flex">
-                  {Array.from({ length: t.stars }).map((_, idx) => (
-                    <Star key={idx} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  ))}
+                <div className="flex items-center justify-between">
+                  <div className="flex">
+                    {Array.from({ length: t.stars }).map((_, idx) => (
+                      <Star key={idx} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                    ))}
+                  </div>
+                  <div className="text-xs text-slate-500 font-mono">★ 5.0</div>
                 </div>
                 <p className="text-sm text-slate-300 leading-relaxed flex-1">
                   &ldquo;{t.text}&rdquo;
                 </p>
                 <div className="flex items-center gap-3 pt-2 border-t border-border/60">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${t.color}`}>
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${t.color}`}>
                     {t.initials}
                   </div>
                   <div>
@@ -452,7 +706,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Demo preview ─────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-6 py-24">
+      <section className="max-w-6xl mx-auto px-6 py-24 border-t border-border/50">
         <div className="text-center mb-14 animate-fade-in-up">
           <div className="chip mb-4 mx-auto w-fit">Demo interactiva</div>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
@@ -464,7 +718,6 @@ export default function LandingPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Trainer demo */}
           <Link href="/demo/trainer" className="card-hover p-6 group block animate-fade-in-up delay-100">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-glow-sm shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:shadow-glow-primary"
@@ -476,7 +729,6 @@ export default function LandingPage() {
                 <div className="text-xs text-slate-400">Clientes, rutinas, citas y analytics</div>
               </div>
             </div>
-
             <div className="rounded-xl bg-background border border-border/70 overflow-hidden mb-5 group-hover:border-border-bright transition-colors duration-300">
               <div className="bg-surface-2 px-3 py-2 border-b border-border flex items-center gap-1.5">
                 <div className="flex gap-1.5">
@@ -518,13 +770,11 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-
             <div className="flex items-center gap-2 text-brand-primary font-semibold text-sm group-hover:gap-3 transition-all duration-200">
               Ver panel del entrenador <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
 
-          {/* Client demo */}
           <Link href="/demo/client" className="card-hover p-6 group block animate-fade-in-up delay-200">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-glow-sm shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:shadow-glow-accent"
@@ -536,7 +786,6 @@ export default function LandingPage() {
                 <div className="text-xs text-slate-400">Rutinas, progreso y mensajes</div>
               </div>
             </div>
-
             <div className="rounded-xl bg-background border border-border/70 overflow-hidden mb-5 group-hover:border-border-bright transition-colors duration-300">
               <div className="bg-surface-2 px-3 py-2 border-b border-border flex items-center gap-1.5">
                 <div className="flex gap-1.5">
@@ -560,10 +809,10 @@ export default function LandingPage() {
                 <div className="text-[9px] font-semibold text-white mb-2">Fuerza + Hipertrofia · Hoy</div>
                 <div className="space-y-1.5">
                   {[
-                    { name: 'Press banca',   sets: '4×10', done: true },
-                    { name: 'Sentadilla',    sets: '4×8',  done: true },
-                    { name: 'Remo con barra',sets: '3×12', done: false },
-                    { name: 'Press militar', sets: '3×10', done: false },
+                    { name: 'Press banca',    sets: '4×10', done: true },
+                    { name: 'Sentadilla',     sets: '4×8',  done: true },
+                    { name: 'Remo con barra', sets: '3×12', done: false },
+                    { name: 'Press militar',  sets: '3×10', done: false },
                   ].map(ex => (
                     <div key={ex.name} className="flex items-center gap-2">
                       <div className={`w-4 h-4 rounded-md border flex items-center justify-center text-[8px] shrink-0 ${ex.done ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400' : 'border-border text-slate-500'}`}>
@@ -576,11 +825,32 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-
             <div className="flex items-center gap-2 text-brand-accent font-semibold text-sm group-hover:gap-3 transition-all duration-200">
               Ver portal del cliente <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
+        </div>
+      </section>
+
+      {/* ── Trust signals ────────────────────────────────────────────────── */}
+      <section className="py-12 border-t border-border/50 bg-surface/5">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            {[
+              { icon: Shield,     label: 'RGPD compliant',           sublabel: 'Datos en servidores EU' },
+              { icon: Clock,      label: 'Soporte en español',       sublabel: 'Respuesta en 24h' },
+              { icon: Zap,        label: 'Uptime 99.9%',             sublabel: 'SLA garantizado' },
+              { icon: BarChart3,  label: 'Datos cifrados',           sublabel: 'SSL + backups diarios' },
+            ].map(item => (
+              <div key={item.label} className="flex flex-col items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center">
+                  <item.icon className="w-4 h-4 text-slate-400" />
+                </div>
+                <div className="text-sm font-semibold text-white">{item.label}</div>
+                <div className="text-xs text-slate-500">{item.sublabel}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -601,7 +871,7 @@ export default function LandingPage() {
                 className={`relative card p-7 flex flex-col animate-fade-in-up ${i === 0 ? '' : i === 1 ? 'delay-150' : 'delay-300'} ${
                   highlight ? 'border-brand-primary/40' : 'hover:border-border-bright'
                 } transition-all duration-300 hover:-translate-y-1`}
-                style={highlight ? { background: 'linear-gradient(160deg, rgba(14,165,233,0.08) 0%, #1E293B 55%)', boxShadow: '0 20px 50px -20px rgba(14,165,233,0.4)' } : undefined}
+                style={highlight ? { background: 'linear-gradient(160deg, rgba(14,165,233,0.09) 0%, #1E293B 55%)', boxShadow: '0 20px 50px -20px rgba(14,165,233,0.4)' } : undefined}
               >
                 {highlight && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] font-bold px-3 py-1 rounded-full text-white whitespace-nowrap"
@@ -622,10 +892,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/register"
-                  className={`w-full justify-center ${highlight ? 'btn-gradient' : 'btn-secondary'}`}
-                >
+                <Link href="/register" className={`w-full justify-center ${highlight ? 'btn-gradient' : 'btn-secondary'}`}>
                   Empezar ahora
                 </Link>
               </div>
@@ -634,7 +901,9 @@ export default function LandingPage() {
         </div>
 
         <p className="text-center text-xs text-slate-500 mt-8">
-          ¿Solo quieres probar? <Link href="/register" className="text-brand-primary hover:underline">Crea una cuenta gratis</Link> y gestiona hasta 3 clientes sin tarjeta.
+          ¿Solo quieres probar?{' '}
+          <Link href="/register" className="text-brand-primary hover:underline">Crea una cuenta gratis</Link>{' '}
+          y gestiona hasta 3 clientes sin tarjeta.
         </p>
       </section>
 
@@ -666,18 +935,22 @@ export default function LandingPage() {
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
       <section className="py-28 relative overflow-hidden border-t border-border/50">
         <div className="absolute inset-0 pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(14,165,233,0.1) 0%, transparent 60%)' }} />
+             style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(14,165,233,0.12) 0%, transparent 60%)' }} />
         <div className="absolute inset-0 pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse at 80% 100%, rgba(124,58,237,0.06) 0%, transparent 50%)' }} />
+             style={{ background: 'radial-gradient(ellipse at 80% 100%, rgba(124,58,237,0.07) 0%, transparent 50%)' }} />
 
         <div className="relative max-w-2xl mx-auto px-6 text-center animate-fade-in-up">
-          <div className="chip mb-6 mx-auto w-fit">Gratis para siempre</div>
+          <div className="chip mb-6 mx-auto w-fit">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse inline-block" />
+            Gratis para siempre · Sin tarjeta
+          </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-5 text-balance tracking-tight">
             Tu negocio merece<br />
             <span className="gradient-text">las mejores herramientas</span>
           </h2>
           <p className="text-slate-400 mb-10 text-lg leading-relaxed">
-            Empieza gratis con hasta 3 clientes.<br />Escala a medida que crece tu negocio.
+            Empieza gratis con hasta 3 clientes.<br />
+            Escala a medida que crece tu negocio.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
@@ -705,7 +978,10 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-sky-400" />
+              <div className="w-6 h-6 rounded-lg flex items-center justify-center"
+                   style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
+                <Zap className="w-3.5 h-3.5 text-white" />
+              </div>
               <span className="font-bold text-white">TrainerBoost</span>
             </div>
             <nav className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500">
@@ -716,7 +992,9 @@ export default function LandingPage() {
               <Link href="/terms" className="hover:text-slate-300 transition-colors">Términos de servicio</Link>
             </nav>
           </div>
-          <p className="text-center text-xs text-slate-600">© 2025 TrainerBoost · Hecho con ❤️ para entrenadores personales · Spain 🇪🇸</p>
+          <p className="text-center text-xs text-slate-600">
+            © 2025 TrainerBoost · Hecho con ❤️ para entrenadores personales · Spain 🇪🇸
+          </p>
         </div>
       </footer>
     </div>

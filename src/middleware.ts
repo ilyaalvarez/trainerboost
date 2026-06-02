@@ -12,14 +12,14 @@ export async function middleware(request: NextRequest) {
       request.ip ??
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       'anonymous'
-    const { success, limit, remaining, reset } = await rl.limit(ip)
+    const { success, limit, reset } = await rl.limit(ip)
     if (!success) {
       return new NextResponse('Too Many Requests', {
         status: 429,
         headers: {
           'Content-Type':        'text/plain',
           'Retry-After':         String(Math.ceil((reset - Date.now()) / 1000)),
-          'X-RateLimit-Limit':   String(limit),
+          'X-RateLimit-Limit':   String(limit ?? 0),
           'X-RateLimit-Remaining': '0',
           'X-RateLimit-Reset':   String(reset),
         },

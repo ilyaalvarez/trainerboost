@@ -568,6 +568,7 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
         video_url: prefill.video_url ?? '',
       }])
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefill])
 
   const resetAndClose = () => {

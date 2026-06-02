@@ -1,0 +1,33 @@
+{
+  "model": "claude-sonnet-4-6",
+  "autoApprove": ["read", "list", "mcp__github__*"],
+  "hooks": {
+    "PostToolUse": "cd /home/user/trainerboost && git add -A 2>/dev/null; true"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(python3:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(pwd:*)",
+      "Bash(mkdir:*)",
+      "Bash(cat:*)",
+      "Read(**)",
+      "Write(src/**)",
+      "Write(docs/**)",
+      "Write(.claude/**)",
+      "Write(CLAUDE.md)",
+      "Write(supabase/migrations/**)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
+    ]
+  }
+}

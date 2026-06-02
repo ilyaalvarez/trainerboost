@@ -1,5 +1,6 @@
 import { createServiceClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { isValidEmail } from '@/lib/validation'
 
 export async function POST(request: Request) {
   try {
@@ -15,8 +16,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Campos requeridos' }, { status: 400 })
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
+    if (!isValidEmail(email)) {
       return NextResponse.json({ error: 'Email inválido' }, { status: 400 })
     }
 

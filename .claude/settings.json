@@ -2,7 +2,7 @@
   "model": "claude-sonnet-4-6",
   "autoApprove": ["read", "list", "mcp__github__*"],
   "hooks": {
-    "PostToolUse": "cd /home/user/trainerboost && git add -A 2>/dev/null; true"
+    "PostToolUse": "git -C \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" add --update 2>/dev/null; true"
   },
   "permissions": {
     "allow": [

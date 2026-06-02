@@ -16,16 +16,14 @@ export default function EmptyState({ icon, title, description, action, className
     <div
       className={cn(
         'flex flex-col items-center justify-center text-center',
-        'rounded-lg border border-dashed',
+        'rounded-lg border border-dashed border-gray-200 bg-gray-50',
         'px-6 py-14 gap-4',
         className,
       )}
-      style={{ borderColor: '#E5E7EB', background: '#F9FAFB' }}
     >
       {/* Icon */}
       <div
-        className="flex items-center justify-center w-12 h-12 rounded-xl"
-        style={{ background: '#F3F4F6', border: '1px solid #E5E7EB' }}
+        className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 border border-gray-200"
         aria-hidden="true"
       >
         <span className="[&>svg]:w-5 [&>svg]:h-5 text-gray-400">{icon}</span>
@@ -50,4 +48,3 @@ export default function EmptyState({ icon, title, description, action, className
     </div>
   )
 }
-/* ✓ REDISEÑADO: Empty state light — fondo gris muy suave, icono en contenedor gris, texto oscuro */

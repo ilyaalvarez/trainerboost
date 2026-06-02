@@ -60,4 +60,3 @@ export default function Badge({ status, label, className }: BadgeProps) {
     </span>
   )
 }
-/* ✓ REDISEÑADO: Badges light — fondos pasteles, texto oscuro semántico, ring sutil, radius cuadrado */

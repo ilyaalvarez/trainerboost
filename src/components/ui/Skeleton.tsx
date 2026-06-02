@@ -6,13 +6,12 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'rounded-md overflow-hidden relative',
+        'bg-gray-100 rounded-md overflow-hidden relative',
         'before:absolute before:inset-0',
         'before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent',
         'before:translate-x-[-100%] before:animate-shimmer',
         className,
       )}
-      style={{ background: '#F3F4F6' }}
       aria-hidden="true"
     />
   )
@@ -21,8 +20,7 @@ export function Skeleton({ className }: SkeletonProps) {
 export function SkeletonCard({ className }: { className?: string }) {
   return (
     <div
-      className={cn('rounded-xl border p-4 space-y-4 bg-white', className)}
-      style={{ borderColor: '#E5E7EB', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
+      className={cn('rounded-xl border border-gray-200 p-4 space-y-4 bg-white shadow-sm', className)}
       aria-hidden="true"
     >
       <div className="flex items-center gap-3">
@@ -49,16 +47,15 @@ export function SkeletonTable({ rows = 5, cols = 4, className }: { rows?: number
 
   return (
     <div
-      className={cn('w-full rounded-xl overflow-hidden bg-white', className)}
-      style={{ border: '1px solid #E5E7EB' }}
+      className={cn('w-full rounded-xl border border-gray-200 overflow-hidden bg-white', className)}
       aria-hidden="true"
     >
-      <div className="flex items-center gap-4 px-4 py-3" style={{ borderBottom: '1px solid #E5E7EB', background: '#F9FAFB' }}>
+      <div className="flex items-center gap-4 px-4 py-3 border-b border-gray-200 bg-gray-50">
         {Array.from({ length: cols }).map((_, ci) => (
           <Skeleton key={`th-${ci}`} className={cn('h-3 rounded', colWidths[ci % colWidths.length])} />
         ))}
       </div>
-      <div className="divide-y" style={{ borderColor: '#F3F4F6' }}>
+      <div className="divide-y divide-gray-100">
         {Array.from({ length: rows }).map((_, ri) => (
           <div key={`tr-${ri}`} className="flex items-center gap-4 px-4 py-3.5">
             {Array.from({ length: cols }).map((_, ci) => (
@@ -73,4 +70,3 @@ export function SkeletonTable({ rows = 5, cols = 4, className }: { rows?: number
     </div>
   )
 }
-/* ✓ REDISEÑADO: Skeleton light — base #F3F4F6, shimmer blanco, card con borde gris claro */

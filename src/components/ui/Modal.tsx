@@ -49,22 +49,20 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', h
       aria-modal="true"
       aria-labelledby="modal-title"
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 animate-fade-in"
-      style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 animate-fade-in bg-black/40 backdrop-blur-sm"
     >
       {/* Dialog panel */}
       <div
         className={cn(
           'relative w-full rounded-xl bg-white flex flex-col max-h-[calc(100dvh-2rem)]',
-          'animate-modal-in',
+          'animate-modal-in shadow-lg ring-1 ring-black/[0.06]',
           sizeClasses[size],
           className,
         )}
-        style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.06)' }}
       >
         {/* Header */}
         {!hideHeader && (
-          <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderBottom: '1px solid #E5E7EB' }}>
+          <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-gray-200">
             <h2 id="modal-title" className="text-gray-900 font-semibold text-base leading-snug">
               {title}
             </h2>
@@ -88,4 +86,3 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', h
     document.body,
   )
 }
-/* ✓ REDISEÑADO: Modal light — overlay rgba(0,0,0,0.4) + backdrop blur, card blanco, header con borde sutil */

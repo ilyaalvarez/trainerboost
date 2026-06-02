@@ -12,10 +12,30 @@ import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
 import EmptyState from '@/components/ui/EmptyState'
+import { Skeleton } from '@/components/ui/Skeleton'
 import type {
   AppointmentWithProfiles, AppointmentStatus, AppointmentType,
   ClientWithProfile,
 } from '@/types/database'
+
+// ─── Skeleton ────────────────────────────────────────────────────────────────
+
+function AppointmentSkeleton() {
+  return (
+    <div className="card px-5 py-4 flex items-center gap-4 flex-wrap">
+      <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+      <div className="flex-1 space-y-2">
+        <Skeleton className="h-4 w-36 rounded" />
+        <Skeleton className="h-3 w-52 rounded" />
+      </div>
+      <Skeleton className="h-6 w-20 rounded-full" />
+      <div className="flex gap-2">
+        <Skeleton className="h-8 w-20 rounded-lg" />
+        <Skeleton className="h-8 w-20 rounded-lg" />
+      </div>
+    </div>
+  )
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -338,8 +358,8 @@ export default function AppointmentsPage() {
 
       {/* List */}
       {dataLoading ? (
-        <div className="card p-12 flex items-center justify-center">
-          <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => <AppointmentSkeleton key={i} />)}
         </div>
       ) : displayed.length === 0 ? (
         <EmptyState
@@ -497,8 +517,10 @@ export default function AppointmentsPage() {
       {view === 'calendar' && (
         <div className="card p-4">
           {dataLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
+            <div className="space-y-2 py-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full rounded-lg" />
+              ))}
             </div>
           ) : (
             <>

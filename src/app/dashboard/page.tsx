@@ -44,7 +44,7 @@ export default async function DashboardPage() {
       .neq('status', 'cancelled')
       .order('scheduled_at'),
     supabase.from('messages')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .eq('receiver_id', user.id)
       .is('read_at', null),
     supabase.from('messages')
@@ -52,22 +52,22 @@ export default async function DashboardPage() {
       .eq('receiver_id', user.id)
       .order('created_at', { ascending: false })
       .limit(5),
-    supabase.from('subscriptions').select('*').eq('user_id', user.id).single(),
+    supabase.from('subscriptions').select('status, max_clients').eq('user_id', user.id).single(),
     supabase.from('profiles').select('bio, phone, specialties').eq('id', user.id).single(),
-    supabase.from('trainer_clients').select('*', { count: 'exact', head: true })
+    supabase.from('trainer_clients').select('id', { count: 'exact', head: true })
       .eq('trainer_id', user.id).gte('started_at', thisMonthStart),
-    supabase.from('trainer_clients').select('*', { count: 'exact', head: true })
+    supabase.from('trainer_clients').select('id', { count: 'exact', head: true })
       .eq('trainer_id', user.id).gte('started_at', lastMonthStart).lte('started_at', lastMonthEnd),
-    supabase.from('appointments').select('*', { count: 'exact', head: true })
+    supabase.from('appointments').select('id', { count: 'exact', head: true })
       .eq('trainer_id', user.id).gte('scheduled_at', thisMonthStart).neq('status', 'cancelled'),
-    supabase.from('appointments').select('*', { count: 'exact', head: true })
+    supabase.from('appointments').select('id', { count: 'exact', head: true })
       .eq('trainer_id', user.id).gte('scheduled_at', lastMonthStart).lte('scheduled_at', lastMonthEnd).neq('status', 'cancelled'),
   ])
 
   const [{ count: pendingApts }, { data: todayActivity }] = await Promise.all([
     supabase
       .from('appointments')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .eq('trainer_id', user.id)
       .eq('status', 'pending')
       .gte('scheduled_at', new Date().toISOString()),

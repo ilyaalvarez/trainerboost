@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getUnreadMessageCount, getPendingAppointmentsCount } from '@/lib/data/dashboard'
 import { Users, CalendarDays, MessageSquare, TrendingUp, Plus, Clock, Zap, Calendar, ChevronRight, Rocket, CheckCircle2, Dumbbell, Apple, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import { formatRelative, formatDate, timeAgo } from '@/lib/utils'
@@ -23,7 +24,7 @@ export default async function DashboardPage() {
   const [
     { data: clients },
     { data: todayAppointments },
-    { count: unreadCount },
+    unreadCount,
     { data: recentMessages },
     { data: subscription },
     { data: profile },
@@ -43,10 +44,7 @@ export default async function DashboardPage() {
       .lte('scheduled_at', `${todayStr}T23:59:59`)
       .neq('status', 'cancelled')
       .order('scheduled_at'),
-    supabase.from('messages')
-      .select('id', { count: 'exact', head: true })
-      .eq('receiver_id', user.id)
-      .is('read_at', null),
+    getUnreadMessageCount(user.id),
     supabase.from('messages')
       .select('*, sender:sender_id(full_name, avatar_url)')
       .eq('receiver_id', user.id)
@@ -64,13 +62,8 @@ export default async function DashboardPage() {
       .eq('trainer_id', user.id).gte('scheduled_at', lastMonthStart).lte('scheduled_at', lastMonthEnd).neq('status', 'cancelled'),
   ])
 
-  const [{ count: pendingApts }, { data: todayActivity }] = await Promise.all([
-    supabase
-      .from('appointments')
-      .select('id', { count: 'exact', head: true })
-      .eq('trainer_id', user.id)
-      .eq('status', 'pending')
-      .gte('scheduled_at', new Date().toISOString()),
+  const [pendingApts, { data: todayActivity }] = await Promise.all([
+    getPendingAppointmentsCount(user.id),
     supabase
       .from('progress_logs')
       .select('client_id, logged_at, weight_kg, profiles!client_id(full_name, avatar_url)')

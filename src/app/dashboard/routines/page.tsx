@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useDraftList } from '@/hooks/useDraftList'
 import { toast } from 'sonner'
 import {
   Dumbbell, Plus, Search, ChevronDown, ChevronUp,
@@ -551,7 +552,8 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
   })
 
   // Step 2 exercises
-  const [exercises, setExercises] = useState<ExerciseDraft[]>([blankExercise()])
+  const { items: exercises, setItems: setExercises, add: addExercise, remove: removeExercise,
+          updateField: updateExercise, move: moveExercise, reset: resetExercises } = useDraftList(blankExercise)
 
   // When a prefill exercise is provided, inject it into step 2
   useEffect(() => {
@@ -571,7 +573,7 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
   const resetAndClose = () => {
     setStep(1)
     setForm({ title: '', description: '', frequency: '', client_id: '', starts_at: '', ends_at: '' })
-    setExercises([blankExercise()])
+    resetExercises()
     onClose()
   }
 
@@ -580,9 +582,9 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
     if (!isOpen) {
       setStep(1)
       setForm({ title: '', description: '', frequency: '', client_id: '', starts_at: '', ends_at: '' })
-      setExercises([blankExercise()])
+      resetExercises()
     }
-  }, [isOpen])
+  }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleStep1 = (e: React.FormEvent) => {
     e.preventDefault()
@@ -648,21 +650,6 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
     toast.success('Rutina creada correctamente')
     resetAndClose()
     onSuccess()
-  }
-
-  const addExercise = () => setExercises(prev => [...prev, blankExercise()])
-  const removeExercise = (id: string) => setExercises(prev => prev.filter(e => e.id !== id))
-  const updateExercise = (id: string, field: keyof ExerciseDraft, value: string) => {
-    setExercises(prev => prev.map(e => e.id === id ? { ...e, [field]: value } : e))
-  }
-  const moveExercise = (index: number, dir: -1 | 1) => {
-    setExercises(prev => {
-      const arr = [...prev]
-      const target = index + dir
-      if (target < 0 || target >= arr.length) return arr;
-      [arr[index], arr[target]] = [arr[target], arr[index]]
-      return arr
-    })
   }
 
   return (
@@ -822,7 +809,8 @@ function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
     client_id: '', starts_at: '', ends_at: '',
   })
 
-  const [exercises, setExercises] = useState<ExerciseDraft[]>([blankExercise()])
+  const { items: exercises, setItems: setExercises, add: addExercise, remove: removeExercise,
+          updateField: updateExercise, move: moveExercise } = useDraftList(blankExercise)
 
   // When routine changes (modal opens), populate form and fetch exercises
   useEffect(() => {
@@ -922,21 +910,6 @@ function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
     toast.success('Rutina actualizada')
     onClose()
     onSuccess()
-  }
-
-  const addExercise = () => setExercises(prev => [...prev, blankExercise()])
-  const removeExercise = (id: string) => setExercises(prev => prev.filter(e => e.id !== id))
-  const updateExercise = (id: string, field: keyof ExerciseDraft, value: string) => {
-    setExercises(prev => prev.map(e => e.id === id ? { ...e, [field]: value } : e))
-  }
-  const moveExercise = (index: number, dir: -1 | 1) => {
-    setExercises(prev => {
-      const arr = [...prev]
-      const target = index + dir
-      if (target < 0 || target >= arr.length) return arr;
-      [arr[index], arr[target]] = [arr[target], arr[index]]
-      return arr
-    })
   }
 
   return (

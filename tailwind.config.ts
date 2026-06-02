@@ -24,6 +24,10 @@ const config: Config = {
           DEFAULT: '#334155',
           bright:  '#475569',
         },
+        success: '#10B981',
+        warning: '#F59E0B',
+        danger:  '#EF4444',
+        'surface-light': '#F7F8FA',
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
@@ -50,6 +54,7 @@ const config: Config = {
         'border-glow':   'borderGlow 3s ease-in-out infinite',
         'gradient-x':    'gradientX 4s ease infinite',
         'spin-slow':     'spin 12s linear infinite',
+        'modal-in':      'modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
       },
       keyframes: {
         fadeIn:      { from: { opacity: '0' }, to: { opacity: '1' } },
@@ -73,6 +78,7 @@ const config: Config = {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
         },
+        modalIn:     { from: { transform: 'translateY(8px) scale(0.98)', opacity: '0' }, to: { transform: 'translateY(0) scale(1)', opacity: '1' } },
       },
       boxShadow: {
         'glow-primary':   '0 0 24px rgba(14,165,233,0.2), 0 0 8px rgba(14,165,233,0.1)',

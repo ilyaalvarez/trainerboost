@@ -90,3 +90,76 @@ SUPABASE_PROJECT_ID=xxxx                  # solo para npm run db:types
 - Toast: `sonner` (`toast.success`, `toast.error`)
 - Iconos: `lucide-react`
 - Fechas: `date-fns` con helpers de `@/lib/utils`
+
+---
+
+## Protocolo de inicio de sesión
+
+Al comenzar cualquier sesión, ejecutar en este orden:
+1. Leer este CLAUDE.md → es el contexto canónico del proyecto
+2. Identificar el tipo de tarea → elegir estrategia y modelo correcto
+3. Localizar una feature similar ya implementada → seguir ese patrón exacto
+
+---
+
+## Modelo correcto por tipo de tarea
+
+| Tarea | Modelo | Ahorro vs Opus |
+|-------|--------|----------------|
+| Renombrar variables, formatear código | Haiku 4.5 | ~95% |
+| Traducir comentarios, generar docs | Haiku 4.5 | ~95% |
+| Generar tests unitarios simples | Sonnet 4.6 | ~75% |
+| Refactoring estándar | Sonnet 4.6 | ~75% |
+| Debug complejo con múltiples archivos | Sonnet 4.6 | ~50% |
+| Arquitectura de sistema compleja | Opus 4.8 | 0% |
+| Research técnico + decisiones de diseño | Opus 4.8 | 0% |
+
+Extended Thinking: **solo** en diseño de arquitectura, bugs no deterministas, y decisiones con múltiples trade-offs.
+
+---
+
+## Reglas de ahorro de tokens
+
+1. Enviar SOLO el código relevante, nunca archivos completos de 500 líneas
+2. Referenciar código ya discutido en lugar de repetirlo
+3. Agrupar preguntas relacionadas en un solo mensaje
+4. Sesiones de +30 turnos → usar `/clear` y reabrir con contexto de 5 líneas
+5. Usar el modelo correcto para cada tarea (tabla arriba)
+
+---
+
+## Comandos slash disponibles
+
+| Comando | Acción |
+|---------|--------|
+| `/review $ARGS` | Análisis de seguridad, bugs, convenciones, rendimiento |
+| `/feature $ARGS` | Implementación completa siguiendo el protocolo del proyecto |
+| `/debug $ARGS` | Diagnóstico sistemático con hipótesis por probabilidad |
+| `/test $ARGS` | Generación de tests con cobertura completa |
+| `/optimize $ARGS` | Optimización de queries, bundle y rendimiento |
+
+---
+
+## Anti-patrones prohibidos
+
+- Pegar archivos completos cuando solo 20 líneas son relevantes
+- Usar Opus para tareas que Sonnet resuelve igual de bien
+- No usar MCPs cuando están disponibles (copiar/pegar manual)
+- Sesiones de +50 turnos sin `/clear`
+- Extended Thinking activado para tareas rutinarias
+- Múltiples mensajes para preguntas que van juntas
+- No actualizar CLAUDE.md tras cambios de arquitectura
+- Prompt sin criterios de éxito definidos
+
+---
+
+## Referencias
+
+- Arquitectura detallada → `docs/architecture.md`
+- Configuración del agente → `.claude/settings.json`
+- Comandos slash → `.claude/commands/`
+
+---
+
+## Última actualización
+2026-06-02

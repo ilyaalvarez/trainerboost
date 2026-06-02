@@ -11,36 +11,28 @@ interface EmptyStateProps {
   className?: string
 }
 
-export default function EmptyState({
-  icon,
-  title,
-  description,
-  action,
-  className,
-}: EmptyStateProps) {
+export default function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
   return (
     <div
       className={cn(
         'flex flex-col items-center justify-center text-center',
-        'rounded-xl border border-dashed border-border',
+        'rounded-lg border border-dashed border-gray-200 bg-gray-50',
         'px-6 py-14 gap-4',
         className,
       )}
-      style={{ background: 'rgba(30,41,59,0.4)' }}
     >
       {/* Icon */}
       <div
-        className="flex items-center justify-center w-14 h-14 rounded-2xl shadow-card"
-        style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.1), rgba(124,58,237,0.08))', border: '1px solid rgba(14,165,233,0.15)' }}
+        className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 border border-gray-200"
         aria-hidden="true"
       >
-        <span className="[&>svg]:w-6 [&>svg]:h-6 text-slate-400">{icon}</span>
+        <span className="[&>svg]:w-5 [&>svg]:h-5 text-gray-400">{icon}</span>
       </div>
 
       {/* Text */}
-      <div className="space-y-1.5 max-w-xs">
-        <h3 className="text-white font-semibold text-sm leading-snug">{title}</h3>
-        <p className="text-slate-400 text-sm leading-relaxed">{description}</p>
+      <div className="space-y-1 max-w-xs">
+        <h3 className="text-gray-900 font-semibold text-sm leading-snug">{title}</h3>
+        <p className="text-gray-500 text-sm leading-relaxed">{description}</p>
       </div>
 
       {/* CTA */}
@@ -48,7 +40,7 @@ export default function EmptyState({
         <button
           type="button"
           onClick={action.onClick}
-          className="mt-2 btn-primary text-sm"
+          className="mt-1 btn-secondary text-sm"
         >
           {action.label}
         </button>

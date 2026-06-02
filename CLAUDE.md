@@ -1,5 +1,58 @@
 # TrainerBoost — Guía de desarrollo
 
+## ⚡ TAREAS PENDIENTES — leer al inicio de sesión
+
+### PRIORIDAD 1 — Vercel (hacer primero)
+Todos los deploys en Vercel fallan por env vars no configuradas. Pasos:
+1. Usar `mcp__vercel__*` para listar env vars actuales del proyecto
+2. Añadir las que falten (están en `.env.local`):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+   - `STRIPE_PRICE_ID_STARTER` / `_PRO` / `_UNLIMITED`
+   - `SUPABASE_PROJECT_ID`
+   - `RESEND_API_KEY`
+   - `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`
+3. Triggerear redeploy y confirmar que pasa a verde
+
+### PRIORIDAD 2 — Mejoras de rendimiento (10 tareas identificadas)
+Análisis completo ya hecho. Implementar en este orden:
+
+**#1 — Query en cascada `clients/[id]/page.tsx` (30 min, ALTO impacto)**
+Líneas 119-122: 2 roundtrips a Supabase → unificar en 1 query con join
+
+**#2 — Code-split `clients/[id]/page.tsx` (2-3h, ALTO impacto)**
+1.594 líneas en un `use client`. Extraer tabs a componentes lazy con `dynamic()`
+
+**#3 — `select('*')` en queries de COUNT `dashboard/page.tsx` (1h)**
+Líneas 55, 57, 59-64: seleccionar solo columnas necesarias
+
+**#4 — N+1 en `clients/page.tsx` líneas 107-127 (1h)**
+Query pesada con IN() de 50+ clientes → usar aggregados en la query
+
+**#5 — Lógica duplicada rutinas/nutrición (1.5h)**
+~300 líneas repetidas → extraer `useDraftManager.ts`
+
+**#6 — Revalidación de datos stale (1h)**
+Server components sin `revalidate` → datos pueden estar desactualizados 30-60s
+
+**#7 — `select('*')` en layouts (30 min)**
+`client/layout.tsx` y `dashboard/layout.tsx` traen columnas innecesarias
+
+**#8 — Loading states en appointments (1h)**
+`dashboard/appointments/page.tsx` sin skeleton durante carga
+
+**#9 — Queries duplicadas layout+page (1.5h)**
+`dashboard/layout.tsx` y `dashboard/page.tsx` hacen las mismas queries
+
+**#10 — Validación input API push (30 min)**
+`api/push/send/route.ts` sin validación de payload
+
+---
+
 ## Stack
 Next.js 14 (App Router) · TypeScript strict · Tailwind CSS · Supabase · Stripe · Vercel
 

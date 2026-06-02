@@ -312,7 +312,7 @@ export default function SettingsPage() {
                     if (!file || !userId) return
                     if (!file.type.startsWith('image/')) { toast.error('Solo se permiten imágenes'); return }
                     if (file.size > 5 * 1024 * 1024) { toast.error('Imagen demasiado grande (máx 5MB)'); return }
-                    const ext = file.name.split('.').pop() ?? 'jpg'
+                    const ext = ['jpg','jpeg','png','webp'].includes(file.name.split('.').pop()?.toLowerCase() ?? '') ? file.name.split('.').pop()!.toLowerCase() : 'jpg'
                     const path = `${userId}.${ext}`
                     setAvatarUploading(true)
                     const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })

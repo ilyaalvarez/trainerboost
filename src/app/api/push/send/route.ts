@@ -1,15 +1,16 @@
 import { NextResponse } from 'next/server'
 import webpush from 'web-push'
 import { createServiceClient } from '@/lib/supabase/server'
+import { isValidUUID, isValidUrl } from '@/lib/validation'
 
 const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY
 const vapidEmail = process.env.VAPID_EMAIL ?? 'mailto:hola@trainerboost.es'
 
 export async function POST(request: Request) {
-  // Internal route — require service-level auth via shared secret
+  const secret = process.env.INTERNAL_API_SECRET
   const authHeader = request.headers.get('x-internal-secret')
-  if (authHeader !== process.env.INTERNAL_API_SECRET) {
+  if (!secret || authHeader !== secret) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -19,16 +20,22 @@ export async function POST(request: Request) {
 
   webpush.setVapidDetails(vapidEmail, vapidPublicKey, vapidPrivateKey)
 
-  let payload: { userId: string; title: string; body?: string; url?: string }
+  let input: { userId: string; title: string; body?: string; url?: string }
   try {
-    payload = await request.json()
+    input = await request.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { userId, title, body, url } = payload
-  if (!userId || typeof userId !== 'string' || !title || typeof title !== 'string') {
-    return NextResponse.json({ error: 'userId and title are required' }, { status: 400 })
+  const { userId, title, body, url } = input
+  if (!isValidUUID(userId)) {
+    return NextResponse.json({ error: 'userId must be a valid UUID' }, { status: 400 })
+  }
+  if (!title || typeof title !== 'string' || title.length > 200) {
+    return NextResponse.json({ error: 'title is required (max 200 chars)' }, { status: 400 })
+  }
+  if (url !== undefined && !isValidUrl(url)) {
+    return NextResponse.json({ error: 'url must be a valid http/https URL' }, { status: 400 })
   }
 
   const supabase = createServiceClient()

@@ -75,11 +75,14 @@ export default function OnboardingPage() {
         toast.success('¡Perfil configurado!')
         router.push('/dashboard')
       } else {
-        if (!inviteCode.trim()) { toast.error('Introduce el código de invitación'); return }
+        const trimmedCode = inviteCode.trim().toLowerCase()
+        if (!trimmedCode || trimmedCode.length < 6 || trimmedCode.length > 64 || !/^[a-z0-9_-]+$/.test(trimmedCode)) {
+          toast.error('Código de invitación inválido'); return
+        }
         const { data: inv, error: invErr } = await supabase
           .from('invitations')
           .select('*, trainer:trainer_id(id, full_name)')
-          .eq('code', inviteCode.trim().toLowerCase())
+          .eq('code', trimmedCode)
           .is('used_at', null)
           .gte('expires_at', new Date().toISOString())
           .single()

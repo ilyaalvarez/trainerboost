@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { stripe, PLANS, planFromPriceId, type PlanKey } from '@/lib/stripe'
+import { isValidUUID } from '@/lib/validation'
 import type Stripe from 'stripe'
 
 /**
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         const userId  = session.metadata?.supabase_user_id
-        if (!userId || !session.subscription) break
+        if (!isValidUUID(userId) || !session.subscription) break
 
         // Read the real subscription to derive the plan from the price paid.
         const sub      = await stripe.subscriptions.retrieve(session.subscription as string)

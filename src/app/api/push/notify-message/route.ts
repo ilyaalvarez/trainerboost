@@ -1,13 +1,26 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isValidUUID } from '@/lib/validation'
 
 export async function POST(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { receiverId, content } = await request.json() as { receiverId: string; content: string }
-  if (!receiverId || !content) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+  let body: { receiverId: string; content: string }
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  const { receiverId, content } = body
+  if (!isValidUUID(receiverId)) {
+    return NextResponse.json({ error: 'receiverId must be a valid UUID' }, { status: 400 })
+  }
+  if (!content || typeof content !== 'string' || content.trim().length === 0) {
+    return NextResponse.json({ error: 'content is required' }, { status: 400 })
+  }
 
   // Get sender name and role
   const { data: senderProfile } = await supabase
@@ -31,6 +44,7 @@ export async function POST(request: Request) {
       body: content.slice(0, 100),
       url,
     }),
+    signal: AbortSignal.timeout(5000),
   }).catch(() => {})
 
   return NextResponse.json({ ok: true })

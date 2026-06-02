@@ -1,6 +1,7 @@
 {
   "model": "claude-sonnet-4-6",
-  "autoApprove": ["read", "list", "mcp__github__*"],
+  "autoApprove": ["read", "list", "mcp__github__*", "mcp__vercel__*"],
+  "enableAllProjectMcpServers": true,
   "hooks": {
     "PostToolUse": "git -C \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" add --update 2>/dev/null; true"
   },
@@ -22,12 +23,11 @@
       "Write(docs/**)",
       "Write(.claude/**)",
       "Write(CLAUDE.md)",
-      "Write(supabase/migrations/**)"
+      "Write(supabase/migrations/**)",
+      "Write(.mcp.json)"
     ],
     "deny": [
-      "Bash(rm -rf:*)",
-      "Bash(curl:*)",
-      "Bash(wget:*)"
+      "Bash(rm -rf:*)"
     ]
   }
 }

@@ -1,16 +1,23 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+const CODE_RE = /^[a-zA-Z0-9_-]{6,64}$/
+
 export async function GET(
   _request: Request,
   { params }: { params: { code: string } },
 ) {
+  const code = params.code?.trim()
+  if (!code || !CODE_RE.test(code)) {
+    return NextResponse.json({ valid: false, error: 'Código inválido' }, { status: 400 })
+  }
+
   const supabase = createClient()
 
   const { data, error } = await supabase
     .from('invitations')
     .select('id, trainer_id, email, expires_at, used_at, profiles!trainer_id(full_name)')
-    .eq('code', params.code)
+    .eq('code', code)
     .single()
 
   if (error || !data) {

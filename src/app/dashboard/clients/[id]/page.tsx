@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { isValidUUID } from '@/lib/validation'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import {
@@ -95,6 +96,7 @@ export default function ClientDetailPage() {
   // ── Load data ──────────────────────────────────────────────────────────────
 
   const loadData = useCallback(async () => {
+    if (!isValidUUID(clientId)) { router.push('/dashboard/clients'); return }
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/login'); return }
     setTrainerId(user.id)

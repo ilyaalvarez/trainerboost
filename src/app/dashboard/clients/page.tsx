@@ -106,30 +106,23 @@ export default function ClientsPage() {
       if (clientIds.length > 0) {
         const [{ data: routines }, { data: progressLogs }] = await Promise.all([
           supabase
-            .from('routines')
-            .select('client_id, created_at')
-            .in('client_id', clientIds)
-            .eq('status', 'active')
-            .order('created_at', { ascending: false }),
+            .from('latest_routine_per_client')
+            .select('client_id, latest_routine_at')
+            .in('client_id', clientIds),
           supabase
-            .from('progress_logs')
-            .select('client_id, logged_at')
-            .in('client_id', clientIds)
-            .order('logged_at', { ascending: false }),
+            .from('latest_progress_per_client')
+            .select('client_id, latest_progress_at')
+            .in('client_id', clientIds),
         ])
 
         if (routines) {
           for (const r of routines) {
-            if (!routineMap[r.client_id]) {
-              routineMap[r.client_id] = r.created_at
-            }
+            routineMap[r.client_id] = r.latest_routine_at as string
           }
         }
         if (progressLogs) {
           for (const l of progressLogs) {
-            if (!progressMap[l.client_id]) {
-              progressMap[l.client_id] = l.logged_at
-            }
+            progressMap[l.client_id] = l.latest_progress_at as string
           }
         }
       }

@@ -104,7 +104,6 @@ export default function ClientDetailPage() {
       { data: profileData },
       { data: relationData },
       { data: routinesData },
-      { data: exercisesData },
       { data: mealPlansData },
       { data: progressData },
       { data: appointmentsData },
@@ -114,12 +113,10 @@ export default function ClientDetailPage() {
       supabase.from('profiles').select('*').eq('id', clientId).single(),
       supabase.from('trainer_clients').select('*')
         .eq('client_id', clientId).eq('trainer_id', user.id).single(),
-      supabase.from('routines').select('*')
-        .eq('client_id', clientId).eq('trainer_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('routine_exercises').select('*')
-        .in('routine_id',
-          (await supabase.from('routines').select('id').eq('client_id', clientId)).data?.map(r => r.id) ?? []
-        ).order('order_index'),
+      supabase.from('routines').select('*, routine_exercises(*)')
+        .eq('client_id', clientId).eq('trainer_id', user.id)
+        .order('created_at', { ascending: false })
+        .order('order_index', { referencedTable: 'routine_exercises', ascending: true }),
       supabase.from('meal_plans').select('*')
         .eq('client_id', clientId).eq('trainer_id', user.id).order('created_at', { ascending: false }),
       supabase.from('progress_logs').select('*')
@@ -138,9 +135,10 @@ export default function ClientDetailPage() {
 
     if (!profileData || !relationData) { router.push('/dashboard/clients'); return }
 
-    const routinesWithExercises = (routinesData ?? []).map(r => ({
+    type RoutineWithEmbedded = Routine & { routine_exercises: RoutineExercise[] }
+    const routinesWithExercises = ((routinesData ?? []) as unknown as RoutineWithEmbedded[]).map(r => ({
       ...r,
-      exercises: (exercisesData ?? []).filter(e => e.routine_id === r.id),
+      exercises: r.routine_exercises ?? [],
     }))
 
     setData({

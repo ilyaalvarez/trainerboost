@@ -19,11 +19,16 @@ export async function POST(request: Request) {
 
   webpush.setVapidDetails(vapidEmail, vapidPublicKey, vapidPrivateKey)
 
-  const { userId, title, body, url } = await request.json() as {
-    userId: string
-    title: string
-    body?: string
-    url?: string
+  let payload: { userId: string; title: string; body?: string; url?: string }
+  try {
+    payload = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  const { userId, title, body, url } = payload
+  if (!userId || typeof userId !== 'string' || !title || typeof title !== 'string') {
+    return NextResponse.json({ error: 'userId and title are required' }, { status: 400 })
   }
 
   const supabase = createServiceClient()
@@ -34,14 +39,14 @@ export async function POST(request: Request) {
 
   if (!subs || subs.length === 0) return NextResponse.json({ sent: 0 })
 
-  const payload = JSON.stringify({ title, body, url })
+  const pushPayload = JSON.stringify({ title, body, url })
   let sent = 0
   const stale: string[] = []
 
   await Promise.all(
     subs.map(async (sub) => {
       try {
-        await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload)
+        await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, pushPayload)
         sent++
       } catch (err) {
         // 410 Gone = subscription expired, mark for cleanup

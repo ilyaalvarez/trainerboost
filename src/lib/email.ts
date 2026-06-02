@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { escapeHtml } from '@/lib/validation'
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -24,7 +25,7 @@ export async function sendWelcomeEmail(to: string, name: string, role: 'trainer'
 }
 
 function trainerWelcomeHtml(name: string) {
-  const firstName = name.split(' ')[0]
+  const firstName = escapeHtml(name.split(' ')[0])
   return `<!DOCTYPE html>
 <html lang="es">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -84,7 +85,7 @@ function trainerWelcomeHtml(name: string) {
 }
 
 function clientWelcomeHtml(name: string) {
-  const firstName = name.split(' ')[0]
+  const firstName = escapeHtml(name.split(' ')[0])
   return `<!DOCTYPE html>
 <html lang="es">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">

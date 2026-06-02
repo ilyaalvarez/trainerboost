@@ -1,7 +1,32 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { getRatelimiter } from '@/lib/ratelimit'
 
 export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname
+
+  // ── Rate limiting (runs before auth to fail-fast on blocked IPs) ─────────
+  const rl = getRatelimiter(path)
+  if (rl) {
+    const ip =
+      request.ip ??
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+      'anonymous'
+    const { success, limit, remaining, reset } = await rl.limit(ip)
+    if (!success) {
+      return new NextResponse('Too Many Requests', {
+        status: 429,
+        headers: {
+          'Content-Type':        'text/plain',
+          'Retry-After':         String(Math.ceil((reset - Date.now()) / 1000)),
+          'X-RateLimit-Limit':   String(limit),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset':   String(reset),
+        },
+      })
+    }
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -22,7 +47,6 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-  const path = request.nextUrl.pathname
 
   const publicPrefixes = ['/_next', '/favicon', '/api/webhooks', '/pricing', '/demo']
   const publicExact = ['/', '/login', '/register', '/onboarding', '/forgot-password', '/reset-password', '/privacy', '/terms', '/contact']

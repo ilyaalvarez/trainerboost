@@ -1,10 +1,7 @@
 import Stripe from 'stripe'
 import { PLAN_CONFIG, type PlanKey } from './plans'
 
-const secretKey = process.env.STRIPE_SECRET_KEY
-if (!secretKey) {
-  throw new Error('STRIPE_SECRET_KEY no está configurada')
-}
+const secretKey = process.env.STRIPE_SECRET_KEY ?? ''
 
 export const stripe = new Stripe(secretKey, {
   apiVersion: '2026-05-27.dahlia',

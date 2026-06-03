@@ -10,7 +10,7 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          primary:   '#A3FF4A',
+          primary:   '#8FD43A',
           secondary: '#7C3AED',
           accent:    '#10B981',
         },
@@ -35,9 +35,9 @@ const config: Config = {
         display: ['var(--font-display)', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #A3FF4A 0%, #7C3AED 100%)',
-        'gradient-accent':  'linear-gradient(135deg, #10B981 0%, #A3FF4A 100%)',
-        'hero-mesh':        'radial-gradient(ellipse at 20% 50%, rgba(163,255,74,0.06) 0%, transparent 55%), radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.04) 0%, transparent 50%), radial-gradient(ellipse at 60% 80%, rgba(163,255,74,0.03) 0%, transparent 45%)',
+        'gradient-primary': 'linear-gradient(135deg, #8FD43A 0%, #7C3AED 100%)',
+        'gradient-accent':  'linear-gradient(135deg, #10B981 0%, #8FD43A 100%)',
+        'hero-mesh':        'radial-gradient(ellipse at 20% 50%, rgba(143,212,58,0.04) 0%, transparent 55%), radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.03) 0%, transparent 50%), radial-gradient(ellipse at 60% 80%, rgba(143,212,58,0.02) 0%, transparent 45%)',
       },
       animation: {
         'fade-in':       'fadeIn 0.2s ease-out',
@@ -82,12 +82,12 @@ const config: Config = {
         modalIn:     { from: { transform: 'translateY(8px) scale(0.98)', opacity: '0' }, to: { transform: 'translateY(0) scale(1)', opacity: '1' } },
       },
       boxShadow: {
-        'glow-primary':   '0 0 24px rgba(163,255,74,0.25), 0 0 8px rgba(163,255,74,0.12)',
-        'glow-secondary': '0 0 24px rgba(124,58,237,0.2), 0 0 8px rgba(124,58,237,0.1)',
-        'glow-accent':    '0 0 24px rgba(16,185,129,0.2), 0 0 8px rgba(16,185,129,0.1)',
-        'glow-sm':        '0 0 12px rgba(163,255,74,0.18)',
-        'glow-md':        '0 0 20px rgba(163,255,74,0.28)',
-        'glow-green':     '0 0 32px rgba(163,255,74,0.35), 0 0 12px rgba(163,255,74,0.2)',
+        'glow-primary':   '0 0 16px rgba(143,212,58,0.14), 0 0 5px rgba(143,212,58,0.08)',
+        'glow-secondary': '0 0 16px rgba(124,58,237,0.14), 0 0 5px rgba(124,58,237,0.07)',
+        'glow-accent':    '0 0 16px rgba(16,185,129,0.14), 0 0 5px rgba(16,185,129,0.07)',
+        'glow-sm':        '0 0 8px rgba(143,212,58,0.1)',
+        'glow-md':        '0 0 14px rgba(143,212,58,0.15)',
+        'glow-green':     '0 0 20px rgba(143,212,58,0.18), 0 0 7px rgba(143,212,58,0.1)',
         'card':           '0 4px 6px -1px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2)',
         'card-hover':     '0 12px 28px -4px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.25)',
         'card-elevated':  '0 20px 40px -10px rgba(0,0,0,0.5)',

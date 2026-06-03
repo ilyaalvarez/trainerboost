@@ -27,5 +27,5 @@ export default function AnimatedCounter({ value, duration = 1.2, className }: An
     return () => controls.stop()
   }, [value, duration])
 
-  return <span ref={ref}>{value}</span>
+  return <span ref={ref} className={className}>{value}</span>
 }

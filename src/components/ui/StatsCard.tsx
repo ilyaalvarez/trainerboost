@@ -1,5 +1,8 @@
+'use client'
+
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import AnimatedCounter from './AnimatedCounter'
 
 interface StatsCardProps {
   label: string
@@ -18,30 +21,35 @@ const colorMap: Record<NonNullable<StatsCardProps['color']>, {
   icon: string
   accent: string
   glow: string
+  value: string
 }> = {
   primary:   {
-    wrapper: 'bg-sky-500/10 ring-sky-500/20',
-    icon:    'text-sky-400',
-    accent:  'linear-gradient(90deg, #0EA5E9, #7C3AED)',
-    glow:    'rgba(14,165,233,0.15)',
+    wrapper: 'bg-lime-500/10 ring-lime-500/20',
+    icon:    'text-lime-400',
+    accent:  'linear-gradient(90deg, #A3FF4A, #7C3AED)',
+    glow:    'rgba(163,255,74,0.15)',
+    value:   '#A3FF4A',
   },
   accent:    {
     wrapper: 'bg-emerald-500/10 ring-emerald-500/20',
     icon:    'text-emerald-400',
-    accent:  'linear-gradient(90deg, #10B981, #0EA5E9)',
+    accent:  'linear-gradient(90deg, #10B981, #A3FF4A)',
     glow:    'rgba(16,185,129,0.15)',
+    value:   '#F1F5F9',
   },
   secondary: {
     wrapper: 'bg-violet-500/10 ring-violet-500/20',
     icon:    'text-violet-400',
     accent:  'linear-gradient(90deg, #7C3AED, #EC4899)',
     glow:    'rgba(124,58,237,0.15)',
+    value:   '#F1F5F9',
   },
   warning:   {
     wrapper: 'bg-amber-500/10 ring-amber-500/20',
     icon:    'text-amber-400',
     accent:  'linear-gradient(90deg, #F59E0B, #EF4444)',
     glow:    'rgba(245,158,11,0.15)',
+    value:   '#F1F5F9',
   },
 }
 
@@ -53,17 +61,17 @@ export default function StatsCard({
   color = 'primary',
   className,
 }: StatsCardProps) {
-  const { wrapper, icon: iconText, accent, glow } = colorMap[color]
+  const { wrapper, icon: iconText, accent, glow, value: valueColor } = colorMap[color]
 
   return (
     <div
       className={cn(
         'relative flex flex-col gap-3 overflow-hidden group cursor-default',
-        'rounded-xl border border-[#334155] bg-[#1E293B]',
+        'rounded-xl border border-[#222222] bg-[#141414]',
         'px-5 py-4',
         'shadow-card',
         'transition-all duration-200',
-        'hover:-translate-y-1.5 hover:border-[#475569] hover:shadow-[0_20px_40px_-8px_rgba(0,0,0,0.55)]',
+        'hover:-translate-y-1.5 hover:border-[#333333] hover:shadow-[0_20px_40px_-8px_rgba(0,0,0,0.65)]',
         className,
       )}
       style={{
@@ -110,10 +118,12 @@ export default function StatsCard({
 
       {/* Value */}
       <p
-        className="font-mono text-[1.75rem] font-bold leading-none tracking-tight text-[#F1F5F9] transition-all duration-200 group-hover:text-white"
-        style={{ fontFamily: "'JetBrains Mono', monospace" }}
+        className="font-display text-[3rem] font-bold leading-none tracking-tight transition-all duration-200"
+        style={{ color: valueColor }}
       >
-        {value}
+        {typeof value === 'number'
+          ? <AnimatedCounter value={value} />
+          : value}
       </p>
 
       {/* Change badge */}

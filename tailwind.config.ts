@@ -10,19 +10,19 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          primary:   '#0EA5E9',
+          primary:   '#A3FF4A',
           secondary: '#7C3AED',
           accent:    '#10B981',
         },
         surface: {
-          DEFAULT: '#1E293B',
-          2:       '#263548',
-          3:       '#2d3f55',
+          DEFAULT: '#141414',
+          2:       '#1A1A1A',
+          3:       '#222222',
         },
-        background: '#0F172A',
+        background: '#0A0A0A',
         border: {
-          DEFAULT: '#334155',
-          bright:  '#475569',
+          DEFAULT: '#222222',
+          bright:  '#333333',
         },
         success: '#10B981',
         warning: '#F59E0B',
@@ -30,13 +30,14 @@ const config: Config = {
         'surface-light': '#F7F8FA',
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-mono)', 'monospace'],
+        sans:    ['var(--font-sans)',    'system-ui', 'sans-serif'],
+        mono:    ['var(--font-mono)',    'monospace'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #0EA5E9 0%, #7C3AED 100%)',
-        'gradient-accent':  'linear-gradient(135deg, #10B981 0%, #0EA5E9 100%)',
-        'hero-mesh':        'radial-gradient(ellipse at 20% 50%, rgba(14,165,233,0.07) 0%, transparent 55%), radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.05) 0%, transparent 50%), radial-gradient(ellipse at 60% 80%, rgba(16,185,129,0.04) 0%, transparent 45%)',
+        'gradient-primary': 'linear-gradient(135deg, #A3FF4A 0%, #7C3AED 100%)',
+        'gradient-accent':  'linear-gradient(135deg, #10B981 0%, #A3FF4A 100%)',
+        'hero-mesh':        'radial-gradient(ellipse at 20% 50%, rgba(163,255,74,0.06) 0%, transparent 55%), radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.04) 0%, transparent 50%), radial-gradient(ellipse at 60% 80%, rgba(163,255,74,0.03) 0%, transparent 45%)',
       },
       animation: {
         'fade-in':       'fadeIn 0.2s ease-out',
@@ -71,8 +72,8 @@ const config: Config = {
         },
         scaleIn:     { from: { transform: 'scale(0.9)', opacity: '0' }, to: { transform: 'scale(1)', opacity: '1' } },
         borderGlow:  {
-          '0%, 100%': { boxShadow: '0 0 0 0 rgba(14,165,233,0)' },
-          '50%': { boxShadow: '0 0 20px 2px rgba(14,165,233,0.2)' },
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(163,255,74,0)' },
+          '50%': { boxShadow: '0 0 20px 2px rgba(163,255,74,0.25)' },
         },
         gradientX:   {
           '0%, 100%': { backgroundPosition: '0% 50%' },
@@ -81,11 +82,12 @@ const config: Config = {
         modalIn:     { from: { transform: 'translateY(8px) scale(0.98)', opacity: '0' }, to: { transform: 'translateY(0) scale(1)', opacity: '1' } },
       },
       boxShadow: {
-        'glow-primary':   '0 0 24px rgba(14,165,233,0.2), 0 0 8px rgba(14,165,233,0.1)',
+        'glow-primary':   '0 0 24px rgba(163,255,74,0.25), 0 0 8px rgba(163,255,74,0.12)',
         'glow-secondary': '0 0 24px rgba(124,58,237,0.2), 0 0 8px rgba(124,58,237,0.1)',
         'glow-accent':    '0 0 24px rgba(16,185,129,0.2), 0 0 8px rgba(16,185,129,0.1)',
-        'glow-sm':        '0 0 12px rgba(14,165,233,0.15)',
-        'glow-md':        '0 0 20px rgba(14,165,233,0.25)',
+        'glow-sm':        '0 0 12px rgba(163,255,74,0.18)',
+        'glow-md':        '0 0 20px rgba(163,255,74,0.28)',
+        'glow-green':     '0 0 32px rgba(163,255,74,0.35), 0 0 12px rgba(163,255,74,0.2)',
         'card':           '0 4px 6px -1px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2)',
         'card-hover':     '0 12px 28px -4px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.25)',
         'card-elevated':  '0 20px 40px -10px rgba(0,0,0,0.5)',

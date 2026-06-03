@@ -95,7 +95,7 @@ const TESTIMONIALS = [
     name: 'Carlos Martínez',
     role: 'Entrenador personal · Madrid',
     initials: 'CM',
-    color: 'bg-sky-500/20 text-sky-300',
+    color: 'bg-lime-500/20 text-lime-300',
     text: 'Pasé de gestionar todo con Excel a tener todo centralizado. Mis clientes lo usan a diario y el feedback es increíble.',
     stars: 5,
   },
@@ -141,14 +141,14 @@ export default function LandingPage() {
 
       {/* ── Announcement bar ────────────────────────────────────────────── */}
       <div className="relative overflow-hidden"
-           style={{ background: 'linear-gradient(90deg, rgba(14,165,233,0.15) 0%, rgba(124,58,237,0.15) 50%, rgba(14,165,233,0.15) 100%)' }}>
+           style={{ background: 'linear-gradient(90deg, rgba(163,255,74,0.1) 0%, rgba(124,58,237,0.12) 50%, rgba(163,255,74,0.1) 100%)' }}>
         <div className="max-w-6xl mx-auto px-6 py-2.5 flex items-center justify-center gap-2 text-center">
-          <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+          <Sparkles className="w-3.5 h-3.5 text-lime-400 shrink-0" />
           <span className="text-xs text-slate-300">
             <span className="font-semibold text-white">Nuevo:</span>{' '}
             Mensajería en tiempo real + notificaciones push en todos los planes
           </span>
-          <Link href="/register" className="text-xs text-sky-400 font-semibold hover:text-sky-300 flex items-center gap-0.5 shrink-0">
+          <Link href="/register" className="text-xs text-lime-400 font-semibold hover:text-lime-300 flex items-center gap-0.5 shrink-0">
             Probar gratis <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
@@ -160,9 +160,9 @@ export default function LandingPage() {
           <div className="flex items-center gap-2.5">
             <div
               className="w-8 h-8 rounded-xl flex items-center justify-center shadow-glow-sm"
-              style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
+              style={{ background: 'linear-gradient(135deg, #A3FF4A, #7C3AED)' }}
             >
-              <Zap className="w-4 h-4 text-white" />
+              <Zap className="w-4 h-4 text-black" />
             </div>
             <span className="font-bold text-base tracking-tight gradient-text">TrainerBoost</span>
           </div>
@@ -181,11 +181,11 @@ export default function LandingPage() {
       <section className="relative max-w-6xl mx-auto px-6 pt-20 pb-16">
         {/* Ambient glows */}
         <div className="absolute top-0 left-0 w-[800px] h-[600px] pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse at 15% 35%, rgba(14,165,233,0.1) 0%, transparent 60%)' }} />
+             style={{ background: 'radial-gradient(ellipse at 15% 35%, rgba(163,255,74,0.07) 0%, transparent 60%)' }} />
         <div className="absolute top-0 right-0 w-[600px] h-[500px] pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse at 85% 20%, rgba(124,58,237,0.08) 0%, transparent 55%)' }} />
+             style={{ background: 'radial-gradient(ellipse at 85% 20%, rgba(124,58,237,0.06) 0%, transparent 55%)' }} />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse at 50% 100%, rgba(16,185,129,0.04) 0%, transparent 60%)' }} />
+             style={{ background: 'radial-gradient(ellipse at 50% 100%, rgba(163,255,74,0.03) 0%, transparent 60%)' }} />
 
         <div className="relative grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
           {/* Left: copy */}
@@ -253,9 +253,9 @@ export default function LandingPage() {
           {/* Right: App preview */}
           <div className="relative hidden lg:block animate-slide-right delay-200">
             <div className="absolute inset-0 blur-3xl pointer-events-none"
-                 style={{ background: 'radial-gradient(ellipse at 60% 40%, rgba(14,165,233,0.18) 0%, rgba(124,58,237,0.1) 50%, transparent 70%)' }} />
+                 style={{ background: 'radial-gradient(ellipse at 60% 40%, rgba(163,255,74,0.12) 0%, rgba(124,58,237,0.07) 50%, transparent 70%)' }} />
             <div className="relative rounded-2xl overflow-hidden border border-border/80 shadow-card-elevated"
-                 style={{ background: '#1E293B' }}>
+                 style={{ background: '#141414' }}>
               {/* Browser chrome */}
               <div className="bg-surface-2 border-b border-border px-4 py-2.5 flex items-center gap-2">
                 <div className="flex gap-1.5">
@@ -274,7 +274,7 @@ export default function LandingPage() {
                 <div className="w-36 bg-surface/60 border-r border-border/60 p-2.5 flex flex-col gap-0.5 shrink-0">
                   <div className="flex items-center gap-1.5 px-2 py-2 mb-2">
                     <div className="w-5 h-5 rounded-md shrink-0"
-                         style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }} />
+                         style={{ background: 'linear-gradient(135deg, #A3FF4A, #7C3AED)' }} />
                     <span className="text-[9px] font-bold text-white">TrainerBoost</span>
                   </div>
                   {[
@@ -286,8 +286,8 @@ export default function LandingPage() {
                     { label: 'Mensajes',  active: false, icon: '◉' },
                   ].map(item => (
                     <div key={item.label}
-                         className={`text-[9px] px-2 py-1.5 rounded-md transition-colors flex items-center gap-1.5 ${item.active ? 'text-sky-400 font-semibold' : 'text-slate-500'}`}
-                         style={item.active ? { background: 'linear-gradient(90deg, rgba(14,165,233,0.15), transparent)' } : {}}>
+                         className={`text-[9px] px-2 py-1.5 rounded-md transition-colors flex items-center gap-1.5 ${item.active ? 'text-lime-400 font-semibold' : 'text-slate-500'}`}
+                         style={item.active ? { background: 'linear-gradient(90deg, rgba(163,255,74,0.12), transparent)' } : {}}>
                       <span className="opacity-60">{item.icon}</span>
                       {item.label}
                     </div>
@@ -301,8 +301,8 @@ export default function LandingPage() {
                       <div className="text-[11px] font-bold text-white">Panel principal</div>
                       <div className="text-[9px] text-slate-500">Jueves, 29 Mayo 2025</div>
                     </div>
-                    <div className="h-5 w-16 rounded-md text-[8px] flex items-center justify-center text-sky-400 font-semibold"
-                         style={{ background: 'rgba(14,165,233,0.15)', border: '1px solid rgba(14,165,233,0.25)' }}>
+                    <div className="h-5 w-16 rounded-md text-[8px] flex items-center justify-center text-lime-400 font-semibold"
+                         style={{ background: 'rgba(163,255,74,0.12)', border: '1px solid rgba(163,255,74,0.25)' }}>
                       + Añadir
                     </div>
                   </div>
@@ -310,7 +310,7 @@ export default function LandingPage() {
                   {/* Stats grid */}
                   <div className="grid grid-cols-2 gap-1.5">
                     {[
-                      { label: 'Clientes activos', value: '24', delta: '+2', color: '14,165,233' },
+                      { label: 'Clientes activos', value: '24', delta: '+2', color: '163,255,74' },
                       { label: 'Citas hoy',         value: '6',  delta: '+1', color: '124,58,237' },
                       { label: 'Mensajes nuevos',   value: '8',  delta: '+3', color: '16,185,129' },
                       { label: 'Este mes',           value: '2.8k€', delta: '+12%', color: '245,158,11' },
@@ -330,7 +330,7 @@ export default function LandingPage() {
                   <div className="rounded-lg bg-surface/50 border border-border/60 p-2">
                     <div className="text-[8px] font-semibold text-white mb-1.5 flex items-center justify-between">
                       Próximas citas
-                      <span className="text-sky-400 font-normal">Ver todas →</span>
+                      <span className="text-lime-400 font-normal">Ver todas →</span>
                     </div>
                     {[
                       { time: '09:00', name: 'Ana García',      type: 'Online',    dot: '#0EA5E9' },
@@ -351,7 +351,7 @@ export default function LandingPage() {
                     <div className="text-[8px] font-semibold text-white mb-2">Progreso semanal</div>
                     <div className="space-y-1.5">
                       {[
-                        { label: 'Rutinas completadas', pct: 75, color: '#0EA5E9' },
+                        { label: 'Rutinas completadas', pct: 75, color: '#A3FF4A' },
                         { label: 'Planes nutricionales', pct: 60, color: '#10B981' },
                         { label: 'Seguimiento activo',  pct: 90, color: '#7C3AED' },
                       ].map(p => (
@@ -372,12 +372,12 @@ export default function LandingPage() {
 
               {/* Bottom fade */}
               <div className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
-                   style={{ background: 'linear-gradient(to top, #1E293B, transparent)' }} />
+                   style={{ background: 'linear-gradient(to top, #141414, transparent)' }} />
             </div>
 
             {/* Floating badges */}
             <div className="absolute -left-8 top-12 rounded-xl px-3 py-2.5 shadow-card-elevated flex items-center gap-2.5 animate-float"
-                 style={{ background: '#1E293B', border: '1px solid rgba(255,255,255,0.08)' }}>
+                 style={{ background: '#1A1A1A', border: '1px solid rgba(255,255,255,0.07)' }}>
               <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
                    style={{ background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.3)' }}>
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -389,13 +389,13 @@ export default function LandingPage() {
             </div>
 
             <div className="absolute -right-6 top-28 rounded-xl px-3 py-2.5 shadow-card-elevated animate-float"
-                 style={{ animationDelay: '1s', background: '#1E293B', border: '1px solid rgba(255,255,255,0.08)' }}>
+                 style={{ animationDelay: '1s', background: '#1A1A1A', border: '1px solid rgba(163,255,74,0.12)' }}>
               <div className="text-[8px] text-slate-400 mb-0.5">Ingresos del mes</div>
               <div className="text-[15px] font-bold text-white font-mono">2.840€ <span className="text-emerald-400 text-[9px]">↑12%</span></div>
             </div>
 
             <div className="absolute -right-4 bottom-16 rounded-xl px-3 py-2.5 shadow-card-elevated animate-float"
-                 style={{ animationDelay: '2s', background: '#1E293B', border: '1px solid rgba(255,255,255,0.08)' }}>
+                 style={{ animationDelay: '2s', background: '#1A1A1A', border: '1px solid rgba(255,255,255,0.07)' }}>
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-violet-500/20 flex items-center justify-center">
                   <span className="text-[9px] font-bold text-violet-300">JR</span>
@@ -464,7 +464,7 @@ export default function LandingPage() {
           <div className="card p-6 border-emerald-500/25 relative overflow-hidden"
                style={{ background: 'linear-gradient(160deg, rgba(16,185,129,0.06) 0%, #1E293B 60%)' }}>
             <div className="absolute top-0 left-0 right-0 h-0.5"
-                 style={{ background: 'linear-gradient(90deg, #10B981, #0EA5E9)' }} />
+                 style={{ background: 'linear-gradient(90deg, #10B981, #A3FF4A)' }} />
             <div className="flex items-center gap-2 mb-5">
               <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -485,7 +485,7 @@ export default function LandingPage() {
 
       {/* ── Cómo funciona ────────────────────────────────────────────────── */}
       <section className="border-t border-border/50 py-24"
-               style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(14,165,233,0.04) 0%, transparent 60%)' }}>
+               style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(163,255,74,0.03) 0%, transparent 60%)' }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16 animate-fade-in-up">
             <div className="chip-accent mb-4 mx-auto w-fit">Proceso simple</div>
@@ -495,12 +495,12 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-3 gap-6 relative">
             <div className="absolute top-[3.5rem] left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px hidden md:block"
-                 style={{ background: 'linear-gradient(90deg, rgba(14,165,233,0.35), rgba(124,58,237,0.35))' }} />
+                 style={{ background: 'linear-gradient(90deg, rgba(163,255,74,0.3), rgba(124,58,237,0.3))' }} />
 
             {[
-              { n: '01', title: 'Regístrate en 2 minutos', desc: 'Crea tu cuenta gratis. Sin tarjeta, sin configuraciones complejas.', gradient: '#0EA5E9, #7C3AED' },
+              { n: '01', title: 'Regístrate en 2 minutos', desc: 'Crea tu cuenta gratis. Sin tarjeta, sin configuraciones complejas.', gradient: '#A3FF4A, #7C3AED' },
               { n: '02', title: 'Añade tus clientes', desc: 'Invítalos por email o enlace. Configura rutinas y planes desde el primer día.', gradient: '#7C3AED, #10B981' },
-              { n: '03', title: 'Gestiona todo en uno', desc: 'Citas, nutrición, mensajes y seguimiento desde un solo panel.', gradient: '#10B981, #0EA5E9' },
+              { n: '03', title: 'Gestiona todo en uno', desc: 'Citas, nutrición, mensajes y seguimiento desde un solo panel.', gradient: '#10B981, #A3FF4A' },
             ].map((step, i) => (
               <div key={step.n} className={`relative animate-fade-in-up ${i === 1 ? 'delay-150' : i === 2 ? 'delay-300' : ''}`}>
                 <div className="card p-8 text-center h-full flex flex-col items-center hover:-translate-y-1 transition-transform duration-300">
@@ -588,8 +588,8 @@ export default function LandingPage() {
             <div className="relative flex justify-center animate-slide-right delay-150">
               <div className="relative" style={{ width: '260px' }}>
                 {/* Phone frame */}
-                <div className="rounded-[2rem] overflow-hidden border-2 border-slate-700 shadow-2xl"
-                     style={{ background: '#0F172A', boxShadow: '0 40px 80px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)' }}>
+                <div className="rounded-[2rem] overflow-hidden border-2 border-[#222222] shadow-2xl"
+                     style={{ background: '#0A0A0A', boxShadow: '0 40px 80px -20px rgba(0,0,0,0.85), 0 0 0 1px rgba(163,255,74,0.06)' }}>
                   {/* Status bar */}
                   <div className="bg-surface px-5 pt-3 pb-2 flex justify-between items-center">
                     <span className="text-[10px] text-slate-400 font-medium">9:41</span>
@@ -598,21 +598,21 @@ export default function LandingPage() {
                     </div>
                   </div>
                   {/* App header */}
-                  <div className="px-4 pb-3 border-b border-border"
-                       style={{ background: 'linear-gradient(180deg, #1E293B, #1E293B)' }}>
+                  <div className="px-4 pb-3 border-b border-[#222222]"
+                       style={{ background: 'linear-gradient(180deg, #141414, #141414)' }}>
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <div className="text-[12px] font-bold text-white">Hola, Ana 👋</div>
                         <div className="text-[9px] text-slate-400">Lunes · Día de pecho</div>
                       </div>
-                      <div className="w-7 h-7 rounded-full bg-sky-500/25 flex items-center justify-center text-[9px] font-bold text-sky-300">AG</div>
+                      <div className="w-7 h-7 rounded-full bg-lime-500/20 flex items-center justify-center text-[9px] font-bold text-lime-300">AG</div>
                     </div>
                     {/* Tabs */}
                     <div className="flex gap-1 overflow-hidden">
                       {['Hoy', 'Rutinas', 'Nutrición', 'Progreso', 'Chat'].map((tab, i) => (
                         <div key={tab}
                              className={`text-[8px] px-2 py-1 rounded-full whitespace-nowrap ${i === 0 ? 'font-semibold' : 'text-slate-500'}`}
-                             style={i === 0 ? { background: 'rgba(14,165,233,0.2)', color: '#38BDF8' } : {}}>
+                             style={i === 0 ? { background: 'rgba(163,255,74,0.15)', color: '#A3FF4A' } : {}}>
                           {tab}
                         </div>
                       ))}
@@ -642,9 +642,9 @@ export default function LandingPage() {
                     ))}
                     {/* Progress ring */}
                     <div className="mt-3 p-2 rounded-lg flex items-center gap-3"
-                         style={{ background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.15)' }}>
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-[9px] font-bold text-sky-400"
-                           style={{ background: 'conic-gradient(#0EA5E9 40%, rgba(14,165,233,0.1) 40%)', boxShadow: '0 0 10px rgba(14,165,233,0.2)' }}>
+                         style={{ background: 'rgba(163,255,74,0.07)', border: '1px solid rgba(163,255,74,0.15)' }}>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-[9px] font-bold text-lime-400"
+                           style={{ background: 'conic-gradient(#A3FF4A 40%, rgba(163,255,74,0.08) 40%)', boxShadow: '0 0 10px rgba(163,255,74,0.2)' }}>
                         2/5
                       </div>
                       <div>
@@ -665,7 +665,7 @@ export default function LandingPage() {
 
       {/* ── Testimonials ─────────────────────────────────────────────────── */}
       <section className="py-24 border-t border-border/50"
-               style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(14,165,233,0.03) 0%, transparent 70%)' }}>
+               style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(163,255,74,0.03) 0%, transparent 70%)' }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-14 animate-fade-in-up">
             <div className="chip mb-4 mx-auto w-fit">Testimonios</div>

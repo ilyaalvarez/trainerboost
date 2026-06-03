@@ -54,14 +54,14 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
 
   return (
     <aside className="w-64 border-r border-border flex flex-col shrink-0 h-full"
-           style={{ background: 'linear-gradient(180deg, #192035 0%, #1E293B 100%)' }}>
+           style={{ background: 'linear-gradient(180deg, #0D0D0D 0%, #111111 100%)' }}>
 
       {/* ── Logo ──────────────────────────────────────────────────────── */}
       <div className="p-5 border-b border-border/60">
         <div className="flex items-center gap-3">
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center shadow-glow-sm shrink-0 transition-transform duration-200 hover:scale-105"
-            style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
+            style={{ background: 'linear-gradient(135deg, #A3FF4A, #7C3AED)' }}
           >
             <Zap className="w-4 h-4 text-white" />
           </div>
@@ -82,8 +82,8 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
         <div
           className="mx-4 mt-3 px-3 py-2 rounded-lg border transition-all duration-200 hover:shadow-glow-sm"
           style={{
-            background: 'linear-gradient(135deg, rgba(14,165,233,0.08) 0%, rgba(124,58,237,0.05) 100%)',
-            borderColor: 'rgba(14,165,233,0.25)',
+            background: 'linear-gradient(135deg, rgba(163,255,74,0.07) 0%, rgba(124,58,237,0.04) 100%)',
+            borderColor: 'rgba(163,255,74,0.2)',
           }}
         >
           <div className="flex items-center justify-between">
@@ -106,7 +106,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
             window.dispatchEvent(e)
           }}
           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border/60 text-slate-500 text-xs hover:border-slate-600 hover:text-slate-400 transition-all group"
-          style={{ background: 'rgba(15,23,42,0.4)' }}
+          style={{ background: 'rgba(10,10,10,0.5)' }}
         >
           <Search className="w-3.5 h-3.5 shrink-0" />
           <span className="flex-1 text-left">Buscar...</span>
@@ -133,12 +133,12 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
             >
               <item.icon className={cn(
                 'w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110',
-                isActive ? 'text-sky-300' : 'text-slate-500 group-hover:text-slate-300'
+                isActive ? 'text-lime-400' : 'text-slate-500 group-hover:text-slate-300'
               )} />
               <span>{item.label}</span>
 
               {item.label === 'Mensajes' && unreadMessages > 0 && (
-                <span className="ml-auto bg-brand-primary text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                <span className="ml-auto bg-brand-primary text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
                   {unreadMessages}
                 </span>
               )}

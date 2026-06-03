@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, JetBrains_Mono } from 'next/font/google'
+import { Inter, JetBrains_Mono, Barlow_Condensed } from 'next/font/google'
 import Script from 'next/script'
 import { Toaster } from 'sonner'
 import CookieBanner from '@/components/CookieBanner'
@@ -15,6 +15,13 @@ const inter = Inter({
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
+  display: 'swap',
+})
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  variable: '--font-display',
   display: 'swap',
 })
 
@@ -53,7 +60,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#0EA5E9',
+  themeColor: '#A3FF4A',
 }
 
 const jsonLd = {
@@ -84,7 +91,7 @@ const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`dark ${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="es" className={`dark ${inter.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable}`}>
       <head>
         <script
           type="application/ld+json"
@@ -98,8 +105,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           position="top-right"
           toastOptions={{
             style: {
-              background: '#1E293B',
-              border: '1px solid #334155',
+              background: '#141414',
+              border: '1px solid #222222',
               color: '#F1F5F9',
             },
           }}

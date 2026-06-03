@@ -150,7 +150,7 @@ export default async function DashboardPage() {
       {/* ── Free plan CTA ─────────────────────────────────────────────── */}
       {(!subscription || subscription.status !== 'active') && (
         <div className="rounded-xl border p-4 flex items-center justify-between gap-4 animate-fade-in-up"
-             style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.06), rgba(124,58,237,0.04))', borderColor: 'rgba(14,165,233,0.2)' }}>
+             style={{ background: 'linear-gradient(135deg, rgba(163,255,74,0.05), rgba(124,58,237,0.04))', borderColor: 'rgba(163,255,74,0.18)' }}>
           <div className="flex items-center gap-3">
             <Zap className="w-5 h-5 text-brand-primary shrink-0" />
             <div>
@@ -176,7 +176,7 @@ export default async function DashboardPage() {
           </div>
           {/* Progress bar */}
           <div className="w-full bg-slate-800 rounded-full h-1.5 mb-4">
-            <div className="h-1.5 rounded-full bg-gradient-to-r from-sky-500 to-violet-500 transition-all duration-500"
+            <div className="h-1.5 rounded-full bg-gradient-to-r from-lime-400 to-violet-500 transition-all duration-500"
                  style={{ width: `${([hasSubscription, hasProfile, hasClients].filter(Boolean).length / 3) * 100}%` }} />
           </div>
           <div className="space-y-2.5">
@@ -257,7 +257,7 @@ export default async function DashboardPage() {
           { label: 'Nueva rutina',   icon: Dumbbell,  href: '/dashboard/routines',     color: 'text-violet-400', bg: 'rgba(124,58,237,0.15)' },
           { label: 'Nuevo plan',     icon: Apple,     href: '/dashboard/nutrition',    color: 'text-emerald-400', bg: 'rgba(16,185,129,0.15)' },
           { label: 'Nueva cita',     icon: Calendar,  href: '/dashboard/appointments', color: 'text-amber-400',  bg: 'rgba(245,158,11,0.15)' },
-          { label: 'Invitar cliente',icon: UserPlus,  href: '/dashboard/clients',      color: 'text-sky-400',    bg: 'rgba(14,165,233,0.15)' },
+          { label: 'Invitar cliente',icon: UserPlus,  href: '/dashboard/clients',      color: 'text-lime-400',   bg: 'rgba(163,255,74,0.12)' },
         ] as const).map(action => (
           <Link key={action.label} href={action.href}
             className="card card-interactive p-4 flex flex-col items-center gap-2 text-center">

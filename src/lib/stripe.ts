@@ -1,11 +1,14 @@
 import Stripe from 'stripe'
 import { PLAN_CONFIG, type PlanKey } from './plans'
 
-const secretKey = process.env.STRIPE_SECRET_KEY ?? ''
+const secretKey = process.env.STRIPE_SECRET_KEY
 
-export const stripe = new Stripe(secretKey, {
-  apiVersion: '2026-05-27.dahlia',
-})
+// Lazy: only instantiate when the key exists — avoids crashing at build time
+// when env vars are not set. At runtime, callers will get a TypeError if stripe
+// is used without the key, which is the correct behavior.
+export const stripe = (secretKey
+  ? new Stripe(secretKey, { apiVersion: '2026-05-27.dahlia' })
+  : null) as Stripe
 
 const PRICE_IDS: Record<PlanKey, string | undefined> = {
   starter:   process.env.STRIPE_PRICE_ID_STARTER,

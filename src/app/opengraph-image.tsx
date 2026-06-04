@@ -1,130 +1,85 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'TrainerBoost — Software para entrenadores personales'
+export const alt = 'TrainerBoost — Gestiona tu negocio de entrenamiento personal'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-export default function Image() {
+export default function OGImage() {
   return new ImageResponse(
     (
       <div
         style={{
-          background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%)',
+          background: '#0A0A0A',
           width: '100%',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           justifyContent: 'center',
+          padding: '80px',
           fontFamily: 'system-ui, sans-serif',
           position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        {/* Background gradient orbs */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 80,
-            left: 160,
-            width: 400,
-            height: 400,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(14,165,233,0.12) 0%, transparent 70%)',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 80,
-            right: 160,
-            width: 360,
-            height: 360,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%)',
-          }}
-        />
+        <div style={{
+          position: 'absolute', top: -100, left: -100,
+          width: 600, height: 600, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(143,212,58,0.12) 0%, transparent 70%)',
+        }} />
+        <div style={{
+          position: 'absolute', bottom: -150, right: -100,
+          width: 500, height: 500, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 70%)',
+        }} />
 
-        {/* Logo mark */}
-        <div
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: 20,
-            background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 24,
-            boxShadow: '0 0 40px rgba(14,165,233,0.4)',
-          }}
-        >
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="white">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-          </svg>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 48 }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: 16,
+            background: 'linear-gradient(135deg, #8FD43A, #7C3AED)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <span style={{ color: 'black', fontSize: 28, fontWeight: 900 }}>⚡</span>
+          </div>
+          <span style={{ color: 'white', fontSize: 32, fontWeight: 800, letterSpacing: '-1px' }}>
+            TrainerBoost
+          </span>
         </div>
 
-        {/* Brand name */}
-        <div
-          style={{
-            fontSize: 52,
-            fontWeight: 800,
-            color: 'white',
-            letterSpacing: '-1px',
-            marginBottom: 16,
-          }}
-        >
-          TrainerBoost
+        <div style={{
+          fontSize: 62, fontWeight: 800, color: 'white',
+          lineHeight: 1.1, letterSpacing: '-2px', marginBottom: 24, maxWidth: 900,
+        }}>
+          {'Deja de gestionar clientes'}
+          <span style={{ color: '#8FD43A' }}>{' por WhatsApp'}</span>
         </div>
 
-        {/* Tagline */}
-        <div
-          style={{
-            fontSize: 24,
-            color: '#94A3B8',
-            textAlign: 'center',
-            maxWidth: 700,
-            lineHeight: 1.4,
-          }}
-        >
-          La plataforma SaaS para entrenadores personales
+        <div style={{
+          fontSize: 26, color: '#94A3B8', maxWidth: 700,
+          lineHeight: 1.4, marginBottom: 56,
+        }}>
+          La plataforma para entrenadores personales. Rutinas, nutrición, citas y pagos en un solo lugar.
         </div>
 
-        {/* Feature pills */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 12,
-            marginTop: 40,
-          }}
-        >
-          {['Clientes', 'Rutinas', 'Nutrición', 'Analytics'].map((f) => (
-            <div
-              key={f}
-              style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 100,
-                padding: '8px 20px',
-                fontSize: 16,
-                color: '#CBD5E1',
-              }}
-            >
-              {f}
+        <div style={{ display: 'flex', gap: 16 }}>
+          {['Gratis para empezar', 'Desde 19€/mes', 'Hecho en España'].map(pill => (
+            <div key={pill} style={{
+              padding: '10px 20px', borderRadius: 100,
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              color: '#CBD5E1', fontSize: 18, fontWeight: 600,
+            }}>
+              {pill}
             </div>
           ))}
         </div>
 
-        {/* URL */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 36,
-            fontSize: 18,
-            color: '#475569',
-          }}
-        >
-          app.trainerboost.es
+        <div style={{
+          position: 'absolute', bottom: 48, right: 80,
+          color: '#475569', fontSize: 20, fontWeight: 500,
+        }}>
+          trainerboost.es
         </div>
       </div>
     ),

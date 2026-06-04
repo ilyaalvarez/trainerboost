@@ -34,11 +34,11 @@ export const metadata: Metadata = {
   keywords: ['entrenador personal', 'gestión clientes', 'rutinas fitness', 'nutrición deportiva', 'plataforma entrenadores', 'software entrenador'],
   authors: [{ name: 'TrainerBoost' }],
   creator: 'TrainerBoost',
-  metadataBase: new URL('https://app.trainerboost.es'),
+  metadataBase: new URL('https://trainerboost.es'),
   openGraph: {
     type: 'website',
     locale: 'es_ES',
-    url: 'https://app.trainerboost.es',
+    url: 'https://trainerboost.es',
     siteName: 'TrainerBoost',
     title: 'TrainerBoost — Gestiona tu negocio de entrenamiento personal',
     description: 'La plataforma SaaS para entrenadores personales: gestión de clientes, rutinas, nutrición, citas y mensajes en un solo lugar.',
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#A3FF4A',
+  themeColor: '#8FD43A',
 }
 
 const jsonLd = {
@@ -69,7 +69,7 @@ const jsonLd = {
   name: 'TrainerBoost',
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web, iOS, Android',
-  url: 'https://app.trainerboost.es',
+  url: 'https://trainerboost.es',
   description: 'La plataforma SaaS para entrenadores personales: gestión de clientes, rutinas, nutrición, citas y mensajes en un solo lugar.',
   offers: [
     { '@type': 'Offer', name: 'Gratis',    price: '0',  priceCurrency: 'EUR' },
@@ -79,8 +79,8 @@ const jsonLd = {
   ],
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    reviewCount: '500',
+    ratingValue: '5',
+    reviewCount: '3',
     bestRating: '5',
   },
   inLanguage: 'es',

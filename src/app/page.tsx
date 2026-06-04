@@ -85,9 +85,9 @@ const FEATURE_COLORS: Record<string, { bg: string; text: string; border: string;
 }
 
 const STATS = [
-  { value: '500+',   label: 'Entrenadores activos', icon: Users },
-  { value: '8.000+', label: 'Clientes gestionados',  icon: BarChart3 },
-  { value: '4.9★',   label: 'Valoración media',      icon: Star },
+  { value: '19€',   label: 'Desde 19€/mes', icon: BarChart3 },
+  { value: '100%',  label: 'Hecho en España', icon: Shield },
+  { value: '0€',    label: 'Gratis para empezar', icon: Star },
 ]
 
 const TESTIMONIALS = [

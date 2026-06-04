@@ -23,13 +23,18 @@ export default function PrivacyPage() {
 
       <main className="max-w-4xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-bold text-white mb-2">Política de privacidad</h1>
-        <p className="text-slate-400 text-sm mb-10">Última actualización: 1 de junio de 2025</p>
+        <p className="text-slate-400 text-sm mb-10">Última actualización: 4 de junio de 2026</p>
 
         <div className="prose prose-invert prose-slate max-w-none space-y-8 text-slate-300 leading-relaxed">
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">1. Responsable del tratamiento</h2>
-            <p>TrainerBoost (en adelante, «nosotros») es el responsable del tratamiento de los datos personales que recopilas al usar nuestra plataforma. Para cualquier consulta sobre privacidad puedes escribirnos a <a href="mailto:hola@trainerboost.es" className="text-brand-primary hover:underline">hola@trainerboost.es</a>.</p>
+            <p>
+              TrainerBoost (en adelante, «nosotros»), con domicilio en España y correo de contacto{' '}
+              <a href="mailto:hola@trainerboost.es" className="text-brand-primary hover:underline">hola@trainerboost.es</a>,
+              {' '}es el responsable del tratamiento de los datos personales recogidos a través de la plataforma accesible en{' '}
+              <a href="https://trainerboost.es" className="text-brand-primary hover:underline">trainerboost.es</a>.
+            </p>
           </section>
 
           <section>
@@ -66,6 +71,7 @@ export default function PrivacyPage() {
               <li><strong className="text-slate-200">Supabase:</strong> almacenamiento de base de datos y autenticación (servidores en la UE).</li>
               <li><strong className="text-slate-200">Stripe:</strong> procesamiento de pagos (certificado PCI DSS).</li>
               <li><strong className="text-slate-200">Vercel:</strong> alojamiento de la aplicación.</li>
+              <li><strong className="text-slate-200">Resend:</strong> envío de correos electrónicos transaccionales (bienvenida, notificaciones).</li>
             </ul>
           </section>
 

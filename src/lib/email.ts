@@ -77,7 +77,7 @@ function trainerWelcomeHtml(name: string) {
     <p style="color:#475569;font-size:12px;text-align:center;margin-top:24px;line-height:1.6;">
       ¿Necesitas ayuda? Responde a este email o escríbenos a
       <a href="mailto:hola@trainerboost.es" style="color:#0EA5E9;">hola@trainerboost.es</a><br>
-      © 2025 TrainerBoost · Spain 🇪🇸
+      © 2026 TrainerBoost · Spain 🇪🇸
     </p>
   </div>
 </body>
@@ -119,7 +119,7 @@ function clientWelcomeHtml(name: string) {
     </div>
 
     <p style="color:#475569;font-size:12px;text-align:center;margin-top:24px;">
-      © 2025 TrainerBoost · Spain 🇪🇸
+      © 2026 TrainerBoost · Spain 🇪🇸
     </p>
   </div>
 </body>

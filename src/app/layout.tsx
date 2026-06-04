@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono, Barlow_Condensed } from 'next/font/google'
 import Script from 'next/script'
 import { Toaster } from 'sonner'
+import { Analytics } from '@vercel/analytics/react'
 import CookieBanner from '@/components/CookieBanner'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
 import './globals.css'
@@ -111,6 +112,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             },
           }}
         />
+        <Analytics />
         <CookieBanner />
         <ServiceWorkerRegistration />
         {/* 🔑 Analytics: añade NEXT_PUBLIC_PLAUSIBLE_DOMAIN=app.trainerboost.es en .env.local y Vercel para activar */}

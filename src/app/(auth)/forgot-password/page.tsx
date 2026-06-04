@@ -6,6 +6,8 @@ import { toast } from 'sonner'
 import { Mail, ArrowLeft, Loader2, Zap, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
+export const dynamic = 'force-dynamic'
+
 export default function ForgotPasswordPage() {
   const supabase = createClient()
   const [email, setEmail]     = useState('')

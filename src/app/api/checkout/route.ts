@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { stripe, PLANS, type PlanKey } from '@/lib/stripe'
+
+const checkoutSchema = z.object({
+  plan: z.enum(['starter', 'pro', 'unlimited'] as const),
+})
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +16,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
     }
 
-    const { plan } = await request.json() as { plan: PlanKey }
+    const parsed = checkoutSchema.safeParse(await request.json())
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Plan inválido' }, { status: 400 })
+    }
+    const { plan } = parsed.data as { plan: PlanKey }
     const planConfig = PLANS[plan]
     if (!planConfig) {
       return NextResponse.json({ error: 'Plan inválido' }, { status: 400 })

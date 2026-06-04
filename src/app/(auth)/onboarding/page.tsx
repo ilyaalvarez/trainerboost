@@ -10,6 +10,8 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { FREE_MAX_CLIENTS } from '@/lib/plans'
 
+export const dynamic = 'force-dynamic'
+
 const SPECIALTIES = [
   'Fuerza y musculación', 'Pérdida de peso', 'Atletismo', 'CrossFit',
   'Yoga', 'Pilates', 'Nutrición deportiva', 'Rehabilitación',

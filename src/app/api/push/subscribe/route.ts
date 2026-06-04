@@ -1,27 +1,32 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 
-const MAX_ENDPOINT = 2048
-const MAX_KEY      = 256
+const subscribeSchema = z.object({
+  endpoint: z.string().url().max(2048),
+  p256dh:   z.string().min(1).max(256),
+  auth:     z.string().min(1).max(256),
+})
+
+const unsubscribeSchema = z.object({
+  endpoint: z.string().url().max(2048),
+})
 
 export async function POST(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  let body: { endpoint: string; p256dh: string; auth: string }
-  try {
-    body = await request.json()
-  } catch {
+  let raw: unknown
+  try { raw = await request.json() } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { endpoint, p256dh, auth } = body
-  if (!endpoint || typeof endpoint !== 'string' || endpoint.length > MAX_ENDPOINT ||
-      !p256dh   || typeof p256dh   !== 'string' || p256dh.length   > MAX_KEY ||
-      !auth     || typeof auth     !== 'string' || auth.length     > MAX_KEY) {
+  const parsed = subscribeSchema.safeParse(raw)
+  if (!parsed.success) {
     return NextResponse.json({ error: 'Missing or invalid push subscription fields' }, { status: 400 })
   }
+  const { endpoint, p256dh, auth } = parsed.data
 
   const { error } = await supabase.from('push_subscriptions').upsert(
     { user_id: user.id, endpoint, p256dh, auth },
@@ -36,18 +41,16 @@ export async function DELETE(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  let body: { endpoint: string }
-  try {
-    body = await request.json()
-  } catch {
+  let raw: unknown
+  try { raw = await request.json() } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { endpoint } = body
-  if (!endpoint || typeof endpoint !== 'string' || endpoint.length > MAX_ENDPOINT) {
+  const parsed = unsubscribeSchema.safeParse(raw)
+  if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid endpoint' }, { status: 400 })
   }
 
-  await supabase.from('push_subscriptions').delete().eq('endpoint', endpoint).eq('user_id', user.id)
+  await supabase.from('push_subscriptions').delete().eq('endpoint', parsed.data.endpoint).eq('user_id', user.id)
   return NextResponse.json({ ok: true })
 }

@@ -1,26 +1,27 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { isValidUUID } from '@/lib/validation'
+
+const notifyMessageSchema = z.object({
+  receiverId: z.string().uuid(),
+  content:    z.string().min(1).max(2000),
+})
 
 export async function POST(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  let body: { receiverId: string; content: string }
-  try {
-    body = await request.json()
-  } catch {
+  let raw: unknown
+  try { raw = await request.json() } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { receiverId, content } = body
-  if (!isValidUUID(receiverId)) {
-    return NextResponse.json({ error: 'receiverId must be a valid UUID' }, { status: 400 })
+  const parsed = notifyMessageSchema.safeParse(raw)
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 })
   }
-  if (!content || typeof content !== 'string' || content.trim().length === 0) {
-    return NextResponse.json({ error: 'content is required' }, { status: 400 })
-  }
+  const { receiverId, content } = parsed.data
 
   // Get sender name and role
   const { data: senderProfile } = await supabase

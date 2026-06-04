@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 
-const CODE_RE = /^[a-zA-Z0-9_-]{6,64}$/
+const codeSchema = z.string().min(6).max(64).regex(/^[a-zA-Z0-9_-]+$/)
 
 export async function GET(
   _request: Request,
   { params }: { params: { code: string } },
 ) {
-  const code = params.code?.trim()
-  if (!code || !CODE_RE.test(code)) {
+  const parsed = codeSchema.safeParse(params.code?.trim())
+  if (!parsed.success) {
     return NextResponse.json({ valid: false, error: 'Código inválido' }, { status: 400 })
   }
+  const code = parsed.data
 
   const supabase = createClient()
 
@@ -32,11 +34,13 @@ export async function GET(
     return NextResponse.json({ valid: false, error: 'Este código ha expirado' }, { status: 410 })
   }
 
+  const p = data.profiles as { full_name: string | null } | { full_name: string | null }[] | null
+  const trainerName = (Array.isArray(p) ? p[0]?.full_name : (p as { full_name: string | null } | null)?.full_name) ?? 'Tu entrenador'
+
   return NextResponse.json({
     valid: true,
     trainerId: data.trainer_id,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    trainerName: (data.profiles as any)?.[0]?.full_name ?? (data.profiles as any)?.full_name ?? 'Tu entrenador',
+    trainerName,
     email: data.email,
   })
 }

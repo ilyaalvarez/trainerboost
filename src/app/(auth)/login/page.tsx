@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 import { Zap, Mail, Lock, ArrowRight, Loader2, ArrowLeft, Eye, EyeOff, AlertTriangle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
+export const dynamic = 'force-dynamic'
+
 function getAuthError(error: string): string {
   if (error.includes('Invalid login credentials')) return 'Email o contraseña incorrectos'
   if (error.includes('Email not confirmed')) return 'Confirma tu email antes de entrar'

@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import webpush from 'web-push'
 import { createServiceClient } from '@/lib/supabase/server'
-import { isValidUUID, isValidUrl } from '@/lib/validation'
+
+const sendSchema = z.object({
+  userId: z.string().uuid(),
+  title:  z.string().min(1).max(200),
+  body:   z.string().max(500).optional(),
+  url:    z.string().url().optional(),
+})
 
 const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY
@@ -20,23 +27,16 @@ export async function POST(request: Request) {
 
   webpush.setVapidDetails(vapidEmail, vapidPublicKey, vapidPrivateKey)
 
-  let input: { userId: string; title: string; body?: string; url?: string }
-  try {
-    input = await request.json()
-  } catch {
+  let raw: unknown
+  try { raw = await request.json() } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { userId, title, body, url } = input
-  if (!isValidUUID(userId)) {
-    return NextResponse.json({ error: 'userId must be a valid UUID' }, { status: 400 })
+  const parsed = sendSchema.safeParse(raw)
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 })
   }
-  if (!title || typeof title !== 'string' || title.length > 200) {
-    return NextResponse.json({ error: 'title is required (max 200 chars)' }, { status: 400 })
-  }
-  if (url !== undefined && !isValidUrl(url)) {
-    return NextResponse.json({ error: 'url must be a valid http/https URL' }, { status: 400 })
-  }
+  const { userId, title, body, url } = parsed.data
 
   const supabase = createServiceClient()
   const { data: subs } = await supabase

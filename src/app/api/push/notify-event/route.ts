@@ -1,29 +1,29 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { isValidUUID, isValidUrl } from '@/lib/validation'
+
+const notifyEventSchema = z.object({
+  userId: z.string().uuid(),
+  title:  z.string().min(1).max(200),
+  body:   z.string().max(500).optional(),
+  url:    z.string().url().optional(),
+})
 
 export async function POST(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  let input: { userId: string; title: string; body?: string; url?: string }
-  try {
-    input = await request.json()
-  } catch {
+  let raw: unknown
+  try { raw = await request.json() } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { userId, title, body, url } = input
-  if (!isValidUUID(userId)) {
-    return NextResponse.json({ error: 'userId must be a valid UUID' }, { status: 400 })
+  const parsed = notifyEventSchema.safeParse(raw)
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 })
   }
-  if (!title || typeof title !== 'string' || title.length > 200) {
-    return NextResponse.json({ error: 'title is required (max 200 chars)' }, { status: 400 })
-  }
-  if (url !== undefined && !isValidUrl(url)) {
-    return NextResponse.json({ error: 'url must be a valid http/https URL' }, { status: 400 })
-  }
+  const { userId, title, body, url } = parsed.data
 
   const secret = process.env.INTERNAL_API_SECRET
   if (!secret) return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 })

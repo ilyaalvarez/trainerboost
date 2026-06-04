@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+
+const sendInviteSchema = z.object({
+  invitationId: z.string().uuid(),
+})
 
 export async function POST(request: Request) {
   const supabase = createClient()
@@ -10,10 +15,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { invitationId } = await request.json() as { invitationId: string }
-  if (!invitationId) {
-    return NextResponse.json({ error: 'invitationId requerido' }, { status: 400 })
+  const parsed = sendInviteSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'invitationId inválido' }, { status: 400 })
   }
+  const { invitationId } = parsed.data
 
   // Verify the caller actually owns this invitation (prevents IDOR).
   const { data: invitation } = await supabase

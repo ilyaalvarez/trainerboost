@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 import { Lock, ArrowRight, Loader2, Zap, CheckCircle2, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
+export const dynamic = 'force-dynamic'
+
 export default function ResetPasswordPage() {
   const router   = useRouter()
   const supabase = createClient()

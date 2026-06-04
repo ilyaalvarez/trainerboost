@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 import { Mail, Lock, User, ArrowRight, Loader2, Users, Zap, ArrowLeft, CheckCircle2, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
+export const dynamic = 'force-dynamic'
+
 type Step = 1 | 2
 type Role = 'trainer' | 'client'
 

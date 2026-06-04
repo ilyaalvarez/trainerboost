@@ -1,35 +1,28 @@
 import { createServiceClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { isValidEmail } from '@/lib/validation'
+import { z } from 'zod'
+
+const contactSchema = z.object({
+  name:    z.string().min(1).max(120),
+  email:   z.string().email().max(254),
+  type:    z.string().max(50).optional().default('general'),
+  message: z.string().min(1).max(2000),
+})
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json() as {
-      name?: string
-      email?: string
-      type?: string
-      message?: string
+    const parsed = contactSchema.safeParse(await request.json())
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Campos inválidos' }, { status: 400 })
     }
-    const { name, email, type, message } = body
-
-    if (!name?.trim() || !email?.trim() || !message?.trim()) {
-      return NextResponse.json({ error: 'Campos requeridos' }, { status: 400 })
-    }
-
-    if (!isValidEmail(email)) {
-      return NextResponse.json({ error: 'Email inválido' }, { status: 400 })
-    }
-
-    if (message.length > 2000) {
-      return NextResponse.json({ error: 'Mensaje demasiado largo' }, { status: 400 })
-    }
+    const { name, email, type, message } = parsed.data
 
     const supabase = createServiceClient()
     const { error } = await supabase.from('contact_requests').insert({
-      name:    name.trim().slice(0, 120),
-      email:   email.trim().toLowerCase().slice(0, 254),
-      type:    (type ?? 'general').slice(0, 50),
-      message: message.trim().slice(0, 2000),
+      name:    name.trim(),
+      email:   email.trim().toLowerCase(),
+      type:    type ?? 'general',
+      message: message.trim(),
     })
 
     if (error) {

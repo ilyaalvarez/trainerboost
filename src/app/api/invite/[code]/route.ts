@@ -6,15 +6,16 @@ const codeSchema = z.string().min(6).max(64).regex(/^[a-zA-Z0-9_-]+$/)
 
 export async function GET(
   _request: Request,
-  { params }: { params: { code: string } },
+  { params }: { params: Promise<{ code: string }> },
 ) {
-  const parsed = codeSchema.safeParse(params.code?.trim())
+  const { code: rawCode } = await params
+  const parsed = codeSchema.safeParse(rawCode?.trim())
   if (!parsed.success) {
     return NextResponse.json({ valid: false, error: 'Código inválido' }, { status: 400 })
   }
   const code = parsed.data
 
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data, error } = await supabase
     .from('invitations')

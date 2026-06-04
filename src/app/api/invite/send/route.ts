@@ -7,7 +7,7 @@ const sendInviteSchema = z.object({
 })
 
 export async function POST(request: Request) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // getUser() revalidates the JWT against the auth server (getSession does not).
   const { data: { user } } = await supabase.auth.getUser()

@@ -5,7 +5,7 @@ import { getUnreadMessageCount, getPendingAppointmentsCount } from '@/lib/data/d
 import type { Profile, Subscription } from '@/types/database'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')

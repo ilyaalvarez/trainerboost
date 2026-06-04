@@ -9,7 +9,6 @@ export async function middleware(request: NextRequest) {
   const rl = getRatelimiter(path)
   if (rl) {
     const ip =
-      request.ip ??
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       'anonymous'
     const { success, limit, reset } = await rl.limit(ip)

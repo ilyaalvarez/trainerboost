@@ -5,7 +5,7 @@ import { PushPrompt } from '@/components/ui/PushPrompt'
 import type { Profile } from '@/types/database'
 
 export default async function ClientLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')

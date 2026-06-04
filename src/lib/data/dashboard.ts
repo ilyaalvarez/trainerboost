@@ -2,7 +2,7 @@ import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 
 export const getUnreadMessageCount = cache(async (userId: string): Promise<number> => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { count } = await supabase
     .from('messages')
     .select('id', { count: 'exact', head: true })
@@ -12,7 +12,7 @@ export const getUnreadMessageCount = cache(async (userId: string): Promise<numbe
 })
 
 export const getPendingAppointmentsCount = cache(async (userId: string): Promise<number> => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { count } = await supabase
     .from('appointments')
     .select('id', { count: 'exact', head: true })

@@ -11,7 +11,7 @@ import { DailyCheckinCard } from '@/components/ui/DailyCheckinCard'
 import { QuickLogButton } from './_components/QuickLogButton'
 
 export default async function ClientHomePage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 

@@ -23,6 +23,23 @@ export async function POST(request: Request) {
   }
   const { receiverId, content } = parsed.data
 
+  // Verify an active trainer–client relationship exists between sender and receiver.
+  // Prevents any authenticated user from spamming push notifications to arbitrary UUIDs.
+  const { data: relationship } = await supabase
+    .from('trainer_clients')
+    .select('id')
+    .or(
+      `and(trainer_id.eq.${user.id},client_id.eq.${receiverId}),` +
+      `and(client_id.eq.${user.id},trainer_id.eq.${receiverId})`
+    )
+    .eq('status', 'active')
+    .limit(1)
+    .maybeSingle()
+
+  if (!relationship) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
+  }
+
   // Get sender name and role
   const { data: senderProfile } = await supabase
     .from('profiles')

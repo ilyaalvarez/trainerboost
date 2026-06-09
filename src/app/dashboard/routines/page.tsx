@@ -154,8 +154,9 @@ export default function RoutinesPage() {
   }
 
   const archiveRoutine = async (id: string, currentStatus: RoutineStatus) => {
+    if (!trainerId) return
     const newStatus: RoutineStatus = currentStatus === 'active' ? 'archived' : 'active'
-    const { error } = await supabase.from('routines').update({ status: newStatus }).eq('id', id)
+    const { error } = await supabase.from('routines').update({ status: newStatus }).eq('id', id).eq('trainer_id', trainerId)
     if (error) { toast.error('Error: ' + error.message); return }
     toast.success(newStatus === 'archived' ? 'Rutina archivada' : 'Rutina restaurada')
     setRoutines(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r))
@@ -869,6 +870,7 @@ function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
         ends_at:     form.ends_at || null,
       })
       .eq('id', routine.id)
+      .eq('trainer_id', routine.trainer_id)
 
     if (updateError) {
       toast.error('Error al actualizar rutina: ' + updateError.message)

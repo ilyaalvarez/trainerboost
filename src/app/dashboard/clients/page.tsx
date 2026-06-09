@@ -247,7 +247,8 @@ export default function ClientsPage() {
   }
 
   async function updateTags(clientId: string, tags: string[]) {
-    await supabase.from('trainer_clients').update({ tags }).eq('id', clientId)
+    if (!userId) return
+    await supabase.from('trainer_clients').update({ tags }).eq('id', clientId).eq('trainer_id', userId)
     setClients(prev => prev.map(c => c.id === clientId ? { ...c, tags } : c))
   }
 

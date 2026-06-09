@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     headers: { 'Content-Type': 'application/json', 'x-internal-secret': secret },
     body: JSON.stringify({ userId, title, body, url }),
     signal: AbortSignal.timeout(5000),
-  }).catch(() => {})
+  }).catch(err => console.error('[push/notify-event] Error al enviar push:', err))
 
   return NextResponse.json({ ok: true })
 }

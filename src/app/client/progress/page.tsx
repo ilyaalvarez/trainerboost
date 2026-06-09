@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Plus, Loader2, Scale, Flame, TrendingDown, TrendingUp, ClipboardList, X, ChevronLeft, ChevronRight, Target, Pencil, Medal } from 'lucide-react'
+import { Plus, Loader2, Scale, Flame, TrendingDown, TrendingUp, ClipboardList, X, ChevronLeft, ChevronRight, Target, Pencil, Medal, Dumbbell, ChevronDown } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { ProgressLog } from '@/types/database'
 import { formatDate } from '@/lib/utils'
@@ -13,6 +13,12 @@ import Milestones from '@/components/ui/Milestones'
 import { ActivityHeatmap } from '@/components/ui/ActivityHeatmap'
 import ProgressChart from '../_components/ProgressChart'
 import { PhotoUpload } from '@/components/ui/PhotoUpload'
+
+interface WorkoutSession {
+  date: string
+  exercises: { name: string; sets: Array<{ set_number: number; weight_kg: number | null; reps: number | null }> }[]
+  totalSets: number
+}
 
 function computeStreak(dates: string[]): number {
   const unique = Array.from(new Set(dates.map(d => d.slice(0, 10)))).sort((a, b) => (a < b ? 1 : -1))
@@ -46,6 +52,9 @@ export default function ClientProgressPage() {
   const [completedWorkouts, setCompletedWorkouts] = useState(0)
 
   const [personalRecords, setPersonalRecords] = useState<Array<{ name: string; maxWeight: number; reps: number | null; date: string }>>([])
+  const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
+  const [expandedSession, setExpandedSession] = useState<string | null>(null)
+  const [showAllSessions, setShowAllSessions] = useState(false)
   const [lightbox, setLightbox] = useState<{ urls: string[]; idx: number } | null>(null)
   const [showGoalModal, setShowGoalModal] = useState(false)
   const [goalWeight, setGoalWeight]       = useState('')
@@ -100,7 +109,7 @@ export default function ClientProgressPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const [{ data: l }, { data: tc }, { count: workoutsCount }, { data: setLogsData }] = await Promise.all([
+    const [{ data: l }, { data: tc }, { count: workoutsCount }, { data: setLogsData }, { data: sessionRawData }] = await Promise.all([
       supabase.from('progress_logs')
         .select('*')
         .eq('client_id', user.id)
@@ -118,6 +127,13 @@ export default function ClientProgressPage() {
         .eq('client_id', user.id)
         .not('weight_kg', 'is', null)
         .gt('weight_kg', 0),
+      supabase.from('set_logs')
+        .select('exercise_id, set_number, weight_kg, reps, logged_at, routine_exercises!exercise_id(name)')
+        .eq('client_id', user.id)
+        .order('logged_at', { ascending: false })
+        .order('exercise_id')
+        .order('set_number')
+        .limit(300),
     ])
 
     setLogs(l || [])
@@ -139,6 +155,24 @@ export default function ClientProgressPage() {
       .sort((a, b) => b.maxWeight - a.maxWeight)
       .slice(0, 8)
     setPersonalRecords(records)
+
+    // Build workout session history from set_logs grouped by date → exercise
+    type SessionRow = { exercise_id: string; set_number: number; weight_kg: number | null; reps: number | null; logged_at: string; routine_exercises: { name: string } | null }
+    const sessionsMap = new Map<string, Map<string, { name: string; sets: Array<{ set_number: number; weight_kg: number | null; reps: number | null }> }>>()
+    for (const row of (sessionRawData ?? []) as unknown as SessionRow[]) {
+      const date = row.logged_at
+      const exName = (row.routine_exercises as { name: string } | null)?.name ?? 'Ejercicio'
+      if (!sessionsMap.has(date)) sessionsMap.set(date, new Map())
+      const dayMap = sessionsMap.get(date)!
+      if (!dayMap.has(row.exercise_id)) dayMap.set(row.exercise_id, { name: exName, sets: [] })
+      dayMap.get(row.exercise_id)!.sets.push({ set_number: row.set_number, weight_kg: row.weight_kg, reps: row.reps })
+    }
+    const sessions: WorkoutSession[] = Array.from(sessionsMap.entries()).map(([date, exMap]) => ({
+      date,
+      exercises: Array.from(exMap.values()),
+      totalSets: Array.from(exMap.values()).reduce((s, ex) => s + ex.sets.length, 0),
+    }))
+    setWorkoutSessions(sessions)
 
     setLoading(false)
   }, [supabase])
@@ -469,6 +503,78 @@ export default function ClientProgressPage() {
         </div>
       )}
 
+      {/* Workout session history */}
+      {workoutSessions.length > 0 && (() => {
+        const visible = showAllSessions ? workoutSessions : workoutSessions.slice(0, 7)
+        return (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Dumbbell className="w-4 h-4 text-brand-primary" />
+                <h2 className="font-semibold text-white">Historial de entrenamientos</h2>
+              </div>
+              <span className="text-xs text-slate-500">{workoutSessions.length} sesiones</span>
+            </div>
+            <div className="space-y-2">
+              {visible.map(session => {
+                const isOpen = expandedSession === session.date
+                return (
+                  <div key={session.date} className="card overflow-hidden">
+                    <button
+                      onClick={() => setExpandedSession(isOpen ? null : session.date)}
+                      className="w-full flex items-center gap-3 p-4 text-left hover:bg-surface-2/50 transition-colors"
+                    >
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                           style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.2)' }}>
+                        <Dumbbell className="w-4 h-4 text-brand-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-white capitalize text-sm">
+                          {formatDate(session.date, "EEEE d MMM yyyy")}
+                        </div>
+                        <div className="text-xs text-slate-400 mt-0.5">
+                          {session.exercises.length} {session.exercises.length === 1 ? 'ejercicio' : 'ejercicios'} · {session.totalSets} sets
+                        </div>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isOpen && (
+                      <div className="border-t border-border/50 px-4 pb-4 pt-3 space-y-4">
+                        {session.exercises.map((ex, ei) => (
+                          <div key={ei}>
+                            <div className="text-xs font-semibold text-slate-300 uppercase tracking-wide mb-2">{ex.name}</div>
+                            <div className="flex flex-wrap gap-2">
+                              {ex.sets.map((s, si) => (
+                                <div key={si}
+                                     className="px-2.5 py-1.5 rounded-lg text-xs font-mono"
+                                     style={{ background: 'rgba(14,165,233,0.07)', border: '1px solid rgba(14,165,233,0.18)' }}>
+                                  <span className="text-slate-500 mr-1">S{s.set_number}</span>
+                                  {s.weight_kg != null && <span className="text-white font-semibold">{s.weight_kg}kg</span>}
+                                  {s.weight_kg != null && s.reps != null && <span className="text-slate-500 mx-0.5">×</span>}
+                                  {s.reps != null && <span className="text-slate-300">{s.reps}</span>}
+                                  {s.weight_kg == null && s.reps == null && <span className="text-slate-500">—</span>}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+            {workoutSessions.length > 7 && (
+              <button
+                onClick={() => setShowAllSessions(v => !v)}
+                className="mt-3 w-full text-xs text-brand-primary hover:text-sky-300 transition-colors py-2 text-center"
+              >
+                {showAllSessions ? 'Ver menos ↑' : `Ver todas (${workoutSessions.length}) ↓`}
+              </button>
+            )}
+          </div>
+        )
+      })()}
 
       {/* Table */}
       {loading ? (

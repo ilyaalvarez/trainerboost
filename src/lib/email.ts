@@ -114,6 +114,56 @@ export async function sendAppointmentReminderEmail(
   }).catch(err => { console.error('[email] sendAppointmentReminderEmail failed:', err?.message) })
 }
 
+export async function sendWeeklyCheckinEmail(to: string, clientName: string, trainerName: string) {
+  if (!resend) return
+  const firstName   = escapeHtml(clientName.split(' ')[0])
+  const trainerFirst = escapeHtml(trainerName.split(' ')[0])
+  const link = `${APP_URL}/client/checkin`
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${trainerFirst} quiere saber cómo fue tu semana 💪`,
+    html: `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#0F172A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <div style="max-width:540px;margin:40px auto;padding:0 20px;">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#10B981,#0EA5E9);padding:10px 20px;border-radius:12px;">
+        <span style="color:white;font-size:18px;font-weight:800;">💪 TrainerBoost</span>
+      </div>
+    </div>
+    <div style="background:#1E293B;border:1px solid #334155;border-radius:20px;padding:36px;">
+      <h1 style="color:white;font-size:22px;font-weight:700;margin:0 0 12px;">¡Hola, ${firstName}!</h1>
+      <p style="color:#94A3B8;font-size:15px;line-height:1.6;margin:0 0 24px;">
+        Tu entrenador <strong style="color:#E2E8F0;">${trainerFirst}</strong> quiere saber cómo fue tu semana.
+        Solo son 5 preguntas rápidas — te lleva menos de 2 minutos.
+      </p>
+      <div style="background:#263548;border-radius:12px;padding:16px;margin-bottom:28px;">
+        ${['Energía de la semana (1-10)','Dolor o molestias','Adherencia a la rutina','Adherencia a la dieta','Peso actual (opcional)'].map((q, i) => `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:${i < 4 ? '10px' : '0'};">
+          <div style="width:20px;height:20px;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="color:#10B981;font-size:10px;font-weight:700;">${i + 1}</span>
+          </div>
+          <span style="color:#CBD5E1;font-size:13px;">${q}</span>
+        </div>`).join('')}
+      </div>
+      <div style="text-align:center;">
+        <a href="${link}" style="display:inline-block;background:linear-gradient(135deg,#10B981,#0EA5E9);color:white;font-weight:700;font-size:15px;text-decoration:none;padding:14px 36px;border-radius:12px;">
+          Hacer mi check-in →
+        </a>
+      </div>
+    </div>
+    <p style="color:#475569;font-size:12px;text-align:center;margin-top:24px;">
+      © 2026 TrainerBoost · <a href="mailto:hola@trainerboost.es" style="color:#0EA5E9;">hola@trainerboost.es</a>
+    </p>
+  </div>
+</body>
+</html>`,
+  }).catch(err => { console.error('[email] sendWeeklyCheckinEmail failed:', err?.message) })
+}
+
 export async function sendWelcomeEmail(to: string, name: string, role: 'trainer' | 'client') {
   if (!resend) return
 

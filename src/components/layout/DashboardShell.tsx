@@ -15,10 +15,11 @@ interface Props {
   subscription: Subscription | null
   unreadMessages: number
   pendingApts?: number
+  pendingCheckins?: number
   children: React.ReactNode
 }
 
-export default function DashboardShell({ profile, subscription, unreadMessages, pendingApts = 0, children }: Props) {
+export default function DashboardShell({ profile, subscription, unreadMessages, pendingApts = 0, pendingCheckins = 0, children }: Props) {
   const [sidebarOpen, setSidebarOpen]   = useState(false)
   const [notifOpen, setNotifOpen]       = useState(false)
   const [paletteOpen, setPaletteOpen]   = useState(false)
@@ -69,6 +70,7 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
           subscription={subscription}
           unreadMessages={liveUnread}
           pendingApts={pendingApts}
+          pendingCheckins={pendingCheckins}
         />
       </div>
 

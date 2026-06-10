@@ -34,10 +34,11 @@ interface Props {
   subscription: Subscription | null
   unreadMessages?: number
   pendingApts?: number
+  pendingCheckins?: number
   onClose?: () => void
 }
 
-export default function DashboardSidebar({ profile, subscription, unreadMessages = 0, pendingApts = 0, onClose }: Props) {
+export default function DashboardSidebar({ profile, subscription, unreadMessages = 0, pendingApts = 0, pendingCheckins = 0, onClose }: Props) {
   const pathname = usePathname()
   const router   = useRouter()
   const supabase = createClient()
@@ -145,6 +146,11 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
               {item.label === 'Citas' && pendingApts > 0 && (
                 <span className="ml-auto bg-amber-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                   {pendingApts}
+                </span>
+              )}
+              {item.label === 'Clientes' && pendingCheckins > 0 && (
+                <span className="ml-auto bg-violet-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                  {pendingCheckins}
                 </span>
               )}
             </Link>

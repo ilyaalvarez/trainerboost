@@ -55,21 +55,20 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
     : 'Gratuito'
 
   return (
-    <aside className="w-64 border-r border-border flex flex-col shrink-0 h-full"
-           style={{ background: 'linear-gradient(180deg, #0D0D0D 0%, #111111 100%)' }}>
+    <aside className="w-64 border-r border-border flex flex-col shrink-0 h-full bg-background">
 
       {/* ── Logo ──────────────────────────────────────────────────────── */}
       <div className="p-5 border-b border-border/60">
         <div className="flex items-center gap-3">
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center shadow-glow-sm shrink-0 transition-transform duration-200 hover:scale-105"
-            style={{ background: 'linear-gradient(135deg, #A3FF4A, #7C3AED)' }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+            style={{ background: '#8FD43A' }}
           >
-            <Zap className="w-4 h-4 text-white" />
+            <Zap className="w-4 h-4 text-black" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-bold text-white text-sm tracking-tight">TrainerBoost</div>
-            <div className="text-xs text-slate-500 font-medium">Dashboard</div>
+            <div className="text-xs text-slate-600">Dashboard</div>
           </div>
           <NotificationBell
             userId={profile.id}
@@ -81,19 +80,13 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
 
       {/* ── Plan badge ────────────────────────────────────────────────── */}
       {subscription?.status === 'active' && (
-        <div
-          className="mx-4 mt-3 px-3 py-2 rounded-lg border transition-all duration-200 hover:shadow-glow-sm"
-          style={{
-            background: 'linear-gradient(135deg, rgba(163,255,74,0.07) 0%, rgba(124,58,237,0.04) 100%)',
-            borderColor: 'rgba(163,255,74,0.2)',
-          }}
-        >
+        <div className="mx-4 mt-3 px-3 py-2 rounded-lg border border-border-bright bg-surface-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <Zap className="w-3 h-3 text-brand-primary" />
-              <span className="text-xs font-semibold text-brand-primary">Plan {planLabel}</span>
+              <span className="text-xs font-medium text-brand-primary">Plan {planLabel}</span>
             </div>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-600">
               {subscription.max_clients === 999999 ? '∞' : subscription.max_clients} clientes
             </span>
           </div>
@@ -107,12 +100,11 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
             const e = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
             window.dispatchEvent(e)
           }}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border/60 text-slate-500 text-xs hover:border-slate-600 hover:text-slate-400 transition-all group"
-          style={{ background: 'rgba(10,10,10,0.5)' }}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border text-slate-600 text-xs hover:border-border-bright hover:text-slate-400 transition-all bg-surface"
         >
           <Search className="w-3.5 h-3.5 shrink-0" />
           <span className="flex-1 text-left">Buscar...</span>
-          <kbd className="hidden md:flex items-center gap-0.5 text-[10px] font-mono opacity-60 group-hover:opacity-100 transition-opacity">⌘K</kbd>
+          <kbd className="hidden md:flex items-center gap-0.5 text-[10px] font-mono opacity-50">⌘K</kbd>
         </button>
       </div>
 
@@ -127,30 +119,30 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
               href={item.href}
               onClick={onClose}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ease-smooth-out group relative',
+                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group relative',
                 isActive
                   ? 'nav-pill-active'
-                  : 'text-slate-400 hover:bg-surface-2 hover:text-slate-200'
+                  : 'text-slate-500 hover:bg-surface-2 hover:text-slate-300'
               )}
             >
               <item.icon className={cn(
-                'w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110',
-                isActive ? 'text-lime-400' : 'text-slate-500 group-hover:text-slate-300'
+                'w-4 h-4 shrink-0',
+                isActive ? 'text-brand-primary' : 'text-slate-600 group-hover:text-slate-400'
               )} />
               <span>{item.label}</span>
 
               {item.label === 'Mensajes' && unreadMessages > 0 && (
-                <span className="ml-auto bg-brand-primary text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
+                <span className="ml-auto bg-brand-primary text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {unreadMessages}
                 </span>
               )}
               {item.label === 'Citas' && pendingApts > 0 && (
-                <span className="ml-auto bg-amber-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                <span className="ml-auto bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {pendingApts}
                 </span>
               )}
               {item.label === 'Check-ins' && pendingCheckins > 0 && (
-                <span className="ml-auto bg-violet-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                <span className="ml-auto bg-violet-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {pendingCheckins}
                 </span>
               )}
@@ -169,32 +161,30 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
               href={item.href}
               onClick={onClose}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ease-smooth-out group',
-                isActive ? 'bg-surface-2 text-white' : 'text-slate-400 hover:bg-surface-2 hover:text-slate-200'
+                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group',
+                isActive ? 'bg-surface-2 text-white' : 'text-slate-500 hover:bg-surface-2 hover:text-slate-300'
               )}
             >
-              <item.icon className="w-4 h-4 shrink-0 text-slate-500 group-hover:text-slate-300 transition-transform duration-200 group-hover:scale-110" />
+              <item.icon className="w-4 h-4 shrink-0 text-slate-600 group-hover:text-slate-400 transition-colors" />
               {item.label}
             </Link>
           )
         })}
 
         {/* User + logout */}
-        <div className="pt-2 mt-1 border-t border-border/50">
+        <div className="pt-2 mt-1 border-t border-border/40">
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="ring-2 ring-brand-primary/20 rounded-full">
-              <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
-            </div>
+            <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
             <div className="flex-1 min-w-0">
               <div className="text-xs font-semibold text-white truncate">{profile.full_name}</div>
-              <div className="text-xs text-slate-500 truncate">Entrenador</div>
+              <div className="text-xs text-slate-600 truncate">Entrenador</div>
             </div>
             <button
               onClick={logout}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all duration-150 group"
+              className="p-1.5 rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-400/8 transition-all duration-150"
               title="Cerrar sesión"
             >
-              <LogOut className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+              <LogOut className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

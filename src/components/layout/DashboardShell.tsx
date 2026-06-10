@@ -119,10 +119,10 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
 
           <div className="flex items-center gap-2">
             <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center shadow-glow-sm"
-              style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
+              className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: '#8FD43A' }}
             >
-              <Zap className="w-3.5 h-3.5 text-white" />
+              <Zap className="w-3.5 h-3.5 text-black" />
             </div>
             <span className="font-bold text-white text-sm tracking-tight">TrainerBoost</span>
           </div>

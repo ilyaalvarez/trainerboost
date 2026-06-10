@@ -20,35 +20,30 @@ const colorMap: Record<NonNullable<StatsCardProps['color']>, {
   wrapper: string
   icon: string
   accent: string
-  glow: string
   value: string
 }> = {
   primary:   {
-    wrapper: 'bg-lime-500/10 ring-lime-500/20',
+    wrapper: 'bg-lime-500/8 ring-lime-500/15',
     icon:    'text-lime-400',
-    accent:  'linear-gradient(90deg, #A3FF4A, #7C3AED)',
-    glow:    'rgba(163,255,74,0.15)',
-    value:   '#A3FF4A',
+    accent:  '#8FD43A',
+    value:   '#8FD43A',
   },
   accent:    {
-    wrapper: 'bg-emerald-500/10 ring-emerald-500/20',
+    wrapper: 'bg-emerald-500/8 ring-emerald-500/15',
     icon:    'text-emerald-400',
-    accent:  'linear-gradient(90deg, #10B981, #A3FF4A)',
-    glow:    'rgba(16,185,129,0.15)',
+    accent:  '#10B981',
     value:   '#F1F5F9',
   },
   secondary: {
-    wrapper: 'bg-violet-500/10 ring-violet-500/20',
+    wrapper: 'bg-violet-500/8 ring-violet-500/15',
     icon:    'text-violet-400',
-    accent:  'linear-gradient(90deg, #7C3AED, #EC4899)',
-    glow:    'rgba(124,58,237,0.15)',
+    accent:  '#7C3AED',
     value:   '#F1F5F9',
   },
   warning:   {
-    wrapper: 'bg-amber-500/10 ring-amber-500/20',
+    wrapper: 'bg-amber-500/8 ring-amber-500/15',
     icon:    'text-amber-400',
-    accent:  'linear-gradient(90deg, #F59E0B, #EF4444)',
-    glow:    'rgba(245,158,11,0.15)',
+    accent:  '#F59E0B',
     value:   '#F1F5F9',
   },
 }
@@ -61,54 +56,40 @@ export default function StatsCard({
   color = 'primary',
   className,
 }: StatsCardProps) {
-  const { wrapper, icon: iconText, accent, glow, value: valueColor } = colorMap[color]
+  const { wrapper, icon: iconText, accent, value: valueColor } = colorMap[color]
 
   return (
     <div
       className={cn(
         'relative flex flex-col gap-3 overflow-hidden group cursor-default',
-        'rounded-xl border border-[#222222] bg-[#141414]',
+        'rounded-xl border border-border bg-surface',
         'px-5 py-4',
         'shadow-card',
-        'transition-all duration-200',
-        'hover:-translate-y-1.5 hover:border-[#333333] hover:shadow-[0_20px_40px_-8px_rgba(0,0,0,0.65)]',
+        'transition-all duration-200 ease-smooth-out',
+        'hover:-translate-y-1 hover:border-border-bright hover:shadow-card-hover',
         className,
       )}
-      style={{
-        ['--glow' as string]: glow,
-      }}
     >
-      {/* Hover glow overlay */}
-      <div
-        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-        style={{ boxShadow: `0 12px 28px -4px rgba(0,0,0,0.5), 0 0 0 1px ${glow}` }}
-      />
-
       {/* Colored top accent line */}
       <div
-        className="absolute top-0 left-0 right-0 h-0.5 rounded-t-xl"
-        style={{ background: accent }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-0 left-0 h-0.5 rounded-t-xl w-0 group-hover:w-full transition-all duration-500 ease-out opacity-60 blur-[3px]"
+        className="absolute top-0 left-0 right-0 h-px rounded-t-xl"
         style={{ background: accent }}
         aria-hidden="true"
       />
 
       {/* Label + icon */}
       <div className="flex items-start justify-between gap-2 mt-1">
-        <span className="text-[#94A3B8] text-xs font-medium uppercase tracking-wider leading-none pt-0.5">
+        <span className="text-slate-500 text-xs font-medium leading-none pt-0.5">
           {label}
         </span>
         <div
           className={cn(
             'flex items-center justify-center',
-            'w-9 h-9 rounded-lg shrink-0 ring-1',
-            'transition-all duration-300 group-hover:scale-110 group-hover:rotate-3',
+            'w-8 h-8 rounded-lg shrink-0 ring-1',
+            'transition-transform duration-200 group-hover:scale-105',
             wrapper,
             iconText,
-            '[&>svg]:w-[18px] [&>svg]:h-[18px]',
+            '[&>svg]:w-4 [&>svg]:h-4',
           )}
           aria-hidden="true"
         >
@@ -118,7 +99,7 @@ export default function StatsCard({
 
       {/* Value */}
       <p
-        className="font-display text-[3rem] font-bold leading-none tracking-tight transition-all duration-200"
+        className="font-display text-kpi font-bold leading-none tracking-tight"
         style={{ color: valueColor }}
       >
         {typeof value === 'number'
@@ -131,19 +112,19 @@ export default function StatsCard({
         <div className="flex items-center gap-1.5">
           <span
             className={cn(
-              'inline-flex items-center gap-1 rounded-full px-2 py-0.5',
-              'text-[11px] font-semibold ring-1 ring-inset',
+              'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5',
+              'text-[11px] font-medium ring-1 ring-inset',
               change.positive
-                ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20'
-                : 'bg-red-500/10     text-red-400     ring-red-500/20',
+                ? 'bg-emerald-500/8 text-emerald-400 ring-emerald-500/15'
+                : 'bg-red-500/8     text-red-400     ring-red-500/15',
             )}
           >
             {change.positive
-              ? <TrendingUp size={11} strokeWidth={2.5} aria-hidden="true" />
-              : <TrendingDown size={11} strokeWidth={2.5} aria-hidden="true" />}
+              ? <TrendingUp size={10} strokeWidth={2.5} aria-hidden="true" />
+              : <TrendingDown size={10} strokeWidth={2.5} aria-hidden="true" />}
             {change.value}
           </span>
-          <span className="text-[#94A3B8] text-[11px]">vs. mes anterior</span>
+          <span className="text-slate-600 text-[11px]">vs. mes anterior</span>
         </div>
       )}
     </div>

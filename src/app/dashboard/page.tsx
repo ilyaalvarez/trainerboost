@@ -150,7 +150,7 @@ export default async function DashboardPage() {
       {/* ── Free plan CTA ─────────────────────────────────────────────── */}
       {(!subscription || subscription.status !== 'active') && (
         <div className="rounded-xl border p-4 flex items-center justify-between gap-4 animate-fade-in-up"
-             style={{ background: 'linear-gradient(135deg, rgba(163,255,74,0.05), rgba(124,58,237,0.04))', borderColor: 'rgba(163,255,74,0.18)' }}>
+             style={{ background: 'rgba(143,212,58,0.04)', borderColor: 'rgba(143,212,58,0.16)' }}>
           <div className="flex items-center gap-3">
             <Zap className="w-5 h-5 text-brand-primary shrink-0" />
             <div>
@@ -257,7 +257,7 @@ export default async function DashboardPage() {
           { label: 'Nueva rutina',   icon: Dumbbell,  href: '/dashboard/routines',     color: 'text-violet-400', bg: 'rgba(124,58,237,0.15)' },
           { label: 'Nuevo plan',     icon: Apple,     href: '/dashboard/nutrition',    color: 'text-emerald-400', bg: 'rgba(16,185,129,0.15)' },
           { label: 'Nueva cita',     icon: Calendar,  href: '/dashboard/appointments', color: 'text-amber-400',  bg: 'rgba(245,158,11,0.15)' },
-          { label: 'Invitar cliente',icon: UserPlus,  href: '/dashboard/clients',      color: 'text-lime-400',   bg: 'rgba(163,255,74,0.12)' },
+          { label: 'Invitar cliente',icon: UserPlus,  href: '/dashboard/clients',      color: 'text-lime-400',   bg: 'rgba(143,212,58,0.10)' },
         ] as const).map(action => (
           <Link key={action.label} href={action.href}
             className="card card-interactive p-4 flex flex-col items-center gap-2 text-center">

@@ -19,7 +19,7 @@ export default async function ClientLayout({ children }: { children: React.React
   return (
     <div className="min-h-screen bg-background">
       <ClientTopbar profile={profile as Profile} />
-      <main className="max-w-5xl mx-auto px-4 py-6">
+      <main className="max-w-5xl mx-auto px-4 pt-4 pb-24 md:py-6">
         {children}
       </main>
       <PushPrompt userId={user.id} />

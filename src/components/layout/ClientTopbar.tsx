@@ -47,12 +47,12 @@ export default function ClientTopbar({ profile }: Props) {
   }, [supabase, profile.id])
 
   const NAV_ITEMS = [
-    { href: '/client',               icon: Home,            label: 'Inicio',      badge: 0 },
-    { href: '/client/routine',       icon: Dumbbell,        label: 'Mi Rutina',   badge: 0 },
-    { href: '/client/nutrition',     icon: UtensilsCrossed, label: 'Nutrición',   badge: 0 },
-    { href: '/client/appointments',  icon: CalendarDays,    label: 'Citas',       badge: 0 },
-    { href: '/client/messages',      icon: MessageSquare,   label: 'Mensajes',    badge: unreadMessages },
-    { href: '/client/settings',      icon: Settings,        label: 'Perfil',      badge: 0 },
+    { href: '/client',               icon: Home,            label: 'Inicio',    badge: 0 },
+    { href: '/client/routine',       icon: Dumbbell,        label: 'Rutina',    badge: 0 },
+    { href: '/client/nutrition',     icon: UtensilsCrossed, label: 'Nutrición', badge: 0 },
+    { href: '/client/appointments',  icon: CalendarDays,    label: 'Citas',     badge: 0 },
+    { href: '/client/messages',      icon: MessageSquare,   label: 'Mensajes',  badge: unreadMessages },
+    { href: '/client/settings',      icon: Settings,        label: 'Perfil',    badge: 0 },
   ]
 
   async function logout() {
@@ -61,19 +61,17 @@ export default function ClientTopbar({ profile }: Props) {
   }
 
   return (
-    <header className="sticky top-0 z-40">
-      {/* Main bar */}
-      <div className="bg-surface/90 backdrop-blur-xl border-b border-border/80"
-           style={{ boxShadow: '0 1px 0 rgba(255,255,255,0.03)' }}>
+    <>
+      {/* ── Top header ──────────────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-40 bg-surface/90 backdrop-blur-xl border-b border-border/80"
+              style={{ boxShadow: '0 1px 0 rgba(255,255,255,0.03)' }}>
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
 
             {/* Logo */}
             <Link href="/client" className="flex items-center gap-2.5 group">
-              <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:scale-110 group-hover:shadow-glow-sm"
-                style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
-              >
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+                   style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
                 <Zap className="w-3.5 h-3.5 text-white" />
               </div>
               <span className="font-bold text-white text-sm tracking-tight hidden sm:block">TrainerBoost</span>
@@ -85,26 +83,17 @@ export default function ClientTopbar({ profile }: Props) {
                 const isActive = pathname === item.href ||
                   (item.href !== '/client' && pathname.startsWith(item.href))
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      'relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 group',
-                      isActive
-                        ? 'text-brand-primary'
-                        : 'text-slate-400 hover:bg-surface-2 hover:text-slate-100',
-                    )}
-                    style={isActive ? {
-                      background: 'linear-gradient(180deg, rgba(14,165,233,0.1) 0%, transparent 100%)',
-                    } : undefined}
-                  >
+                  <Link key={item.href} href={item.href}
+                        className={cn(
+                          'relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 group',
+                          isActive
+                            ? 'text-brand-primary'
+                            : 'text-slate-400 hover:bg-surface-2 hover:text-slate-100',
+                        )}
+                        style={isActive ? { background: 'linear-gradient(180deg, rgba(14,165,233,0.1) 0%, transparent 100%)' } : undefined}>
                     <div className="relative">
-                      <item.icon className={cn(
-                        'w-3.5 h-3.5 transition-all duration-200',
-                        isActive
-                          ? 'text-brand-primary'
-                          : 'text-slate-500 group-hover:text-slate-300 group-hover:scale-110',
-                      )} />
+                      <item.icon className={cn('w-3.5 h-3.5 transition-all duration-200',
+                        isActive ? 'text-brand-primary' : 'text-slate-500 group-hover:text-slate-300')} />
                       {item.badge > 0 && !isActive && (
                         <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
                           {item.badge > 9 ? '9+' : item.badge}
@@ -113,10 +102,8 @@ export default function ClientTopbar({ profile }: Props) {
                     </div>
                     {item.label}
                     {isActive && (
-                      <span
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-[2px] rounded-full"
-                        style={{ background: 'linear-gradient(90deg, #0EA5E9, #7C3AED)', boxShadow: '0 0 6px rgba(14,165,233,0.6)' }}
-                      />
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-[2px] rounded-full"
+                            style={{ background: 'linear-gradient(90deg, #0EA5E9, #7C3AED)' }} />
                     )}
                   </Link>
                 )
@@ -125,64 +112,60 @@ export default function ClientTopbar({ profile }: Props) {
 
             {/* User area */}
             <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-2.5 px-2 py-1 rounded-lg hover:bg-surface-2 transition-colors cursor-default group">
-                <div className="ring-2 ring-brand-primary/25 rounded-full transition-all duration-200 group-hover:ring-brand-primary/50">
+              <div className="hidden sm:flex items-center gap-2.5 px-2 py-1 rounded-lg hover:bg-surface-2 transition-colors cursor-default">
+                <div className="ring-2 ring-brand-primary/25 rounded-full">
                   <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
                 </div>
-                <span className="text-xs text-slate-400 font-medium group-hover:text-slate-200 transition-colors">
+                <span className="text-xs text-slate-400 font-medium">
                   {profile.full_name.split(' ')[0]}
                 </span>
               </div>
-              <NotificationBell
-                userId={profile.id}
-                isOpen={notifOpen}
-                onToggle={() => setNotifOpen(v => !v)}
-              />
-              <button
-                onClick={logout}
-                className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all duration-150 group"
-                title="Cerrar sesión"
-              >
-                <LogOut className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+              <NotificationBell userId={profile.id} isOpen={notifOpen} onToggle={() => setNotifOpen(v => !v)} />
+              <button onClick={logout} title="Cerrar sesión"
+                      className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all duration-150">
+                <LogOut className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Mobile nav */}
-      <div className="md:hidden bg-surface/95 backdrop-blur-xl border-b border-border/60">
-        <div className="max-w-5xl mx-auto px-4">
-          <nav className="flex items-center gap-0.5 py-1.5 overflow-x-auto">
-            {NAV_ITEMS.map(item => {
-              const isActive = pathname === item.href ||
-                (item.href !== '/client' && pathname.startsWith(item.href))
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 shrink-0',
-                    isActive
-                      ? 'text-brand-primary bg-brand-primary/10 border border-brand-primary/20'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-surface-2',
+      {/* ── Bottom nav (mobile only) ─────────────────────────────────────────── */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border/60"
+           style={{ background: 'rgba(15,23,42,0.97)', backdropFilter: 'blur(20px)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="flex items-stretch h-14">
+          {NAV_ITEMS.map(item => {
+            const isActive = pathname === item.href ||
+              (item.href !== '/client' && pathname.startsWith(item.href))
+            return (
+              <Link key={item.href} href={item.href}
+                    className="flex-1 flex flex-col items-center justify-center gap-0.5 relative min-h-[44px]"
+                    style={{ WebkitTapHighlightColor: 'transparent' }}>
+                {/* Active indicator */}
+                {isActive && (
+                  <span className="absolute top-0 left-1/4 right-1/4 h-0.5 rounded-full"
+                        style={{ background: 'linear-gradient(90deg,#0EA5E9,#7C3AED)' }} />
+                )}
+                {/* Icon */}
+                <div className="relative">
+                  <item.icon className={cn('w-5 h-5 transition-colors duration-150',
+                    isActive ? 'text-brand-primary' : 'text-slate-500')} />
+                  {item.badge > 0 && !isActive && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-3.5 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center px-0.5">
+                      {item.badge > 9 ? '9+' : item.badge}
+                    </span>
                   )}
-                >
-                  <div className="relative">
-                    <item.icon className="w-3.5 h-3.5" />
-                    {item.badge > 0 && !isActive && (
-                      <span className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">
-                        {item.badge > 9 ? '9+' : item.badge}
-                      </span>
-                    )}
-                  </div>
+                </div>
+                {/* Label */}
+                <span className={cn('text-[9px] font-semibold tracking-wide transition-colors duration-150',
+                  isActive ? 'text-brand-primary' : 'text-slate-600')}>
                   {item.label}
-                </Link>
-              )
-            })}
-          </nav>
+                </span>
+              </Link>
+            )
+          })}
         </div>
-      </div>
-    </header>
+      </nav>
+    </>
   )
 }

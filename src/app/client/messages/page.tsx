@@ -158,7 +158,7 @@ export default function ClientMessagesPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-7rem)] animate-fade-in">
+    <div className="flex flex-col h-[calc(100dvh-10rem)] md:h-[calc(100vh-7rem)] animate-fade-in">
       {/* Header */}
       <div className="card p-4 flex items-center gap-3 mb-4">
         <Avatar name={trainer.full_name} url={trainer.avatar_url} size="md" />

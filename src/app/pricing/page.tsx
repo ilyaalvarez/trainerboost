@@ -371,8 +371,8 @@ export default function PricingPage() {
         {/* ── Stats row ──────────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-16 text-center animate-fade-in-up delay-400">
           {[
-            { icon: Users,      value: '500+',  label: 'Entrenadores activos' },
-            { icon: TrendingUp, value: '8k+',   label: 'Clientes gestionados' },
+            { icon: Users,      value: 'Beta',  label: 'Entrenadores en acceso anticipado' },
+            { icon: TrendingUp, value: 'Gratis', label: 'Para empezar' },
             { icon: Award,      value: '4.9★',  label: 'Valoración media' },
           ].map(({ icon: Icon, value, label }) => (
             <div key={label} className="card p-5 hover:-translate-y-0.5 transition-transform duration-200">
@@ -381,6 +381,23 @@ export default function PricingPage() {
               <div className="text-xs text-slate-400">{label}</div>
             </div>
           ))}
+        </div>
+
+        {/* ── ROI argument ───────────────────────────────────────────────── */}
+        <div className="max-w-2xl mx-auto mb-16 animate-fade-in-up delay-400">
+          <div className="rounded-2xl p-8 border border-brand-primary/20 text-center"
+               style={{ background: 'linear-gradient(135deg, rgba(143,212,58,0.06), rgba(14,165,233,0.04))' }}>
+            <div className="text-xs font-semibold text-brand-primary uppercase tracking-widest mb-4">ROI real</div>
+            <h3 className="text-xl font-bold text-white mb-3 tracking-tight">
+              ¿Por qué 19€/mes es la mejor inversión que puedes hacer?
+            </h3>
+            <p className="text-slate-400 text-sm leading-relaxed max-w-lg mx-auto">
+              Si tienes 10 clientes a 150€/mes, ingresas 1.500€. Si TrainerBoost te ayuda a retener
+              un cliente <span className="text-white font-semibold">2 meses más al año</span>, ya recuperaste
+              12 veces el coste de la app. Y si te ahorra 8 horas a la semana en gestión...
+              {' '}<span className="text-brand-primary font-semibold">¿cuánto vale tu hora?</span>
+            </p>
+          </div>
         </div>
 
         {/* ── FAQ ────────────────────────────────────────────────────────── */}

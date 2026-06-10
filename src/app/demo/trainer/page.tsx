@@ -176,10 +176,10 @@ export default function TrainerDemoPage() {
   const [activeKey, setActiveKey] = useState('dashboard')
 
   // Animated counters (always top-level)
-  const cClients   = useCountUp(4)
-  const cRevenue   = useCountUp(760)
-  const cSessions  = useCountUp(24)
-  const cRetention = useCountUp(92)
+  const cClients   = useCountUp(24)
+  const cRevenue   = useCountUp(2840)
+  const cSessions  = useCountUp(14)
+  const cRetention = useCountUp(83)
 
   // Clients
   const [search, setSearch]             = useState('')
@@ -304,12 +304,12 @@ export default function TrainerDemoPage() {
            style={{ background: 'linear-gradient(135deg,rgba(14,165,233,0.08),rgba(124,58,237,0.05))', borderColor: 'rgba(14,165,233,0.25)' }}>
         <div className="flex items-center justify-between mb-1.5">
           <span className="text-xs font-semibold text-brand-primary flex items-center gap-1"><Zap className="w-3 h-3" /> Plan Pro</span>
-          <span className="text-xs text-slate-400">4 / 10</span>
+          <span className="text-xs text-slate-400">24 / 30</span>
         </div>
         <div className="h-1 bg-surface-2 rounded-full overflow-hidden">
-          <div className="h-full rounded-full" style={{ width: '40%', background: 'linear-gradient(90deg,#0EA5E9,#7C3AED)' }} />
+          <div className="h-full rounded-full" style={{ width: '80%', background: 'linear-gradient(90deg,#0EA5E9,#7C3AED)' }} />
         </div>
-        <p className="text-[10px] text-slate-500 mt-1">4 de 10 clientes · Plan Pro activo</p>
+        <p className="text-[10px] text-slate-500 mt-1">24 de 30 clientes · Plan Pro activo</p>
       </div>
       <nav className="flex-1 p-3 space-y-0.5 mt-2">
         {NAV.map(item => {
@@ -890,10 +890,10 @@ export default function TrainerDemoPage() {
                   <p className="text-slate-400 text-sm mt-0.5">Rendimiento · Mayo 2025</p>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up delay-75">
-                  <StatsCard label="Clientes activos" value={4}    change={{ value: '+1',  positive: true }} icon={<Users className="w-5 h-5" />}        color="primary" />
-                  <StatsCard label="Ingresos mes"     value="760€" change={{ value: '+18%', positive: true }} icon={<TrendingUp className="w-5 h-5" />}   color="accent" />
-                  <StatsCard label="Sesiones mes"     value={24}   change={{ value: '+4',  positive: true }} icon={<CalendarDays className="w-5 h-5" />} color="secondary" />
-                  <StatsCard label="Retención"        value="92%"  icon={<Trophy className="w-5 h-5" />}                                                 color="warning" />
+                  <StatsCard label="Clientes activos" value={24}      change={{ value: '+3',  positive: true }} icon={<Users className="w-5 h-5" />}        color="primary" />
+                  <StatsCard label="Ingresos mes"     value="2.840€" change={{ value: '+18%', positive: true }} icon={<TrendingUp className="w-5 h-5" />}   color="accent" />
+                  <StatsCard label="Sesiones sem."    value={14}     change={{ value: '+2',  positive: true }} icon={<CalendarDays className="w-5 h-5" />} color="secondary" />
+                  <StatsCard label="Retención"        value="83%"    icon={<Trophy className="w-5 h-5" />}                                                 color="warning" />
                 </div>
 
                 <div className="card p-6 animate-fade-in-up delay-150">
@@ -958,7 +958,7 @@ export default function TrainerDemoPage() {
                     </div>
                     <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
                       <div><div className="text-2xl font-bold font-mono gradient-text">+33%</div><div className="text-xs text-slate-500">Crecimiento anual</div></div>
-                      <div className="text-right"><div className="text-2xl font-bold font-mono text-white">4</div><div className="text-xs text-slate-500">Clientes activos</div></div>
+                      <div className="text-right"><div className="text-2xl font-bold font-mono text-white">24</div><div className="text-xs text-slate-500">Clientes activos</div></div>
                     </div>
                   </div>
                 </div>

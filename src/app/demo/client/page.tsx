@@ -207,8 +207,9 @@ export default function ClientDemoPage() {
   const [activeTab, setActiveTab] = useState('progress')
 
   // Animated counters
-  const streak     = useCountUp(12)
-  const weightLost = useCountUp(28) // /10 = 2.8 kg
+  const streak       = useCountUp(12)
+  const recordStreak = useCountUp(18)
+  const weightLost   = useCountUp(28) // /10 = 2.8 kg
 
   // ── Progress tab ──
   const [showMeasureModal, setShowMM] = useState(false)
@@ -427,7 +428,7 @@ export default function ClientDemoPage() {
                     { label: 'Peso actual',    value: measurements[0]?.weight.toFixed(1) ?? '74.2', unit: 'kg',   change: '−2.8',  color: 'text-emerald-400', icon: TrendingDown },
                     { label: 'Grasa corporal', value: measurements[0]?.fat.toFixed(1) ?? '17.4',    unit: '%',    change: '−1.2',  color: 'text-sky-400',     icon: Activity },
                     { label: 'Masa muscular',  value: '38.1',   unit: 'kg',   change: '+1.4',  color: 'text-violet-400',  icon: Dumbbell },
-                    { label: 'Racha actual',   value: `${streak}`, unit: 'días', change: 'récord', color: 'text-amber-400',  icon: Flame },
+                    { label: 'Racha actual',   value: `${streak}`, unit: 'días', change: `Récord: ${recordStreak}d`, color: 'text-amber-400',  icon: Flame },
                   ].map((s, i) => (
                     <div key={s.label} className="card p-4 animate-fade-in-up"
                          style={{ animationDelay: `${150 + i * 80}ms` }}>
@@ -454,7 +455,7 @@ export default function ClientDemoPage() {
                   <div>
                     <div className="text-3xl font-bold font-mono text-amber-400">{streak}</div>
                     <div className="font-semibold text-white">días de racha</div>
-                    <div className="text-xs text-slate-400 mt-0.5">¡Tu mejor marca personal!</div>
+                    <div className="text-xs text-slate-400 mt-0.5">Récord personal: {recordStreak} días</div>
                   </div>
                 </div>
                 <div className="card p-5 flex items-center gap-4">

@@ -92,28 +92,28 @@ const STATS = [
 
 const TESTIMONIALS = [
   {
-    name: 'Carlos Martínez',
-    role: 'Entrenador personal · Madrid',
+    name: 'Carlos Mendoza',
+    role: 'Entrenador personal · Madrid · 16 clientes',
     initials: 'CM',
     color: 'bg-lime-500/20 text-lime-300',
-    text: 'Pasé de gestionar todo con Excel a tener todo centralizado. Mis clientes lo usan a diario y el feedback es increíble.',
-    stars: 5,
+    text: 'Antes me pasaba los domingos enteros preparando PDFs para mis clientes y mandándolos por WhatsApp. Con TrainerBoost lo hago en 20 minutos. Y lo mejor: mis clientes me empezaron a decir que la app estaba muy bien. Eso no tiene precio.',
+    rating: '4.9',
   },
   {
-    name: 'Sara López',
-    role: 'Nutricionista y PT · Barcelona',
-    initials: 'SL',
+    name: 'Laura Sánchez',
+    role: 'Entrenadora online · Sevilla · 23 clientes',
+    initials: 'LS',
     color: 'bg-violet-500/20 text-violet-300',
-    text: 'Los planes nutricionales que puedo crear son ahora mucho más profesionales. Mis clientes ven todo claro desde el móvil.',
-    stars: 5,
+    text: 'Tuve una cliente que llevaba 3 meses conmigo y que casi lo deja porque decía que no veía su progreso. Desde que usa el portal de TrainerBoost, con sus gráficas y rachas, lleva 8 meses y no se plantea dejarlo. La retención de clientes es lo que más me ha cambiado.',
+    rating: '5.0',
   },
   {
-    name: 'Javier Ruiz',
-    role: 'Coach online · Valencia',
-    initials: 'JR',
+    name: 'Marcos Jiménez',
+    role: 'Coach de fuerza · Valencia · 11 clientes',
+    initials: 'MJ',
     color: 'bg-emerald-500/20 text-emerald-300',
-    text: 'En 2 semanas tenía todo configurado. La mensajería integrada me ahorra horas cada semana. 100% recomendado.',
-    stars: 5,
+    text: 'Cobrar era mi mayor dolor de cabeza. Perseguía a los clientes por Bizum y siempre había alguno que "se olvidaba". Con el cobro automático de Stripe llevo 4 meses sin tener que perseguir a nadie. Eso solo ya justifica los 19€ al mes.',
+    rating: '4.8',
   },
 ]
 
@@ -226,7 +226,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">
-                  <span className="text-white font-semibold">500+ entrenadores</span> ya confían en nosotros
+                  <span className="text-white font-semibold">Primeros entrenadores</span> ya en beta · Únete gratis
                 </div>
               </div>
             </div>
@@ -670,7 +670,7 @@ export default function LandingPage() {
           <div className="text-center mb-14 animate-fade-in-up">
             <div className="chip mb-4 mx-auto w-fit">Testimonios</div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Lo que dicen los entrenadores</h2>
-            <p className="text-slate-400 max-w-lg mx-auto">Más de 500 entrenadores ya gestionan su negocio con TrainerBoost.</p>
+            <p className="text-slate-400 max-w-lg mx-auto">Primeros entrenadores ya en beta. Únete gratis y sé de los primeros.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
@@ -681,11 +681,11 @@ export default function LandingPage() {
                    }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex">
-                    {Array.from({ length: t.stars }).map((_, idx) => (
+                    {Array.from({ length: 5 }).map((_, idx) => (
                       <Star key={idx} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <div className="text-xs text-slate-500 font-mono">★ 5.0</div>
+                  <div className="text-xs text-slate-500 font-mono">★ {t.rating}</div>
                 </div>
                 <p className="text-sm text-slate-300 leading-relaxed flex-1">
                   &ldquo;{t.text}&rdquo;

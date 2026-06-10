@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, Users, Dumbbell, UtensilsCrossed,
-  CalendarDays, MessageSquare, Settings, LogOut, CreditCard, Zap, BarChart2, Search,
+  CalendarDays, MessageSquare, Settings, LogOut, CreditCard, Zap, BarChart2, Search, ClipboardList,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/nutrition',    icon: UtensilsCrossed, label: 'Nutrición' },
   { href: '/dashboard/appointments', icon: CalendarDays,    label: 'Citas' },
   { href: '/dashboard/messages',     icon: MessageSquare,   label: 'Mensajes' },
+  { href: '/dashboard/checkins',     icon: ClipboardList,   label: 'Check-ins' },
   { href: '/dashboard/analytics',    icon: BarChart2,       label: 'Analytics' },
 ]
 
@@ -148,7 +149,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
                   {pendingApts}
                 </span>
               )}
-              {item.label === 'Clientes' && pendingCheckins > 0 && (
+              {item.label === 'Check-ins' && pendingCheckins > 0 && (
                 <span className="ml-auto bg-violet-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                   {pendingCheckins}
                 </span>

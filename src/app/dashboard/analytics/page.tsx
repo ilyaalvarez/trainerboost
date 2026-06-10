@@ -6,7 +6,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, BarChart, Bar, Cell,
 } from 'recharts'
-import { TrendingDown, TrendingUp, Users, Activity, Calendar, MessageCircle, Download } from 'lucide-react'
+import { TrendingDown, TrendingUp, Users, Activity, Calendar, MessageCircle, Download, CreditCard, Zap } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
@@ -24,6 +24,21 @@ interface BusinessKpis {
   activeClientsCount: number
   totalMessages: number
   retentionRate: number | null
+}
+
+interface SubscriptionKpi {
+  plan: string | null
+  status: string
+  maxClients: number
+  currentPeriodEnd: string | null
+}
+
+const PLAN_PRICES: Record<string, number> = { starter: 19, pro: 39, unlimited: 79 }
+const PLAN_LABELS: Record<string, string> = { starter: 'Starter', pro: 'Pro', unlimited: 'Unlimited' }
+const PLAN_COLORS: Record<string, string> = {
+  starter: 'text-sky-400 bg-sky-400/15',
+  pro: 'text-violet-400 bg-violet-400/15',
+  unlimited: 'text-amber-400 bg-amber-400/15',
 }
 
 interface ClientProgress {
@@ -71,6 +86,7 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true)
   const [metric, setMetric] = useState<'weight_kg' | 'body_fat_pct'>('weight_kg')
   const [kpis, setKpis] = useState<BusinessKpis>({ sessionsThisMonth: 0, activeClientsCount: 0, totalMessages: 0, retentionRate: null })
+  const [subscription, setSubscription] = useState<SubscriptionKpi | null>(null)
   const [clientCheckins, setClientCheckins] = useState<Array<{ clientId: string; name: string; avatarUrl: string | null; avgEnergy: number | null; avgMood: number | null; avgSleep: number | null; checkinsCount: number }>>([])
 
   const load = useCallback(async () => {
@@ -88,6 +104,7 @@ export default function AnalyticsPage() {
       { count: activeClientsCount },
       { count: totalMessages },
       { data: recentSessions },
+      { data: subData },
     ] = await Promise.all([
       supabase.from('appointments').select('*', { count: 'exact', head: true })
         .eq('trainer_id', user.id).eq('status', 'done').gte('created_at', thisMonthStart),
@@ -99,7 +116,18 @@ export default function AnalyticsPage() {
         .eq('trainer_id', user.id).eq('status', 'done')
         .gte('scheduled_at', twelveWeeksAgo)
         .order('scheduled_at'),
+      supabase.from('subscriptions').select('plan,status,max_clients,current_period_end')
+        .eq('user_id', user.id).maybeSingle(),
     ])
+
+    if (subData) {
+      setSubscription({
+        plan: subData.plan,
+        status: subData.status,
+        maxClients: subData.max_clients ?? 0,
+        currentPeriodEnd: subData.current_period_end,
+      })
+    }
 
     // Build weekly sessions chart data (last 12 weeks)
     const weekMap: Record<string, number> = {}
@@ -382,6 +410,81 @@ export default function AnalyticsPage() {
           </div>
         )
       })()}
+
+      {/* Plan & MRR */}
+      {subscription && (
+        <div className="card p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-violet-400/15">
+                <CreditCard className="w-4 h-4 text-violet-400" />
+              </div>
+              <h2 className="text-sm font-semibold text-white">Tu plan</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              {subscription.plan && (
+                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${PLAN_COLORS[subscription.plan] ?? 'text-slate-400 bg-slate-400/15'}`}>
+                  {PLAN_LABELS[subscription.plan] ?? subscription.plan}
+                </span>
+              )}
+              <span className={`text-xs px-2 py-0.5 rounded-full ${subscription.status === 'active' ? 'bg-emerald-400/15 text-emerald-400' : 'bg-slate-600/30 text-slate-400'}`}>
+                {subscription.status === 'active' ? 'Activo' : subscription.status}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-[#0F172A]/60 rounded-xl p-4 border border-[#334155]/60">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">MRR</span>
+              </div>
+              <p className="text-2xl font-bold text-white">
+                {subscription.plan && PLAN_PRICES[subscription.plan]
+                  ? `${PLAN_PRICES[subscription.plan]}€`
+                  : '—'}
+              </p>
+              <p className="text-xs text-slate-500 mt-0.5">al mes</p>
+            </div>
+
+            <div className="bg-[#0F172A]/60 rounded-xl p-4 border border-[#334155]/60">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Users className="w-3.5 h-3.5 text-sky-400" />
+                <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">Capacidad</span>
+              </div>
+              <p className="text-2xl font-bold text-white">
+                {kpis.activeClientsCount}
+                <span className="text-sm font-normal text-slate-500"> / {subscription.maxClients === 9999 ? '∞' : subscription.maxClients}</span>
+              </p>
+              {subscription.maxClients > 0 && subscription.maxClients !== 9999 && (
+                <div className="mt-2 h-1.5 bg-[#1E293B] rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${Math.min((kpis.activeClientsCount / subscription.maxClients) * 100, 100)}%`,
+                      background: kpis.activeClientsCount / subscription.maxClients > 0.9 ? '#EF4444' : kpis.activeClientsCount / subscription.maxClients > 0.7 ? '#F59E0B' : '#0EA5E9',
+                    }}
+                  />
+                </div>
+              )}
+              <p className="text-xs text-slate-500 mt-1">clientes activos</p>
+            </div>
+
+            <div className="bg-[#0F172A]/60 rounded-xl p-4 border border-[#334155]/60">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">Renovación</span>
+              </div>
+              <p className="text-sm font-semibold text-white mt-2">
+                {subscription.currentPeriodEnd
+                  ? new Date(subscription.currentPeriodEnd).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+                  : '—'}
+              </p>
+              <p className="text-xs text-slate-500 mt-0.5">próxima fecha</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Progress KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

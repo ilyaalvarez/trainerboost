@@ -157,10 +157,10 @@ export default async function ClientHomePage() {
         const streakPct = Math.round((daysWithLogsThisWeek / 7) * 100)
         return (
           <div className="card p-4 space-y-3"
-               style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(14,165,233,0.04))', borderColor: 'rgba(16,185,129,0.2)' }}>
+               style={{ background: 'rgba(16,185,129,0.05)', borderColor: 'rgba(16,185,129,0.2)' }}>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                   style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.1))' }}>
+                   style={{ background: 'rgba(16,185,129,0.15)' }}>
                 <Flame className={`w-6 h-6 ${daysWithLogsThisWeek >= 5 ? 'text-amber-400' : 'text-brand-accent'}`} />
               </div>
               <div>
@@ -172,7 +172,7 @@ export default async function ClientHomePage() {
             {/* Progress bar */}
             <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
               <div className="h-full rounded-full transition-all duration-700"
-                   style={{ width: `${streakPct}%`, background: daysWithLogsThisWeek >= 7 ? '#F59E0B' : 'linear-gradient(90deg, #10B981, #0EA5E9)' }} />
+                   style={{ width: `${streakPct}%`, background: daysWithLogsThisWeek >= 7 ? '#F59E0B' : '#10B981' }} />
             </div>
           </div>
         )

@@ -263,15 +263,13 @@ export default function ClientRoutinePage() {
             className="h-full rounded-full transition-all duration-500"
             style={{
               width: `${progress}%`,
-              background: progress === 100
-                ? 'linear-gradient(90deg, #10B981, #0EA5E9)'
-                : '#0EA5E9',
+              background: progress === 100 ? '#8FD43A' : '#0EA5E9',
             }}
           />
         </div>
         {progress === 100 && (
           <div className="rounded-xl p-3 flex items-center gap-3 animate-fade-in"
-               style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(14,165,233,0.06))', border: '1px solid rgba(16,185,129,0.25)' }}>
+               style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>
             <span className="text-2xl">🎉</span>
             <div>
               <p className="text-sm font-semibold text-emerald-400">¡Sesión completada!</p>

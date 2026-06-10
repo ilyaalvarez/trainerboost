@@ -60,8 +60,8 @@ export default function ContactPage() {
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-glow-sm"
-                 style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
-              <Zap className="w-4 h-4 text-white" />
+                 style={{ background: '#8FD43A' }}>
+              <Zap className="w-4 h-4 text-black" />
             </div>
             <span className="font-bold text-base tracking-tight gradient-text">TrainerBoost</span>
           </Link>

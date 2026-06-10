@@ -381,10 +381,10 @@ export default function ClientsPage() {
               const profile = client.profile
 
               const statusBar: Record<string, string> = {
-                active:  'linear-gradient(90deg, #10B981, #0EA5E9)',
-                paused:  'linear-gradient(90deg, #F59E0B, #EF4444)',
-                ended:   'linear-gradient(90deg, #475569, #64748B)',
-                pending: 'linear-gradient(90deg, #0EA5E9, #7C3AED)',
+                active:  '#8FD43A',
+                paused:  '#F59E0B',
+                ended:   '#475569',
+                pending: '#0EA5E9',
               }
               const bar = statusBar[client.status] ?? statusBar.ended
 
@@ -403,10 +403,8 @@ export default function ClientsPage() {
                   key={client.id}
                   className="card card-interactive overflow-hidden"
                 >
-                  {/* Colored accent bar with shimmer */}
-                  <div className="h-1.5 rounded-t-2xl relative overflow-hidden" style={{ background: bar }}>
-                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2.5s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-                  </div>
+                  {/* Colored accent bar */}
+                  <div className="h-px rounded-t-2xl" style={{ background: bar }} />
 
                   <div className="p-5">
                     {/* Avatar + name + badge */}
@@ -443,13 +441,13 @@ export default function ClientsPage() {
                                                  'bg-red-400'
                       return (
                     <div className="grid grid-cols-2 gap-2 mb-4">
-                      <div className="rounded-lg px-3 py-2.5" style={{ background: 'rgba(30,41,59,0.8)' }}>
+                      <div className="rounded-lg px-3 py-2.5 bg-surface-3">
                         <div className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">
                           <Clock className="w-2.5 h-2.5" /> Cliente desde
                         </div>
                         <div className="text-sm font-semibold text-slate-200">{timeLabel}</div>
                       </div>
-                      <div className="rounded-lg px-3 py-2.5" style={{ background: 'rgba(30,41,59,0.8)' }}>
+                      <div className="rounded-lg px-3 py-2.5 bg-surface-3">
                         <div className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${actDot}`} />
                           Último progreso
@@ -519,8 +517,7 @@ export default function ClientsPage() {
                     {/* CTA */}
                     <Link
                       href={`/dashboard/clients/${profile?.id}`}
-                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-glow-sm group"
-                      style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
+                      className="btn-secondary w-full justify-center group text-sm py-2"
                     >
                       Ver perfil completo
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -542,7 +539,7 @@ export default function ClientsPage() {
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
                   aria-label="Página anterior"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-surface-3 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -553,8 +550,8 @@ export default function ClientsPage() {
                     className={cn(
                       'w-7 h-7 rounded-lg text-xs font-semibold transition-colors',
                       p === page
-                        ? 'bg-[#0EA5E9] text-white'
-                        : 'text-slate-400 hover:bg-[#334155] hover:text-white'
+                        ? 'bg-brand-primary text-black'
+                        : 'text-slate-500 hover:bg-surface-3 hover:text-white'
                     )}
                   >
                     {p}
@@ -564,7 +561,7 @@ export default function ClientsPage() {
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   aria-label="Página siguiente"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-surface-3 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -594,7 +591,7 @@ export default function ClientsPage() {
           ) : invitation ? (
             <div className="space-y-3">
               {/* Code display */}
-              <div className="font-mono text-2xl font-bold text-white tracking-[0.25em] text-center bg-[#0F172A] border border-[#334155] rounded-xl py-4 px-5 select-all">
+              <div className="font-mono text-2xl font-bold text-white tracking-[0.25em] text-center bg-background border border-border rounded-xl py-4 px-5 select-all">
                 {invitation.code.toUpperCase()}
               </div>
 

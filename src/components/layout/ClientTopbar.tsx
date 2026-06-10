@@ -70,9 +70,9 @@ export default function ClientTopbar({ profile }: Props) {
 
             {/* Logo */}
             <Link href="/client" className="flex items-center gap-2.5 group">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-                   style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
-                <Zap className="w-3.5 h-3.5 text-white" />
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                   style={{ background: '#8FD43A' }}>
+                <Zap className="w-3.5 h-3.5 text-black" />
               </div>
               <span className="font-bold text-white text-sm tracking-tight hidden sm:block">TrainerBoost</span>
             </Link>
@@ -90,7 +90,7 @@ export default function ClientTopbar({ profile }: Props) {
                             ? 'text-brand-primary'
                             : 'text-slate-400 hover:bg-surface-2 hover:text-slate-100',
                         )}
-                        style={isActive ? { background: 'linear-gradient(180deg, rgba(14,165,233,0.1) 0%, transparent 100%)' } : undefined}>
+                        style={isActive ? { background: 'rgba(143,212,58,0.07)' } : undefined}>
                     <div className="relative">
                       <item.icon className={cn('w-3.5 h-3.5 transition-all duration-200',
                         isActive ? 'text-brand-primary' : 'text-slate-500 group-hover:text-slate-300')} />
@@ -103,7 +103,7 @@ export default function ClientTopbar({ profile }: Props) {
                     {item.label}
                     {isActive && (
                       <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-[2px] rounded-full"
-                            style={{ background: 'linear-gradient(90deg, #0EA5E9, #7C3AED)' }} />
+                            style={{ background: '#8FD43A' }} />
                     )}
                   </Link>
                 )
@@ -132,7 +132,7 @@ export default function ClientTopbar({ profile }: Props) {
 
       {/* ── Bottom nav (mobile only) ─────────────────────────────────────────── */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border/60"
-           style={{ background: 'rgba(15,23,42,0.97)', backdropFilter: 'blur(20px)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+           style={{ background: 'rgba(10,10,10,0.97)', backdropFilter: 'blur(20px)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="flex items-stretch h-14">
           {NAV_ITEMS.map(item => {
             const isActive = pathname === item.href ||
@@ -144,7 +144,7 @@ export default function ClientTopbar({ profile }: Props) {
                 {/* Active indicator */}
                 {isActive && (
                   <span className="absolute top-0 left-1/4 right-1/4 h-0.5 rounded-full"
-                        style={{ background: 'linear-gradient(90deg,#0EA5E9,#7C3AED)' }} />
+                        style={{ background: '#8FD43A' }} />
                 )}
                 {/* Icon */}
                 <div className="relative">

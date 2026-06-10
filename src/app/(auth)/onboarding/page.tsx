@@ -116,8 +116,8 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
       <div className="relative z-10 h-14 flex items-center px-6 border-b border-border/40">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-               style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
-            <Zap className="w-3.5 h-3.5 text-white" />
+               style={{ background: '#8FD43A' }}>
+            <Zap className="w-3.5 h-3.5 text-black" />
           </div>
           <span className="font-bold text-white text-sm tracking-tight">TrainerBoost</span>
         </div>

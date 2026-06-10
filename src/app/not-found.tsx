@@ -6,7 +6,7 @@ export default function NotFound() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center text-center p-8">
       <div
         className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 shadow-glow-primary"
-        style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}
+        style={{ background: '#8FD43A' }}
       >
         <Zap className="w-8 h-8 text-white" />
       </div>

@@ -347,7 +347,7 @@ export default function ClientDemoPage() {
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                   style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
+                   style={{ background: '#8FD43A' }}>
                 <Zap className="w-3.5 h-3.5 text-white" />
               </div>
               <span className="font-bold text-white text-sm">TrainerBoost</span>
@@ -915,7 +915,7 @@ export default function ClientDemoPage() {
                       </div>
                       <div className={`max-w-[72%] flex flex-col gap-1 ${msg.from === 'client' ? 'items-end' : 'items-start'}`}>
                         <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${msg.from === 'trainer' ? 'bg-surface-2 text-white rounded-tl-sm' : 'text-white rounded-tr-sm'}`}
-                             style={msg.from === 'client' ? { background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' } : {}}>
+                             style={msg.from === 'client' ? { background: '#8FD43A' } : {}}>
                           {msg.text}
                         </div>
                         <span className="text-[10px] text-slate-600 px-1">{msg.time}</span>

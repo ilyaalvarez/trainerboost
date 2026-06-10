@@ -476,9 +476,8 @@ export default function ClientDetailPage() {
             className="group relative card border overflow-hidden text-center p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover"
             style={{ borderColor: 'rgba(51,65,85,0.8)' }}
           >
-            {/* Hover background reveal */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                 style={{ background: `radial-gradient(circle at 50% 0%, ${action.glow} 0%, transparent 70%)` }} />
+            {/* Hover background */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-surface-2" />
             <div
               className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-white relative transition-transform duration-200 group-hover:scale-110"
               style={{ background: action.gradient, boxShadow: `0 6px 20px -4px ${action.glow}` }}
@@ -523,7 +522,7 @@ export default function ClientDetailPage() {
               {tab === t.id && (
                 <span
                   className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full animate-scale-in"
-                  style={{ background: 'linear-gradient(90deg, #0EA5E9, #7C3AED)', boxShadow: '0 0 8px rgba(14,165,233,0.5)' }}
+                  style={{ background: '#8FD43A' }}
                 />
               )}
             </button>
@@ -541,7 +540,7 @@ export default function ClientDetailPage() {
           <div className="lg:col-span-2 space-y-4">
             <div className="card p-5">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #0EA5E9, #7C3AED)' }} />
+                <div className="w-1 h-4 rounded-full bg-brand-primary" />
                 <h2 className="font-semibold text-white text-sm">Información básica</h2>
               </div>
               <dl className="space-y-0">
@@ -597,7 +596,7 @@ export default function ClientDetailPage() {
           <div className="lg:col-span-3 card p-5 flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #10B981, #0EA5E9)' }} />
+                <div className="w-1 h-4 rounded-full bg-brand-primary" />
                 <h2 className="font-semibold text-white text-sm">Notas del entrenador</h2>
               </div>
               <span className="text-[10px] text-slate-500 flex items-center gap-1">
@@ -691,12 +690,11 @@ export default function ClientDetailPage() {
                          'card overflow-hidden transition-all duration-200',
                          isActive ? 'border-sky-500/20' : 'hover:border-border-bright',
                        )}
-                       style={isActive ? { background: 'linear-gradient(135deg, rgba(14,165,233,0.04) 0%, #1E293B 60%)' } : undefined}>
+                       style={isActive ? { borderColor: 'rgba(143,212,58,0.2)' } : undefined}>
 
                     {/* Active indicator bar */}
                     {isActive && (
-                      <div className="h-0.5 w-full"
-                           style={{ background: 'linear-gradient(90deg, #0EA5E9, #7C3AED)' }} />
+                      <div className="h-px w-full bg-brand-primary/50" />
                     )}
 
                     <button
@@ -823,8 +821,8 @@ export default function ClientDetailPage() {
                 const isActive = plan.status === 'active'
                 return (
                   <div key={plan.id} className="card p-5 space-y-4"
-                       style={isActive ? { borderColor: 'rgba(16,185,129,0.25)', background: 'linear-gradient(135deg, rgba(16,185,129,0.04) 0%, #1E293B 60%)' } : undefined}>
-                    {isActive && <div className="h-0.5 -mx-5 -mt-5 mb-0 rounded-t-2xl" style={{ background: 'linear-gradient(90deg, #10B981, #0EA5E9)' }} />}
+                       style={isActive ? { borderColor: 'rgba(16,185,129,0.2)' } : undefined}>
+                    {isActive && <div className="h-px -mx-5 -mt-5 mb-0 rounded-t-2xl bg-brand-accent/60" />}
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h3 className="font-semibold text-white">{plan.title}</h3>
@@ -921,7 +919,7 @@ export default function ClientDetailPage() {
               {weightData.length >= 2 && (
                 <div className="card p-5">
                   <div className="flex items-center gap-2 mb-5">
-                    <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #0EA5E9, #7C3AED)' }} />
+                    <div className="w-1 h-4 rounded-full bg-brand-primary" />
                     <h3 className="text-sm font-semibold text-white">Evolución del peso</h3>
                   </div>
                   <ResponsiveContainer width="100%" height={200}>
@@ -954,7 +952,7 @@ export default function ClientDetailPage() {
               {progressLogs.length > 0 && (
                 <div className="card p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #10B981, #0EA5E9)' }} />
+                    <div className="w-1 h-4 rounded-full bg-brand-primary" />
                     <h3 className="text-sm font-semibold text-white">Historial de actividad</h3>
                   </div>
                   <ActivityHeatmap logDates={progressLogs.map(l => l.logged_at)} />
@@ -971,7 +969,7 @@ export default function ClientDetailPage() {
                 return (
                   <div className="card p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #7C3AED, #0EA5E9)' }} />
+                      <div className="w-1 h-4 rounded-full bg-brand-primary" />
                       <h3 className="text-sm font-semibold text-white">Antes y ahora</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -1171,11 +1169,11 @@ export default function ClientDetailPage() {
                         <div
                           className={cn(
                             'rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
-                            isMine ? 'text-white rounded-br-sm' : 'rounded-bl-sm text-slate-200',
+                            isMine ? 'text-black rounded-br-sm' : 'rounded-bl-sm text-slate-200',
                           )}
                           style={isMine
-                            ? { background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)', boxShadow: '0 4px 12px rgba(14,165,233,0.25)' }
-                            : { background: 'rgba(51,65,85,0.6)', border: '1px solid rgba(71,85,105,0.5)' }}
+                            ? { background: '#8FD43A', color: '#000' }
+                            : { background: 'rgba(30,30,30,0.8)', border: '1px solid rgba(44,44,44,0.8)' }}
                         >
                           {msg.content}
                         </div>

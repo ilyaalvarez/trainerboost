@@ -111,8 +111,8 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-glow-sm"
-               style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
-            <Zap className="w-5 h-5 text-white" />
+               style={{ background: '#8FD43A' }}>
+            <Zap className="w-5 h-5 text-black" />
           </div>
           <span className="text-xl font-bold text-white tracking-tight">TrainerBoost</span>
         </div>
@@ -126,7 +126,7 @@ export default function RegisterPage() {
                   ? 'text-white shadow-glow-sm'
                   : 'bg-surface border border-border text-slate-500'
               }`}
-              style={step >= s ? { background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' } : {}}>
+              style={step >= s ? { background: '#8FD43A' } : {}}>
                 {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
               </div>
               {s < 2 && (
@@ -155,7 +155,7 @@ export default function RegisterPage() {
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 transition-all duration-200 ${
                     role === 'trainer' ? 'shadow-glow-sm' : ''
                   }`}
-                  style={{ background: role === 'trainer' ? 'linear-gradient(135deg, #0EA5E9, #7C3AED)' : '#263548' }}>
+                  style={{ background: role === 'trainer' ? '#8FD43A' : '#263548' }}>
                     <Zap className="w-4 h-4 text-white" />
                   </div>
                   <div className={`font-semibold text-sm mb-0.5 transition-colors ${role === 'trainer' ? 'text-white' : 'text-slate-200'}`}>
@@ -175,7 +175,7 @@ export default function RegisterPage() {
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 transition-all duration-200 ${
                     role === 'client' ? 'shadow-glow-sm' : ''
                   }`}
-                  style={{ background: role === 'client' ? 'linear-gradient(135deg, #0EA5E9, #7C3AED)' : '#263548' }}>
+                  style={{ background: role === 'client' ? '#8FD43A' : '#263548' }}>
                     <Users className="w-4 h-4 text-white" />
                   </div>
                   <div className={`font-semibold text-sm mb-0.5 transition-colors ${role === 'client' ? 'text-white' : 'text-slate-200'}`}>

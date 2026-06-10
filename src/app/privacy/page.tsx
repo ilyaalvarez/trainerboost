@@ -12,8 +12,8 @@ export default function PrivacyPage() {
       <nav className="border-b border-border/50 bg-background/85 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
-              <Zap className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#8FD43A' }}>
+              <Zap className="w-4 h-4 text-black" />
             </div>
             <span className="font-bold text-base tracking-tight text-white">TrainerBoost</span>
           </Link>

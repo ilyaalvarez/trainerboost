@@ -40,8 +40,8 @@ export default function DemoPage() {
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-                 style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
-              <Zap className="w-3.5 h-3.5 text-white" />
+                 style={{ background: '#8FD43A' }}>
+              <Zap className="w-3.5 h-3.5 text-black" />
             </div>
             <span className="font-bold text-white text-sm tracking-tight">TrainerBoost</span>
           </Link>
@@ -137,8 +137,8 @@ export default function DemoPage() {
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-glow-sm shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:shadow-glow-primary"
-                       style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
-                    <Zap className="w-6 h-6 text-white" />
+                       style={{ background: '#8FD43A' }}>
+                    <Zap className="w-6 h-6 text-black" />
                   </div>
                   <div>
                     <div className="text-lg font-bold text-white group-hover:text-sky-300 transition-colors">Panel Entrenador</div>

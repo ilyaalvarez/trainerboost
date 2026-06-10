@@ -291,7 +291,7 @@ export default function TrainerDemoPage() {
       <div className="p-5 border-b border-border">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-glow-sm shrink-0"
-               style={{ background: 'linear-gradient(135deg, #0EA5E9, #7C3AED)' }}>
+               style={{ background: '#8FD43A' }}>
             <Zap className="w-4 h-4 text-white" />
           </div>
           <div>

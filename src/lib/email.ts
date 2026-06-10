@@ -8,6 +8,112 @@ const resend = process.env.RESEND_API_KEY
 const FROM = 'TrainerBoost <hola@trainerboost.es>'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.trainerboost.es'
 
+export async function sendInvitationEmail(to: string, trainerName: string, code: string) {
+  if (!resend) return
+  const firstName = escapeHtml(trainerName.split(' ')[0])
+  const link = `${APP_URL}/onboarding?code=${encodeURIComponent(code)}`
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${firstName} te invita a TrainerBoost 💪`,
+    html: `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#0F172A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <div style="max-width:560px;margin:40px auto;padding:0 20px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#0EA5E9,#7C3AED);padding:10px 20px;border-radius:12px;">
+        <span style="color:white;font-size:18px;font-weight:800;">⚡ TrainerBoost</span>
+      </div>
+    </div>
+    <div style="background:#1E293B;border:1px solid #334155;border-radius:20px;padding:36px;">
+      <h1 style="color:white;font-size:22px;font-weight:700;margin:0 0 12px;">Tu entrenador te está esperando</h1>
+      <p style="color:#94A3B8;font-size:15px;line-height:1.6;margin:0 0 24px;">
+        <strong style="color:#E2E8F0;">${firstName}</strong> te ha invitado a unirte a su portal de entrenamiento personal en TrainerBoost.
+      </p>
+      <div style="background:#263548;border-radius:12px;padding:20px;text-align:center;margin-bottom:28px;">
+        <p style="color:#94A3B8;font-size:12px;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;">Tu código de acceso</p>
+        <div style="color:#0EA5E9;font-size:28px;font-weight:800;font-family:monospace;letter-spacing:4px;">${escapeHtml(code)}</div>
+      </div>
+      <div style="text-align:center;">
+        <a href="${link}" style="display:inline-block;background:linear-gradient(135deg,#0EA5E9,#7C3AED);color:white;font-weight:700;font-size:15px;text-decoration:none;padding:14px 36px;border-radius:12px;">
+          Activar mi cuenta →
+        </a>
+      </div>
+      <p style="color:#475569;font-size:13px;text-align:center;margin-top:20px;">
+        O introduce el código manualmente en <a href="${APP_URL}/onboarding" style="color:#0EA5E9;">${APP_URL}/onboarding</a>
+      </p>
+    </div>
+    <p style="color:#475569;font-size:12px;text-align:center;margin-top:24px;">
+      © 2026 TrainerBoost · Spain 🇪🇸 · <a href="mailto:hola@trainerboost.es" style="color:#0EA5E9;">hola@trainerboost.es</a>
+    </p>
+  </div>
+</body>
+</html>`,
+  }).catch(err => { console.error('[email] sendInvitationEmail failed:', err?.message) })
+}
+
+export async function sendAppointmentReminderEmail(
+  to: string,
+  recipientName: string,
+  otherPartyName: string,
+  aptTime: Date,
+  aptType: string,
+  role: 'client' | 'trainer',
+) {
+  if (!resend) return
+  const firstName   = escapeHtml(recipientName.split(' ')[0])
+  const otherFirst  = escapeHtml(otherPartyName.split(' ')[0])
+  const timeStr = aptTime.toLocaleString('es-ES', {
+    weekday: 'long', day: 'numeric', month: 'long',
+    hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid',
+  })
+  const link = role === 'client' ? `${APP_URL}/client/appointments` : `${APP_URL}/dashboard/appointments`
+  const typeLabel = aptType === 'online' ? 'Online' : aptType === 'llamada' ? 'Llamada' : 'Presencial'
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Recordatorio: cita mañana a las ${aptTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' })}`,
+    html: `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#0F172A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <div style="max-width:560px;margin:40px auto;padding:0 20px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#0EA5E9,#7C3AED);padding:10px 20px;border-radius:12px;">
+        <span style="color:white;font-size:18px;font-weight:800;">⚡ TrainerBoost</span>
+      </div>
+    </div>
+    <div style="background:#1E293B;border:1px solid #334155;border-radius:20px;padding:36px;">
+      <h1 style="color:white;font-size:22px;font-weight:700;margin:0 0 8px;">Hola, ${firstName} 👋</h1>
+      <p style="color:#94A3B8;font-size:15px;line-height:1.6;margin:0 0 24px;">
+        Te recordamos que mañana tienes una cita con <strong style="color:#E2E8F0;">${otherFirst}</strong>.
+      </p>
+      <div style="background:#263548;border-radius:12px;padding:20px;margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <span style="font-size:20px;">📅</span>
+          <div>
+            <div style="color:#E2E8F0;font-size:14px;font-weight:600;">${timeStr.charAt(0).toUpperCase() + timeStr.slice(1)}</div>
+            <div style="color:#64748B;font-size:12px;margin-top:2px;">${typeLabel}</div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <a href="${link}" style="display:inline-block;background:linear-gradient(135deg,#0EA5E9,#7C3AED);color:white;font-weight:700;font-size:14px;text-decoration:none;padding:12px 28px;border-radius:10px;">
+          Ver mis citas →
+        </a>
+      </div>
+    </div>
+    <p style="color:#475569;font-size:12px;text-align:center;margin-top:24px;">
+      © 2026 TrainerBoost · <a href="mailto:hola@trainerboost.es" style="color:#0EA5E9;">hola@trainerboost.es</a>
+    </p>
+  </div>
+</body>
+</html>`,
+  }).catch(err => { console.error('[email] sendAppointmentReminderEmail failed:', err?.message) })
+}
+
 export async function sendWelcomeEmail(to: string, name: string, role: 'trainer' | 'client') {
   if (!resend) return
 

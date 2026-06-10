@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { sendInvitationEmail } from '@/lib/email'
 
 const sendInviteSchema = z.object({
   invitationId: z.string().uuid(),
@@ -9,7 +10,6 @@ const sendInviteSchema = z.object({
 export async function POST(request: Request) {
   const supabase = await createClient()
 
-  // getUser() revalidates the JWT against the auth server (getSession does not).
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -21,10 +21,10 @@ export async function POST(request: Request) {
   }
   const { invitationId } = parsed.data
 
-  // Verify the caller actually owns this invitation (prevents IDOR).
+  // Fetch invitation + verify ownership (prevents IDOR)
   const { data: invitation } = await supabase
     .from('invitations')
-    .select('id, trainer_id')
+    .select('id, trainer_id, code, email')
     .eq('id', invitationId)
     .single()
 
@@ -32,17 +32,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invitación no encontrada' }, { status: 404 })
   }
 
-  const { data: { session } } = await supabase.auth.getSession()
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const res = await fetch(`${supabaseUrl}/functions/v1/send-invitation`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${session?.access_token}`,
-    },
-    body: JSON.stringify({ invitationId }),
-  })
+  if (!invitation.email) {
+    return NextResponse.json({ error: 'La invitación no tiene email' }, { status: 400 })
+  }
 
-  const data = await res.json()
-  return NextResponse.json(data, { status: res.status })
+  // Fetch trainer name for the email
+  const { data: trainerProfile } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', user.id)
+    .single()
+
+  const trainerName = trainerProfile?.full_name ?? 'Tu entrenador'
+
+  await sendInvitationEmail(invitation.email, trainerName, invitation.code)
+
+  return NextResponse.json({ success: true })
 }

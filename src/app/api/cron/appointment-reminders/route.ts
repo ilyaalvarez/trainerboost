@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import { sendAppointmentReminderEmail } from '@/lib/email'
 
 // Vercel Cron Job — runs daily at 7:00 AM UTC (configured in vercel.json)
-// Protected by CRON_SECRET injected automatically by Vercel
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -35,34 +35,67 @@ export async function GET(request: Request) {
   }
 
   const notifications: NotificationInsert[] = []
+  let emailsSent = 0
 
   for (const apt of (appointments ?? [])) {
     if (!apt.client_id) continue
 
-    const aptTime  = new Date(apt.scheduled_at)
+    const aptTime   = new Date(apt.scheduled_at)
     const diffHours = (aptTime.getTime() - now.getTime()) / 3600000
 
-    let title = ''
-    let body  = ''
+    const is24h = diffHours >= 20 && diffHours <= 26
+    const is2h  = diffHours >= 0  && diffHours <= 2
 
-    if (diffHours >= 20 && diffHours <= 26) {
-      const timeStr = aptTime.toLocaleTimeString('es-ES', {
-        hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid',
-      })
-      title = 'Cita mañana'
-      body  = `Tienes una cita mañana a las ${timeStr}`
-    } else if (diffHours >= 0 && diffHours <= 2) {
-      const mins = Math.round((aptTime.getTime() - now.getTime()) / 60000)
-      title = 'Cita próxima'
-      body  = `Tu cita empieza en ${mins} minutos`
-    } else {
-      continue
-    }
+    if (!is24h && !is2h) continue
 
+    const timeStr = aptTime.toLocaleTimeString('es-ES', {
+      hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid',
+    })
+    const title = is24h ? 'Cita mañana'  : 'Cita próxima'
+    const body  = is24h
+      ? `Tienes una cita mañana a las ${timeStr}`
+      : `Tu cita empieza en ${Math.round((aptTime.getTime() - now.getTime()) / 60000)} minutos`
+
+    // In-app notifications (both parties)
     notifications.push(
       { user_id: apt.client_id,  type: 'appointment', title, body, link: '/client/appointments'   },
       { user_id: apt.trainer_id, type: 'appointment', title, body, link: '/dashboard/appointments' },
     )
+
+    // Email reminders — only for 24h advance (not 2h, to avoid spam)
+    if (is24h) {
+      const [{ data: clientProfile }, { data: trainerProfile }] = await Promise.all([
+        supabase.from('profiles').select('full_name').eq('id', apt.client_id).single(),
+        supabase.from('profiles').select('full_name').eq('id', apt.trainer_id).single(),
+      ])
+
+      // Get auth emails via service role (auth.users is accessible via admin API)
+      const [{ data: clientUser }, { data: trainerUser }] = await Promise.all([
+        supabase.auth.admin.getUserById(apt.client_id),
+        supabase.auth.admin.getUserById(apt.trainer_id),
+      ])
+
+      const clientEmail  = clientUser?.user?.email
+      const trainerEmail = trainerUser?.user?.email
+      const clientName   = clientProfile?.full_name  ?? 'Cliente'
+      const trainerName  = trainerProfile?.full_name ?? 'Entrenador'
+
+      const emailPromises = []
+
+      if (clientEmail) {
+        emailPromises.push(
+          sendAppointmentReminderEmail(clientEmail, clientName, trainerName, aptTime, apt.type, 'client')
+        )
+      }
+      if (trainerEmail) {
+        emailPromises.push(
+          sendAppointmentReminderEmail(trainerEmail, trainerName, clientName, aptTime, apt.type, 'trainer')
+        )
+      }
+
+      await Promise.allSettled(emailPromises)
+      emailsSent += emailPromises.length
+    }
   }
 
   if (notifications.length > 0) {
@@ -71,8 +104,9 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({
-    processed: (appointments ?? []).length,
-    notified:  notifications.length,
-    ran_at:    now.toISOString(),
+    processed:    (appointments ?? []).length,
+    notified:     notifications.length,
+    emails_sent:  emailsSent,
+    ran_at:       now.toISOString(),
   })
 }

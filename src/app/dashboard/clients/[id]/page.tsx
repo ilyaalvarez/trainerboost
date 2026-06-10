@@ -165,6 +165,24 @@ export default function ClientDetailPage() {
     }
   }, [tab, data?.messages])
 
+  // ── Realtime: live progress updates from client ────────────────────────────
+  useEffect(() => {
+    if (!trainerId) return
+    const channel = supabase
+      .channel(`progress-${clientId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'progress_logs', filter: `client_id=eq.${clientId}` },
+        (payload) => {
+          const newLog = payload.new as ProgressLog
+          setData(prev => prev ? { ...prev, progressLogs: [...prev.progressLogs, newLog] } : prev)
+          toast.info('Nuevo registro de progreso del cliente', { duration: 2500 })
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [trainerId, clientId, supabase])
+
   const handleNotesChange = (value: string) => {
     setNotes(value)
     if (notesTimer.current) clearTimeout(notesTimer.current)

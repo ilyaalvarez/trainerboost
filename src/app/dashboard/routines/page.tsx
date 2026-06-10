@@ -38,6 +38,20 @@ interface LibraryExercise {
   created_at: string
 }
 
+interface GlobalExercise {
+  id: string
+  name: string
+  category: string | null
+  muscle_group: string | null
+  muscles_secondary: string[]
+  equipment: string | null
+  difficulty: 'principiante' | 'intermedio' | 'avanzado' | null
+  description: string | null
+  default_sets: number | null
+  default_reps: string | null
+  default_rest: number | null
+}
+
 interface ExerciseDraft {
   id: string
   name: string
@@ -78,6 +92,7 @@ export default function RoutinesPage() {
   const [duplicating, setDuplicating] = useState<Set<string>>(new Set())
 
   const [libraryExercises, setLibraryExercises] = useState<LibraryExercise[]>([])
+  const [globalExercises, setGlobalExercises] = useState<GlobalExercise[]>([])
   const [librarySearch, setLibrarySearch] = useState('')
   const [showLibraryForm, setShowLibraryForm] = useState(false)
   const [editingExercise, setEditingExercise] = useState<LibraryExercise | null>(null)
@@ -98,6 +113,7 @@ export default function RoutinesPage() {
         { data: routinesData },
         { data: tcData },
         { data: libData },
+        { data: globalData },
       ] = await Promise.all([
         supabase.from('routines').select('*')
           .eq('trainer_id', user.id)
@@ -106,9 +122,11 @@ export default function RoutinesPage() {
           .select('client_id, profile:client_id(id, full_name, avatar_url, phone, bio, specialties, role, created_at, updated_at)')
           .eq('trainer_id', user.id),
         supabase.from('exercise_library').select('*').eq('trainer_id', user.id).order('name'),
+        supabase.from('global_exercises').select('*').order('category').order('name'),
       ])
 
       setLibraryExercises((libData ?? []) as LibraryExercise[])
+      setGlobalExercises((globalData ?? []) as GlobalExercise[])
 
       const clientProfiles: Profile[] = (tcData ?? []).map(tc => tc.profile as unknown as Profile).filter(Boolean)
       setClients(clientProfiles)
@@ -358,8 +376,10 @@ export default function RoutinesPage() {
           onOpenEdit={(ex) => { setEditingExercise(ex); setShowLibraryForm(true) }}
           onCloseForm={() => { setShowLibraryForm(false); setEditingExercise(null) }}
           onSaved={(updated) => setLibraryExercises(updated)}
+          globalExercises={globalExercises}
           onUse={(ex) => {
-            setPrefillExercise({ name: ex.name, sets: ex.default_sets, reps: ex.default_reps, rest_seconds: ex.default_rest, notes: ex.description, video_url: ex.video_url })
+            const videoUrl = 'video_url' in ex ? (ex as LibraryExercise).video_url : null
+            setPrefillExercise({ name: ex.name, sets: ex.default_sets, reps: ex.default_reps, rest_seconds: ex.default_rest, notes: ex.description, video_url: videoUrl })
             setActiveTab('routines')
             setShowModal(true)
           }}
@@ -1071,6 +1091,31 @@ const CATEGORY_COLORS: Record<Category, string> = {
   funcional:    'bg-[#A78BFA]/15 text-[#A78BFA]',
 }
 
+const GLOBAL_CAT_COLORS: Record<string, string> = {
+  pecho:     'bg-[#0EA5E9]/15 text-[#0EA5E9]',
+  espalda:   'bg-[#A78BFA]/15 text-[#A78BFA]',
+  piernas:   'bg-[#10B981]/15 text-[#10B981]',
+  hombros:   'bg-[#F59E0B]/15 text-[#F59E0B]',
+  biceps:    'bg-[#EF4444]/15 text-[#EF4444]',
+  triceps:   'bg-[#EC4899]/15 text-[#EC4899]',
+  core:      'bg-[#06B6D4]/15 text-[#06B6D4]',
+  cardio:    'bg-[#F97316]/15 text-[#F97316]',
+  gluteos:   'bg-[#8B5CF6]/15 text-[#8B5CF6]',
+  full_body: 'bg-[#84CC16]/15 text-[#84CC16]',
+}
+const GLOBAL_CAT_LABELS: Record<string, string> = {
+  pecho: 'Pecho', espalda: 'Espalda', piernas: 'Piernas', hombros: 'Hombros',
+  biceps: 'Bíceps', triceps: 'Tríceps', core: 'Core', cardio: 'Cardio',
+  gluteos: 'Glúteos', full_body: 'Full Body',
+}
+const EQUIP_LABELS: Record<string, string> = {
+  barra: 'Barra', mancuernas: 'Mancuernas', maquina: 'Máquina',
+  bodyweight: 'Peso corporal', cable: 'Cable / Polea', kettlebell: 'Kettlebell',
+}
+const DIFF_COLORS: Record<string, string> = {
+  principiante: 'text-emerald-400', intermedio: 'text-amber-400', avanzado: 'text-red-400',
+}
+
 interface LibraryFormState {
   name: string
   category: string
@@ -1088,6 +1133,7 @@ function blankLibraryForm(): LibraryFormState {
 
 function ExerciseLibraryPanel({
   exercises,
+  globalExercises,
   search,
   onSearchChange,
   showForm,
@@ -1100,6 +1146,7 @@ function ExerciseLibraryPanel({
   onUse,
 }: {
   exercises: LibraryExercise[]
+  globalExercises: GlobalExercise[]
   search: string
   onSearchChange: (v: string) => void
   showForm: boolean
@@ -1109,13 +1156,17 @@ function ExerciseLibraryPanel({
   onOpenEdit: (ex: LibraryExercise) => void
   onCloseForm: () => void
   onSaved: (updated: LibraryExercise[]) => void
-  onUse: (ex: LibraryExercise) => void
+  onUse: (ex: LibraryExercise | GlobalExercise) => void
 }) {
   const supabase = createClient()
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<LibraryFormState>(blankLibraryForm())
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [muscleFilter, setMuscleFilter] = useState<string>('')
+  const [libView, setLibView] = useState<'catalog' | 'personal'>('catalog')
+  const [catFilter, setCatFilter] = useState('')
+  const [equipFilter, setEquipFilter] = useState('')
+  const [diffFilter, setDiffFilter] = useState('')
 
   // Sync form when opening edit
   useEffect(() => {
@@ -1207,146 +1258,260 @@ function ExerciseLibraryPanel({
     return matchesSearch && matchesMuscle
   })
 
+  const filteredGlobal = globalExercises.filter(ex => {
+    const q = search.toLowerCase()
+    return (
+      (!q || ex.name.toLowerCase().includes(q) || ex.muscle_group?.toLowerCase().includes(q) || ex.description?.toLowerCase().includes(q)) &&
+      (!catFilter   || ex.category  === catFilter) &&
+      (!equipFilter || ex.equipment === equipFilter) &&
+      (!diffFilter  || ex.difficulty === diffFilter)
+    )
+  })
+
+  const uniqueGlobalCats  = Array.from(new Set(globalExercises.map(e => e.category).filter(Boolean) as string[])).sort()
+  const uniqueGlobalEquip = Array.from(new Set(globalExercises.map(e => e.equipment).filter(Boolean) as string[])).sort()
+
   return (
     <div className="space-y-4">
-      {/* Search bar */}
+      {/* Tab switcher */}
+      <div className="flex gap-1 border-b border-[#334155]">
+        <button type="button" onClick={() => setLibView('catalog')}
+                className={cn('flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+                  libView === 'catalog' ? 'border-[#0EA5E9] text-[#0EA5E9]' : 'border-transparent text-slate-400 hover:text-slate-200')}>
+          <BookOpen size={14} /> Catálogo global
+          <span className="ml-1 text-xs bg-[#0EA5E9]/15 text-[#0EA5E9] px-1.5 py-0.5 rounded-full font-bold">{globalExercises.length}</span>
+        </button>
+        <button type="button" onClick={() => setLibView('personal')}
+                className={cn('flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+                  libView === 'personal' ? 'border-[#0EA5E9] text-[#0EA5E9]' : 'border-transparent text-slate-400 hover:text-slate-200')}>
+          <Dumbbell size={14} /> Mi biblioteca
+          {exercises.length > 0 && <span className="ml-1 text-xs bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full font-bold">{exercises.length}</span>}
+        </button>
+      </div>
+
+      {/* Search bar (shared) */}
       <div className="relative">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-        <input
-          className="input pl-9"
-          placeholder="Buscar ejercicio..."
-          value={search}
-          onChange={e => onSearchChange(e.target.value)}
-        />
+        <input className="input pl-9" placeholder={libView === 'catalog' ? 'Buscar en el catálogo...' : 'Buscar ejercicio...'}
+               value={search} onChange={e => onSearchChange(e.target.value)} />
       </div>
 
-      {/* Muscle group chips */}
-      {uniqueMuscleGroups.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            type="button"
-            onClick={() => setMuscleFilter('')}
-            className={cn(
-              'text-xs px-2.5 py-1 rounded-full border transition-all',
-              !muscleFilter
-                ? 'bg-sky-500/20 border-sky-500/40 text-sky-300'
-                : 'border-border/60 text-slate-500 hover:text-slate-300'
+      {/* ── CATALOG TAB ─────────────────────────────────────────────────────── */}
+      {libView === 'catalog' && (
+        <>
+          {/* Filters row */}
+          <div className="flex flex-wrap gap-2">
+            <select className="input w-auto text-xs py-1.5" value={catFilter} onChange={e => setCatFilter(e.target.value)}>
+              <option value="">Todas las categorías</option>
+              {uniqueGlobalCats.map(c => <option key={c} value={c}>{GLOBAL_CAT_LABELS[c] ?? c}</option>)}
+            </select>
+            <select className="input w-auto text-xs py-1.5" value={equipFilter} onChange={e => setEquipFilter(e.target.value)}>
+              <option value="">Todo el equipamiento</option>
+              {uniqueGlobalEquip.map(e => <option key={e} value={e}>{EQUIP_LABELS[e] ?? e}</option>)}
+            </select>
+            <select className="input w-auto text-xs py-1.5" value={diffFilter} onChange={e => setDiffFilter(e.target.value)}>
+              <option value="">Cualquier nivel</option>
+              <option value="principiante">Principiante</option>
+              <option value="intermedio">Intermedio</option>
+              <option value="avanzado">Avanzado</option>
+            </select>
+            {(catFilter || equipFilter || diffFilter) && (
+              <button type="button" onClick={() => { setCatFilter(''); setEquipFilter(''); setDiffFilter('') }}
+                      className="text-xs text-slate-400 hover:text-white flex items-center gap-1 px-2">
+                <X size={12} /> Limpiar
+              </button>
             )}
-          >
-            Todos
-          </button>
-          {uniqueMuscleGroups.map(mg => (
-            <button
-              key={mg}
-              type="button"
-              onClick={() => setMuscleFilter(f => f === mg ? '' : mg)}
-              className={cn(
-                'text-xs px-2.5 py-1 rounded-full border transition-all',
-                muscleFilter === mg
-                  ? 'bg-violet-500/20 border-violet-500/40 text-violet-300'
-                  : 'border-border/60 text-slate-500 hover:text-slate-300'
-              )}
-            >
-              {mg}
-            </button>
-          ))}
-        </div>
+          </div>
+
+          {/* Stats */}
+          <div className="text-sm text-slate-400">
+            {filteredGlobal.length} ejercicios
+            {(search || catFilter || equipFilter || diffFilter) && <span className="text-slate-600"> de {globalExercises.length}</span>}
+          </div>
+
+          {/* Catalog grid */}
+          {filteredGlobal.length === 0 ? (
+            <EmptyState icon={<BookOpen />} title="Sin resultados" description="Prueba con otros filtros." />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+              {filteredGlobal.map(ex => (
+                <div key={ex.id} className="card p-4 flex flex-col gap-2.5 hover:border-[#334155] transition-all">
+                  <div className="flex items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-white text-sm leading-snug">{ex.name}</h3>
+                      {ex.muscle_group && <p className="text-xs text-slate-400 mt-0.5 truncate">{ex.muscle_group}</p>}
+                    </div>
+                    {ex.category && (
+                      <span className={cn('shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full',
+                        GLOBAL_CAT_COLORS[ex.category] ?? 'bg-slate-700 text-slate-300')}>
+                        {GLOBAL_CAT_LABELS[ex.category] ?? ex.category}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {ex.equipment && (
+                      <span className="text-[10px] bg-[#1E293B] border border-[#334155] text-slate-400 px-1.5 py-0.5 rounded">
+                        {EQUIP_LABELS[ex.equipment] ?? ex.equipment}
+                      </span>
+                    )}
+                    {ex.difficulty && (
+                      <span className={cn('text-[10px] font-medium capitalize', DIFF_COLORS[ex.difficulty])}>
+                        {ex.difficulty}
+                      </span>
+                    )}
+                  </div>
+
+                  {ex.description && (
+                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{ex.description}</p>
+                  )}
+
+                  {(ex.default_sets ?? ex.default_reps ?? ex.default_rest) && (
+                    <div className="flex gap-3 text-xs text-slate-500">
+                      {ex.default_sets && <span><span className="text-slate-300 font-medium">{ex.default_sets}</span> ser.</span>}
+                      {ex.default_reps && <span><span className="text-slate-300 font-medium">{ex.default_reps}</span> reps</span>}
+                      {ex.default_rest !== null && ex.default_rest !== undefined && ex.default_rest > 0 && (
+                        <span><span className="text-slate-300 font-medium">{ex.default_rest}s</span> desc.</span>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="pt-1 border-t border-[#334155]/60">
+                    <button type="button" onClick={() => onUse(ex)}
+                            className="btn-primary text-xs py-1.5 px-3 w-full flex items-center justify-center gap-1">
+                      <Plus size={12} /> Añadir a rutina
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
-      {/* Stats */}
-      <div className="flex items-center gap-4 text-sm">
-        <span className="text-slate-400">{filtered.length} ejercicios</span>
-        {(search || muscleFilter) && <span className="text-slate-500">de {exercises.length} en biblioteca</span>}
-      </div>
+      {/* ── PERSONAL LIBRARY TAB ────────────────────────────────────────────── */}
+      {libView === 'personal' && (
+        <>
+          {/* Muscle group chips */}
+          {uniqueMuscleGroups.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              <button type="button" onClick={() => setMuscleFilter('')}
+                      className={cn('text-xs px-2.5 py-1 rounded-full border transition-all',
+                        !muscleFilter ? 'bg-sky-500/20 border-sky-500/40 text-sky-300' : 'border-border/60 text-slate-500 hover:text-slate-300')}>
+                Todos
+              </button>
+              {uniqueMuscleGroups.map(mg => (
+                <button key={mg} type="button" onClick={() => setMuscleFilter(f => f === mg ? '' : mg)}
+                        className={cn('text-xs px-2.5 py-1 rounded-full border transition-all',
+                          muscleFilter === mg ? 'bg-violet-500/20 border-violet-500/40 text-violet-300' : 'border-border/60 text-slate-500 hover:text-slate-300')}>
+                  {mg}
+                </button>
+              ))}
+            </div>
+          )}
 
-      {/* Form modal */}
-      <Modal
-        isOpen={showForm}
-        onClose={onCloseForm}
-        title={editingExercise ? 'Editar ejercicio' : 'Nuevo ejercicio'}
-        size="lg"
-      >
+          {/* Stats */}
+          <div className="flex items-center gap-4 text-sm">
+            <span className="text-slate-400">{filtered.length} ejercicios</span>
+            {(search || muscleFilter) && <span className="text-slate-500">de {exercises.length} en biblioteca</span>}
+          </div>
+
+          {/* Exercise grid */}
+          {filtered.length === 0 ? (
+            <EmptyState icon={<BookOpen />}
+              title={search ? 'Sin resultados' : 'Biblioteca vacía'}
+              description={search ? 'Prueba con otro término.' : 'Crea tu primer ejercicio reutilizable.'}
+              action={!search ? { label: 'Nuevo ejercicio', onClick: onOpenCreate } : undefined} />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {filtered.map(ex => (
+                <div key={ex.id} className="card p-4 flex flex-col gap-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-white truncate">{ex.name}</h3>
+                      {ex.muscle_group && <p className="text-xs text-slate-400 mt-0.5 truncate">{ex.muscle_group}</p>}
+                    </div>
+                    {ex.category && (
+                      <span className={cn('shrink-0 text-xs font-medium px-2 py-0.5 rounded-full capitalize',
+                        CATEGORY_COLORS[ex.category as Category] ?? 'bg-slate-700 text-slate-300')}>
+                        {ex.category}
+                      </span>
+                    )}
+                  </div>
+                  {(ex.default_sets ?? ex.default_reps ?? ex.default_rest) && (
+                    <div className="flex gap-3 text-xs text-slate-400">
+                      {ex.default_sets && <span><span className="text-slate-200 font-medium">{ex.default_sets}</span> series</span>}
+                      {ex.default_reps && <span><span className="text-slate-200 font-medium">{ex.default_reps}</span> reps</span>}
+                      {ex.default_rest && <span><span className="text-slate-200 font-medium">{ex.default_rest}s</span> descanso</span>}
+                    </div>
+                  )}
+                  {ex.description && <p className="text-xs text-slate-500 line-clamp-2">{ex.description}</p>}
+                  <div className="flex items-center gap-1 mt-auto pt-1 border-t border-[#334155]">
+                    <button type="button" onClick={() => onUse(ex)} className="btn-secondary text-xs py-1 px-2 flex items-center gap-1">
+                      <Plus size={12} /> Usar
+                    </button>
+                    <button type="button" onClick={() => onOpenEdit(ex)} className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 ml-auto">
+                      <Pencil size={12} /> Editar
+                    </button>
+                    {confirmDelete === ex.id ? (
+                      <div className="flex items-center gap-1">
+                        <button type="button" onClick={() => handleDelete(ex.id)} className="btn-ghost text-xs py-1 px-2 text-red-400 hover:text-red-300">Confirmar</button>
+                        <button type="button" onClick={() => setConfirmDelete(null)} className="btn-ghost text-xs py-1 px-2 text-slate-400">No</button>
+                      </div>
+                    ) : (
+                      <button type="button" onClick={() => handleDelete(ex.id)} className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 text-red-400 hover:text-red-300">
+                        <Trash2 size={12} /> Eliminar
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Form modal — outside tab conditions, always available */}
+      <Modal isOpen={showForm} onClose={onCloseForm} title={editingExercise ? 'Editar ejercicio' : 'Nuevo ejercicio'} size="lg">
         <form onSubmit={handleSave} className="space-y-4">
           <div>
             <label className="label">Nombre *</label>
-            <input
-              className="input"
-              placeholder="Ej: Sentadilla con barra"
-              value={form.name}
-              onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-            />
+            <input className="input" placeholder="Ej: Sentadilla con barra" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label">Categoría</label>
-              <select
-                className="input"
-                value={form.category}
-                onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
-              >
+              <select className="input" value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}>
                 <option value="">Seleccionar...</option>
                 {CATEGORY_OPTIONS.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
               </select>
             </div>
             <div>
               <label className="label">Grupo muscular</label>
-              <input
-                className="input"
-                placeholder="Ej: Cuádriceps, glúteos"
-                value={form.muscle_group}
-                onChange={e => setForm(p => ({ ...p, muscle_group: e.target.value }))}
-              />
+              <input className="input" placeholder="Ej: Cuádriceps, glúteos" value={form.muscle_group} onChange={e => setForm(p => ({ ...p, muscle_group: e.target.value }))} />
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="label">Series</label>
-              <input
-                type="number"
-                className="input"
-                placeholder="4"
-                value={form.default_sets}
-                onChange={e => setForm(p => ({ ...p, default_sets: e.target.value }))}
-              />
+              <input type="number" className="input" placeholder="4" value={form.default_sets} onChange={e => setForm(p => ({ ...p, default_sets: e.target.value }))} />
             </div>
             <div>
               <label className="label">Reps</label>
-              <input
-                className="input"
-                placeholder="8-12"
-                value={form.default_reps}
-                onChange={e => setForm(p => ({ ...p, default_reps: e.target.value }))}
-              />
+              <input className="input" placeholder="8-12" value={form.default_reps} onChange={e => setForm(p => ({ ...p, default_reps: e.target.value }))} />
             </div>
             <div>
               <label className="label">Descanso (s)</label>
-              <input
-                type="number"
-                className="input"
-                placeholder="90"
-                value={form.default_rest}
-                onChange={e => setForm(p => ({ ...p, default_rest: e.target.value }))}
-              />
+              <input type="number" className="input" placeholder="90" value={form.default_rest} onChange={e => setForm(p => ({ ...p, default_rest: e.target.value }))} />
             </div>
           </div>
           <div>
             <label className="label flex items-center gap-1"><LinkIcon size={11} /> URL vídeo</label>
-            <input
-              className="input"
-              placeholder="https://youtube.com/..."
-              value={form.video_url}
-              onChange={e => setForm(p => ({ ...p, video_url: e.target.value }))}
-            />
+            <input className="input" placeholder="https://youtube.com/..." value={form.video_url} onChange={e => setForm(p => ({ ...p, video_url: e.target.value }))} />
           </div>
           <div>
-            <label className="label">Descripción</label>
-            <textarea
-              className="input resize-none"
-              rows={3}
-              placeholder="Indicaciones técnicas, progresiones..."
-              value={form.description}
-              onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-            />
+            <label className="label">Descripción / Instrucciones</label>
+            <textarea className="input resize-none" rows={3} placeholder="Indicaciones técnicas, progresiones..." value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} />
           </div>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onCloseForm} className="btn-secondary flex-1">Cancelar</button>
@@ -1356,98 +1521,6 @@ function ExerciseLibraryPanel({
           </div>
         </form>
       </Modal>
-
-      {/* Exercise grid */}
-      {filtered.length === 0 ? (
-        <EmptyState
-          icon={<BookOpen />}
-          title={search ? 'Sin resultados' : 'Biblioteca vacía'}
-          description={search ? 'Prueba con otro término de búsqueda.' : 'Crea tu primer ejercicio reutilizable.'}
-          action={!search ? { label: 'Nuevo ejercicio', onClick: onOpenCreate } : undefined}
-        />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filtered.map(ex => (
-            <div key={ex.id} className="card p-4 flex flex-col gap-3">
-              {/* Card header */}
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-white truncate">{ex.name}</h3>
-                  {ex.muscle_group && (
-                    <p className="text-xs text-slate-400 mt-0.5 truncate">{ex.muscle_group}</p>
-                  )}
-                </div>
-                {ex.category && (
-                  <span className={cn(
-                    'shrink-0 text-xs font-medium px-2 py-0.5 rounded-full capitalize',
-                    CATEGORY_COLORS[ex.category as Category] ?? 'bg-slate-700 text-slate-300',
-                  )}>
-                    {ex.category}
-                  </span>
-                )}
-              </div>
-
-              {/* Sets / Reps */}
-              {(ex.default_sets ?? ex.default_reps ?? ex.default_rest) && (
-                <div className="flex gap-3 text-xs text-slate-400">
-                  {ex.default_sets && <span><span className="text-slate-200 font-medium">{ex.default_sets}</span> series</span>}
-                  {ex.default_reps && <span><span className="text-slate-200 font-medium">{ex.default_reps}</span> reps</span>}
-                  {ex.default_rest && <span><span className="text-slate-200 font-medium">{ex.default_rest}s</span> descanso</span>}
-                </div>
-              )}
-
-              {/* Description snippet */}
-              {ex.description && (
-                <p className="text-xs text-slate-500 line-clamp-2">{ex.description}</p>
-              )}
-
-              {/* Actions */}
-              <div className="flex items-center gap-1 mt-auto pt-1 border-t border-[#334155]">
-                <button
-                  type="button"
-                  onClick={() => onUse(ex)}
-                  className="btn-secondary text-xs py-1 px-2 flex items-center gap-1"
-                >
-                  <Plus size={12} /> Usar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onOpenEdit(ex)}
-                  className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 ml-auto"
-                >
-                  <Pencil size={12} /> Editar
-                </button>
-                {confirmDelete === ex.id ? (
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(ex.id)}
-                      className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 text-red-400 hover:text-red-300"
-                    >
-                      Confirmar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setConfirmDelete(null)}
-                      className="btn-ghost text-xs py-1 px-2 text-slate-400"
-                    >
-                      No
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(ex.id)}
-                    className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 text-red-400 hover:text-red-300"
-                  >
-                    <Trash2 size={12} /> Eliminar
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

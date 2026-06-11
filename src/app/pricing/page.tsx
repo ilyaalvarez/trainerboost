@@ -96,7 +96,20 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export default function PricingPage() {
   const router = useRouter()
   const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null)
+  const [loadingFree, setLoadingFree] = useState(false)
   const [annual, setAnnual] = useState(false)
+
+  async function handleFreePlan() {
+    setLoadingFree(true)
+    try {
+      const res = await fetch('/api/free-plan', { method: 'POST' })
+      if (res.status === 401) { router.push('/register'); return }
+      if (!res.ok) { toast.error('Error al activar el plan gratuito'); return }
+      router.push('/dashboard')
+    } finally {
+      setLoadingFree(false)
+    }
+  }
 
   async function handleCheckout(plan: PlanKey) {
     setLoadingPlan(plan)
@@ -204,12 +217,15 @@ export default function PricingPage() {
               ))}
             </ul>
 
-            <Link
-              href="/register"
-              className="w-full py-2.5 rounded-xl font-semibold text-sm text-center transition-all duration-200 bg-surface-2 border border-border hover:border-border-bright hover:bg-surface-3 text-white block hover:-translate-y-0.5"
+            <button
+              onClick={handleFreePlan}
+              disabled={loadingFree}
+              className="w-full py-2.5 rounded-xl font-semibold text-sm text-center transition-all duration-200 bg-surface-2 border border-border hover:border-border-bright hover:bg-surface-3 text-white flex items-center justify-center gap-2 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Empezar gratis
-            </Link>
+              {loadingFree
+                ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Activando...</>
+                : 'Empezar gratis'}
+            </button>
           </div>
 
           {/* Paid plans */}

@@ -47,7 +47,7 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const publicPrefixes = ['/_next', '/favicon', '/api/webhooks', '/pricing', '/demo']
+  const publicPrefixes = ['/_next', '/favicon', '/api/webhooks', '/pricing', '/demo', '/auth']
   const publicExact = ['/', '/login', '/register', '/onboarding', '/forgot-password', '/reset-password', '/privacy', '/terms', '/contact']
   const isPublic = publicPrefixes.some(p => path.startsWith(p)) || publicExact.includes(path)
 

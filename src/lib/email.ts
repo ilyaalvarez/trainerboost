@@ -11,42 +11,81 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.trainerboost.es'
 export async function sendInvitationEmail(to: string, trainerName: string, code: string) {
   if (!resend) return
   const firstName = escapeHtml(trainerName.split(' ')[0])
-  const link = `${APP_URL}/onboarding?code=${encodeURIComponent(code)}`
+  const safeCode  = escapeHtml(code)
+  const link      = `${APP_URL}/register?code=${encodeURIComponent(code)}`
+
+  const featureRows = [
+    ['📋', 'Rutina del día', 'Sets, repeticiones y notas de coaching'],
+    ['🥗', 'Plan de nutrición', 'Comidas y macros personalizados'],
+    ['📈', 'Seguimiento de progreso', 'Peso, medidas y evolución'],
+    ['💬', 'Chat directo', 'Feedback e instrucciones de tu entrenador'],
+  ].map(([icon, title, desc]) => `
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+        <span style="font-size:15px;line-height:1;flex-shrink:0;margin-top:2px;">${icon}</span>
+        <div>
+          <div style="color:#0F172A;font-size:13px;font-weight:600;margin:0 0 1px;">${title}</div>
+          <div style="color:#64748B;font-size:12px;margin:0;">${desc}</div>
+        </div>
+      </div>`).join('')
+
   await resend.emails.send({
     from: FROM,
     to,
-    subject: `${firstName} te invita a TrainerBoost 💪`,
+    subject: `${firstName} te ha preparado tu portal de entrenamiento`,
     html: `<!DOCTYPE html>
 <html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#0F172A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <div style="max-width:560px;margin:40px auto;padding:0 20px;">
-    <div style="text-align:center;margin-bottom:32px;">
-      <div style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#0EA5E9,#7C3AED);padding:10px 20px;border-radius:12px;">
-        <span style="color:white;font-size:18px;font-weight:800;">⚡ TrainerBoost</span>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Tu portal de entrenamiento está listo</title>
+</head>
+<body style="margin:0;padding:0;background:#F1F5F9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:40px 16px;">
+
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="display:inline-flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;background:#8FD43A;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;">
+          <span style="color:#0F172A;font-size:14px;font-weight:900;">⚡</span>
+        </div>
+        <span style="color:#0F172A;font-size:18px;font-weight:800;letter-spacing:-0.5px;">TrainerBoost</span>
       </div>
     </div>
-    <div style="background:#1E293B;border:1px solid #334155;border-radius:20px;padding:36px;">
-      <h1 style="color:white;font-size:22px;font-weight:700;margin:0 0 12px;">Tu entrenador te está esperando</h1>
-      <p style="color:#94A3B8;font-size:15px;line-height:1.6;margin:0 0 24px;">
-        <strong style="color:#E2E8F0;">${firstName}</strong> te ha invitado a unirte a su portal de entrenamiento personal en TrainerBoost.
-      </p>
-      <div style="background:#263548;border-radius:12px;padding:20px;text-align:center;margin-bottom:28px;">
-        <p style="color:#94A3B8;font-size:12px;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;">Tu código de acceso</p>
-        <div style="color:#0EA5E9;font-size:28px;font-weight:800;font-family:monospace;letter-spacing:4px;">${escapeHtml(code)}</div>
+
+    <div style="background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);">
+      <div style="height:4px;background:linear-gradient(90deg,#8FD43A,#4ADE80);"></div>
+      <div style="padding:36px 32px;">
+
+        <div style="display:inline-block;background:#F0FDF4;border:1px solid #BBF7D0;color:#15803D;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.6px;">Invitación personal</div>
+        <h1 style="color:#0F172A;font-size:24px;font-weight:800;margin:0 0 10px;line-height:1.25;">${firstName} te ha preparado<br>tu portal de entrenamiento</h1>
+        <p style="color:#475569;font-size:15px;line-height:1.65;margin:0 0 24px;">Tu entrenador ha creado un espacio exclusivo para seguir tu progreso, ver tus rutinas y estar en contacto directo. Todo en un solo lugar.</p>
+
+        <div style="background:#F8FAFC;border-radius:12px;padding:20px 20px 8px;margin-bottom:28px;">
+          <p style="color:#94A3B8;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin:0 0 14px;">Tendrás acceso a</p>
+          ${featureRows}
+        </div>
+
+        <div style="text-align:center;margin-bottom:28px;">
+          <a href="${link}" style="display:inline-block;background:#8FD43A;color:#0F172A;font-weight:700;font-size:15px;text-decoration:none;padding:14px 40px;border-radius:12px;">Crear mi cuenta gratis →</a>
+          <p style="color:#94A3B8;font-size:12px;margin:8px 0 0;">Sin tarjeta de crédito · Menos de 2 minutos</p>
+        </div>
+
+        <div style="border-top:1px solid #E2E8F0;margin:0 0 24px;"></div>
+
+        <p style="color:#64748B;font-size:13px;text-align:center;margin:0 0 10px;">¿El botón no funciona? Introduce este código en <a href="${APP_URL}/register" style="color:#16A34A;text-decoration:none;font-weight:500;">trainerboost.es/register</a></p>
+        <div style="background:#F8FAFC;border:2px dashed #CBD5E1;border-radius:10px;padding:14px;text-align:center;">
+          <div style="color:#0F172A;font-size:22px;font-weight:800;font-family:ui-monospace,'Courier New',monospace;letter-spacing:5px;">${safeCode}</div>
+          <div style="color:#94A3B8;font-size:11px;margin-top:4px;">Válido durante 7 días</div>
+        </div>
+
       </div>
-      <div style="text-align:center;">
-        <a href="${link}" style="display:inline-block;background:linear-gradient(135deg,#0EA5E9,#7C3AED);color:white;font-weight:700;font-size:15px;text-decoration:none;padding:14px 36px;border-radius:12px;">
-          Activar mi cuenta →
-        </a>
-      </div>
-      <p style="color:#475569;font-size:13px;text-align:center;margin-top:20px;">
-        O introduce el código manualmente en <a href="${APP_URL}/onboarding" style="color:#0EA5E9;">${APP_URL}/onboarding</a>
-      </p>
     </div>
-    <p style="color:#475569;font-size:12px;text-align:center;margin-top:24px;">
-      © 2026 TrainerBoost · Spain 🇪🇸 · <a href="mailto:hola@trainerboost.es" style="color:#0EA5E9;">hola@trainerboost.es</a>
+
+    <p style="color:#94A3B8;font-size:12px;text-align:center;margin-top:20px;line-height:1.6;">
+      Recibiste este email porque ${firstName} te invitó a TrainerBoost.<br>
+      Si no lo esperabas, puedes ignorarlo sin problema.<br>
+      © 2026 TrainerBoost · <a href="mailto:hola@trainerboost.es" style="color:#64748B;text-decoration:none;">hola@trainerboost.es</a>
     </p>
+
   </div>
 </body>
 </html>`,

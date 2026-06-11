@@ -20,6 +20,12 @@ function periodEndISO(sub: Stripe.Subscription): string {
 }
 
 export async function POST(request: NextRequest) {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!stripe || !webhookSecret) {
+    console.error('[stripe/webhook] stripe or STRIPE_WEBHOOK_SECRET not configured')
+    return NextResponse.json({ error: 'Webhook no configurado' }, { status: 503 })
+  }
+
   const body      = await request.text()
   const signature = request.headers.get('stripe-signature')
 
@@ -32,7 +38,7 @@ export async function POST(request: NextRequest) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      webhookSecret
     )
   } catch (err) {
     console.error('Webhook signature error:', err)

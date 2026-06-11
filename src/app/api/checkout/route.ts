@@ -8,6 +8,9 @@ const checkoutSchema = z.object({
 })
 
 export async function POST(request: NextRequest) {
+  if (!stripe) {
+    return NextResponse.json({ error: 'Pagos no configurados' }, { status: 503 })
+  }
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

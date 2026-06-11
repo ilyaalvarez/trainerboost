@@ -18,18 +18,22 @@ export async function proxy(request: NextRequest) {
     const ip =
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       'anonymous'
-    const { success, limit, reset } = await rl.limit(ip)
-    if (!success) {
-      return new NextResponse('Too Many Requests', {
-        status: 429,
-        headers: {
-          'Content-Type':        'text/plain',
-          'Retry-After':         String(Math.ceil((reset - Date.now()) / 1000)),
-          'X-RateLimit-Limit':   String(limit ?? 0),
-          'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset':   String(reset),
-        },
-      })
+    try {
+      const { success, limit, reset } = await rl.limit(ip)
+      if (!success) {
+        return new NextResponse('Too Many Requests', {
+          status: 429,
+          headers: {
+            'Content-Type':          'text/plain',
+            'Retry-After':           String(Math.ceil((reset - Date.now()) / 1000)),
+            'X-RateLimit-Limit':     String(limit ?? 0),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset':     String(reset),
+          },
+        })
+      }
+    } catch {
+      // Upstash unavailable — skip rate limiting rather than blocking all traffic
     }
   }
 
@@ -70,26 +74,38 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user && (path === '/login' || path === '/register' || path === '/')) {
-    const { data: profile } = await supabase
-      .from('profiles').select('role').eq('id', user.id).single()
-    if (!profile) return NextResponse.redirect(new URL('/onboarding', request.url))
-    return NextResponse.redirect(
-      new URL(profile.role === 'client' ? '/client' : '/dashboard', request.url)
-    )
+    try {
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', user.id).single()
+      if (!profile) return NextResponse.redirect(new URL('/onboarding', request.url))
+      return NextResponse.redirect(
+        new URL(profile.role === 'client' ? '/client' : '/dashboard', request.url)
+      )
+    } catch {
+      return supabaseResponse
+    }
   }
 
   if (path.startsWith('/dashboard') && user) {
-    const { data: profile } = await supabase
-      .from('profiles').select('role').eq('id', user.id).single()
-    if (!profile) return NextResponse.redirect(new URL('/onboarding', request.url))
-    if (profile.role !== 'trainer') return NextResponse.redirect(new URL('/client', request.url))
+    try {
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', user.id).single()
+      if (!profile) return NextResponse.redirect(new URL('/onboarding', request.url))
+      if (profile.role !== 'trainer') return NextResponse.redirect(new URL('/client', request.url))
+    } catch {
+      return supabaseResponse
+    }
   }
 
   if (path.startsWith('/client') && user) {
-    const { data: profile } = await supabase
-      .from('profiles').select('role').eq('id', user.id).single()
-    if (!profile) return NextResponse.redirect(new URL('/onboarding', request.url))
-    if (profile.role !== 'client') return NextResponse.redirect(new URL('/dashboard', request.url))
+    try {
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', user.id).single()
+      if (!profile) return NextResponse.redirect(new URL('/onboarding', request.url))
+      if (profile.role !== 'client') return NextResponse.redirect(new URL('/dashboard', request.url))
+    } catch {
+      return supabaseResponse
+    }
   }
 
   return supabaseResponse

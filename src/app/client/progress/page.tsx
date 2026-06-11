@@ -673,7 +673,7 @@ export default function ClientProgressPage() {
       {/* Add modal */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Registrar medida">
         <form onSubmit={handleSave} className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div>
               <label className="label">Peso (kg) *</label>
               <input

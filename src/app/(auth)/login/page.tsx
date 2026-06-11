@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Zap, Mail, Lock, ArrowRight, Loader2, ArrowLeft, Eye, EyeOff, AlertTriangle } from 'lucide-react'
@@ -16,8 +16,16 @@ function getAuthError(error: string): string {
   return 'Error al iniciar sesión. Inténtalo de nuevo'
 }
 
+function getOAuthError(code: string, message?: string | null): string {
+  if (code === 'no_code') return 'Error OAuth: no se recibió código de autorización'
+  if (code === 'oauth_failed') return message ? decodeURIComponent(message) : 'El proveedor de Google rechazó la solicitud'
+  if (code === 'exchange_failed') return message ? `Error de autenticación: ${decodeURIComponent(message)}` : 'Error al verificar las credenciales con Google'
+  return 'Error al iniciar sesión con Google. Inténtalo de nuevo'
+}
+
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
   const [email, setEmail]             = useState('')
   const [password, setPassword]       = useState('')
@@ -25,6 +33,16 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [attempts, setAttempts]       = useState(0)
   const [rememberMe, setRememberMe]   = useState(true)
+  const [oauthError, setOauthError]   = useState<string | null>(null)
+
+  useEffect(() => {
+    const errorCode = searchParams.get('error')
+    if (errorCode) {
+      const msg = getOAuthError(errorCode, searchParams.get('message'))
+      setOauthError(msg)
+      toast.error(msg)
+    }
+  }, [searchParams])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -104,6 +122,14 @@ export default function LoginPage() {
               <p className="text-sm text-semantic-warning-text">
                 Demasiados intentos. Espera unos segundos antes de volver a intentarlo.
               </p>
+            </div>
+          )}
+
+          {/* OAuth error */}
+          {oauthError && (
+            <div className="flex items-start gap-2.5 p-3 mb-4 bg-semantic-error/10 border border-semantic-error/20 rounded-xl">
+              <AlertTriangle className="w-4 h-4 text-semantic-error-text shrink-0 mt-0.5" />
+              <p className="text-sm text-semantic-error-text">{oauthError}</p>
             </div>
           )}
 

@@ -188,12 +188,14 @@ export default function AppointmentsPage() {
   // ── Inline status change ─────────────────────────────────────────────────
 
   async function changeStatus(id: string, status: AppointmentStatus) {
+    if (!userId) return
     setActionLoading(id + status)
     try {
       const { error } = await supabase
         .from('appointments')
         .update({ status })
         .eq('id', id)
+        .eq('trainer_id', userId)
 
       if (error) throw error
 

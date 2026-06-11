@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Camera, Loader2, Save, KeyRound, LogOut, Eye, EyeOff } from 'lucide-react'
+import { Camera, Loader2, Save, KeyRound, LogOut, Eye, EyeOff, Trash2, AlertTriangle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Avatar from '@/components/ui/Avatar'
+import Modal from '@/components/ui/Modal'
 import type { Profile } from '@/types/database'
 
 export default function ClientSettingsPage() {
@@ -27,6 +28,10 @@ export default function ClientSettingsPage() {
   const [savingPwd,   setSavingPwd]   = useState(false)
   const [pwdError,    setPwdError]    = useState<string | null>(null)
   const [showPwd,     setShowPwd]     = useState(false)
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteConfirm,   setDeleteConfirm]   = useState('')
+  const [deleting,        setDeleting]        = useState(false)
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -91,6 +96,25 @@ export default function ClientSettingsPage() {
   async function logout() {
     await supabase.auth.signOut()
     router.push('/login')
+  }
+
+  async function deleteAccount() {
+    if (deleteConfirm !== 'ELIMINAR') return
+    setDeleting(true)
+    try {
+      const res = await fetch('/api/account/delete', { method: 'DELETE' })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        toast.error(body.error ?? 'Error al eliminar la cuenta')
+        return
+      }
+      await supabase.auth.signOut()
+      router.push('/login')
+    } catch {
+      toast.error('Error al eliminar la cuenta')
+    } finally {
+      setDeleting(false)
+    }
   }
 
   if (!profile) {
@@ -228,6 +252,70 @@ export default function ClientSettingsPage() {
           </button>
         </div>
       </section>
+
+      {/* ── Danger zone ───────────────────────────────────────────── */}
+      <section className="card p-6 border border-semantic-error/20">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <p className="text-sm font-semibold text-semantic-error-text">Eliminar cuenta</p>
+            <p className="text-xs text-fg-muted mt-0.5">Borra permanentemente tu cuenta y todos tus datos. Irreversible.</p>
+          </div>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="btn-secondary border-semantic-error/30 text-semantic-error-text hover:bg-semantic-error/10 text-sm flex items-center gap-2"
+          >
+            <Trash2 className="w-4 h-4" />
+            Eliminar cuenta
+          </button>
+        </div>
+      </section>
+
+      {/* ── Delete confirmation modal ──────────────────────────────── */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => { setShowDeleteModal(false); setDeleteConfirm('') }}
+        title="Eliminar cuenta"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 p-3 bg-semantic-error/10 border border-semantic-error/20 rounded-xl">
+            <AlertTriangle className="w-5 h-5 text-semantic-error-text shrink-0 mt-0.5" />
+            <div className="text-sm text-semantic-error-text">
+              <p className="font-semibold mb-1">Esta acción es irreversible</p>
+              <p>Se eliminarán todos tus datos: progreso, mensajes, citas y configuración.</p>
+            </div>
+          </div>
+          <div>
+            <label className="label">
+              Escribe <span className="font-mono font-bold text-fg-primary">ELIMINAR</span> para confirmar
+            </label>
+            <input
+              value={deleteConfirm}
+              onChange={e => setDeleteConfirm(e.target.value)}
+              className="input font-mono"
+              placeholder="ELIMINAR"
+              autoComplete="off"
+            />
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => { setShowDeleteModal(false); setDeleteConfirm('') }}
+              className="btn-secondary flex-1"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={deleteAccount}
+              disabled={deleteConfirm !== 'ELIMINAR' || deleting}
+              className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ background: deleteConfirm === 'ELIMINAR' && !deleting ? 'var(--semantic-error)' : undefined }}
+            >
+              {deleting
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Eliminando…</>
+                : <><Trash2 className="w-4 h-4" /> Eliminar cuenta</>}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

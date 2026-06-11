@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import {
   Zap, ArrowRight, Loader2, X, Users, Dumbbell, BarChart2,
@@ -331,9 +331,10 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
 // ─── Client form (unchanged flow) ─────────────────────────────────────────────
 
 function ClientForm({ userId }: { userId: string }) {
-  const router   = useRouter()
-  const supabase = useMemo(() => createClient(), [])
-  const [inviteCode, setInviteCode] = useState('')
+  const router       = useRouter()
+  const searchParams = useSearchParams()
+  const supabase     = useMemo(() => createClient(), [])
+  const [inviteCode, setInviteCode] = useState(() => searchParams.get('code') ?? '')
   const [phone,      setPhone]      = useState('')
   const [loading,    setLoading]    = useState(false)
 

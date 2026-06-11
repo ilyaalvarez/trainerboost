@@ -743,7 +743,7 @@ export default function LandingPage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-4 items-stretch">
-          {PRICING_TIERS.map(({ key, highlight }, i) => {
+          {PRICING_TIERS.map(({ key, highlight }) => {
             const plan = PLAN_CONFIG[key]
             return (
               <div

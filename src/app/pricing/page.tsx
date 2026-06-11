@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import {
-  Check, Zap, Loader2, Sparkles, ChevronDown,
+  Check, Zap, Loader2, ChevronDown,
   Shield, Clock, TrendingUp, Users, Award,
 } from 'lucide-react'
 import { PLANS, type PlanKey } from '@/lib/stripe'

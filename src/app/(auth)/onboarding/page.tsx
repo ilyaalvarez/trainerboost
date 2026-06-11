@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import {
   Zap, ArrowRight, Loader2, X, Users, Dumbbell, BarChart2,
-  CheckCircle2, MessageSquare, CalendarDays, Mail, Sparkles,
+  CheckCircle2, MessageSquare, Mail, Sparkles,
   ChevronRight,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'

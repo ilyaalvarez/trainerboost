@@ -18,8 +18,8 @@ function MacroBar({ label, value, max, color }: {
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-xs">
-        <span className="text-slate-400">{label}</span>
-        <span className="font-mono font-semibold text-white">{value}g / {max}g</span>
+        <span className="text-fg-muted">{label}</span>
+        <span className="font-mono font-semibold text-fg-primary">{value}g / {max}g</span>
       </div>
       <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
         <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
@@ -169,7 +169,7 @@ export default function ClientNutritionPage() {
   if (!plan) {
     return (
       <EmptyState
-        icon={<UtensilsCrossed className="w-8 h-8 text-slate-500" />}
+        icon={<UtensilsCrossed className="w-8 h-8 text-fg-muted" />}
         title="Sin plan nutricional"
         description="Tu entrenador todavía no te ha asignado un plan. Escríbele un mensaje para empezar."
         action={{ label: 'Escribir a mi entrenador', onClick: () => { window.location.href = '/client/messages' } }}
@@ -187,8 +187,8 @@ export default function ClientNutritionPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">{plan.title}</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Plan nutricional activo</p>
+          <h1 className="text-2xl font-bold text-fg-primary">{plan.title}</h1>
+          <p className="text-fg-muted text-sm mt-0.5">Plan nutricional activo</p>
         </div>
         <button onClick={handleExportPdf} className="btn-secondary flex-shrink-0 text-sm">
           <Download className="w-4 h-4" />
@@ -199,35 +199,35 @@ export default function ClientNutritionPage() {
       {/* Macros overview */}
       <div className="card p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-white">Objetivos del día</h2>
+          <h2 className="font-semibold text-fg-primary">Objetivos del día</h2>
           {checkedFoods.size > 0 && (
-            <span className="text-xs text-slate-400">
-              Consumido: <span className="text-white font-semibold">{consumed?.calories ?? 0} kcal</span>
+            <span className="text-xs text-fg-muted">
+              Consumido: <span className="text-fg-primary font-semibold">{consumed?.calories ?? 0} kcal</span>
             </span>
           )}
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
           {[
-            { label: 'Calorías', value: totals?.calories ?? 0, consumed: consumed?.calories ?? 0, target: plan.calories_target ?? 0, unit: 'kcal', color: 'text-white' },
-            { label: 'Proteína', value: totals?.protein ?? 0, consumed: consumed?.protein ?? 0, target: plan.protein_target ?? 0, unit: 'g', color: 'text-sky-400' },
-            { label: 'Carbos', value: totals?.carbs ?? 0, consumed: consumed?.carbs ?? 0, target: plan.carbs_target ?? 0, unit: 'g', color: 'text-amber-400' },
-            { label: 'Grasa', value: totals?.fat ?? 0, consumed: consumed?.fat ?? 0, target: plan.fat_target ?? 0, unit: 'g', color: 'text-violet-400' },
+            { label: 'Calorías', value: totals?.calories ?? 0, consumed: consumed?.calories ?? 0, target: plan.calories_target ?? 0, unit: 'kcal', color: 'text-fg-primary' },
+            { label: 'Proteína', value: totals?.protein ?? 0, consumed: consumed?.protein ?? 0, target: plan.protein_target ?? 0, unit: 'g', color: 'text-semantic-info-text' },
+            { label: 'Carbos', value: totals?.carbs ?? 0, consumed: consumed?.carbs ?? 0, target: plan.carbs_target ?? 0, unit: 'g', color: 'text-semantic-warning-text' },
+            { label: 'Grasa', value: totals?.fat ?? 0, consumed: consumed?.fat ?? 0, target: plan.fat_target ?? 0, unit: 'g', color: 'text-brand-secondary-text' },
           ].map(m => (
             <div key={m.label} className="text-center p-3 rounded-xl bg-surface-2">
               <div className={`font-mono text-xl font-bold ${m.color}`}>
                 {checkedFoods.size > 0 ? m.consumed : m.value}
               </div>
-              <div className="text-xs text-slate-500 mt-0.5">{m.label}</div>
+              <div className="text-xs text-fg-muted mt-0.5">{m.label}</div>
               {m.target > 0 && (
-                <div className="text-xs text-slate-600 mt-0.5">/ {m.target}{m.unit}</div>
+                <div className="text-xs text-fg-disabled mt-0.5">/ {m.target}{m.unit}</div>
               )}
             </div>
           ))}
         </div>
         <div className="space-y-3">
-          {plan.protein_target && <MacroBar label="Proteína" value={checkedFoods.size > 0 ? (consumed?.protein ?? 0) : (totals?.protein ?? 0)} max={plan.protein_target} color="bg-sky-400" />}
-          {plan.carbs_target   && <MacroBar label="Carbos"   value={checkedFoods.size > 0 ? (consumed?.carbs ?? 0) : (totals?.carbs ?? 0)}     max={plan.carbs_target}   color="bg-amber-400" />}
-          {plan.fat_target     && <MacroBar label="Grasa"    value={checkedFoods.size > 0 ? (consumed?.fat ?? 0) : (totals?.fat ?? 0)}         max={plan.fat_target}     color="bg-violet-400" />}
+          {plan.protein_target && <MacroBar label="Proteína" value={checkedFoods.size > 0 ? (consumed?.protein ?? 0) : (totals?.protein ?? 0)} max={plan.protein_target} color="bg-semantic-info" />}
+          {plan.carbs_target   && <MacroBar label="Carbos"   value={checkedFoods.size > 0 ? (consumed?.carbs ?? 0) : (totals?.carbs ?? 0)}     max={plan.carbs_target}   color="bg-semantic-warning" />}
+          {plan.fat_target     && <MacroBar label="Grasa"    value={checkedFoods.size > 0 ? (consumed?.fat ?? 0) : (totals?.fat ?? 0)}         max={plan.fat_target}     color="bg-brand-secondary" />}
         </div>
       </div>
 
@@ -241,11 +241,10 @@ export default function ClientNutritionPage() {
         const circumference = 2 * Math.PI * 28
         return (
           <>
-            <div className={`card p-4 mb-4 flex items-center justify-between transition-colors ${allDone ? 'border-emerald-500/30' : ''}`}
-                 style={allDone ? { background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02))' } : {}}>
+            <div className={`card p-4 mb-4 flex items-center justify-between transition-colors ${allDone ? 'border-brand-accent/30 bg-gradient-to-br from-brand-accent/[0.06] to-brand-accent/[0.02]' : ''}`}>
               <div>
-                <p className="text-sm font-semibold text-white capitalize">{todayLabel}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{checkedCount} de {totalFoods} alimentos completados</p>
+                <p className="text-sm font-semibold text-fg-primary capitalize">{todayLabel}</p>
+                <p className="text-xs text-fg-muted mt-0.5">{checkedCount} de {totalFoods} alimentos completados</p>
               </div>
               <div className="w-16 h-16 relative">
                 <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
@@ -258,20 +257,19 @@ export default function ClientNutritionPage() {
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
                   {allDone
-                    ? <Trophy className="w-5 h-5 text-emerald-400" />
-                    : <span className="text-xs font-bold text-white">{pct}%</span>}
+                    ? <Trophy className="w-5 h-5 text-semantic-success-text" />
+                    : <span className="text-xs font-bold text-fg-primary">{pct}%</span>}
                 </div>
               </div>
             </div>
             {allDone && (
-              <div className="rounded-xl p-4 flex items-center gap-3 mb-4 animate-fade-in"
-                   style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(14,165,233,0.06))', border: '1px solid rgba(16,185,129,0.25)' }}>
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
-                  <Trophy className="w-5 h-5 text-emerald-400" />
+              <div className="rounded-xl p-4 flex items-center gap-3 mb-4 animate-fade-in bg-gradient-to-br from-brand-accent/10 to-semantic-info/[0.06] border border-brand-accent/25">
+                <div className="w-10 h-10 rounded-xl bg-semantic-success/20 flex items-center justify-center shrink-0">
+                  <Trophy className="w-5 h-5 text-semantic-success-text" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">¡Plan completado! 🎉</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Has completado todos los alimentos del día. ¡Excelente disciplina!</p>
+                  <p className="text-sm font-semibold text-fg-primary">¡Plan completado! 🎉</p>
+                  <p className="text-xs text-fg-muted mt-0.5">Has completado todos los alimentos del día. ¡Excelente disciplina!</p>
                 </div>
               </div>
             )}
@@ -283,10 +281,10 @@ export default function ClientNutritionPage() {
       <div className="card p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Droplets className="w-4 h-4 text-sky-400" />
-            <span className="font-semibold text-white text-sm">Hidratación</span>
+            <Droplets className="w-4 h-4 text-semantic-info-text" />
+            <span className="font-semibold text-fg-primary text-sm">Hidratación</span>
           </div>
-          <span className="text-xs text-slate-400 font-mono">{waterGlasses}/{WATER_GOAL} vasos</span>
+          <span className="text-xs text-fg-muted font-mono">{waterGlasses}/{WATER_GOAL} vasos</span>
         </div>
         <div className="flex gap-1.5 mb-3 flex-wrap">
           {Array.from({ length: WATER_GOAL }).map((_, i) => (
@@ -295,8 +293,8 @@ export default function ClientNutritionPage() {
               onClick={() => adjustWater(i < waterGlasses ? -(waterGlasses - i) : (i + 1 - waterGlasses))}
               className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
                 i < waterGlasses
-                  ? 'bg-sky-500/80 text-white'
-                  : 'bg-surface-2 text-slate-600 hover:text-slate-400 border border-border/50'
+                  ? 'bg-semantic-info text-white'
+                  : 'bg-surface-2 text-fg-disabled hover:text-fg-muted border border-border/50'
               }`}
               title={`${i + 1} vasos`}
             >
@@ -310,7 +308,7 @@ export default function ClientNutritionPage() {
             <Minus className="w-3.5 h-3.5" />
           </button>
           <div className="flex-1 h-1.5 bg-surface-2 rounded-full overflow-hidden">
-            <div className="h-full bg-sky-400 rounded-full transition-all duration-300"
+            <div className="h-full bg-semantic-info rounded-full transition-all duration-300"
                  style={{ width: `${Math.min(100, (waterGlasses / WATER_GOAL) * 100)}%` }} />
           </div>
           <button onClick={() => adjustWater(1)} disabled={waterGlasses >= WATER_GOAL + 4}
@@ -319,7 +317,7 @@ export default function ClientNutritionPage() {
           </button>
         </div>
         {waterGlasses >= WATER_GOAL && (
-          <p className="text-emerald-400 text-xs font-semibold mt-2 text-center">
+          <p className="text-semantic-success-text text-xs font-semibold mt-2 text-center">
             ¡Objetivo de hidratación alcanzado! 💧
           </p>
         )}
@@ -334,8 +332,8 @@ export default function ClientNutritionPage() {
             <div key={meal.id} className="card p-5">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold text-white">{meal.name}</h3>
-                  {meal.time && <span className="text-xs text-slate-400">{meal.time}</span>}
+                  <h3 className="font-semibold text-fg-primary">{meal.name}</h3>
+                  {meal.time && <span className="text-xs text-fg-muted">{meal.time}</span>}
                 </div>
                 <span className="font-mono text-sm font-bold text-brand-primary">{mealCals} kcal</span>
               </div>
@@ -347,7 +345,7 @@ export default function ClientNutritionPage() {
                       <button
                         onClick={() => toggleFood(mealIdx, foodIdx)}
                         className={`w-5 h-5 rounded flex items-center justify-center border transition-all shrink-0 ${
-                          isChecked ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600 hover:border-slate-400'
+                          isChecked ? 'bg-semantic-success border-semantic-success' : 'border-border-strong hover:border-border-bright'
                         }`}
                         aria-label={isChecked ? 'Desmarcar alimento' : 'Marcar alimento como comido'}
                       >
@@ -355,21 +353,21 @@ export default function ClientNutritionPage() {
                       </button>
                       <div className="flex items-center justify-between flex-1">
                         <div>
-                          <span className={`text-sm transition-colors ${isChecked ? 'text-slate-500 line-through' : 'text-white'}`}>{food.name}</span>
-                          <span className="text-xs text-slate-500 ml-2">{food.grams}g</span>
+                          <span className={`text-sm transition-colors ${isChecked ? 'text-fg-muted line-through' : 'text-fg-primary'}`}>{food.name}</span>
+                          <span className="text-xs text-fg-muted ml-2">{food.grams}g</span>
                         </div>
-                        <div className="flex gap-4 text-xs text-slate-400 font-mono">
+                        <div className="flex gap-4 text-xs text-fg-muted font-mono">
                           <span>{food.calories}kcal</span>
-                          <span className="text-sky-400">{food.protein}p</span>
-                          <span className="text-amber-400">{food.carbs}c</span>
-                          <span className="text-violet-400">{food.fat}g</span>
+                          <span className="text-semantic-info-text">{food.protein}p</span>
+                          <span className="text-semantic-warning-text">{food.carbs}c</span>
+                          <span className="text-brand-secondary-text">{food.fat}g</span>
                         </div>
                       </div>
                     </div>
                   )
                 })}
                 {foods.length === 0 && (
-                  <p className="text-xs text-slate-500 italic">Sin alimentos configurados</p>
+                  <p className="text-xs text-fg-muted italic">Sin alimentos configurados</p>
                 )}
               </div>
             </div>
@@ -379,8 +377,8 @@ export default function ClientNutritionPage() {
 
       {plan.notes && (
         <div className="card p-5">
-          <h3 className="font-semibold text-white mb-2">Notas del entrenador</h3>
-          <p className="text-sm text-slate-400 leading-relaxed">{plan.notes}</p>
+          <h3 className="font-semibold text-fg-primary mb-2">Notas del entrenador</h3>
+          <p className="text-sm text-fg-muted leading-relaxed">{plan.notes}</p>
         </div>
       )}
     </div>

@@ -70,11 +70,10 @@ export default function ClientTopbar({ profile }: Props) {
 
             {/* Logo */}
             <Link href="/client" className="flex items-center gap-2.5 group">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                   style={{ background: '#8FD43A' }}>
+              <div className="w-7 h-7 rounded-lg bg-brand-primary flex items-center justify-center shrink-0">
                 <Zap className="w-3.5 h-3.5 text-black" />
               </div>
-              <span className="font-bold text-white text-sm tracking-tight hidden sm:block">TrainerBoost</span>
+              <span className="font-bold text-fg-primary text-sm tracking-tight hidden sm:block">TrainerBoost</span>
             </Link>
 
             {/* Desktop nav */}
@@ -87,23 +86,21 @@ export default function ClientTopbar({ profile }: Props) {
                         className={cn(
                           'relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 group',
                           isActive
-                            ? 'text-brand-primary'
-                            : 'text-slate-400 hover:bg-surface-2 hover:text-slate-100',
-                        )}
-                        style={isActive ? { background: 'rgba(143,212,58,0.07)' } : undefined}>
+                            ? 'text-brand-primary bg-brand-primary/[0.07]'
+                            : 'text-fg-muted hover:bg-surface-2 hover:text-fg-primary',
+                        )}>
                     <div className="relative">
                       <item.icon className={cn('w-3.5 h-3.5 transition-all duration-200',
-                        isActive ? 'text-brand-primary' : 'text-slate-500 group-hover:text-slate-300')} />
+                        isActive ? 'text-brand-primary' : 'text-fg-muted group-hover:text-fg-secondary')} />
                       {item.badge > 0 && !isActive && (
-                        <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                        <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-semantic-error text-white text-[9px] font-bold flex items-center justify-center">
                           {item.badge > 9 ? '9+' : item.badge}
                         </span>
                       )}
                     </div>
                     {item.label}
                     {isActive && (
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-[2px] rounded-full"
-                            style={{ background: '#8FD43A' }} />
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-[2px] rounded-full bg-brand-primary" />
                     )}
                   </Link>
                 )
@@ -116,13 +113,13 @@ export default function ClientTopbar({ profile }: Props) {
                 <div className="ring-2 ring-brand-primary/25 rounded-full">
                   <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
                 </div>
-                <span className="text-xs text-slate-400 font-medium">
+                <span className="text-xs text-fg-muted font-medium">
                   {profile.full_name.split(' ')[0]}
                 </span>
               </div>
               <NotificationBell userId={profile.id} isOpen={notifOpen} onToggle={() => setNotifOpen(v => !v)} />
               <button onClick={logout} title="Cerrar sesión"
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all duration-150">
+                      className="p-1.5 rounded-lg text-fg-disabled hover:text-semantic-error-text hover:bg-semantic-error/8 transition-all duration-150">
                 <LogOut className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -131,8 +128,8 @@ export default function ClientTopbar({ profile }: Props) {
       </header>
 
       {/* ── Bottom nav (mobile only) ─────────────────────────────────────────── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border/60"
-           style={{ background: 'rgba(10,10,10,0.97)', backdropFilter: 'blur(20px)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border/60 bg-background/[0.97] backdrop-blur-xl"
+           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="flex items-stretch h-14">
           {NAV_ITEMS.map(item => {
             const isActive = pathname === item.href ||
@@ -143,22 +140,21 @@ export default function ClientTopbar({ profile }: Props) {
                     style={{ WebkitTapHighlightColor: 'transparent' }}>
                 {/* Active indicator */}
                 {isActive && (
-                  <span className="absolute top-0 left-1/4 right-1/4 h-0.5 rounded-full"
-                        style={{ background: '#8FD43A' }} />
+                  <span className="absolute top-0 left-1/4 right-1/4 h-0.5 rounded-full bg-brand-primary" />
                 )}
                 {/* Icon */}
                 <div className="relative">
                   <item.icon className={cn('w-5 h-5 transition-colors duration-150',
-                    isActive ? 'text-brand-primary' : 'text-slate-500')} />
+                    isActive ? 'text-brand-primary' : 'text-fg-muted')} />
                   {item.badge > 0 && !isActive && (
-                    <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-3.5 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center px-0.5">
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-3.5 rounded-full bg-semantic-error text-white text-[8px] font-bold flex items-center justify-center px-0.5">
                       {item.badge > 9 ? '9+' : item.badge}
                     </span>
                   )}
                 </div>
                 {/* Label */}
                 <span className={cn('text-[9px] font-semibold tracking-wide transition-colors duration-150',
-                  isActive ? 'text-brand-primary' : 'text-slate-600')}>
+                  isActive ? 'text-brand-primary' : 'text-fg-disabled')}>
                   {item.label}
                 </span>
               </Link>

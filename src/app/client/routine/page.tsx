@@ -24,15 +24,15 @@ function getYouTubeId(url: string): string | null {
   return null
 }
 
-function categoryFor(name: string): { label: string; color: string } {
+function categoryFor(name: string): { label: string; bg: string; border: string; text: string } {
   const n = name.toLowerCase()
   if (/press|sentadilla|peso|curl|remo|dominada|fondo|hip thrust|peso muerto/.test(n)) {
-    return { label: 'Fuerza', color: '#0EA5E9' }
+    return { label: 'Fuerza', bg: 'bg-semantic-info/10', border: 'border-semantic-info/20', text: 'text-semantic-info-text' }
   }
   if (/cardio|corre|correr|bici|remo ergo|eliptica|elíptica|cinta|salto|hiit/.test(n)) {
-    return { label: 'Cardio', color: '#10B981' }
+    return { label: 'Cardio', bg: 'bg-brand-accent/10', border: 'border-brand-accent/20', text: 'text-brand-accent' }
   }
-  return { label: 'General', color: '#7C3AED' }
+  return { label: 'General', bg: 'bg-brand-secondary/10', border: 'border-brand-secondary/20', text: 'text-brand-secondary-text' }
 }
 
 export default function ClientRoutinePage() {
@@ -190,7 +190,7 @@ export default function ClientRoutinePage() {
   if (!routine) {
     return (
       <EmptyState
-        icon={<Dumbbell className="w-8 h-8 text-slate-500" />}
+        icon={<Dumbbell className="w-8 h-8 text-fg-muted" />}
         title="Sin rutina asignada"
         description="Tu entrenador aún no te ha asignado una rutina. Escríbele un mensaje para empezar."
         action={{ label: 'Escribir a mi entrenador', onClick: () => { window.location.href = '/client/messages' } }}
@@ -208,13 +208,13 @@ export default function ClientRoutinePage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">{routine.title}</h1>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-fg-primary">{routine.title}</h1>
+          <p className="text-fg-muted text-sm mt-0.5">
             {routine.frequency && `${routine.frequency} · `}
             {routine.starts_at && `Desde ${formatDate(routine.starts_at)}`}
           </p>
           {routine.description && (
-            <p className="text-slate-400 text-sm mt-2">{routine.description}</p>
+            <p className="text-fg-muted text-sm mt-2">{routine.description}</p>
           )}
         </div>
         <button onClick={handleExportPdf} className="btn-secondary flex-shrink-0 text-sm">
@@ -227,7 +227,7 @@ export default function ClientRoutinePage() {
       <div className="card p-5 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-sm font-medium text-white">Progreso de hoy</span>
+            <span className="text-sm font-medium text-fg-primary">Progreso de hoy</span>
             {exercises.length > 0 && (() => {
               const totalSets = exercises.reduce((s, ex) => s + (ex.sets ?? 3), 0)
               const estSecs = exercises.reduce((s, ex) => {
@@ -236,7 +236,7 @@ export default function ClientRoutinePage() {
               }, 0)
               const estMins = Math.ceil(estSecs / 60)
               return (
-                <p className="text-xs text-slate-500 mt-0.5">{exercises.length} ejercicios · {totalSets} series · ~{estMins} min</p>
+                <p className="text-xs text-fg-muted mt-0.5">{exercises.length} ejercicios · {totalSets} series · ~{estMins} min</p>
               )
             })()}
           </div>
@@ -245,12 +245,12 @@ export default function ClientRoutinePage() {
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setSessionRunning(r => !r)}
-                className={`p-1 rounded-md transition-colors ${sessionRunning ? 'text-brand-accent hover:text-emerald-300' : 'text-slate-500 hover:text-slate-300'}`}
+                className={`p-1 rounded-md transition-colors ${sessionRunning ? 'text-brand-accent hover:text-semantic-success-text' : 'text-fg-muted hover:text-fg-secondary'}`}
                 title={sessionRunning ? 'Pausar cronómetro' : 'Iniciar cronómetro'}
               >
                 {sessionRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
               </button>
-              <span className={`font-mono text-sm font-bold ${sessionRunning ? 'text-brand-accent' : 'text-slate-500'}`}>
+              <span className={`font-mono text-sm font-bold ${sessionRunning ? 'text-brand-accent' : 'text-fg-muted'}`}>
                 <Clock className="w-3 h-3 inline mr-1 -mt-0.5" />
                 {formatSessionTime(sessionSeconds)}
               </span>
@@ -260,20 +260,16 @@ export default function ClientRoutinePage() {
         </div>
         <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${progress}%`,
-              background: progress === 100 ? '#8FD43A' : '#0EA5E9',
-            }}
+            className={`h-full rounded-full transition-all duration-500 ${progress === 100 ? 'bg-brand-primary' : 'bg-semantic-info'}`}
+            style={{ width: `${progress}%` }}
           />
         </div>
         {progress === 100 && (
-          <div className="rounded-xl p-3 flex items-center gap-3 animate-fade-in"
-               style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>
+          <div className="rounded-xl p-3 flex items-center gap-3 animate-fade-in bg-brand-accent/[0.08] border border-brand-accent/20">
             <span className="text-2xl">🎉</span>
             <div>
-              <p className="text-sm font-semibold text-emerald-400">¡Sesión completada!</p>
-              <p className="text-xs text-slate-400">{formatSessionTime(sessionSeconds)} · {exercises.length} ejercicios</p>
+              <p className="text-sm font-semibold text-semantic-success-text">¡Sesión completada!</p>
+              <p className="text-xs text-fg-muted">{formatSessionTime(sessionSeconds)} · {exercises.length} ejercicios</p>
             </div>
           </div>
         )}
@@ -284,7 +280,7 @@ export default function ClientRoutinePage() {
         {exercises.map((ex, i) => (
           <div
             key={ex.id}
-            className={`card transition-all ${ex.completed ? 'border-emerald-500/30 bg-emerald-500/5' : ''}`}
+            className={`card transition-all ${ex.completed ? 'border-semantic-success/30 bg-semantic-success/5' : ''}`}
           >
             <div className="flex items-center gap-4 p-4">
               {/* Number / Complete btn */}
@@ -293,8 +289,8 @@ export default function ClientRoutinePage() {
                 disabled={completing === ex.id}
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all ${
                   ex.completed
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-surface-2 border border-border text-slate-400 hover:border-brand-primary hover:text-brand-primary'
+                    ? 'bg-semantic-success text-white'
+                    : 'bg-surface-2 border border-border text-fg-muted hover:border-brand-primary hover:text-brand-primary'
                 }`}
               >
                 {completing === ex.id
@@ -306,24 +302,21 @@ export default function ClientRoutinePage() {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`font-medium text-sm ${ex.completed ? 'line-through text-slate-400' : 'text-white'}`}>
+                  <span className={`font-medium text-sm ${ex.completed ? 'line-through text-fg-muted' : 'text-fg-primary'}`}>
                     {ex.name}
                   </span>
                   {(() => {
                     const cat = categoryFor(ex.name)
                     return (
-                      <span
-                        className="text-[10px] font-semibold px-2 py-0.5 rounded-full border"
-                        style={{ background: `${cat.color}1A`, borderColor: `${cat.color}33`, color: cat.color }}
-                      >
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${cat.bg} ${cat.border} ${cat.text}`}>
                         {cat.label}
                       </span>
                     )
                   })()}
                 </div>
                 <div className="flex items-center gap-3 mt-1 flex-wrap">
-                  {ex.sets && <span className="text-xs text-slate-400">{ex.sets} series</span>}
-                  {ex.reps && <span className="text-xs text-slate-400">× {ex.reps} reps</span>}
+                  {ex.sets && <span className="text-xs text-fg-muted">{ex.sets} series</span>}
+                  {ex.reps && <span className="text-xs text-fg-muted">× {ex.reps} reps</span>}
                   {ex.rest_seconds && (
                     timer?.exerciseId === ex.id ? (
                       <span className="inline-flex items-center gap-2">
@@ -335,7 +328,7 @@ export default function ClientRoutinePage() {
                         </span>
                         <button
                           onClick={() => setTimer(null)}
-                          className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                          className="inline-flex items-center gap-1 text-xs text-fg-muted hover:text-fg-secondary transition-colors"
                         >
                           <X className="w-3 h-3" /> Saltar
                         </button>
@@ -343,7 +336,7 @@ export default function ClientRoutinePage() {
                     ) : (
                       <button
                         onClick={() => setTimer({ exerciseId: ex.id, remaining: ex.rest_seconds! })}
-                        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-surface-2 border border-border text-slate-400 hover:text-brand-primary hover:border-brand-primary/40 transition-colors"
+                        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-surface-2 border border-border text-fg-muted hover:text-brand-primary hover:border-brand-primary/40 transition-colors"
                       >
                         <Timer className="w-3 h-3" /> Descansar {ex.rest_seconds}s
                       </button>
@@ -355,7 +348,7 @@ export default function ClientRoutinePage() {
               {(ex.notes || ex.video_url) && (
                 <button
                   onClick={() => setExpanded(expanded === ex.id ? null : ex.id)}
-                  className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-surface-2 transition-all"
+                  className="p-2 rounded-lg text-fg-muted hover:text-fg-secondary hover:bg-surface-2 transition-all"
                 >
                   {expanded === ex.id
                     ? <ChevronUp className="w-4 h-4" />
@@ -368,7 +361,7 @@ export default function ClientRoutinePage() {
             {expanded === ex.id && (
               <div className="px-4 pb-4 space-y-3 border-t border-border/50 pt-3">
                 {ex.notes && (
-                  <p className="text-sm text-slate-400 italic">&ldquo;{ex.notes}&rdquo;</p>
+                  <p className="text-sm text-fg-muted italic">&ldquo;{ex.notes}&rdquo;</p>
                 )}
                 {ex.video_url && (() => {
                   const ytId = getYouTubeId(ex.video_url)
@@ -409,7 +402,7 @@ export default function ClientRoutinePage() {
       {/* Recent workout days (last 7 days) */}
       {recentWorkoutDays.length > 0 && (
         <div className="card p-5">
-          <h2 className="font-semibold text-white text-sm mb-3">Últimos 7 días</h2>
+          <h2 className="font-semibold text-fg-primary text-sm mb-3">Últimos 7 días</h2>
           <div className="flex gap-2 flex-wrap">
             {(() => {
               const today = new Date()
@@ -427,11 +420,11 @@ export default function ClientRoutinePage() {
                         ? 'bg-brand-accent text-white'
                         : isToday
                           ? 'bg-surface-2 border-2 border-brand-primary/40 text-brand-primary'
-                          : 'bg-surface-2 text-slate-600'
+                          : 'bg-surface-2 text-fg-disabled'
                     }`}>
                       {hasWorkout ? <Check className="w-4 h-4" /> : <span className="text-xs font-bold">{d.getDate()}</span>}
                     </div>
-                    <span className={`text-[10px] capitalize ${isToday ? 'text-brand-primary' : 'text-slate-600'}`}>
+                    <span className={`text-[10px] capitalize ${isToday ? 'text-brand-primary' : 'text-fg-disabled'}`}>
                       {label}
                     </span>
                   </div>

@@ -90,10 +90,10 @@ export default async function ClientHomePage() {
     <div className="space-y-6 animate-fade-in">
       {/* Greeting */}
       <div>
-        <h1 className="text-2xl font-bold text-white">
+        <h1 className="text-2xl font-bold text-fg-primary">
           {greeting}, {profile?.full_name?.split(' ')[0]} 💪
         </h1>
-        <p className="text-slate-400 text-sm mt-0.5 capitalize">{formatDate(now, "EEEE, d MMMM")}</p>
+        <p className="text-fg-muted text-sm mt-0.5 capitalize">{formatDate(now, "EEEE, d MMMM")}</p>
       </div>
 
       {/* Daily check-in */}
@@ -105,12 +105,12 @@ export default async function ClientHomePage() {
           <div className="flex items-center gap-4">
             <Avatar name={trainer.full_name} url={trainer.avatar_url} size="lg" />
             <div className="flex-1 min-w-0">
-              <div className="text-xs text-slate-400 mb-0.5">Tu entrenador</div>
-              <div className="font-semibold text-white">{trainer.full_name}</div>
+              <div className="text-xs text-fg-muted mb-0.5">Tu entrenador</div>
+              <div className="font-semibold text-fg-primary">{trainer.full_name}</div>
               {trainer.specialties?.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-1">
                   {trainer.specialties.slice(0, 3).map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-surface-2 border border-border text-slate-400">
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-surface-2 border border-border text-fg-muted">
                       {s}
                     </span>
                   ))}
@@ -123,20 +123,19 @@ export default async function ClientHomePage() {
             </Link>
           </div>
           {trainer.bio && (
-            <p className="mt-3 text-xs text-slate-400 leading-relaxed line-clamp-2 border-t border-border/40 pt-3">
+            <p className="mt-3 text-xs text-fg-muted leading-relaxed line-clamp-2 border-t border-border/40 pt-3">
               {trainer.bio}
             </p>
           )}
         </div>
       ) : (
-        <div className="card p-5 flex items-center gap-4 opacity-70"
-             style={{ borderStyle: 'dashed', borderColor: 'rgba(71,85,105,0.6)' }}>
+        <div className="card p-5 flex items-center gap-4 opacity-70 border-dashed border-fg-muted/60">
           <div className="w-12 h-12 rounded-full bg-surface-2 border border-border flex items-center justify-center shrink-0">
-            <MessageSquare className="w-5 h-5 text-slate-600" />
+            <MessageSquare className="w-5 h-5 text-fg-disabled" />
           </div>
           <div>
-            <div className="text-sm font-medium text-slate-400">Sin entrenador asignado</div>
-            <div className="text-xs text-slate-600 mt-0.5">Cuando tu entrenador te añada, aparecerá aquí.</div>
+            <div className="text-sm font-medium text-fg-muted">Sin entrenador asignado</div>
+            <div className="text-xs text-fg-disabled mt-0.5">Cuando tu entrenador te añada, aparecerá aquí.</div>
           </div>
         </div>
       )}
@@ -156,23 +155,23 @@ export default async function ClientHomePage() {
         const msg = motivations[Math.min(daysWithLogsThisWeek, motivations.length - 1)]
         const streakPct = Math.round((daysWithLogsThisWeek / 7) * 100)
         return (
-          <div className="card p-4 space-y-3"
-               style={{ background: 'rgba(16,185,129,0.05)', borderColor: 'rgba(16,185,129,0.2)' }}>
+          <div className="card p-4 space-y-3 bg-brand-accent/5 border-brand-accent/20">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                   style={{ background: 'rgba(16,185,129,0.15)' }}>
-                <Flame className={`w-6 h-6 ${daysWithLogsThisWeek >= 5 ? 'text-amber-400' : 'text-brand-accent'}`} />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-brand-accent/15">
+                <Flame className={`w-6 h-6 ${daysWithLogsThisWeek >= 5 ? 'text-semantic-warning-text' : 'text-brand-accent'}`} />
               </div>
               <div>
-                <div className="text-sm font-semibold text-white">Racha semanal</div>
-                <div className="text-xs text-slate-400 mt-0.5">{msg}</div>
+                <div className="text-sm font-semibold text-fg-primary">Racha semanal</div>
+                <div className="text-xs text-fg-muted mt-0.5">{msg}</div>
               </div>
               <div className="ml-auto text-3xl font-bold text-brand-accent shrink-0">{daysWithLogsThisWeek}/7</div>
             </div>
             {/* Progress bar */}
             <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
-              <div className="h-full rounded-full transition-all duration-700"
-                   style={{ width: `${streakPct}%`, background: daysWithLogsThisWeek >= 7 ? '#F59E0B' : '#10B981' }} />
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${daysWithLogsThisWeek >= 7 ? 'bg-semantic-warning' : 'bg-brand-accent'}`}
+                style={{ width: `${streakPct}%` }}
+              />
             </div>
           </div>
         )
@@ -181,41 +180,41 @@ export default async function ClientHomePage() {
       {/* Quick stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="card p-4 text-center flex flex-col items-center gap-1">
-          <div className="font-mono text-2xl font-bold text-white">
+          <div className="font-mono text-2xl font-bold text-fg-primary">
             {latestLog?.weight_kg ?? '—'}
           </div>
-          <div className="text-xs text-slate-400">Peso (kg)</div>
+          <div className="text-xs text-fg-muted">Peso (kg)</div>
           {weightChange ? (
-            <div className={`text-xs font-semibold ${parseFloat(weightChange) < 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+            <div className={`text-xs font-semibold ${parseFloat(weightChange) < 0 ? 'text-semantic-success-text' : 'text-semantic-warning-text'}`}>
               {parseFloat(weightChange) > 0 ? '+' : ''}{weightChange} kg
             </div>
           ) : null}
           <QuickLogButton clientId={user.id} trainerId={trainerId} />
         </div>
         <div className="card p-4 text-center">
-          <div className="font-mono text-2xl font-bold text-white">
+          <div className="font-mono text-2xl font-bold text-fg-primary">
             {latestLog?.body_fat_pct ?? '—'}
           </div>
-          <div className="text-xs text-slate-400 mt-0.5">Grasa %</div>
+          <div className="text-xs text-fg-muted mt-0.5">Grasa %</div>
         </div>
         <div className="card p-4 text-center">
-          <div className="font-mono text-2xl font-bold text-white">
+          <div className="font-mono text-2xl font-bold text-fg-primary">
             {latestLog?.muscle_mass_kg ?? '—'}
           </div>
-          <div className="text-xs text-slate-400 mt-0.5">Masa muscular</div>
+          <div className="text-xs text-fg-muted mt-0.5">Masa muscular</div>
         </div>
         <div className="card p-4 text-center">
-          <div className="font-mono text-2xl font-bold text-white">
+          <div className="font-mono text-2xl font-bold text-fg-primary">
             {progressLogs?.length ?? 0}
           </div>
-          <div className="text-xs text-slate-400 mt-0.5">Registros</div>
+          <div className="text-xs text-fg-muted mt-0.5">Registros</div>
         </div>
       </div>
 
       {/* Progress chart */}
       {progressLogs && progressLogs.length >= 2 && (
         <div className="card p-5">
-          <h2 className="font-semibold text-white mb-4">Evolución</h2>
+          <h2 className="font-semibold text-fg-primary mb-4">Evolución</h2>
           <ProgressChart logs={progressLogs} />
         </div>
       )}
@@ -223,14 +222,14 @@ export default async function ClientHomePage() {
       {/* Next appointment */}
       {nextApt && (
         <div className="card p-5">
-          <h2 className="font-semibold text-white mb-3">Próxima cita</h2>
+          <h2 className="font-semibold text-fg-primary mb-3">Próxima cita</h2>
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center">
               <CalendarDays className="w-5 h-5 text-brand-primary" />
             </div>
             <div className="flex-1">
-              <div className="font-medium text-white">{formatRelative(nextApt.scheduled_at)}</div>
-              <div className="text-sm text-slate-400">
+              <div className="font-medium text-fg-primary">{formatRelative(nextApt.scheduled_at)}</div>
+              <div className="text-sm text-fg-muted">
                 {nextApt.duration_minutes}min · {nextApt.type}
                 {nextApt.location && ` · ${nextApt.location}`}
               </div>
@@ -253,24 +252,24 @@ export default async function ClientHomePage() {
                 <Dumbbell className="w-5 h-5 text-brand-accent" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-white text-sm">{activeRoutine.title}</div>
-                <div className="text-xs text-slate-400">{exList.length} ejercicios{activeRoutine.frequency ? ` · ${activeRoutine.frequency}` : ''}</div>
+                <div className="font-semibold text-fg-primary text-sm">{activeRoutine.title}</div>
+                <div className="text-xs text-fg-muted">{exList.length} ejercicios{activeRoutine.frequency ? ` · ${activeRoutine.frequency}` : ''}</div>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-500 shrink-0" />
+              <ChevronRight className="w-4 h-4 text-fg-muted shrink-0" />
             </div>
             {preview.length > 0 && (
               <div className="space-y-1.5">
                 {preview.map((ex, i) => (
-                  <div key={ex.id} className="flex items-center gap-2 text-xs text-slate-400">
-                    <span className="w-5 h-5 rounded-md bg-surface-2 border border-border flex items-center justify-center text-[10px] font-bold text-slate-500 shrink-0">{i + 1}</span>
+                  <div key={ex.id} className="flex items-center gap-2 text-xs text-fg-muted">
+                    <span className="w-5 h-5 rounded-md bg-surface-2 border border-border flex items-center justify-center text-[10px] font-bold text-fg-muted shrink-0">{i + 1}</span>
                     <span className="flex-1 truncate">{ex.name}</span>
                     {ex.sets && ex.reps && (
-                      <span className="text-slate-600 shrink-0">{ex.sets}×{ex.reps}</span>
+                      <span className="text-fg-disabled shrink-0">{ex.sets}×{ex.reps}</span>
                     )}
                   </div>
                 ))}
                 {remaining > 0 && (
-                  <p className="text-xs text-slate-600 pl-7">+{remaining} más…</p>
+                  <p className="text-xs text-fg-disabled pl-7">+{remaining} más…</p>
                 )}
               </div>
             )}
@@ -280,26 +279,23 @@ export default async function ClientHomePage() {
 
       {/* Quick links */}
       <div>
-        <h2 className="text-sm font-semibold text-slate-400 mb-3 uppercase tracking-wide">Accesos rápidos</h2>
+        <h2 className="text-sm font-semibold text-fg-muted mb-3 uppercase tracking-wide">Accesos rápidos</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { href: '/client/routine',      label: 'Mi Rutina',    icon: <Dumbbell className="w-6 h-6" />,     color: '#10B981' },
-            { href: '/client/nutrition',    label: 'Nutrición',    icon: <Apple className="w-6 h-6" />,         color: '#0EA5E9' },
-            { href: '/client/progress',     label: 'Mi Progreso',  icon: <TrendingUp className="w-6 h-6" />,    color: '#7C3AED' },
-            { href: '/client/appointments', label: 'Mis Citas',    icon: <CalendarDays className="w-6 h-6" />,  color: '#F59E0B' },
-          ].map(({ href, label, icon, color }) => (
+            { href: '/client/routine',      label: 'Mi Rutina',   icon: <Dumbbell className="w-6 h-6" />,    iconClass: 'bg-brand-accent/10 text-brand-accent' },
+            { href: '/client/nutrition',    label: 'Nutrición',   icon: <Apple className="w-6 h-6" />,        iconClass: 'bg-semantic-info/10 text-semantic-info-text' },
+            { href: '/client/progress',     label: 'Mi Progreso', icon: <TrendingUp className="w-6 h-6" />,   iconClass: 'bg-brand-secondary/10 text-brand-secondary-text' },
+            { href: '/client/appointments', label: 'Mis Citas',   icon: <CalendarDays className="w-6 h-6" />, iconClass: 'bg-semantic-warning/10 text-semantic-warning-text' },
+          ].map(({ href, label, icon, iconClass }) => (
             <Link
               key={href}
               href={href}
-              className="card p-4 flex flex-col items-center gap-2 text-center hover:border-slate-600 transition-colors group"
+              className="card p-4 flex flex-col items-center gap-2 text-center hover:border-border-strong transition-colors group"
             >
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110"
-                style={{ background: `${color}18`, color }}
-              >
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${iconClass}`}>
                 {icon}
               </div>
-              <span className="text-xs font-medium text-slate-300 group-hover:text-white transition-colors">{label}</span>
+              <span className="text-xs font-medium text-fg-secondary group-hover:text-fg-primary transition-colors">{label}</span>
             </Link>
           ))}
         </div>

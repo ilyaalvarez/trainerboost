@@ -220,8 +220,8 @@ export default function ClientProgressPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Mi Progreso</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Historial de medidas corporales</p>
+          <h1 className="text-2xl font-bold text-fg-primary">Mi Progreso</h1>
+          <p className="text-fg-muted text-sm mt-0.5">Historial de medidas corporales</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn-primary">
           <Plus className="w-4 h-4" /> Registrar medida
@@ -231,45 +231,39 @@ export default function ClientProgressPage() {
       {/* Hero stats */}
       {logs.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="card p-5 flex items-center gap-4"
-               style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.08), rgba(239,68,68,0.05))', borderColor: 'rgba(245,158,11,0.25)' }}>
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                 style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(239,68,68,0.12))' }}>
-              <Flame className="w-6 h-6 text-amber-400" />
+          <div className="card p-5 flex items-center gap-4 bg-gradient-to-br from-semantic-warning/[0.08] to-semantic-error/[0.05] border-semantic-warning/25">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-semantic-warning/20 to-semantic-error/[0.12]">
+              <Flame className="w-6 h-6 text-semantic-warning-text" />
             </div>
             <div>
-              <div className="text-2xl font-bold font-mono text-amber-400">{streakDays}</div>
-              <div className="text-xs text-slate-400">Racha actual ({streakDays === 1 ? 'día' : 'días'})</div>
+              <div className="text-2xl font-bold font-mono text-semantic-warning-text">{streakDays}</div>
+              <div className="text-xs text-fg-muted">Racha actual ({streakDays === 1 ? 'día' : 'días'})</div>
             </div>
           </div>
 
-          <div className="card p-5 flex items-center gap-4"
-               style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.08), rgba(14,165,233,0.05))', borderColor: 'rgba(16,185,129,0.25)' }}>
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                 style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.12))' }}>
+          <div className="card p-5 flex items-center gap-4 bg-gradient-to-br from-brand-accent/[0.08] to-semantic-info/[0.05] border-brand-accent/25">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-brand-accent/20 to-semantic-info/[0.12]">
               {weightChange != null && weightChange > 0
-                ? <TrendingUp className="w-6 h-6 text-amber-400" />
+                ? <TrendingUp className="w-6 h-6 text-semantic-warning-text" />
                 : <TrendingDown className="w-6 h-6 text-brand-accent" />}
             </div>
             <div>
               <div className="text-2xl font-bold font-mono text-brand-accent">
                 {weightChange != null ? `${weightChange > 0 ? '+' : ''}${weightChange.toFixed(1)}` : '—'}
               </div>
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-fg-muted">
                 {weightChange == null ? 'Variación de peso' : weightChange > 0 ? 'kg ganados' : weightChange < 0 ? 'kg perdidos' : 'sin cambio'}
               </div>
             </div>
           </div>
 
-          <div className="card p-5 flex items-center gap-4"
-               style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.08), rgba(14,165,233,0.05))', borderColor: 'rgba(124,58,237,0.25)' }}>
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                 style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(14,165,233,0.12))' }}>
+          <div className="card p-5 flex items-center gap-4 bg-gradient-to-br from-brand-secondary/[0.08] to-semantic-info/[0.05] border-brand-secondary/25">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-brand-secondary/20 to-semantic-info/[0.12]">
               <ClipboardList className="w-6 h-6 text-brand-secondary" />
             </div>
             <div>
               <div className="text-2xl font-bold font-mono text-brand-secondary">{logs.length}</div>
-              <div className="text-xs text-slate-400">Registros</div>
+              <div className="text-xs text-fg-muted">Registros</div>
             </div>
           </div>
         </div>
@@ -277,15 +271,14 @@ export default function ClientProgressPage() {
 
       {/* Goal progress */}
       {latest && (savedGoal.weight || savedGoal.bodyFat) && (
-        <div className="card p-5 space-y-4"
-             style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.05), rgba(124,58,237,0.03))', borderColor: 'rgba(14,165,233,0.2)' }}>
+        <div className="card p-5 space-y-4 bg-gradient-to-br from-semantic-info/[0.05] to-brand-secondary/[0.03] border-semantic-info/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4 text-brand-primary" />
-              <h2 className="font-semibold text-white text-sm">Mi Objetivo</h2>
+              <h2 className="font-semibold text-fg-primary text-sm">Mi Objetivo</h2>
             </div>
             <button onClick={() => { setGoalWeight(String(savedGoal.weight ?? '')); setGoalBodyFat(String(savedGoal.bodyFat ?? '')); setShowGoalModal(true) }}
-              className="text-slate-500 hover:text-slate-300 transition-colors p-1">
+              className="text-fg-muted hover:text-fg-secondary transition-colors p-1">
               <Pencil className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -293,8 +286,8 @@ export default function ClientProgressPage() {
             {savedGoal.weight && latest.weight_kg != null && first?.weight_kg != null && (
               <div>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-400">Peso</span>
-                  <span className="text-white font-semibold">{latest.weight_kg} / {savedGoal.weight} kg</span>
+                  <span className="text-fg-muted">Peso</span>
+                  <span className="text-fg-primary font-semibold">{latest.weight_kg} / {savedGoal.weight} kg</span>
                 </div>
                 {(() => {
                   const start = first.weight_kg!
@@ -306,10 +299,12 @@ export default function ClientProgressPage() {
                   return (
                     <>
                       <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-500"
-                             style={{ width: `${done}%`, background: reached ? '#10B981' : '#0EA5E9' }} />
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${reached ? 'bg-brand-accent' : 'bg-semantic-info'}`}
+                          style={{ width: `${done}%` }}
+                        />
                       </div>
-                      <p className="text-[10px] text-slate-500 mt-0.5">{reached ? '✓ Objetivo alcanzado' : `${done}% completado · faltan ${Math.abs(current - goal).toFixed(1)} kg`}</p>
+                      <p className="text-[10px] text-fg-muted mt-0.5">{reached ? '✓ Objetivo alcanzado' : `${done}% completado · faltan ${Math.abs(current - goal).toFixed(1)} kg`}</p>
                     </>
                   )
                 })()}
@@ -318,8 +313,8 @@ export default function ClientProgressPage() {
             {savedGoal.bodyFat && latest.body_fat_pct != null && first?.body_fat_pct != null && (
               <div>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-400">Grasa corporal</span>
-                  <span className="text-white font-semibold">{latest.body_fat_pct}% / objetivo {savedGoal.bodyFat}%</span>
+                  <span className="text-fg-muted">Grasa corporal</span>
+                  <span className="text-fg-primary font-semibold">{latest.body_fat_pct}% / objetivo {savedGoal.bodyFat}%</span>
                 </div>
                 {(() => {
                   const start = first.body_fat_pct!
@@ -331,10 +326,12 @@ export default function ClientProgressPage() {
                   return (
                     <>
                       <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-500"
-                             style={{ width: `${done}%`, background: reached ? '#10B981' : '#EF4444' }} />
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${reached ? 'bg-brand-accent' : 'bg-semantic-error'}`}
+                          style={{ width: `${done}%` }}
+                        />
                       </div>
-                      <p className="text-[10px] text-slate-500 mt-0.5">{reached ? '✓ Objetivo alcanzado' : `${done}% completado · faltan ${Math.abs(current - goal).toFixed(1)}%`}</p>
+                      <p className="text-[10px] text-fg-muted mt-0.5">{reached ? '✓ Objetivo alcanzado' : `${done}% completado · faltan ${Math.abs(current - goal).toFixed(1)}%`}</p>
                     </>
                   )
                 })()}
@@ -354,8 +351,8 @@ export default function ClientProgressPage() {
             <Target className="w-5 h-5 text-brand-primary" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">Añadir un objetivo</p>
-            <p className="text-xs text-slate-400 mt-0.5">Establece tu peso o % de grasa meta y ve tu progreso hacia él.</p>
+            <p className="text-sm font-semibold text-fg-primary">Añadir un objetivo</p>
+            <p className="text-xs text-fg-muted mt-0.5">Establece tu peso o % de grasa meta y ve tu progreso hacia él.</p>
           </div>
         </button>
       )}
@@ -363,7 +360,7 @@ export default function ClientProgressPage() {
       {/* Activity heatmap */}
       {logs.length > 0 && (
         <div className="card p-5">
-          <h2 className="font-semibold text-white mb-3">Historial de actividad</h2>
+          <h2 className="font-semibold text-fg-primary mb-3">Historial de actividad</h2>
           <ActivityHeatmap logDates={logs.map(l => l.logged_at)} />
         </div>
       )}
@@ -371,7 +368,7 @@ export default function ClientProgressPage() {
       {/* Milestones */}
       {logs.length > 0 && (
         <div>
-          <h2 className="font-semibold text-white mb-3">Logros</h2>
+          <h2 className="font-semibold text-fg-primary mb-3">Logros</h2>
           <Milestones
             totalLogs={logs.length}
             weightChange={weightChange}
@@ -385,18 +382,17 @@ export default function ClientProgressPage() {
       {personalRecords.length > 0 && (
         <div className="card p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Medal className="w-4 h-4 text-amber-400" />
-            <h2 className="font-semibold text-white">Récords personales</h2>
-            <span className="ml-auto text-xs text-slate-500">Máximo peso levantado</span>
+            <Medal className="w-4 h-4 text-semantic-warning-text" />
+            <h2 className="font-semibold text-fg-primary">Récords personales</h2>
+            <span className="ml-auto text-xs text-fg-muted">Máximo peso levantado</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {personalRecords.map(pr => (
-              <div key={pr.name} className="rounded-xl p-3 text-center"
-                   style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.06), rgba(239,68,68,0.04))', border: '1px solid rgba(245,158,11,0.15)' }}>
-                <div className="font-mono text-xl font-bold text-amber-400">{pr.maxWeight}<span className="text-xs text-slate-400 font-normal ml-0.5">kg</span></div>
-                {pr.reps && <div className="text-xs text-slate-400 mt-0.5">{pr.reps} reps</div>}
-                <div className="text-[10px] font-medium text-slate-300 mt-1 truncate" title={pr.name}>{pr.name}</div>
-                <div className="text-[10px] text-slate-600 mt-0.5">{formatDate(pr.date, 'dd MMM yy')}</div>
+              <div key={pr.name} className="rounded-xl p-3 text-center bg-gradient-to-br from-semantic-warning/[0.06] to-semantic-error/[0.04] border border-semantic-warning/15">
+                <div className="font-mono text-xl font-bold text-semantic-warning-text">{pr.maxWeight}<span className="text-xs text-fg-muted font-normal ml-0.5">kg</span></div>
+                {pr.reps && <div className="text-xs text-fg-muted mt-0.5">{pr.reps} reps</div>}
+                <div className="text-[10px] font-medium text-fg-secondary mt-1 truncate" title={pr.name}>{pr.name}</div>
+                <div className="text-[10px] text-fg-disabled mt-0.5">{formatDate(pr.date, 'dd MMM yy')}</div>
               </div>
             ))}
           </div>
@@ -412,11 +408,11 @@ export default function ClientProgressPage() {
             { label: 'Masa muscular', value: latest.muscle_mass_kg, unit: 'kg' },
           ].map(stat => (
             <div key={stat.label} className="card p-4 text-center">
-              <div className="font-mono text-2xl font-bold text-white">
+              <div className="font-mono text-2xl font-bold text-fg-primary">
                 {stat.value ?? '—'}
               </div>
-              <div className="text-xs text-slate-400 mt-0.5">{stat.unit !== '—' ? `${stat.unit} · ` : ''}{stat.label}</div>
-              <div className="text-xs text-slate-600 mt-1">
+              <div className="text-xs text-fg-muted mt-0.5">{stat.unit !== '—' ? `${stat.unit} · ` : ''}{stat.label}</div>
+              <div className="text-xs text-fg-disabled mt-1">
                 {formatDate(latest.logged_at)}
               </div>
             </div>
@@ -436,18 +432,18 @@ export default function ClientProgressPage() {
 
         return (
           <div className="card p-5">
-            <h2 className="font-semibold text-white mb-3">Medidas corporales</h2>
+            <h2 className="font-semibold text-fg-primary mb-3">Medidas corporales</h2>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {measures.map(m => {
                 const current = latest[m.key] as number
                 const firstVal = first?.[m.key] as number | null | undefined
                 const delta = firstVal != null && logs.length >= 2 ? current - firstVal : null
                 return (
-                  <div key={m.key} className="card p-3 text-center" style={{ background: 'rgba(30,41,59,0.6)' }}>
-                    <div className="font-mono text-lg font-bold text-white">{current}</div>
-                    <div className="text-[10px] text-slate-500 uppercase tracking-wide mt-0.5">{m.label} cm</div>
+                  <div key={m.key} className="card p-3 text-center bg-surface-3/60">
+                    <div className="font-mono text-lg font-bold text-fg-primary">{current}</div>
+                    <div className="text-[10px] text-fg-muted uppercase tracking-wide mt-0.5">{m.label} cm</div>
                     {delta != null && (
-                      <div className={`text-[10px] font-semibold mt-1 ${delta < 0 ? 'text-emerald-400' : delta > 0 ? 'text-red-400' : 'text-slate-400'}`}>
+                      <div className={`text-[10px] font-semibold mt-1 ${delta < 0 ? 'text-semantic-success-text' : delta > 0 ? 'text-semantic-error-text' : 'text-fg-muted'}`}>
                         {delta > 0 ? '+' : ''}{delta.toFixed(1)}
                       </div>
                     )}
@@ -467,7 +463,7 @@ export default function ClientProgressPage() {
         const after  = withPhotos[withPhotos.length - 1]
         return (
           <div className="card p-5">
-            <h2 className="font-semibold text-white mb-4">Antes y ahora</h2>
+            <h2 className="font-semibold text-fg-primary mb-4">Antes y ahora</h2>
             <div className="grid grid-cols-2 gap-4">
               {[{ log: before, label: 'Antes' }, { log: after, label: 'Ahora' }].map(({ log, label }) => (
                 <div key={log.id} className="space-y-2">
@@ -480,12 +476,12 @@ export default function ClientProgressPage() {
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
                       <p className="text-xs font-semibold text-white">{label}</p>
-                      <p className="text-[10px] text-slate-300">{formatDate(log.logged_at)}</p>
+                      <p className="text-[10px] text-fg-secondary">{formatDate(log.logged_at)}</p>
                     </div>
                   </div>
                   {log.weight_kg != null && (
                     <div className="text-center">
-                      <span className="font-mono text-sm font-bold text-white">{log.weight_kg} kg</span>
+                      <span className="font-mono text-sm font-bold text-fg-primary">{log.weight_kg} kg</span>
                     </div>
                   )}
                 </div>
@@ -498,7 +494,7 @@ export default function ClientProgressPage() {
       {/* Chart */}
       {logs.length >= 2 && (
         <div className="card p-5">
-          <h2 className="font-semibold text-white mb-4">Evolución</h2>
+          <h2 className="font-semibold text-fg-primary mb-4">Evolución</h2>
           <ProgressChart logs={logs} />
         </div>
       )}
@@ -511,9 +507,9 @@ export default function ClientProgressPage() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Dumbbell className="w-4 h-4 text-brand-primary" />
-                <h2 className="font-semibold text-white">Historial de entrenamientos</h2>
+                <h2 className="font-semibold text-fg-primary">Historial de entrenamientos</h2>
               </div>
-              <span className="text-xs text-slate-500">{workoutSessions.length} sesiones</span>
+              <span className="text-xs text-fg-muted">{workoutSessions.length} sesiones</span>
             </div>
             <div className="space-y-2">
               {visible.map(session => {
@@ -524,35 +520,32 @@ export default function ClientProgressPage() {
                       onClick={() => setExpandedSession(isOpen ? null : session.date)}
                       className="w-full flex items-center gap-3 p-4 text-left hover:bg-surface-2/50 transition-colors"
                     >
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                           style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.2)' }}>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-semantic-info/10 border border-semantic-info/20">
                         <Dumbbell className="w-4 h-4 text-brand-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-white capitalize text-sm">
+                        <div className="font-medium text-fg-primary capitalize text-sm">
                           {formatDate(session.date, "EEEE d MMM yyyy")}
                         </div>
-                        <div className="text-xs text-slate-400 mt-0.5">
+                        <div className="text-xs text-fg-muted mt-0.5">
                           {session.exercises.length} {session.exercises.length === 1 ? 'ejercicio' : 'ejercicios'} · {session.totalSets} sets
                         </div>
                       </div>
-                      <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-4 h-4 text-fg-muted transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
                     </button>
                     {isOpen && (
                       <div className="border-t border-border/50 px-4 pb-4 pt-3 space-y-4">
                         {session.exercises.map((ex, ei) => (
                           <div key={ei}>
-                            <div className="text-xs font-semibold text-slate-300 uppercase tracking-wide mb-2">{ex.name}</div>
+                            <div className="text-xs font-semibold text-fg-secondary uppercase tracking-wide mb-2">{ex.name}</div>
                             <div className="flex flex-wrap gap-2">
                               {ex.sets.map((s, si) => (
-                                <div key={si}
-                                     className="px-2.5 py-1.5 rounded-lg text-xs font-mono"
-                                     style={{ background: 'rgba(14,165,233,0.07)', border: '1px solid rgba(14,165,233,0.18)' }}>
-                                  <span className="text-slate-500 mr-1">S{s.set_number}</span>
-                                  {s.weight_kg != null && <span className="text-white font-semibold">{s.weight_kg}kg</span>}
-                                  {s.weight_kg != null && s.reps != null && <span className="text-slate-500 mx-0.5">×</span>}
-                                  {s.reps != null && <span className="text-slate-300">{s.reps}</span>}
-                                  {s.weight_kg == null && s.reps == null && <span className="text-slate-500">—</span>}
+                                <div key={si} className="px-2.5 py-1.5 rounded-lg text-xs font-mono bg-semantic-info/[0.07] border border-semantic-info/[0.18]">
+                                  <span className="text-fg-muted mr-1">S{s.set_number}</span>
+                                  {s.weight_kg != null && <span className="text-fg-primary font-semibold">{s.weight_kg}kg</span>}
+                                  {s.weight_kg != null && s.reps != null && <span className="text-fg-muted mx-0.5">×</span>}
+                                  {s.reps != null && <span className="text-fg-secondary">{s.reps}</span>}
+                                  {s.weight_kg == null && s.reps == null && <span className="text-fg-muted">—</span>}
                                 </div>
                               ))}
                             </div>
@@ -567,7 +560,7 @@ export default function ClientProgressPage() {
             {workoutSessions.length > 7 && (
               <button
                 onClick={() => setShowAllSessions(v => !v)}
-                className="mt-3 w-full text-xs text-brand-primary hover:text-sky-300 transition-colors py-2 text-center"
+                className="mt-3 w-full text-xs text-brand-primary hover:text-semantic-info-text transition-colors py-2 text-center"
               >
                 {showAllSessions ? 'Ver menos ↑' : `Ver todas (${workoutSessions.length}) ↓`}
               </button>
@@ -583,7 +576,7 @@ export default function ClientProgressPage() {
         </div>
       ) : logs.length === 0 ? (
         <EmptyState
-          icon={<Scale className="w-8 h-8 text-slate-500" />}
+          icon={<Scale className="w-8 h-8 text-fg-muted" />}
           title="Sin registros todavía"
           description="Registra tu primer pesaje para empezar a ver tu progreso."
           action={{ label: 'Registrar ahora', onClick: () => setShowModal(true) }}
@@ -595,7 +588,7 @@ export default function ClientProgressPage() {
               <thead className="border-b border-border">
                 <tr>
                   {['Fecha', 'Peso', 'Grasa %', 'Músculo', 'Cintura', 'Pecho', 'Brazo', 'Notas', 'Fotos'].map(h => (
-                    <th key={h} className="text-left p-4 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                    <th key={h} className="text-left p-4 text-xs font-semibold text-fg-muted uppercase tracking-wide">
                       {h}
                     </th>
                   ))}
@@ -604,14 +597,14 @@ export default function ClientProgressPage() {
               <tbody className="divide-y divide-border/50">
                 {[...logs].reverse().map(log => (
                   <tr key={log.id} className="hover:bg-surface-2/50 transition-colors">
-                    <td className="p-4 text-slate-300">{formatDate(log.logged_at)}</td>
-                    <td className="p-4 font-mono font-semibold text-white">{log.weight_kg ?? '—'}{log.weight_kg ? ' kg' : ''}</td>
-                    <td className="p-4 font-mono text-slate-300">{log.body_fat_pct ?? '—'}{log.body_fat_pct ? '%' : ''}</td>
-                    <td className="p-4 font-mono text-slate-300">{log.muscle_mass_kg ?? '—'}{log.muscle_mass_kg ? ' kg' : ''}</td>
-                    <td className="p-4 font-mono text-violet-400 text-xs">{log.waist_cm ?? '—'}{log.waist_cm ? 'cm' : ''}</td>
-                    <td className="p-4 font-mono text-pink-400 text-xs">{log.chest_cm ?? '—'}{log.chest_cm ? 'cm' : ''}</td>
-                    <td className="p-4 font-mono text-cyan-400 text-xs">{log.arm_cm ?? '—'}{log.arm_cm ? 'cm' : ''}</td>
-                    <td className="p-4 text-slate-400 text-xs max-w-xs truncate">{log.notes || '—'}</td>
+                    <td className="p-4 text-fg-secondary">{formatDate(log.logged_at)}</td>
+                    <td className="p-4 font-mono font-semibold text-fg-primary">{log.weight_kg ?? '—'}{log.weight_kg ? ' kg' : ''}</td>
+                    <td className="p-4 font-mono text-fg-secondary">{log.body_fat_pct ?? '—'}{log.body_fat_pct ? '%' : ''}</td>
+                    <td className="p-4 font-mono text-fg-secondary">{log.muscle_mass_kg ?? '—'}{log.muscle_mass_kg ? ' kg' : ''}</td>
+                    <td className="p-4 font-mono text-brand-secondary-text text-xs">{log.waist_cm ?? '—'}{log.waist_cm ? 'cm' : ''}</td>
+                    <td className="p-4 font-mono text-brand-rose text-xs">{log.chest_cm ?? '—'}{log.chest_cm ? 'cm' : ''}</td>
+                    <td className="p-4 font-mono text-semantic-info-text text-xs">{log.arm_cm ?? '—'}{log.arm_cm ? 'cm' : ''}</td>
+                    <td className="p-4 text-fg-muted text-xs max-w-xs truncate">{log.notes || '—'}</td>
                     <td className="p-4">
                       <PhotoUpload
                         logId={log.id}
@@ -717,7 +710,7 @@ export default function ClientProgressPage() {
             </div>
           </div>
           <details className="mt-1">
-            <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-300">Medidas corporales (opcional)</summary>
+            <summary className="text-xs text-fg-muted cursor-pointer hover:text-fg-secondary">Medidas corporales (opcional)</summary>
             <div className="grid grid-cols-2 gap-3 mt-3">
               {([
                 { key: 'waist_cm', label: 'Cintura (cm)' },
@@ -727,7 +720,7 @@ export default function ClientProgressPage() {
                 { key: 'hip_cm',   label: 'Cadera (cm)' },
               ] as const).map(m => (
                 <div key={m.key}>
-                  <label className="text-xs text-slate-500">{m.label}</label>
+                  <label className="text-xs text-fg-muted">{m.label}</label>
                   <input
                     type="number"
                     step="0.1"
@@ -763,7 +756,7 @@ export default function ClientProgressPage() {
       {/* Goal modal */}
       <Modal isOpen={showGoalModal} onClose={() => setShowGoalModal(false)} title="Establecer objetivo">
         <div className="space-y-4">
-          <p className="text-sm text-slate-400">Define tu meta y verás un indicador de progreso en esta página.</p>
+          <p className="text-sm text-fg-muted">Define tu meta y verás un indicador de progreso en esta página.</p>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label">Peso objetivo (kg)</label>
@@ -789,7 +782,7 @@ export default function ClientProgressPage() {
             </div>
           </div>
           {savedGoal.weight || savedGoal.bodyFat ? (
-            <p className="text-xs text-slate-500">Deja un campo vacío para eliminar ese objetivo.</p>
+            <p className="text-xs text-fg-muted">Deja un campo vacío para eliminar ese objetivo.</p>
           ) : null}
           <div className="flex gap-3 pt-1">
             <button onClick={() => setShowGoalModal(false)} className="btn-secondary flex-1">Cancelar</button>

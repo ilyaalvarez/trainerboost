@@ -103,11 +103,11 @@ export default function ClientSettingsPage() {
 
   return (
     <div className="max-w-lg mx-auto space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-white">Mi perfil</h1>
+      <h1 className="text-2xl font-bold text-fg-primary">Mi perfil</h1>
 
       {/* ── Avatar + name ─────────────────────────────────────────── */}
       <section className="card p-6 space-y-5">
-        <h2 className="font-semibold text-white">Información personal</h2>
+        <h2 className="font-semibold text-fg-primary">Información personal</h2>
         <div className="border-t border-border/60" />
 
         {/* Avatar */}
@@ -125,7 +125,7 @@ export default function ClientSettingsPage() {
             </button>
           </div>
           <div>
-            <p className="text-sm font-medium text-white">{fullName}</p>
+            <p className="text-sm font-medium text-fg-primary">{fullName}</p>
             <button
               onClick={() => avatarRef.current?.click()}
               disabled={uploadingAvatar}
@@ -151,7 +151,7 @@ export default function ClientSettingsPage() {
             />
           </div>
           <div>
-            <label className="label">Teléfono <span className="text-slate-600">(opcional)</span></label>
+            <label className="label">Teléfono <span className="text-fg-disabled">(opcional)</span></label>
             <input
               type="tel"
               value={phone}
@@ -170,7 +170,7 @@ export default function ClientSettingsPage() {
 
       {/* ── Password ──────────────────────────────────────────────── */}
       <section className="card p-6 space-y-5">
-        <h2 className="font-semibold text-white">Cambiar contraseña</h2>
+        <h2 className="font-semibold text-fg-primary">Cambiar contraseña</h2>
         <div className="border-t border-border/60" />
         <form onSubmit={changePassword} className="space-y-4">
           <div>
@@ -180,7 +180,7 @@ export default function ClientSettingsPage() {
                 className="input pr-10" placeholder="••••••••" autoComplete="current-password" />
               <button type="button" onClick={() => setShowPwd(v => !v)}
                 aria-label={showPwd ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-muted hover:text-fg-secondary transition-colors">
                 {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
@@ -200,12 +200,12 @@ export default function ClientSettingsPage() {
             </div>
           </div>
           {newPwd && confirmPwd && (
-            <p className={`text-xs font-medium ${newPwd === confirmPwd ? 'text-emerald-400' : 'text-red-400'}`}>
+            <p className={`text-xs font-medium ${newPwd === confirmPwd ? 'text-semantic-success-text' : 'text-semantic-error-text'}`}>
               {newPwd === confirmPwd ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas no coinciden'}
             </p>
           )}
           {pwdError && (
-            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{pwdError}</p>
+            <p className="text-sm text-semantic-error-text bg-semantic-error/10 border border-semantic-error/20 rounded-lg px-3 py-2">{pwdError}</p>
           )}
           <button type="submit" disabled={savingPwd || !newPwd || !confirmPwd} className="btn-primary">
             {savingPwd
@@ -219,8 +219,8 @@ export default function ClientSettingsPage() {
       <section className="card p-6">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-sm font-medium text-white">Cerrar sesión</p>
-            <p className="text-xs text-slate-500 mt-0.5">Salir de tu cuenta en este dispositivo.</p>
+            <p className="text-sm font-medium text-fg-primary">Cerrar sesión</p>
+            <p className="text-xs text-fg-muted mt-0.5">Salir de tu cuenta en este dispositivo.</p>
           </div>
           <button onClick={logout} className="btn-secondary flex items-center gap-2 text-sm">
             <LogOut className="w-4 h-4" />

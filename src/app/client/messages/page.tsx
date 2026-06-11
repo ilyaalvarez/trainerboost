@@ -150,7 +150,7 @@ export default function ClientMessagesPage() {
   if (!trainer) {
     return (
       <EmptyState
-        icon={<MessageSquare className="w-8 h-8 text-slate-500" />}
+        icon={<MessageSquare className="w-8 h-8 text-fg-muted" />}
         title="Sin entrenador asignado"
         description="Cuando te unas con un entrenador podrás chatear aquí."
       />
@@ -163,9 +163,9 @@ export default function ClientMessagesPage() {
       <div className="card p-4 flex items-center gap-3 mb-4">
         <Avatar name={trainer.full_name} url={trainer.avatar_url} size="md" />
         <div>
-          <div className="font-semibold text-white">{trainer.full_name}</div>
-          <div className="text-xs text-emerald-400 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+          <div className="font-semibold text-fg-primary">{trainer.full_name}</div>
+          <div className="text-xs text-semantic-success-text flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-semantic-success inline-block" />
             Tu entrenador
           </div>
         </div>
@@ -174,7 +174,7 @@ export default function ClientMessagesPage() {
       {/* Messages */}
       <div className="flex-1 card p-4 overflow-y-auto space-y-3">
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-slate-500 text-sm">
+          <div className="flex items-center justify-center h-full text-fg-muted text-sm">
             Empieza la conversación con tu entrenador
           </div>
         ) : (
@@ -182,7 +182,7 @@ export default function ClientMessagesPage() {
             <div key={group.label}>
               <div className="flex items-center gap-3 my-2">
                 <div className="flex-1 h-px bg-border/40" />
-                <span className="text-[10px] text-slate-500 font-medium px-2 capitalize">{group.label}</span>
+                <span className="text-[10px] text-fg-muted font-medium px-2 capitalize">{group.label}</span>
                 <div className="flex-1 h-px bg-border/40" />
               </div>
               {group.msgs.map(msg => {
@@ -196,16 +196,16 @@ export default function ClientMessagesPage() {
                       <div className={`px-4 py-2.5 rounded-2xl text-sm ${
                         isMine
                           ? 'bg-brand-primary text-white rounded-tr-none'
-                          : 'bg-surface-2 text-slate-200 rounded-tl-none'
+                          : 'bg-surface-2 text-fg-secondary rounded-tl-none'
                       }`}>
                         {msg.content}
                       </div>
-                      <span className="text-xs text-slate-500 px-1 flex items-center gap-1">
+                      <span className="text-xs text-fg-muted px-1 flex items-center gap-1">
                         {timeAgo(msg.created_at)}
                         {isMine && (
                           msg.read_at !== null
-                            ? <span className="text-[9px] text-sky-400">✓✓</span>
-                            : <span className="text-[9px] text-slate-500">✓</span>
+                            ? <span className="text-[9px] text-semantic-info-text">✓✓</span>
+                            : <span className="text-[9px] text-fg-muted">✓</span>
                         )}
                       </span>
                     </div>

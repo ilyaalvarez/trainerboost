@@ -29,7 +29,7 @@ function ScaleRow({ value, onChange, min = 1, max = 10, color = '#0EA5E9' }: {
       {Array.from({ length: max - min + 1 }, (_, i) => min + i).map(n => (
         <button key={n} type="button" onClick={() => onChange(n)}
                 className={cn('w-9 h-9 rounded-lg text-sm font-bold transition-all border',
-                  value === n ? 'text-white border-transparent scale-110' : 'text-slate-400 border-border hover:border-slate-500')}
+                  value === n ? 'text-white border-transparent scale-110' : 'text-fg-muted border-border hover:border-border-strong')}
                 style={value === n ? { background: color, boxShadow: `0 0 12px ${color}60` } : {}}>
           {n}
         </button>
@@ -147,10 +147,10 @@ export default function CheckinPage() {
     return (
       <div className="max-w-md mx-auto text-center py-16 animate-fade-in-up">
         <div className="w-16 h-16 rounded-2xl bg-surface-2 flex items-center justify-center mx-auto mb-4">
-          <Dumbbell className="w-7 h-7 text-slate-500" />
+          <Dumbbell className="w-7 h-7 text-fg-muted" />
         </div>
-        <h2 className="text-lg font-bold text-white mb-2">Check-in no activado</h2>
-        <p className="text-slate-400 text-sm">Tu entrenador aún no ha activado los check-ins semanales para ti.</p>
+        <h2 className="text-lg font-bold text-fg-primary mb-2">Check-in no activado</h2>
+        <p className="text-fg-muted text-sm">Tu entrenador aún no ha activado los check-ins semanales para ti.</p>
         <button onClick={() => router.push('/client')} className="btn-secondary mt-6">← Volver al inicio</button>
       </div>
     )
@@ -159,11 +159,11 @@ export default function CheckinPage() {
   if (alreadyDone) {
     return (
       <div className="max-w-md mx-auto text-center py-16 animate-fade-in-up">
-        <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
-          <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+        <div className="w-16 h-16 rounded-full bg-semantic-success/20 border border-semantic-success/30 flex items-center justify-center mx-auto mb-4">
+          <CheckCircle2 className="w-8 h-8 text-semantic-success-text" />
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">¡Ya enviaste tu check-in!</h2>
-        <p className="text-slate-400 text-sm">Esta semana ya está registrada. Vuelve el próximo lunes.</p>
+        <h2 className="text-xl font-bold text-fg-primary mb-2">¡Ya enviaste tu check-in!</h2>
+        <p className="text-fg-muted text-sm">Esta semana ya está registrada. Vuelve el próximo lunes.</p>
         <button onClick={() => router.push('/client')} className="btn-secondary mt-6">← Volver al inicio</button>
       </div>
     )
@@ -172,12 +172,12 @@ export default function CheckinPage() {
   if (done) {
     return (
       <div className="max-w-md mx-auto text-center py-16 animate-fade-in-up">
-        <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto mb-6">
-          <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+        <div className="w-20 h-20 rounded-full bg-semantic-success/20 border border-semantic-success/30 flex items-center justify-center mx-auto mb-6">
+          <CheckCircle2 className="w-10 h-10 text-semantic-success-text" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">¡Enviado! 🎉</h2>
-        <p className="text-slate-400 mb-2">{trainerName.split(' ')[0]} lo recibirá y te responderá pronto.</p>
-        <p className="text-xs text-slate-600">Semana del {new Date(weekStart + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}</p>
+        <h2 className="text-2xl font-bold text-fg-primary mb-2">¡Enviado! 🎉</h2>
+        <p className="text-fg-muted mb-2">{trainerName.split(' ')[0]} lo recibirá y te responderá pronto.</p>
+        <p className="text-xs text-fg-disabled">Semana del {new Date(weekStart + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}</p>
         <button onClick={() => router.push('/client')} className="btn-primary mt-8 px-8">Volver al inicio</button>
       </div>
     )
@@ -188,8 +188,8 @@ export default function CheckinPage() {
       {/* Header */}
       <div className="mb-6">
         <p className="text-xs text-brand-primary font-semibold uppercase tracking-widest mb-1">Check-in semanal</p>
-        <h1 className="text-2xl font-bold text-white mb-1">¿Cómo fue tu semana?</h1>
-        <p className="text-slate-400 text-sm">{trainerName.split(' ')[0]} revisa esto para ajustar tu plan.</p>
+        <h1 className="text-2xl font-bold text-fg-primary mb-1">¿Cómo fue tu semana?</h1>
+        <p className="text-fg-muted text-sm">{trainerName.split(' ')[0]} revisa esto para ajustar tu plan.</p>
       </div>
 
       {/* Progress bar */}
@@ -207,12 +207,12 @@ export default function CheckinPage() {
           <>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Flame className="w-5 h-5 text-amber-400" />
-                <h2 className="font-semibold text-white">Energía general</h2>
+                <Flame className="w-5 h-5 text-semantic-warning-text" />
+                <h2 className="font-semibold text-fg-primary">Energía general</h2>
               </div>
-              <p className="text-sm text-slate-400 mb-4">¿Cómo estuvo tu nivel de energía esta semana?</p>
+              <p className="text-sm text-fg-muted mb-4">¿Cómo estuvo tu nivel de energía esta semana?</p>
               <ScaleRow value={form.energy} onChange={v => setForm(p => ({ ...p, energy: v }))} color="#F59E0B" />
-              <div className="flex justify-between text-xs text-slate-600 mt-2 px-1">
+              <div className="flex justify-between text-xs text-fg-disabled mt-2 px-1">
                 <span>Sin energía</span><span>Perfecto</span>
               </div>
             </div>
@@ -220,12 +220,12 @@ export default function CheckinPage() {
             <div>
               <label className="flex items-center gap-3 cursor-pointer group">
                 <div className={cn('w-12 h-6 rounded-full transition-all duration-200 relative flex-shrink-0',
-                  form.has_pain ? 'bg-red-500' : 'bg-surface-2 border border-border')}
+                  form.has_pain ? 'bg-semantic-error' : 'bg-surface-2 border border-border')}
                      onClick={() => setForm(p => ({ ...p, has_pain: !p.has_pain }))}>
                   <div className={cn('absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all duration-200',
                     form.has_pain ? 'right-0.5' : 'left-0.5')} />
                 </div>
-                <span className="text-sm text-slate-300 group-hover:text-white transition-colors">
+                <span className="text-sm text-fg-secondary group-hover:text-fg-primary transition-colors">
                   Tuve dolor o molestias esta semana
                 </span>
               </label>
@@ -249,16 +249,16 @@ export default function CheckinPage() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <Dumbbell className="w-5 h-5 text-[#0EA5E9]" />
-                <h2 className="font-semibold text-white">Adherencia a la rutina</h2>
+                <h2 className="font-semibold text-fg-primary">Adherencia a la rutina</h2>
               </div>
-              <p className="text-sm text-slate-400 mb-4">¿Qué porcentaje de los entrenamientos completaste?</p>
+              <p className="text-sm text-fg-muted mb-4">¿Qué porcentaje de los entrenamientos completaste?</p>
               <div className="flex gap-2 flex-wrap">
                 {[0, 25, 50, 75, 100].map(pct => (
                   <button key={pct} type="button" onClick={() => setForm(p => ({ ...p, routine_adherence: pct }))}
                           className={cn('px-4 py-2 rounded-lg text-sm font-semibold border transition-all',
                             form.routine_adherence === pct
                               ? 'bg-[#0EA5E9] text-white border-[#0EA5E9]'
-                              : 'border-border text-slate-400 hover:border-slate-500')}>
+                              : 'border-border text-fg-muted hover:border-border-strong')}>
                     {pct}%
                   </button>
                 ))}
@@ -277,12 +277,12 @@ export default function CheckinPage() {
         {step === 2 && (
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <UtensilsCrossed className="w-5 h-5 text-emerald-400" />
-              <h2 className="font-semibold text-white">Adherencia a la dieta</h2>
+              <UtensilsCrossed className="w-5 h-5 text-semantic-success-text" />
+              <h2 className="font-semibold text-fg-primary">Adherencia a la dieta</h2>
             </div>
-            <p className="text-sm text-slate-400 mb-4">¿Cómo seguiste el plan nutricional?</p>
+            <p className="text-sm text-fg-muted mb-4">¿Cómo seguiste el plan nutricional?</p>
             <ScaleRow value={form.diet_adherence} onChange={v => setForm(p => ({ ...p, diet_adherence: v }))} color="#10B981" />
-            <div className="flex justify-between text-xs text-slate-600 mt-2 px-1">
+            <div className="flex justify-between text-xs text-fg-disabled mt-2 px-1">
               <span>No seguí nada</span><span>Al 100%</span>
             </div>
           </div>
@@ -293,22 +293,22 @@ export default function CheckinPage() {
           <>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Scale className="w-5 h-5 text-violet-400" />
-                <h2 className="font-semibold text-white">Peso actual</h2>
+                <Scale className="w-5 h-5 text-[#C4B5FD]" />
+                <h2 className="font-semibold text-fg-primary">Peso actual</h2>
               </div>
-              <p className="text-sm text-slate-400 mb-3">Opcional — si te pesaste esta semana.</p>
+              <p className="text-sm text-fg-muted mb-3">Opcional — si te pesaste esta semana.</p>
               <div className="relative">
                 <input type="number" step="0.1" min="30" max="300"
                        value={form.weight_kg}
                        onChange={e => setForm(p => ({ ...p, weight_kg: e.target.value }))}
                        className="input pr-10 text-lg font-mono"
                        placeholder="ej: 75.2" />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-medium">kg</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-muted text-sm font-medium">kg</span>
               </div>
             </div>
 
             <div>
-              <label className="label">Nota para tu entrenador <span className="text-slate-600">(opcional)</span></label>
+              <label className="label">Nota para tu entrenador <span className="text-fg-disabled">(opcional)</span></label>
               <textarea value={form.client_note}
                         onChange={e => setForm(p => ({ ...p, client_note: e.target.value }))}
                         className="input resize-none text-sm"

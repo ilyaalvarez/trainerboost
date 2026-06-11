@@ -119,7 +119,7 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
                style={{ background: '#8FD43A' }}>
             <Zap className="w-3.5 h-3.5 text-black" />
           </div>
-          <span className="font-bold text-white text-sm tracking-tight">TrainerBoost</span>
+          <span className="font-bold text-fg-primary text-sm tracking-tight">TrainerBoost</span>
         </div>
 
         {/* Progress steps (hidden on step 0) */}
@@ -139,9 +139,9 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
                     }`}>
                       {done
                         ? <CheckCircle2 className="w-3 h-3 text-brand-primary" />
-                        : <span className={current ? 'text-white' : 'text-slate-600'}>{i + 1}</span>}
+                        : <span className={current ? 'text-black' : 'text-fg-disabled'}>{i + 1}</span>}
                     </div>
-                    <span className={`text-xs hidden sm:block ${current ? 'text-white font-medium' : 'text-slate-500'}`}>
+                    <span className={`text-xs hidden sm:block ${current ? 'text-fg-primary font-medium' : 'text-fg-muted'}`}>
                       {label}
                     </span>
                   </div>
@@ -170,25 +170,25 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
                    style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.2), rgba(124,58,237,0.15))', border: '1px solid rgba(14,165,233,0.3)' }}>
                 <Sparkles className="w-8 h-8 text-brand-primary" />
               </div>
-              <h1 className="text-2xl font-bold text-white mb-2">
+              <h1 className="text-2xl font-bold text-fg-primary mb-2">
                 Hola, {firstName} 👋
               </h1>
-              <p className="text-slate-400 mb-8 leading-relaxed">
-                Vamos a configurar tu cuenta en <strong className="text-white">menos de 3 minutos</strong>.
+              <p className="text-fg-secondary mb-8 leading-relaxed">
+                Vamos a configurar tu cuenta en <strong className="text-fg-primary">menos de 3 minutos</strong>.
                 Solo 2 pasos y ya tienes tu dashboard listo.
               </p>
 
               <div className="space-y-3 mb-8 text-left">
                 {[
-                  { icon: Dumbbell,      color: 'text-violet-400', bg: 'rgba(124,58,237,0.15)', text: 'Tus especialidades — para que tus clientes te encuentren' },
-                  { icon: Users,         color: 'text-sky-400',    bg: 'rgba(14,165,233,0.15)',  text: 'Invita a tu primer cliente — recibirá el acceso por email' },
-                  { icon: BarChart2,     color: 'text-emerald-400',bg: 'rgba(16,185,129,0.15)', text: 'Dashboard activo — rutinas, citas y mensajes te esperan' },
+                  { icon: Dumbbell,      color: 'text-[#C4B5FD]',           bg: 'rgba(124,58,237,0.15)', text: 'Tus especialidades — para que tus clientes te encuentren' },
+                  { icon: Users,         color: 'text-semantic-info-text',    bg: 'rgba(14,165,233,0.15)',  text: 'Invita a tu primer cliente — recibirá el acceso por email' },
+                  { icon: BarChart2,     color: 'text-semantic-success-text', bg: 'rgba(16,185,129,0.15)', text: 'Dashboard activo — rutinas, citas y mensajes te esperan' },
                 ].map(({ icon: Icon, color, bg, text }) => (
                   <div key={text} className="flex items-center gap-3 p-3 rounded-xl border border-border/40 bg-surface/40">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: bg }}>
                       <Icon className={`w-4 h-4 ${color}`} />
                     </div>
-                    <span className="text-sm text-slate-300">{text}</span>
+                    <span className="text-sm text-fg-secondary">{text}</span>
                     <CheckCircle2 className="w-4 h-4 text-brand-accent ml-auto shrink-0" />
                   </div>
                 ))}
@@ -198,7 +198,7 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
                 Empezar <ArrowRight className="w-4 h-4" />
               </button>
 
-              <p className="text-xs text-slate-600 mt-3">Plan gratuito · Hasta {FREE_MAX_CLIENTS} clientes · Sin tarjeta</p>
+              <p className="text-xs text-fg-disabled mt-3">Plan gratuito · Hasta {FREE_MAX_CLIENTS} clientes · Sin tarjeta</p>
             </div>
           )}
 
@@ -207,8 +207,8 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
             <div className="card p-8">
               <div className="mb-6">
                 <p className="text-xs font-semibold text-brand-primary uppercase tracking-widest mb-1">Paso 1 de 2</p>
-                <h2 className="text-xl font-bold text-white mb-1">¿En qué te especializas?</h2>
-                <p className="text-slate-400 text-sm">Selecciona las que apliquen. Puedes cambiarlas después.</p>
+                <h2 className="text-xl font-bold text-fg-primary mb-1">¿En qué te especializas?</h2>
+                <p className="text-fg-secondary text-sm">Selecciona las que apliquen. Puedes cambiarlas después.</p>
               </div>
 
               <div className="flex flex-wrap gap-2 mb-8">
@@ -217,7 +217,7 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
                           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                             selectedSpec.includes(spec)
                               ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
-                              : 'bg-surface border-border text-slate-400 hover:border-slate-500 hover:text-slate-300'
+                              : 'bg-surface border-border text-fg-secondary hover:border-border-bright hover:text-fg-primary'
                           }`}>
                     {selectedSpec.includes(spec) && <X className="inline w-3 h-3 mr-1 -mt-0.5" />}
                     {spec}
@@ -245,8 +245,8 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
             <div className="card p-8">
               <div className="mb-6">
                 <p className="text-xs font-semibold text-brand-primary uppercase tracking-widest mb-1">Paso 2 de 2</p>
-                <h2 className="text-xl font-bold text-white mb-1">Invita a tu primer cliente</h2>
-                <p className="text-slate-400 text-sm">
+                <h2 className="text-xl font-bold text-fg-primary mb-1">Invita a tu primer cliente</h2>
+                <p className="text-fg-secondary text-sm">
                   Introduce su email y le llegará un acceso directo. Solo necesita hacer clic.
                 </p>
               </div>
@@ -256,7 +256,7 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
                   <div>
                     <label className="label">Email del cliente</label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted" />
                       <input
                         type="email"
                         value={inviteEmail}
@@ -285,22 +285,22 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
                 /* Invitation sent state */
                 <div className="space-y-5">
                   <div className="text-center py-4">
-                    <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3">
-                      <CheckCircle2 className="w-7 h-7 text-emerald-400" />
+                    <div className="w-14 h-14 rounded-full bg-semantic-success/20 border border-semantic-success/30 flex items-center justify-center mx-auto mb-3">
+                      <CheckCircle2 className="w-7 h-7 text-semantic-success-text" />
                     </div>
-                    <h3 className="font-semibold text-white mb-1">Invitación enviada</h3>
-                    <p className="text-sm text-slate-400">
+                    <h3 className="font-semibold text-fg-primary mb-1">Invitación enviada</h3>
+                    <p className="text-sm text-fg-secondary">
                       {inviteEmail} recibirá un email con su acceso.
                     </p>
                   </div>
 
                   {/* Code as fallback */}
                   <div className="rounded-xl p-4 border border-border/60 bg-surface-2">
-                    <p className="text-xs text-slate-500 mb-2">Código manual (por si no le llega el email):</p>
+                    <p className="text-xs text-fg-muted mb-2">Código manual (por si no le llega el email):</p>
                     <div className="font-mono text-xl font-bold text-brand-primary tracking-[0.3em] text-center">
                       {inviteCode.toUpperCase()}
                     </div>
-                    <p className="text-[10px] text-slate-600 text-center mt-1">
+                    <p className="text-[10px] text-fg-disabled text-center mt-1">
                       Válido 7 días · <a href="/onboarding" className="underline">trainerboost.es/onboarding</a>
                     </p>
                   </div>
@@ -315,8 +315,8 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
               )}
 
               <div className="mt-5 p-3 rounded-xl border border-border/40 bg-surface/40">
-                <p className="text-xs text-slate-500 flex items-start gap-2">
-                  <MessageSquare className="w-3.5 h-3.5 text-slate-600 shrink-0 mt-0.5" />
+                <p className="text-xs text-fg-muted flex items-start gap-2">
+                  <MessageSquare className="w-3.5 h-3.5 text-fg-disabled shrink-0 mt-0.5" />
                   Tu cliente recibirá un email para crear su cuenta y acceder a su portal personalizado.
                 </p>
               </div>
@@ -393,16 +393,16 @@ function ClientForm({ userId }: { userId: string }) {
                style={{ background: 'linear-gradient(135deg, #10B981, #0EA5E9)' }}>
             <Zap className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="font-bold text-white text-sm tracking-tight">TrainerBoost</span>
+          <span className="font-bold text-fg-primary text-sm tracking-tight">TrainerBoost</span>
         </div>
-        <div className="ml-auto flex items-center gap-2 text-xs text-slate-500">
+        <div className="ml-auto flex items-center gap-2 text-xs text-fg-muted">
           <CheckCircle2 className="w-3.5 h-3.5 text-brand-primary" />
           <span>Cuenta creada</span>
           <div className="w-6 h-px bg-border/60" />
           <div className="w-5 h-5 rounded-full bg-brand-primary flex items-center justify-center">
-            <span className="text-[9px] font-bold text-white">2</span>
+            <span className="text-[9px] font-bold text-black">2</span>
           </div>
-          <span className="text-white font-medium">Unirte</span>
+          <span className="text-fg-primary font-medium">Unirte</span>
         </div>
       </div>
 
@@ -410,8 +410,8 @@ function ClientForm({ userId }: { userId: string }) {
         <div className="w-full max-w-lg grid md:grid-cols-2 gap-8 items-start">
           <div className="card p-8 animate-fade-in-up">
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-white mb-1">Únete con tu entrenador</h1>
-              <p className="text-slate-400 text-sm">Introduce el código que te ha dado tu entrenador</p>
+              <h1 className="text-2xl font-bold text-fg-primary mb-1">Únete con tu entrenador</h1>
+              <p className="text-fg-secondary text-sm">Introduce el código que te ha dado tu entrenador</p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
@@ -419,10 +419,10 @@ function ClientForm({ userId }: { userId: string }) {
                 <input value={inviteCode} onChange={e => setInviteCode(e.target.value)}
                        className="input font-mono text-lg tracking-widest text-center uppercase"
                        placeholder="XXXXXXXX" maxLength={12} autoFocus />
-                <p className="text-xs text-slate-500 mt-2">Tu entrenador te dará este código o lo recibirás por email</p>
+                <p className="text-xs text-fg-muted mt-2">Tu entrenador te dará este código o lo recibirás por email</p>
               </div>
               <div>
-                <label className="label">Teléfono <span className="text-slate-600">(opcional)</span></label>
+                <label className="label">Teléfono <span className="text-fg-disabled">(opcional)</span></label>
                 <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
                        className="input" placeholder="+34 600 000 000" />
               </div>
@@ -440,13 +440,13 @@ function ClientForm({ userId }: { userId: string }) {
                    style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.1))' }}>
                 <Users className="w-7 h-7 text-brand-accent" />
               </div>
-              <h3 className="font-semibold text-white mb-2">Tu portal personal</h3>
-              <p className="text-sm text-slate-400 leading-relaxed mb-4">
+              <h3 className="font-semibold text-fg-primary mb-2">Tu portal personal</h3>
+              <p className="text-sm text-fg-secondary leading-relaxed mb-4">
                 Accede a tu rutina, nutrición, citas y mensajes — todo en un solo lugar.
               </p>
               <div className="space-y-2 text-left">
                 {['Rutina del día con timer', 'Plan nutricional y macros', 'Registro de progreso', 'Chat directo con tu PT', 'Rachas y logros'].map(f => (
-                  <div key={f} className="flex items-center gap-2 text-xs text-slate-400">
+                  <div key={f} className="flex items-center gap-2 text-xs text-fg-secondary">
                     <CheckCircle2 className="w-3.5 h-3.5 text-brand-accent shrink-0" />
                     {f}
                   </div>

@@ -30,14 +30,14 @@ const FILTER_TABS: { value: FilterTab; label: string }[] = [
 ]
 
 const PRESET_TAGS = [
-  { label: 'Pérdida de peso',   color: 'bg-amber-500/20 text-amber-300 border border-amber-500/30' },
-  { label: 'Ganancia muscular', color: 'bg-sky-500/20 text-sky-300 border border-sky-500/30' },
-  { label: 'Resistencia',       color: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' },
-  { label: 'Rehabilitación',    color: 'bg-violet-500/20 text-violet-300 border border-violet-500/30' },
-  { label: 'Tonificación',      color: 'bg-pink-500/20 text-pink-300 border border-pink-500/30' },
-  { label: 'Principiante',      color: 'bg-slate-500/20 text-slate-300 border border-slate-500/40' },
-  { label: 'Senior',            color: 'bg-orange-500/20 text-orange-300 border border-orange-500/30' },
-  { label: 'Online',            color: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' },
+  { label: 'Pérdida de peso',   color: 'bg-semantic-warning/20 text-semantic-warning-text border border-semantic-warning/30' },
+  { label: 'Ganancia muscular', color: 'bg-semantic-info/20 text-semantic-info-text border border-semantic-info/30' },
+  { label: 'Resistencia',       color: 'bg-semantic-success/20 text-semantic-success-text border border-semantic-success/30' },
+  { label: 'Rehabilitación',    color: 'bg-brand-secondary/20 text-[#C4B5FD] border border-brand-secondary/30' },
+  { label: 'Tonificación',      color: 'bg-[#EC4899]/20 text-[#F9A8D4] border border-[#EC4899]/30' },
+  { label: 'Principiante',      color: 'bg-surface-4 text-fg-secondary border border-border-strong' },
+  { label: 'Senior',            color: 'bg-[#F97316]/20 text-[#FDBA74] border border-[#F97316]/30' },
+  { label: 'Online',            color: 'bg-semantic-info/20 text-semantic-info-text border border-semantic-info/30' },
 ] as const
 const TAG_COLOR: Record<string, string> = Object.fromEntries(PRESET_TAGS.map(t => [t.label, t.color]))
 
@@ -60,11 +60,11 @@ export default function ClientsPage() {
   const [maxClients, setMaxClients] = useState(0)
 
   // UI state
-  const [search, setSearch]       = useState('')
-  const [filter, setFilter]       = useState<FilterTab>('all')
-  const [page, setPage]           = useState(1)
-  const [tagFilter, setTagFilter]         = useState<string | null>(null)
-  const [editingTagsFor, setEditingTagsFor] = useState<string | null>(null) // client.id
+  const [search, setSearch]                 = useState('')
+  const [filter, setFilter]                 = useState<FilterTab>('all')
+  const [page, setPage]                     = useState(1)
+  const [tagFilter, setTagFilter]           = useState<string | null>(null)
+  const [editingTagsFor, setEditingTagsFor] = useState<string | null>(null)
 
   // Invite modal
   const [inviteOpen, setInviteOpen]       = useState(false)
@@ -98,7 +98,6 @@ export default function ClientsPage() {
       if (error) throw error
       setMaxClients(subData?.max_clients ?? 0)
 
-      // Fetch last routine + last progress log for each client
       const clientIds = (data ?? []).map((c: ClientWithProfile) => c.client_id)
       const routineMap: Record<string, string | null> = {}
       const progressMap: Record<string, string | null> = {}
@@ -116,14 +115,10 @@ export default function ClientsPage() {
         ])
 
         if (routines) {
-          for (const r of routines) {
-            routineMap[r.client_id] = r.latest_routine_at as string
-          }
+          for (const r of routines) routineMap[r.client_id] = r.latest_routine_at as string
         }
         if (progressLogs) {
-          for (const l of progressLogs) {
-            progressMap[l.client_id] = l.latest_progress_at as string
-          }
+          for (const l of progressLogs) progressMap[l.client_id] = l.latest_progress_at as string
         }
       }
 
@@ -152,9 +147,7 @@ export default function ClientsPage() {
     if (tagFilter) list = list.filter(c => (c.tags ?? []).includes(tagFilter))
     if (search.trim()) {
       const q = search.toLowerCase()
-      list = list.filter(c =>
-        c.profile?.full_name?.toLowerCase().includes(q)
-      )
+      list = list.filter(c => c.profile?.full_name?.toLowerCase().includes(q))
     }
     return list
   }, [clients, filter, search, tagFilter])
@@ -168,7 +161,6 @@ export default function ClientsPage() {
     return Array.from(set)
   }, [clients])
 
-  // Reset to page 1 when filters change
   useEffect(() => { setPage(1) }, [filter, search])
 
   // ── Invite logic ─────────────────────────────────────────────────────────
@@ -176,7 +168,6 @@ export default function ClientsPage() {
   async function generateInvite() {
     if (!userId) return
 
-    // Enforce the plan's client limit before issuing a new invite.
     const activeCount = clients.filter(c => c.status === 'active').length
     if (activeCount >= maxClients) {
       toast.error(
@@ -189,17 +180,12 @@ export default function ClientsPage() {
 
     setInviteLoading(true)
     try {
-      // Cryptographically-random code (not guessable, unlike Math.random()).
       const code = crypto.randomUUID().replace(/-/g, '').slice(0, 12).toLowerCase()
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 
       const { data, error } = await supabase
         .from('invitations')
-        .insert({
-          trainer_id: userId,
-          code,
-          expires_at: expiresAt,
-        })
+        .insert({ trainer_id: userId, code, expires_at: expiresAt })
         .select()
         .single()
 
@@ -229,7 +215,6 @@ export default function ClientsPage() {
     if (!invitation || !emailInput.trim()) return
     setEmailSending(true)
     try {
-      // Update invitation with email first
       await supabase.from('invitations').update({ email: emailInput.trim() }).eq('id', invitation.id)
       const res = await fetch('/api/invite/send', {
         method: 'POST',
@@ -283,8 +268,8 @@ export default function ClientsPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Clientes</h1>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-fg-primary">Clientes</h1>
+          <p className="text-fg-muted text-sm mt-0.5">
             {loading ? '…' : `${clients.length} cliente${clients.length !== 1 ? 's' : ''} en total`}
           </p>
         </div>
@@ -304,9 +289,8 @@ export default function ClientsPage() {
 
       {/* ── Search + filters ── */}
       <div className="flex flex-col sm:flex-row gap-3">
-        {/* Search input */}
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted pointer-events-none" />
           <input
             type="text"
             className="input pl-9"
@@ -316,16 +300,12 @@ export default function ClientsPage() {
           />
         </div>
 
-        {/* Filter tabs */}
         <div className="flex gap-1 border-b border-border/40 relative pb-0">
           {FILTER_TABS.map(tab => (
             <button
               key={tab.value}
               onClick={() => setFilter(tab.value)}
-              className={cn(
-                'tab-btn',
-                filter === tab.value ? 'tab-btn-active' : ''
-              )}
+              className={cn('tab-btn', filter === tab.value ? 'tab-btn-active' : '')}
             >
               {tab.label}
             </button>
@@ -342,7 +322,7 @@ export default function ClientsPage() {
               onClick={() => setTagFilter(t => t === tag ? null : tag)}
               className={cn(
                 'text-xs px-3 py-1 rounded-full border transition-all',
-                TAG_COLOR[tag] ?? 'bg-slate-700 text-slate-300 border-slate-600',
+                TAG_COLOR[tag] ?? 'bg-surface-3 text-fg-secondary border-border-strong',
                 tagFilter === tag ? 'ring-2 ring-white/30 scale-105' : 'opacity-70 hover:opacity-100'
               )}
             >
@@ -356,7 +336,7 @@ export default function ClientsPage() {
       {/* ── Table / empty ── */}
       {loading ? (
         <div className="card p-12 flex items-center justify-center">
-          <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
+          <Loader2 className="w-6 h-6 text-fg-muted animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState
@@ -399,10 +379,7 @@ export default function ClientsPage() {
                 `${monthsDiff} meses`
 
               return (
-                <div
-                  key={client.id}
-                  className="card card-interactive overflow-hidden"
-                >
+                <div key={client.id} className="card card-interactive overflow-hidden">
                   {/* Colored accent bar */}
                   <div className="h-px rounded-t-2xl" style={{ background: bar }} />
 
@@ -411,18 +388,14 @@ export default function ClientsPage() {
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
                         <div className="ring-2 ring-white/10 rounded-full shrink-0">
-                          <Avatar
-                            name={profile?.full_name ?? '?'}
-                            url={profile?.avatar_url}
-                            size="md"
-                          />
+                          <Avatar name={profile?.full_name ?? '?'} url={profile?.avatar_url} size="md" />
                         </div>
                         <div className="min-w-0">
-                          <div className="font-semibold text-white text-sm leading-tight truncate">
+                          <div className="font-semibold text-fg-primary text-sm leading-tight truncate">
                             {profile?.full_name ?? '—'}
                           </div>
                           {profile?.phone && (
-                            <div className="text-xs text-slate-500 mt-0.5 truncate">{profile.phone}</div>
+                            <div className="text-xs text-fg-disabled mt-0.5 truncate">{profile.phone}</div>
                           )}
                         </div>
                       </div>
@@ -435,31 +408,31 @@ export default function ClientsPage() {
                         ? Math.floor((Date.now() - new Date(client.lastProgressLog).getTime()) / 86400000)
                         : null
                       const actDot =
-                        daysSinceProg === null ? 'bg-slate-600' :
-                        daysSinceProg <= 7     ? 'bg-emerald-400' :
-                        daysSinceProg <= 14    ? 'bg-amber-400' :
-                                                 'bg-red-400'
+                        daysSinceProg === null ? 'bg-fg-disabled' :
+                        daysSinceProg <= 7     ? 'bg-semantic-success' :
+                        daysSinceProg <= 14    ? 'bg-semantic-warning' :
+                                                 'bg-semantic-error'
                       return (
-                    <div className="grid grid-cols-2 gap-2 mb-4">
-                      <div className="rounded-lg px-3 py-2.5 bg-surface-3">
-                        <div className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">
-                          <Clock className="w-2.5 h-2.5" /> Cliente desde
+                        <div className="grid grid-cols-2 gap-2 mb-4">
+                          <div className="rounded-lg px-3 py-2.5 bg-surface-3">
+                            <div className="flex items-center gap-1 text-[10px] text-fg-muted uppercase tracking-wide mb-0.5">
+                              <Clock className="w-2.5 h-2.5" /> Cliente desde
+                            </div>
+                            <div className="text-sm font-semibold text-fg-primary">{timeLabel}</div>
+                          </div>
+                          <div className="rounded-lg px-3 py-2.5 bg-surface-3">
+                            <div className="flex items-center gap-1 text-[10px] text-fg-muted uppercase tracking-wide mb-0.5">
+                              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${actDot}`} />
+                              Último progreso
+                            </div>
+                            <div className="text-sm font-semibold text-fg-primary">
+                              {client.lastProgressLog
+                                ? timeAgo(client.lastProgressLog)
+                                : <span className="text-fg-disabled font-normal text-xs">Sin registros</span>
+                              }
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-sm font-semibold text-slate-200">{timeLabel}</div>
-                      </div>
-                      <div className="rounded-lg px-3 py-2.5 bg-surface-3">
-                        <div className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">
-                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${actDot}`} />
-                          Último progreso
-                        </div>
-                        <div className="text-sm font-semibold text-slate-200">
-                          {client.lastProgressLog
-                            ? timeAgo(client.lastProgressLog)
-                            : <span className="text-slate-500 font-normal text-xs">Sin registros</span>
-                          }
-                        </div>
-                      </div>
-                    </div>
                       )
                     })()}
 
@@ -467,14 +440,15 @@ export default function ClientsPage() {
                     <div className="mb-3 relative">
                       <div className="flex flex-wrap gap-1.5 items-center min-h-[24px]">
                         {(client.tags ?? []).map(tag => (
-                          <span key={tag} className={cn('text-[10px] px-2 py-0.5 rounded-full', TAG_COLOR[tag] ?? 'bg-slate-700 text-slate-300 border border-slate-600')}>
+                          <span key={tag} className={cn('text-[10px] px-2 py-0.5 rounded-full', TAG_COLOR[tag] ?? 'bg-surface-3 text-fg-secondary border border-border-strong')}>
                             {tag}
                           </span>
                         ))}
                         <button
                           onClick={e => { e.stopPropagation(); setEditingTagsFor(editingTagsFor === client.id ? null : client.id) }}
-                          className="w-5 h-5 rounded-full border border-dashed border-slate-600 hover:border-sky-500 flex items-center justify-center text-slate-500 hover:text-sky-400 transition-colors"
+                          className="w-5 h-5 rounded-full border border-dashed border-border-strong hover:border-brand-primary flex items-center justify-center text-fg-disabled hover:text-brand-primary transition-colors"
                           title="Editar etiquetas"
+                          aria-label="Editar etiquetas"
                         >
                           <Tag className="w-2.5 h-2.5" />
                         </button>
@@ -506,7 +480,7 @@ export default function ClientsPage() {
                           </div>
                           <button
                             onClick={() => setEditingTagsFor(null)}
-                            className="mt-2 text-[10px] text-slate-500 hover:text-white w-full text-center"
+                            className="mt-2 text-[10px] text-fg-muted hover:text-fg-primary w-full text-center transition-colors"
                           >
                             Cerrar
                           </button>
@@ -531,7 +505,7 @@ export default function ClientsPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="card px-4 py-3 flex items-center justify-between">
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-fg-muted">
                 {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} de {filtered.length}
               </p>
               <div className="flex items-center gap-1">
@@ -539,7 +513,7 @@ export default function ClientsPage() {
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
                   aria-label="Página anterior"
-                  className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-surface-3 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-1.5 rounded-lg text-fg-muted hover:text-fg-primary hover:bg-surface-3 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -551,7 +525,7 @@ export default function ClientsPage() {
                       'w-7 h-7 rounded-lg text-xs font-semibold transition-colors',
                       p === page
                         ? 'bg-brand-primary text-black'
-                        : 'text-slate-500 hover:bg-surface-3 hover:text-white'
+                        : 'text-fg-muted hover:bg-surface-3 hover:text-fg-primary'
                     )}
                   >
                     {p}
@@ -561,7 +535,7 @@ export default function ClientsPage() {
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   aria-label="Página siguiente"
-                  className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-surface-3 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-1.5 rounded-lg text-fg-muted hover:text-fg-primary hover:bg-surface-3 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -572,52 +546,40 @@ export default function ClientsPage() {
       )}
 
       {/* ── Invite Modal ── */}
-      <Modal
-        isOpen={inviteOpen}
-        onClose={() => setInviteOpen(false)}
-        title="Invitar cliente"
-        size="sm"
-      >
+      <Modal isOpen={inviteOpen} onClose={() => setInviteOpen(false)} title="Invitar cliente" size="sm">
         <div className="space-y-5">
-          <p className="text-slate-400 text-sm leading-relaxed">
+          <p className="text-fg-muted text-sm leading-relaxed">
             Comparte este código con tu cliente. Al registrarse con él, quedará
             automáticamente vinculado a tu cuenta. El código expira en 7 días.
           </p>
 
           {inviteLoading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
+              <Loader2 className="w-5 h-5 text-fg-muted animate-spin" />
             </div>
           ) : invitation ? (
             <div className="space-y-3">
               {/* Code display */}
-              <div className="font-mono text-2xl font-bold text-white tracking-[0.25em] text-center bg-background border border-border rounded-xl py-4 px-5 select-all">
+              <div className="font-mono text-2xl font-bold text-fg-primary tracking-[0.25em] text-center bg-background border border-border rounded-xl py-4 px-5 select-all">
                 {invitation.code.toUpperCase()}
               </div>
 
-              {/* Expires */}
-              <p className="text-xs text-center text-slate-500">
+              <p className="text-xs text-center text-fg-muted">
                 Expira el {formatDate(invitation.expires_at, 'dd/MM/yyyy HH:mm')}
               </p>
 
-              {/* Copy + refresh */}
               <div className="flex gap-2">
                 <button onClick={copyCode} className="btn-primary flex-1">
                   <Copy className="w-4 h-4" />
                   Copiar código
                 </button>
-                <button
-                  onClick={generateInvite}
-                  className="btn-secondary px-3"
-                  title="Generar nuevo código"
-                >
+                <button onClick={generateInvite} className="btn-secondary px-3" title="Generar nuevo código">
                   <RefreshCw className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Send by email */}
               <div className="border-t border-border pt-4 space-y-2">
-                <p className="text-xs text-slate-500">O enviar por email directamente</p>
+                <p className="text-xs text-fg-muted">O enviar por email directamente</p>
                 <div className="flex gap-2">
                   <input
                     type="email"
@@ -639,7 +601,7 @@ export default function ClientsPage() {
             </div>
           ) : (
             <div className="text-center py-6">
-              <p className="text-slate-500 text-sm">No se pudo generar el código.</p>
+              <p className="text-fg-muted text-sm">No se pudo generar el código.</p>
               <button onClick={generateInvite} className="btn-secondary mt-3">
                 <RefreshCw className="w-4 h-4" />
                 Reintentar

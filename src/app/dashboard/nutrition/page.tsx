@@ -51,11 +51,11 @@ function blankMeal(): MealDraft {
 function MacroBar({ label, value, pct, color }: { label: string; value: number; pct: number; color: string }) {
   return (
     <div>
-      <div className="flex justify-between text-xs text-slate-400 mb-1">
+      <div className="flex justify-between text-xs text-fg-secondary mb-1">
         <span>{label}</span>
         <span>{value}g · {Math.round(pct)}%</span>
       </div>
-      <div className="h-2 bg-[#334155] rounded-full overflow-hidden">
+      <div className="h-2 bg-surface-3 rounded-full overflow-hidden">
         <div className={cn('h-full rounded-full transition-all duration-500', color)} style={{ width: `${Math.min(pct, 100)}%` }} />
       </div>
     </div>
@@ -236,8 +236,8 @@ export default function NutritionPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-white">Nutrición</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Gestiona los planes de alimentación</p>
+          <h1 className="text-2xl font-bold text-fg-primary">Nutrición</h1>
+          <p className="text-fg-secondary text-sm mt-0.5">Gestiona los planes de alimentación</p>
         </div>
         <button type="button" className="btn-primary" onClick={() => setShowNewPlanModal(true)}>
           <Plus size={16} /> Nuevo plan
@@ -247,7 +247,7 @@ export default function NutritionPage() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[180px]">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-secondary" />
           <input className="input pl-9" placeholder="Buscar planes..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <select className="input w-auto" value={filterClient} onChange={e => setFilterClient(e.target.value)}>
@@ -312,7 +312,7 @@ export default function NutritionPage() {
       {/* Delete confirmation modal */}
       <Modal isOpen={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Eliminar plan" size="sm">
         <div className="space-y-4">
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-fg-secondary">
             ¿Estás seguro de que quieres eliminar este plan? Esta acción no se puede deshacer.
           </p>
           <div className="flex gap-3">
@@ -373,36 +373,36 @@ function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, on
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-semibold text-white">{plan.title}</span>
+              <span className="font-semibold text-fg-primary">{plan.title}</span>
               <Badge status={plan.status} />
             </div>
             {plan.client && (
               <div className="flex items-center gap-2 mt-1.5">
                 <Avatar name={plan.client.full_name} url={plan.client.avatar_url} size="sm" />
-                <span className="text-sm text-slate-400">{plan.client.full_name}</span>
+                <span className="text-sm text-fg-secondary">{plan.client.full_name}</span>
               </div>
             )}
             {plan.calories_target && (
-              <div className="flex items-center gap-1 mt-1.5 text-xs text-slate-400">
-                <Flame size={11} className="text-amber-400" />
+              <div className="flex items-center gap-1 mt-1.5 text-xs text-fg-secondary">
+                <Flame size={11} className="text-semantic-warning-text" />
                 <span>{plan.calories_target} kcal / día</span>
               </div>
             )}
           </div>
           <div className="shrink-0 ml-2">
-            {expanded ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+            {expanded ? <ChevronUp size={16} className="text-fg-secondary" /> : <ChevronDown size={16} className="text-fg-secondary" />}
           </div>
         </div>
 
         {/* Macro bars preview */}
         {totalMacroCal > 0 ? (
           <div className="mt-4 space-y-2">
-            <MacroBar label="Proteína" value={p} pct={pPct} color="bg-sky-500" />
-            <MacroBar label="Carbohidratos" value={c} pct={cPct} color="bg-amber-500" />
-            <MacroBar label="Grasa" value={f} pct={fPct} color="bg-violet-500" />
+            <MacroBar label="Proteína" value={p} pct={pPct} color="bg-semantic-info" />
+            <MacroBar label="Carbohidratos" value={c} pct={cPct} color="bg-semantic-warning" />
+            <MacroBar label="Grasa" value={f} pct={fPct} color="bg-brand-secondary" />
           </div>
         ) : (
-          <p className="mt-3 text-[11px] text-slate-600 italic">Sin objetivos de macros definidos</p>
+          <p className="mt-3 text-[11px] text-fg-disabled italic">Sin objetivos de macros definidos</p>
         )}
       </button>
 
@@ -410,11 +410,11 @@ function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, on
       {expanded && (
         <div className="border-t border-[#334155] px-5 pb-5 pt-4 space-y-4">
           {plan.notes && (
-            <p className="text-sm text-slate-300">{plan.notes}</p>
+            <p className="text-sm text-fg-secondary">{plan.notes}</p>
           )}
 
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-300">
+            <h3 className="text-sm font-semibold text-fg-secondary">
               Comidas ({plan.meals.length})
             </h3>
             <button type="button" onClick={onAddMeal} className="btn-primary text-xs py-1.5 px-3">
@@ -423,7 +423,7 @@ function PlanCard({ plan, expanded, onToggle, onArchive, onDelete, onAddMeal, on
           </div>
 
           {plan.meals.length === 0 ? (
-            <p className="text-sm text-slate-500 text-center py-3">Sin comidas añadidas</p>
+            <p className="text-sm text-fg-muted text-center py-3">Sin comidas añadidas</p>
           ) : (
             <div className="space-y-3">
               {plan.meals.map(meal => (
@@ -481,49 +481,49 @@ function MealRow({ meal }: { meal: Meal }) {
         onClick={() => setOpen(o => !o)}
       >
         {meal.time && (
-          <div className="flex items-center gap-1 text-xs text-slate-400 shrink-0">
+          <div className="flex items-center gap-1 text-xs text-fg-secondary shrink-0">
             <Clock size={11} /> {meal.time}
           </div>
         )}
-        <span className="flex-1 font-medium text-sm text-slate-200">{meal.name}</span>
-        <span className="text-xs text-slate-400 shrink-0">{Math.round(totals.kcal)} kcal</span>
-        {open ? <ChevronUp size={14} className="text-slate-400 shrink-0" /> : <ChevronDown size={14} className="text-slate-400 shrink-0" />}
+        <span className="flex-1 font-medium text-sm text-fg-primary">{meal.name}</span>
+        <span className="text-xs text-fg-secondary shrink-0">{Math.round(totals.kcal)} kcal</span>
+        {open ? <ChevronUp size={14} className="text-fg-secondary shrink-0" /> : <ChevronDown size={14} className="text-fg-secondary shrink-0" />}
       </button>
 
       {open && (
         <div className="px-4 pb-4 pt-1 space-y-2">
           {foods.length === 0 ? (
-            <p className="text-xs text-slate-500 text-center py-2">Sin alimentos</p>
+            <p className="text-xs text-fg-muted text-center py-2">Sin alimentos</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-[#334155]">
                     {['Alimento', 'g', 'kcal', 'P', 'C', 'G'].map(h => (
-                      <th key={h} className="text-left pb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-wide pr-3">{h}</th>
+                      <th key={h} className="text-left pb-1.5 text-[10px] font-semibold text-fg-muted uppercase tracking-wide pr-3">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#334155]/30">
                   {foods.map((food, i) => (
                     <tr key={i}>
-                      <td className="py-1.5 pr-3 text-slate-300 font-medium">{food.name}</td>
-                      <td className="py-1.5 pr-3 text-slate-400">{food.grams}</td>
-                      <td className="py-1.5 pr-3 text-slate-400">{food.calories}</td>
-                      <td className="py-1.5 pr-3 text-sky-400">{food.protein}g</td>
-                      <td className="py-1.5 pr-3 text-amber-400">{food.carbs}g</td>
-                      <td className="py-1.5 text-violet-400">{food.fat}g</td>
+                      <td className="py-1.5 pr-3 text-fg-secondary font-medium">{food.name}</td>
+                      <td className="py-1.5 pr-3 text-fg-secondary">{food.grams}</td>
+                      <td className="py-1.5 pr-3 text-fg-secondary">{food.calories}</td>
+                      <td className="py-1.5 pr-3 text-semantic-info-text">{food.protein}g</td>
+                      <td className="py-1.5 pr-3 text-semantic-warning-text">{food.carbs}g</td>
+                      <td className="py-1.5 text-[#C4B5FD]">{food.fat}g</td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot>
                   <tr className="border-t border-[#334155] font-semibold">
-                    <td className="pt-2 pr-3 text-slate-300">Total</td>
-                    <td className="pt-2 pr-3 text-slate-400">—</td>
-                    <td className="pt-2 pr-3 text-slate-300">{Math.round(totals.kcal)}</td>
-                    <td className="pt-2 pr-3 text-sky-400">{Math.round(totals.p)}g</td>
-                    <td className="pt-2 pr-3 text-amber-400">{Math.round(totals.c)}g</td>
-                    <td className="pt-2 text-violet-400">{Math.round(totals.f)}g</td>
+                    <td className="pt-2 pr-3 text-fg-secondary">Total</td>
+                    <td className="pt-2 pr-3 text-fg-secondary">—</td>
+                    <td className="pt-2 pr-3 text-fg-secondary">{Math.round(totals.kcal)}</td>
+                    <td className="pt-2 pr-3 text-semantic-info-text">{Math.round(totals.p)}g</td>
+                    <td className="pt-2 pr-3 text-semantic-warning-text">{Math.round(totals.c)}g</td>
+                    <td className="pt-2 text-[#C4B5FD]">{Math.round(totals.f)}g</td>
                   </tr>
                 </tfoot>
               </table>
@@ -593,7 +593,7 @@ function NewPlanModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
         <div>
           <label className="label flex items-center gap-1"><Users size={11} /> Cliente *</label>
           {clients.length === 0 ? (
-            <p className="text-sm text-slate-400">No tienes clientes activos.</p>
+            <p className="text-sm text-fg-secondary">No tienes clientes activos.</p>
           ) : (
             <select className="input" value={form.client_id} onChange={e => setForm(p => ({ ...p, client_id: e.target.value }))}>
               <option value="">Seleccionar cliente...</option>
@@ -606,7 +606,7 @@ function NewPlanModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
           <input className="input" placeholder="Ej: Plan volumen Q1 2025" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} />
         </div>
         <div>
-          <label className="label flex items-center gap-1"><Flame size={11} className="text-amber-400" /> Objetivo calórico (kcal)</label>
+          <label className="label flex items-center gap-1"><Flame size={11} className="text-semantic-warning-text" /> Objetivo calórico (kcal)</label>
           <input type="number" className="input" placeholder="2200" value={form.calories_target} onChange={e => setForm(p => ({ ...p, calories_target: e.target.value }))} />
         </div>
 
@@ -615,15 +615,15 @@ function NewPlanModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
           <label className="label">Objetivos de macros</label>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <div className="text-[10px] font-semibold text-sky-400 uppercase tracking-wide mb-1">Proteína (g)</div>
+              <div className="text-[10px] font-semibold text-semantic-info-text uppercase tracking-wide mb-1">Proteína (g)</div>
               <input type="number" className="input border-sky-500/30 focus:border-sky-500 text-sm" placeholder="180" value={form.protein_target} onChange={e => setForm(p => ({ ...p, protein_target: e.target.value }))} />
             </div>
             <div>
-              <div className="text-[10px] font-semibold text-amber-400 uppercase tracking-wide mb-1">Carbos (g)</div>
+              <div className="text-[10px] font-semibold text-semantic-warning-text uppercase tracking-wide mb-1">Carbos (g)</div>
               <input type="number" className="input border-amber-500/30 focus:border-amber-500 text-sm" placeholder="250" value={form.carbs_target} onChange={e => setForm(p => ({ ...p, carbs_target: e.target.value }))} />
             </div>
             <div>
-              <div className="text-[10px] font-semibold text-violet-400 uppercase tracking-wide mb-1">Grasa (g)</div>
+              <div className="text-[10px] font-semibold text-[#C4B5FD] uppercase tracking-wide mb-1">Grasa (g)</div>
               <input type="number" className="input border-violet-500/30 focus:border-violet-500 text-sm" placeholder="70" value={form.fat_target} onChange={e => setForm(p => ({ ...p, fat_target: e.target.value }))} />
             </div>
           </div>
@@ -633,14 +633,14 @@ function NewPlanModal({ isOpen, onClose, trainerId, clients, onSuccess }: {
         {totalCal > 0 && (
           <div className="rounded-xl bg-[#0F172A]/60 border border-[#334155] p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wide">Distribución de macros</h4>
-              <span className="text-xs text-slate-400">{totalCal} kcal calculadas</span>
+              <h4 className="text-xs font-semibold text-fg-secondary uppercase tracking-wide">Distribución de macros</h4>
+              <span className="text-xs text-fg-secondary">{totalCal} kcal calculadas</span>
             </div>
-            <MacroBar label="Proteína" value={p} pct={(p * 4 / totalCal) * 100} color="bg-sky-500" />
-            <MacroBar label="Carbohidratos" value={c} pct={(c * 4 / totalCal) * 100} color="bg-amber-500" />
-            <MacroBar label="Grasa" value={f} pct={(f * 9 / totalCal) * 100} color="bg-violet-500" />
+            <MacroBar label="Proteína" value={p} pct={(p * 4 / totalCal) * 100} color="bg-semantic-info" />
+            <MacroBar label="Carbohidratos" value={c} pct={(c * 4 / totalCal) * 100} color="bg-semantic-warning" />
+            <MacroBar label="Grasa" value={f} pct={(f * 9 / totalCal) * 100} color="bg-brand-secondary" />
             {form.calories_target && (
-              <p className={cn('text-xs text-center mt-1', Math.abs(Number(form.calories_target) - totalCal) < 50 ? 'text-emerald-400' : 'text-amber-400')}>
+              <p className={cn('text-xs text-center mt-1', Math.abs(Number(form.calories_target) - totalCal) < 50 ? 'text-semantic-success-text' : 'text-semantic-warning-text')}>
                 {Math.abs(Number(form.calories_target) - totalCal) < 50
                   ? 'Macros alineados con el objetivo calórico'
                   : `Diferencia de ${Math.abs(Math.round(Number(form.calories_target) - totalCal))} kcal con el objetivo`
@@ -760,7 +760,7 @@ function AddMealModal({ isOpen, onClose, planId, mealCount, onSuccess }: {
                     value={food.name}
                     onChange={e => updateFood(food.id, 'name', e.target.value)}
                   />
-                  <button type="button" onClick={() => removeFood(food.id)} className="text-slate-500 hover:text-red-400 transition-colors shrink-0">
+                  <button type="button" onClick={() => removeFood(food.id)} className="text-fg-muted hover:text-semantic-error-text transition-colors shrink-0">
                     <X size={15} />
                   </button>
                 </div>
@@ -770,24 +770,24 @@ function AddMealModal({ isOpen, onClose, planId, mealCount, onSuccess }: {
                     <input type="number" className="input text-xs" placeholder="150" value={food.grams} onChange={e => updateFood(food.id, 'grams', e.target.value)} />
                   </div>
                   <div>
-                    <label className="label text-[10px] text-sky-400">Proteína (g)</label>
+                    <label className="label text-[10px] text-semantic-info-text">Proteína (g)</label>
                     <input type="number" step="0.1" className="input text-xs border-sky-500/20" placeholder="30" value={food.protein}
                       onChange={e => recalcFood(food.id, { protein: e.target.value })} />
                   </div>
                   <div>
-                    <label className="label text-[10px] text-amber-400">Carbos (g)</label>
+                    <label className="label text-[10px] text-semantic-warning-text">Carbos (g)</label>
                     <input type="number" step="0.1" className="input text-xs border-amber-500/20" placeholder="0" value={food.carbs}
                       onChange={e => recalcFood(food.id, { carbs: e.target.value })} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="label text-[10px] text-violet-400">Grasa (g)</label>
+                    <label className="label text-[10px] text-[#C4B5FD]">Grasa (g)</label>
                     <input type="number" step="0.1" className="input text-xs border-violet-500/20" placeholder="5" value={food.fat}
                       onChange={e => recalcFood(food.id, { fat: e.target.value })} />
                   </div>
                   <div>
-                    <label className="label text-[10px] text-amber-500">Calorías (kcal)</label>
+                    <label className="label text-[10px] text-semantic-warning-text">Calorías (kcal)</label>
                     <input type="number" className="input text-xs" placeholder="Auto" value={food.calories}
                       onChange={e => updateFood(food.id, 'calories', e.target.value)} />
                   </div>
@@ -806,10 +806,10 @@ function AddMealModal({ isOpen, onClose, planId, mealCount, onSuccess }: {
           )
           return (
             <div className="flex gap-4 rounded-lg bg-[#334155]/20 px-4 py-3 text-xs font-medium">
-              <span className="text-slate-300">{Math.round(t.kcal)} kcal</span>
-              <span className="text-sky-400">{Math.round(t.p)}g P</span>
-              <span className="text-amber-400">{Math.round(t.c)}g C</span>
-              <span className="text-violet-400">{Math.round(t.fa)}g G</span>
+              <span className="text-fg-secondary">{Math.round(t.kcal)} kcal</span>
+              <span className="text-semantic-info-text">{Math.round(t.p)}g P</span>
+              <span className="text-semantic-warning-text">{Math.round(t.c)}g C</span>
+              <span className="text-[#C4B5FD]">{Math.round(t.fa)}g G</span>
             </div>
           )
         })()}

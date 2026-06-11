@@ -19,8 +19,8 @@ function passwordStrength(pwd: string): { score: number; label: string; color: s
   if (/[0-9]/.test(pwd)) score++
   if (/[^A-Za-z0-9]/.test(pwd)) score++
   const labels = ['Muy débil', 'Débil', 'Regular', 'Fuerte', 'Muy fuerte']
-  const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-emerald-500', 'bg-emerald-600']
-  return { score, label: labels[score] ?? 'Débil', color: colors[score] ?? 'bg-red-500' }
+  const colors = ['bg-semantic-error', 'bg-[#F97316]', 'bg-semantic-warning', 'bg-semantic-success', 'bg-semantic-success']
+  return { score, label: labels[score] ?? 'Débil', color: colors[score] ?? 'bg-semantic-error' }
 }
 
 export default function RegisterPage() {
@@ -103,7 +103,7 @@ export default function RegisterPage() {
       <div className="relative w-full max-w-md animate-fade-in-up">
 
         {/* Back */}
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-white transition-colors mb-8 group">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg-primary transition-colors mb-8 group">
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform duration-200" />
           Volver al inicio
         </Link>
@@ -114,7 +114,7 @@ export default function RegisterPage() {
                style={{ background: '#8FD43A' }}>
             <Zap className="w-5 h-5 text-black" />
           </div>
-          <span className="text-xl font-bold text-white tracking-tight">TrainerBoost</span>
+          <span className="text-xl font-bold text-fg-primary tracking-tight">TrainerBoost</span>
         </div>
 
         {/* Step indicator */}
@@ -124,7 +124,7 @@ export default function RegisterPage() {
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                 step >= s
                   ? 'text-white shadow-glow-sm'
-                  : 'bg-surface border border-border text-slate-500'
+                  : 'bg-surface border border-border text-fg-muted'
               }`}
               style={step >= s ? { background: '#8FD43A' } : {}}>
                 {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
@@ -140,8 +140,8 @@ export default function RegisterPage() {
 
           {step === 1 ? (
             <div className="animate-fade-in">
-              <h1 className="text-2xl font-bold text-white mb-1">Crea tu cuenta</h1>
-              <p className="text-slate-400 text-sm mb-6">¿Cómo vas a usar TrainerBoost?</p>
+              <h1 className="text-2xl font-bold text-fg-primary mb-1">Crea tu cuenta</h1>
+              <p className="text-fg-secondary text-sm mb-6">¿Cómo vas a usar TrainerBoost?</p>
 
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <button
@@ -158,10 +158,10 @@ export default function RegisterPage() {
                   style={{ background: role === 'trainer' ? '#8FD43A' : '#263548' }}>
                     <Zap className="w-4 h-4 text-white" />
                   </div>
-                  <div className={`font-semibold text-sm mb-0.5 transition-colors ${role === 'trainer' ? 'text-white' : 'text-slate-200'}`}>
+                  <div className={`font-semibold text-sm mb-0.5 transition-colors ${role === 'trainer' ? 'text-fg-primary' : 'text-fg-primary'}`}>
                     Soy entrenador
                   </div>
-                  <div className="text-xs text-slate-400">Gestiono clientes y rutinas</div>
+                  <div className="text-xs text-fg-secondary">Gestiono clientes y rutinas</div>
                 </button>
 
                 <button
@@ -178,10 +178,10 @@ export default function RegisterPage() {
                   style={{ background: role === 'client' ? '#8FD43A' : '#263548' }}>
                     <Users className="w-4 h-4 text-white" />
                   </div>
-                  <div className={`font-semibold text-sm mb-0.5 transition-colors ${role === 'client' ? 'text-white' : 'text-slate-200'}`}>
+                  <div className={`font-semibold text-sm mb-0.5 transition-colors ${role === 'client' ? 'text-fg-primary' : 'text-fg-primary'}`}>
                     Soy cliente
                   </div>
-                  <div className="text-xs text-slate-400">Sigo el plan de mi entrenador</div>
+                  <div className="text-xs text-fg-secondary">Sigo el plan de mi entrenador</div>
                 </button>
               </div>
 
@@ -194,14 +194,14 @@ export default function RegisterPage() {
             <div className="animate-fade-in">
               <button
                 onClick={() => setStep(1)}
-                className="text-sm text-slate-400 hover:text-white mb-5 flex items-center gap-1.5 transition-colors group"
+                className="text-sm text-fg-secondary hover:text-fg-primary mb-5 flex items-center gap-1.5 transition-colors group"
               >
                 <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
                 Cambiar rol
               </button>
 
-              <h1 className="text-2xl font-bold text-white mb-1">Tus datos</h1>
-              <p className="text-slate-400 text-sm mb-6">
+              <h1 className="text-2xl font-bold text-fg-primary mb-1">Tus datos</h1>
+              <p className="text-fg-secondary text-sm mb-6">
                 {role === 'trainer' ? 'Configura tu perfil de entrenador' : 'Únete con el código de tu entrenador después'}
               </p>
 
@@ -209,7 +209,7 @@ export default function RegisterPage() {
                 <div>
                   <label className="label">Nombre completo</label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted pointer-events-none" />
                     <input
                       value={name}
                       onChange={e => setName(e.target.value)}
@@ -223,7 +223,7 @@ export default function RegisterPage() {
                 <div>
                   <label className="label">Email</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted pointer-events-none" />
                     <input
                       type="email"
                       value={email}
@@ -238,7 +238,7 @@ export default function RegisterPage() {
                 <div>
                   <label className="label">Contraseña</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted pointer-events-none" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
@@ -251,7 +251,7 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(prev => !prev)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-muted hover:text-fg-secondary transition-colors"
                       tabIndex={-1}
                       aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                     >
@@ -266,17 +266,17 @@ export default function RegisterPage() {
                         {[0, 1, 2, 3].map(i => (
                           <div
                             key={i}
-                            className={`h-1 flex-1 rounded-full transition-colors ${i < strength.score ? strength.color : 'bg-slate-700'}`}
+                            className={`h-1 flex-1 rounded-full transition-colors ${i < strength.score ? strength.color : 'bg-surface-3'}`}
                           />
                         ))}
                       </div>
-                      <p className="text-xs text-slate-500">{strength.label}</p>
+                      <p className="text-xs text-fg-muted">{strength.label}</p>
                     </div>
                   )}
 
                   {/* Inline password length error */}
                   {pwdError && (
-                    <p className="text-xs text-red-400 mt-1.5">{pwdError}</p>
+                    <p className="text-xs text-semantic-error-text mt-1.5">{pwdError}</p>
                   )}
                 </div>
 
@@ -288,7 +288,7 @@ export default function RegisterPage() {
                     onChange={e => setAcceptedTerms(e.target.checked)}
                     className="w-4 h-4 mt-0.5 rounded border-border bg-surface accent-brand-primary cursor-pointer shrink-0"
                   />
-                  <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors leading-snug">
+                  <span className="text-sm text-fg-secondary group-hover:text-fg-primary transition-colors leading-snug">
                     Acepto los{' '}
                     <Link href="/terms" className="text-brand-primary hover:underline" target="_blank">Términos de servicio</Link>
                     {' '}y la{' '}
@@ -310,7 +310,7 @@ export default function RegisterPage() {
           )}
         </div>
 
-        <p className="text-center text-sm text-slate-400 mt-6">
+        <p className="text-center text-sm text-fg-secondary mt-6">
           ¿Ya tienes cuenta?{' '}
           <Link href="/login" className="text-brand-primary hover:underline font-medium transition-colors">
             Inicia sesión

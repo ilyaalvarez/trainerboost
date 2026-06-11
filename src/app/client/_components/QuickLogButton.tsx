@@ -68,9 +68,9 @@ export function QuickLogButton({ clientId, trainerId }: Props) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Scale className="w-4 h-4 text-brand-primary" />
-                <h3 className="font-semibold text-white text-sm">Registro rápido</h3>
+                <h3 className="font-semibold text-fg-primary text-sm">Registro rápido</h3>
               </div>
-              <button onClick={handleClose} aria-label="Cerrar" className="p-1 rounded-lg text-slate-500 hover:text-white hover:bg-surface-2 transition-all">
+              <button onClick={handleClose} aria-label="Cerrar" className="p-1 rounded-lg text-fg-muted hover:text-fg-primary hover:bg-surface-2 transition-all">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -90,7 +90,7 @@ export function QuickLogButton({ clientId, trainerId }: Props) {
                     autoFocus
                     required
                   />
-                  <span className="text-slate-400 text-sm shrink-0">kg</span>
+                  <span className="text-fg-muted text-sm shrink-0">kg</span>
                 </div>
               </div>
 
@@ -98,7 +98,7 @@ export function QuickLogButton({ clientId, trainerId }: Props) {
               <button
                 type="button"
                 onClick={() => setShowExtra(v => !v)}
-                className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+                className="flex items-center gap-1.5 text-xs text-fg-muted hover:text-fg-secondary transition-colors"
               >
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showExtra ? 'rotate-180' : ''}`} />
                 {showExtra ? 'Ocultar medidas opcionales' : 'Añadir grasa / músculo'}
@@ -119,7 +119,7 @@ export function QuickLogButton({ clientId, trainerId }: Props) {
                         className="input flex-1"
                         placeholder="18.5"
                       />
-                      <span className="text-slate-400 text-sm shrink-0">%</span>
+                      <span className="text-fg-muted text-sm shrink-0">%</span>
                     </div>
                   </div>
                   <div>
@@ -135,7 +135,7 @@ export function QuickLogButton({ clientId, trainerId }: Props) {
                         className="input flex-1"
                         placeholder="35.0"
                       />
-                      <span className="text-slate-400 text-sm shrink-0">kg</span>
+                      <span className="text-fg-muted text-sm shrink-0">kg</span>
                     </div>
                   </div>
                 </div>

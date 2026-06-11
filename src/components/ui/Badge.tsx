@@ -22,19 +22,19 @@ interface BadgeProps {
 }
 
 const variantMap: Record<StatusVariant, { dot: string; pill: string; label: string }> = {
-  active:     { dot: 'bg-success',         pill: 'bg-[#ECFDF5]  text-[#065F46]  ring-1 ring-inset ring-[#059669]/25', label: 'Activo'      },
-  paused:     { dot: 'bg-warning',         pill: 'bg-[#FFFBEB]  text-[#92400E]  ring-1 ring-inset ring-[#D97706]/25', label: 'Pausado'     },
-  ended:      { dot: 'bg-danger',          pill: 'bg-[#FEF2F2]  text-[#991B1B]  ring-1 ring-inset ring-[#DC2626]/25', label: 'Finalizado'  },
-  pending:    { dot: 'bg-gray-400',        pill: 'bg-gray-100   text-gray-600   ring-1 ring-inset ring-gray-300',      label: 'Pendiente'   },
-  confirmed:  { dot: 'bg-brand-primary',   pill: 'bg-[#EEF2FF]  text-[#1B4FD8]  ring-1 ring-inset ring-[#1B4FD8]/25', label: 'Confirmada'  },
-  done:       { dot: 'bg-success',         pill: 'bg-[#ECFDF5]  text-[#065F46]  ring-1 ring-inset ring-[#059669]/25', label: 'Realizada'   },
-  cancelled:  { dot: 'bg-danger',          pill: 'bg-[#FEF2F2]  text-[#991B1B]  ring-1 ring-inset ring-[#DC2626]/25', label: 'Cancelada'   },
-  presencial: { dot: 'bg-brand-primary',   pill: 'bg-[#EEF2FF]  text-[#1B4FD8]  ring-1 ring-inset ring-[#1B4FD8]/25', label: 'Presencial'  },
-  online:     { dot: 'bg-[#7C3AED]',       pill: 'bg-[#EDE9FE]  text-[#5B21B6]  ring-1 ring-inset ring-[#7C3AED]/25', label: 'Online'      },
-  llamada:    { dot: 'bg-warning',         pill: 'bg-[#FFFBEB]  text-[#92400E]  ring-1 ring-inset ring-[#D97706]/25', label: 'Llamada'     },
-  archived:   { dot: 'bg-gray-400',        pill: 'bg-gray-100   text-gray-500   ring-1 ring-inset ring-gray-300',      label: 'Archivada'   },
-  inactive:   { dot: 'bg-gray-400',        pill: 'bg-gray-100   text-gray-500   ring-1 ring-inset ring-gray-300',      label: 'Inactivo'    },
-  past_due:   { dot: 'bg-warning',         pill: 'bg-[#FFFBEB]  text-[#92400E]  ring-1 ring-inset ring-[#D97706]/25', label: 'Vencido'     },
+  active:     { dot: 'bg-semantic-success',   pill: 'bg-semantic-success/10  text-semantic-success-text border border-semantic-success/20',  label: 'Activo'     },
+  paused:     { dot: 'bg-semantic-warning',   pill: 'bg-semantic-warning/10  text-semantic-warning-text border border-semantic-warning/20',  label: 'Pausado'    },
+  ended:      { dot: 'bg-semantic-error',     pill: 'bg-semantic-error/10    text-semantic-error-text   border border-semantic-error/20',    label: 'Finalizado' },
+  pending:    { dot: 'bg-fg-disabled',        pill: 'bg-surface-3 text-fg-muted    border border-border-strong',                             label: 'Pendiente'  },
+  confirmed:  { dot: 'bg-semantic-info',      pill: 'bg-semantic-info/10     text-semantic-info-text    border border-semantic-info/20',     label: 'Confirmada' },
+  done:       { dot: 'bg-semantic-success',   pill: 'bg-semantic-success/10  text-semantic-success-text border border-semantic-success/20',  label: 'Realizada'  },
+  cancelled:  { dot: 'bg-semantic-error',     pill: 'bg-semantic-error/10    text-semantic-error-text   border border-semantic-error/20',    label: 'Cancelada'  },
+  presencial: { dot: 'bg-semantic-info',      pill: 'bg-semantic-info/10     text-semantic-info-text    border border-semantic-info/20',     label: 'Presencial' },
+  online:     { dot: 'bg-brand-secondary',    pill: 'bg-brand-secondary/10   text-[#C4B5FD]             border border-brand-secondary/20',   label: 'Online'     },
+  llamada:    { dot: 'bg-semantic-warning',   pill: 'bg-semantic-warning/10  text-semantic-warning-text border border-semantic-warning/20',  label: 'Llamada'    },
+  archived:   { dot: 'bg-fg-disabled',        pill: 'bg-surface-3 text-fg-disabled border border-border-strong',                             label: 'Archivada'  },
+  inactive:   { dot: 'bg-fg-disabled',        pill: 'bg-surface-3 text-fg-disabled border border-border-strong',                             label: 'Inactivo'   },
+  past_due:   { dot: 'bg-semantic-warning',   pill: 'bg-semantic-warning/10  text-semantic-warning-text border border-semantic-warning/20',  label: 'Vencido'    },
 }
 
 export default function Badge({ status, label, className }: BadgeProps) {

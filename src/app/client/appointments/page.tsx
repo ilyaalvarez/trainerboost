@@ -130,8 +130,8 @@ export default function ClientAppointmentsPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-white">Mis Citas</h1>
-        <p className="text-slate-400 text-sm mt-0.5">Sesiones con tu entrenador</p>
+        <h1 className="text-2xl font-bold text-fg-primary">Mis Citas</h1>
+        <p className="text-fg-muted text-sm mt-0.5">Sesiones con tu entrenador</p>
       </div>
 
       {/* Request new appointment */}
@@ -147,10 +147,10 @@ export default function ClientAppointmentsPage() {
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="card w-full max-w-md p-6 space-y-4 animate-fade-in">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-white">Solicitar cita</h2>
+              <h2 className="text-lg font-semibold text-fg-primary">Solicitar cita</h2>
               <button
                 onClick={() => setShowRequest(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-surface-2 transition-all"
+                className="p-1.5 rounded-lg text-fg-muted hover:text-fg-primary hover:bg-surface-2 transition-all"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -158,7 +158,7 @@ export default function ClientAppointmentsPage() {
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-slate-400 mb-1 block">Fecha</label>
+                <label className="text-xs font-medium text-fg-muted mb-1 block">Fecha</label>
                 <input
                   type="date"
                   value={reqForm.date}
@@ -169,7 +169,7 @@ export default function ClientAppointmentsPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-slate-400 mb-1 block">Hora</label>
+                <label className="text-xs font-medium text-fg-muted mb-1 block">Hora</label>
                 <input
                   type="time"
                   value={reqForm.time}
@@ -179,7 +179,7 @@ export default function ClientAppointmentsPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-slate-400 mb-1 block">Tipo de sesión</label>
+                <label className="text-xs font-medium text-fg-muted mb-1 block">Tipo de sesión</label>
                 <select
                   value={reqForm.type}
                   onChange={e => setReqForm(f => ({ ...f, type: e.target.value as 'presencial' | 'online' | 'llamada' }))}
@@ -192,7 +192,7 @@ export default function ClientAppointmentsPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-slate-400 mb-1 block">Notas (opcional)</label>
+                <label className="text-xs font-medium text-fg-muted mb-1 block">Notas (opcional)</label>
                 <textarea
                   value={reqForm.notes}
                   onChange={e => setReqForm(f => ({ ...f, notes: e.target.value }))}
@@ -231,7 +231,7 @@ export default function ClientAppointmentsPage() {
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-              tab === t ? 'bg-surface text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              tab === t ? 'bg-surface text-fg-primary shadow-sm' : 'text-fg-muted hover:text-fg-primary'
             }`}
           >
             {t === 'upcoming' ? `Próximas (${upcoming.length})` : 'Historial'}
@@ -245,7 +245,7 @@ export default function ClientAppointmentsPage() {
         </div>
       ) : currentList.length === 0 ? (
         <EmptyState
-          icon={<CalendarDays className="w-8 h-8 text-slate-500" />}
+          icon={<CalendarDays className="w-8 h-8 text-fg-muted" />}
           title={tab === 'upcoming' ? 'Sin citas próximas' : 'Sin historial'}
           description={tab === 'upcoming' ? 'Tu entrenador agendará la próxima sesión.' : 'Las citas pasadas aparecerán aquí.'}
         />
@@ -259,18 +259,18 @@ export default function ClientAppointmentsPage() {
                     <CalendarDays className="w-5 h-5 text-brand-primary" />
                   </div>
                   <div>
-                    <div className="font-semibold text-white">{formatRelative(apt.scheduled_at)}</div>
-                    <div className="text-sm text-slate-400 mt-0.5">
+                    <div className="font-semibold text-fg-primary">{formatRelative(apt.scheduled_at)}</div>
+                    <div className="text-sm text-fg-muted mt-0.5">
                       {apt.trainer?.full_name} · {apt.duration_minutes}min · {apt.type}
                       {apt.location && apt.type === 'online' && apt.location.startsWith('http') ? (
                         <> · <a href={apt.location} target="_blank" rel="noopener noreferrer"
-                          className="text-sky-400 hover:text-sky-300 font-medium transition-colors">
+                          className="text-semantic-info-text hover:text-semantic-info-text/80 font-medium transition-colors">
                           Unirse a videollamada
                         </a></>
                       ) : apt.location ? ` · ${apt.location}` : null}
                     </div>
                     {apt.notes && (
-                      <div className="text-xs text-slate-500 mt-1 italic">{apt.notes}</div>
+                      <div className="text-xs text-fg-muted mt-1 italic">{apt.notes}</div>
                     )}
                   </div>
                 </div>
@@ -281,7 +281,7 @@ export default function ClientAppointmentsPage() {
                       <button
                         onClick={() => confirmApt(apt.id)}
                         disabled={acting === apt.id}
-                        className="flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                        className="flex items-center gap-1 text-xs text-semantic-success-text hover:text-semantic-success-text/80 transition-colors"
                       >
                         {acting === apt.id
                           ? <Loader2 className="w-3 h-3 animate-spin" />
@@ -290,17 +290,17 @@ export default function ClientAppointmentsPage() {
                       </button>
                       {confirmCancel === apt.id ? (
                         <>
-                          <span className="text-xs font-medium text-amber-400">¿Seguro?</span>
+                          <span className="text-xs font-medium text-semantic-warning-text">¿Seguro?</span>
                           <button
                             onClick={() => cancelApt(apt.id)}
                             disabled={acting === apt.id}
-                            className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors font-semibold"
+                            className="flex items-center gap-1 text-xs text-semantic-error-text hover:text-semantic-error-text/80 transition-colors font-semibold"
                           >
                             Sí, cancelar
                           </button>
                           <button
                             onClick={() => setConfirmCancel(null)}
-                            className="flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors"
+                            className="flex items-center gap-1 text-xs text-fg-muted hover:text-fg-primary transition-colors"
                           >
                             No
                           </button>
@@ -309,7 +309,7 @@ export default function ClientAppointmentsPage() {
                         <button
                           onClick={() => cancelApt(apt.id)}
                           disabled={acting === apt.id}
-                          className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors"
+                          className="flex items-center gap-1 text-xs text-semantic-error-text hover:text-semantic-error-text/80 transition-colors"
                         >
                           <X className="w-3 h-3" /> Cancelar
                         </button>

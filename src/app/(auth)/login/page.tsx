@@ -79,7 +79,7 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md animate-fade-in-up">
 
         {/* Back */}
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-white transition-colors mb-8 group">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg-primary transition-colors mb-8 group">
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform duration-200" />
           Volver al inicio
         </Link>
@@ -90,18 +90,18 @@ export default function LoginPage() {
                style={{ background: '#8FD43A' }}>
             <Zap className="w-5 h-5 text-black" />
           </div>
-          <span className="text-xl font-bold text-white tracking-tight">TrainerBoost</span>
+          <span className="text-xl font-bold text-fg-primary tracking-tight">TrainerBoost</span>
         </div>
 
         <div className="glass-card p-8">
-          <h1 className="text-2xl font-bold text-white mb-1">Bienvenido de nuevo</h1>
-          <p className="text-slate-400 text-sm mb-6">Inicia sesión en tu cuenta</p>
+          <h1 className="text-2xl font-bold text-fg-primary mb-1">Bienvenido de nuevo</h1>
+          <p className="text-fg-secondary text-sm mb-6">Inicia sesión en tu cuenta</p>
 
           {/* Rate limiting warning */}
           {attempts >= 3 && (
-            <div className="flex items-start gap-2.5 p-3 mb-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-              <p className="text-sm text-amber-300">
+            <div className="flex items-start gap-2.5 p-3 mb-4 bg-semantic-warning/10 border border-semantic-warning/20 rounded-xl">
+              <AlertTriangle className="w-4 h-4 text-semantic-warning-text shrink-0 mt-0.5" />
+              <p className="text-sm text-semantic-warning-text">
                 Demasiados intentos. Espera unos segundos antes de volver a intentarlo.
               </p>
             </div>
@@ -123,7 +123,7 @@ export default function LoginPage() {
 
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-px bg-border" />
-            <span className="text-xs text-slate-500">o con email</span>
+            <span className="text-xs text-fg-muted">o con email</span>
             <div className="flex-1 h-px bg-border" />
           </div>
 
@@ -131,7 +131,7 @@ export default function LoginPage() {
             <div>
               <label className="label">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted pointer-events-none" />
                 <input
                   type="email"
                   value={email}
@@ -147,12 +147,12 @@ export default function LoginPage() {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="label mb-0">Contraseña</label>
-                <Link href="/forgot-password" className="text-xs text-slate-500 hover:text-brand-primary transition-colors">
+                <Link href="/forgot-password" className="text-xs text-fg-muted hover:text-brand-primary transition-colors">
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted pointer-events-none" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -165,7 +165,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(prev => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-muted hover:text-fg-secondary transition-colors"
                   tabIndex={-1}
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
@@ -182,7 +182,7 @@ export default function LoginPage() {
                 onChange={e => setRememberMe(e.target.checked)}
                 className="w-4 h-4 rounded border-border bg-surface accent-brand-primary cursor-pointer"
               />
-              <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">Recordarme</span>
+              <span className="text-sm text-fg-secondary group-hover:text-fg-primary transition-colors">Recordarme</span>
             </label>
 
             <button
@@ -197,15 +197,15 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-sm text-slate-400 mt-6">
+        <p className="text-center text-sm text-fg-secondary mt-6">
           ¿No tienes cuenta?{' '}
           <Link href="/register" className="text-brand-primary hover:underline font-medium transition-colors">
             Regístrate gratis
           </Link>
         </p>
-        <p className="text-center text-xs text-slate-500 mt-3">
+        <p className="text-center text-xs text-fg-muted mt-3">
           ¿Quieres verlo antes?{' '}
-          <Link href="/demo" className="text-slate-400 hover:text-white transition-colors">
+          <Link href="/demo" className="text-fg-secondary hover:text-fg-primary transition-colors">
             Explorar demo →
           </Link>
         </p>

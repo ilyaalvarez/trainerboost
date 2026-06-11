@@ -36,9 +36,9 @@ interface SubscriptionKpi {
 const PLAN_PRICES: Record<string, number> = { starter: 19, pro: 39, unlimited: 79 }
 const PLAN_LABELS: Record<string, string> = { starter: 'Starter', pro: 'Pro', unlimited: 'Unlimited' }
 const PLAN_COLORS: Record<string, string> = {
-  starter: 'text-sky-400 bg-sky-400/15',
-  pro: 'text-violet-400 bg-violet-400/15',
-  unlimited: 'text-amber-400 bg-amber-400/15',
+  starter: 'text-semantic-info-text bg-semantic-info/15',
+  pro: 'text-[#C4B5FD] bg-brand-secondary/15',
+  unlimited: 'text-semantic-warning-text bg-semantic-warning/15',
 }
 
 interface ClientProgress {
@@ -63,12 +63,12 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-surface border border-border rounded-xl p-3 text-xs shadow-lg">
-      <p className="text-slate-400 mb-2">{label}</p>
+      <p className="text-fg-secondary mb-2">{label}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center gap-2 mb-1">
           <span className="w-2 h-2 rounded-full" style={{ background: p.color }} />
-          <span className="text-slate-300">{p.name}:</span>
-          <span className="font-semibold text-white">{p.value} kg</span>
+          <span className="text-fg-secondary">{p.name}:</span>
+          <span className="font-semibold text-fg-primary">{p.value} kg</span>
         </div>
       ))}
     </div>
@@ -320,9 +320,9 @@ export default function AnalyticsPage() {
   if (clients.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-        <Activity className="w-12 h-12 text-slate-600 mb-4" />
-        <h2 className="text-lg font-semibold text-white mb-2">Sin datos de progreso</h2>
-        <p className="text-slate-400 text-sm max-w-xs">
+        <Activity className="w-12 h-12 text-fg-disabled mb-4" />
+        <h2 className="text-lg font-semibold text-fg-primary mb-2">Sin datos de progreso</h2>
+        <p className="text-fg-secondary text-sm max-w-xs">
           Registra medidas de tus clientes para ver comparativas aquí.
         </p>
       </div>
@@ -337,23 +337,23 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-white">Analytics</h1>
+        <h1 className="text-2xl font-bold text-fg-primary">Analytics</h1>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setMetric('weight_kg')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${metric === 'weight_kg' ? 'bg-brand-primary text-white' : 'text-slate-400 hover:text-white'}`}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${metric === 'weight_kg' ? 'bg-brand-primary text-black' : 'text-fg-secondary hover:text-fg-primary'}`}
           >
             Peso (kg)
           </button>
           <button
             onClick={() => setMetric('body_fat_pct')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${metric === 'body_fat_pct' ? 'bg-brand-primary text-white' : 'text-slate-400 hover:text-white'}`}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${metric === 'body_fat_pct' ? 'bg-brand-primary text-black' : 'text-fg-secondary hover:text-fg-primary'}`}
           >
             % Grasa
           </button>
           <button
             onClick={exportCsv}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-surface-2 transition-colors border border-border/60"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-fg-secondary hover:text-fg-primary hover:bg-surface-2 transition-colors border border-border/60"
             title="Exportar datos como CSV"
           >
             <Download className="w-3.5 h-3.5" />
@@ -369,28 +369,28 @@ export default function AnalyticsPage() {
             label: 'Clientes activos',
             value: kpis.activeClientsCount,
             Icon: Users,
-            color: 'text-sky-400',
+            color: 'text-semantic-info-text',
             bg: 'rgba(14,165,233,0.15)',
           },
           {
             label: 'Sesiones este mes',
             value: kpis.sessionsThisMonth,
             Icon: Calendar,
-            color: 'text-violet-400',
+            color: 'text-[#C4B5FD]',
             bg: 'rgba(124,58,237,0.15)',
           },
           {
             label: 'Mensajes enviados',
             value: kpis.totalMessages,
             Icon: MessageCircle,
-            color: 'text-emerald-400',
+            color: 'text-semantic-success-text',
             bg: 'rgba(16,185,129,0.15)',
           },
           {
             label: 'Retención 30d',
             value: kpis.retentionRate != null ? `${kpis.retentionRate}%` : '—',
             Icon: Activity,
-            color: 'text-amber-400',
+            color: 'text-semantic-warning-text',
             bg: 'rgba(245,158,11,0.15)',
           },
         ]
@@ -399,12 +399,12 @@ export default function AnalyticsPage() {
             {businessKpis.map(kpi => (
               <div key={kpi.label} className="card p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">{kpi.label}</span>
+                  <span className="text-xs font-medium text-fg-secondary uppercase tracking-wider">{kpi.label}</span>
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: kpi.bg }}>
                     <kpi.Icon className={`w-4 h-4 ${kpi.color}`} />
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-white">{kpi.value}</p>
+                <p className="text-2xl font-bold text-fg-primary">{kpi.value}</p>
               </div>
             ))}
           </div>
@@ -416,18 +416,18 @@ export default function AnalyticsPage() {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-violet-400/15">
-                <CreditCard className="w-4 h-4 text-violet-400" />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-brand-secondary/15">
+                <CreditCard className="w-4 h-4 text-[#C4B5FD]" />
               </div>
-              <h2 className="text-sm font-semibold text-white">Tu plan</h2>
+              <h2 className="text-sm font-semibold text-fg-primary">Tu plan</h2>
             </div>
             <div className="flex items-center gap-2">
               {subscription.plan && (
-                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${PLAN_COLORS[subscription.plan] ?? 'text-slate-400 bg-slate-400/15'}`}>
+                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${PLAN_COLORS[subscription.plan] ?? 'text-fg-secondary bg-surface-3'}`}>
                   {PLAN_LABELS[subscription.plan] ?? subscription.plan}
                 </span>
               )}
-              <span className={`text-xs px-2 py-0.5 rounded-full ${subscription.status === 'active' ? 'bg-emerald-400/15 text-emerald-400' : 'bg-slate-600/30 text-slate-400'}`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${subscription.status === 'active' ? 'bg-semantic-success/15 text-semantic-success-text' : 'bg-surface-3 text-fg-secondary'}`}>
                 {subscription.status === 'active' ? 'Activo' : subscription.status}
               </span>
             </div>
@@ -436,28 +436,28 @@ export default function AnalyticsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-[#0F172A]/60 rounded-xl p-4 border border-[#334155]/60">
               <div className="flex items-center gap-1.5 mb-1">
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">MRR</span>
+                <Zap className="w-3.5 h-3.5 text-semantic-warning-text" />
+                <span className="text-xs text-fg-secondary uppercase tracking-wider font-medium">MRR</span>
               </div>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-2xl font-bold text-fg-primary">
                 {subscription.plan && PLAN_PRICES[subscription.plan]
                   ? `${PLAN_PRICES[subscription.plan]}€`
                   : '—'}
               </p>
-              <p className="text-xs text-slate-500 mt-0.5">al mes</p>
+              <p className="text-xs text-fg-muted mt-0.5">al mes</p>
             </div>
 
             <div className="bg-[#0F172A]/60 rounded-xl p-4 border border-[#334155]/60">
               <div className="flex items-center gap-1.5 mb-1">
-                <Users className="w-3.5 h-3.5 text-sky-400" />
-                <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">Capacidad</span>
+                <Users className="w-3.5 h-3.5 text-semantic-info-text" />
+                <span className="text-xs text-fg-secondary uppercase tracking-wider font-medium">Capacidad</span>
               </div>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-2xl font-bold text-fg-primary">
                 {kpis.activeClientsCount}
-                <span className="text-sm font-normal text-slate-500"> / {subscription.maxClients === 9999 ? '∞' : subscription.maxClients}</span>
+                <span className="text-sm font-normal text-fg-muted"> / {subscription.maxClients === 9999 ? '∞' : subscription.maxClients}</span>
               </p>
               {subscription.maxClients > 0 && subscription.maxClients !== 9999 && (
-                <div className="mt-2 h-1.5 bg-[#1E293B] rounded-full overflow-hidden">
+                <div className="mt-2 h-1.5 bg-surface-2 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all"
                     style={{
@@ -467,20 +467,20 @@ export default function AnalyticsPage() {
                   />
                 </div>
               )}
-              <p className="text-xs text-slate-500 mt-1">clientes activos</p>
+              <p className="text-xs text-fg-muted mt-1">clientes activos</p>
             </div>
 
             <div className="bg-[#0F172A]/60 rounded-xl p-4 border border-[#334155]/60">
               <div className="flex items-center gap-1.5 mb-1">
-                <Calendar className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">Renovación</span>
+                <Calendar className="w-3.5 h-3.5 text-semantic-success-text" />
+                <span className="text-xs text-fg-secondary uppercase tracking-wider font-medium">Renovación</span>
               </div>
-              <p className="text-sm font-semibold text-white mt-2">
+              <p className="text-sm font-semibold text-fg-primary mt-2">
                 {subscription.currentPeriodEnd
                   ? new Date(subscription.currentPeriodEnd).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
                   : '—'}
               </p>
-              <p className="text-xs text-slate-500 mt-0.5">próxima fecha</p>
+              <p className="text-xs text-fg-muted mt-0.5">próxima fecha</p>
             </div>
           </div>
         </div>
@@ -489,37 +489,37 @@ export default function AnalyticsPage() {
       {/* Progress KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="card p-4">
-          <p className="text-xs text-slate-400 mb-1">Clientes con datos</p>
-          <p className="text-2xl font-bold font-mono text-white">{clients.length}</p>
+          <p className="text-xs text-fg-secondary mb-1">Clientes con datos</p>
+          <p className="text-2xl font-bold font-mono text-fg-primary">{clients.length}</p>
           <div className="flex items-center gap-1 mt-1">
-            <Users className="w-3 h-3 text-slate-500" />
-            <span className="text-xs text-slate-500">con registros</span>
+            <Users className="w-3 h-3 text-fg-muted" />
+            <span className="text-xs text-fg-muted">con registros</span>
           </div>
         </div>
         <div className="card p-4">
-          <p className="text-xs text-slate-400 mb-1">Bajaron peso</p>
-          <p className="text-2xl font-bold font-mono text-green-400">{withLoss.length}</p>
+          <p className="text-xs text-fg-secondary mb-1">Bajaron peso</p>
+          <p className="text-2xl font-bold font-mono text-semantic-success-text">{withLoss.length}</p>
           <div className="flex items-center gap-1 mt-1">
-            <TrendingDown className="w-3 h-3 text-green-500" />
-            <span className="text-xs text-slate-500">clientes</span>
+            <TrendingDown className="w-3 h-3 text-semantic-success-text" />
+            <span className="text-xs text-fg-muted">clientes</span>
           </div>
         </div>
         <div className="card p-4">
-          <p className="text-xs text-slate-400 mb-1">Subieron peso</p>
-          <p className="text-2xl font-bold font-mono text-yellow-400">{withGain.length}</p>
+          <p className="text-xs text-fg-secondary mb-1">Subieron peso</p>
+          <p className="text-2xl font-bold font-mono text-semantic-warning-text">{withGain.length}</p>
           <div className="flex items-center gap-1 mt-1">
-            <TrendingUp className="w-3 h-3 text-yellow-500" />
-            <span className="text-xs text-slate-500">clientes</span>
+            <TrendingUp className="w-3 h-3 text-semantic-warning-text" />
+            <span className="text-xs text-fg-muted">clientes</span>
           </div>
         </div>
         <div className="card p-4">
-          <p className="text-xs text-slate-400 mb-1">Cambio medio</p>
-          <p className={`text-2xl font-bold font-mono ${avgChange < 0 ? 'text-green-400' : avgChange > 0 ? 'text-yellow-400' : 'text-white'}`}>
+          <p className="text-xs text-fg-secondary mb-1">Cambio medio</p>
+          <p className={`text-2xl font-bold font-mono ${avgChange < 0 ? 'text-semantic-success-text' : avgChange > 0 ? 'text-semantic-warning-text' : 'text-fg-primary'}`}>
             {isNaN(avgChange) ? '—' : `${avgChange > 0 ? '+' : ''}${avgChange.toFixed(1)} kg`}
           </p>
           <div className="flex items-center gap-1 mt-1">
-            <Activity className="w-3 h-3 text-slate-500" />
-            <span className="text-xs text-slate-500">entre todos</span>
+            <Activity className="w-3 h-3 text-fg-muted" />
+            <span className="text-xs text-fg-muted">entre todos</span>
           </div>
         </div>
       </div>
@@ -528,8 +528,8 @@ export default function AnalyticsPage() {
       {weeklySessions.length > 0 && (
         <div className="card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-white">Sesiones completadas por semana</h2>
-            <span className="text-xs text-slate-500">Últimas 12 semanas</span>
+            <h2 className="text-sm font-semibold text-fg-primary">Sesiones completadas por semana</h2>
+            <span className="text-xs text-fg-muted">Últimas 12 semanas</span>
           </div>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={weeklySessions} margin={{ top: 0, right: 0, bottom: 0, left: -20 }} barSize={18} barCategoryGap="30%">
@@ -551,7 +551,7 @@ export default function AnalyticsPage() {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <p className="text-[10px] text-slate-600 mt-1">Azul = semana actual · Morado = semanas anteriores</p>
+          <p className="text-[10px] text-fg-disabled mt-1">Azul = semana actual · Morado = semanas anteriores</p>
         </div>
       )}
 
@@ -559,19 +559,19 @@ export default function AnalyticsPage() {
       <div className="card p-6">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-sm font-semibold text-white">Bienestar de clientes</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Promedios de check-in — últimos 30 días</p>
+            <h2 className="text-sm font-semibold text-fg-primary">Bienestar de clientes</h2>
+            <p className="text-xs text-fg-muted mt-0.5">Promedios de check-in — últimos 30 días</p>
           </div>
         </div>
         {clientCheckins.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center gap-3">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
                  style={{ background: 'rgba(51,65,85,0.5)' }}>
-              <Activity className="w-6 h-6 text-slate-500" />
+              <Activity className="w-6 h-6 text-fg-muted" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-400">Sin datos de bienestar aún</p>
-              <p className="text-xs text-slate-600 mt-1 max-w-xs">Anima a tus clientes a completar el check-in diario para ver sus niveles de energía, ánimo y sueño.</p>
+              <p className="text-sm font-medium text-fg-secondary">Sin datos de bienestar aún</p>
+              <p className="text-xs text-fg-disabled mt-1 max-w-xs">Anima a tus clientes a completar el check-in diario para ver sus niveles de energía, ánimo y sueño.</p>
             </div>
           </div>
         ) : (
@@ -579,33 +579,33 @@ export default function AnalyticsPage() {
             {clientCheckins.map(c => (
               <div key={c.clientId} className="flex items-center gap-4">
                 <Avatar name={c.name} url={c.avatarUrl} size="sm" />
-                <span className="text-sm text-white flex-1 min-w-0 truncate">{c.name}</span>
+                <span className="text-sm text-fg-primary flex-1 min-w-0 truncate">{c.name}</span>
                 <div className="flex items-center gap-4 text-xs shrink-0">
                   {c.avgEnergy != null && (
                     <div className="flex items-center gap-1">
                       <span>⚡</span>
                       <div className="w-20 h-1.5 bg-surface-2 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full bg-amber-400" style={{ width: `${(c.avgEnergy / 5) * 100}%` }} />
+                        <div className="h-full rounded-full bg-semantic-warning" style={{ width: `${(c.avgEnergy / 5) * 100}%` }} />
                       </div>
-                      <span className="text-slate-400 w-6">{c.avgEnergy}</span>
+                      <span className="text-fg-secondary w-6">{c.avgEnergy}</span>
                     </div>
                   )}
                   {c.avgMood != null && (
                     <div className="flex items-center gap-1">
                       <span>😊</span>
                       <div className="w-20 h-1.5 bg-surface-2 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full bg-sky-400" style={{ width: `${(c.avgMood / 5) * 100}%` }} />
+                        <div className="h-full rounded-full bg-semantic-info" style={{ width: `${(c.avgMood / 5) * 100}%` }} />
                       </div>
-                      <span className="text-slate-400 w-6">{c.avgMood}</span>
+                      <span className="text-fg-secondary w-6">{c.avgMood}</span>
                     </div>
                   )}
                   {c.avgSleep != null && (
-                    <div className="flex items-center gap-1 text-slate-400">
+                    <div className="flex items-center gap-1 text-fg-secondary">
                       <span>🌙</span>
                       <span>{c.avgSleep}h</span>
                     </div>
                   )}
-                  <span className="text-slate-600 text-[10px]">{c.checkinsCount} check-ins</span>
+                  <span className="text-fg-disabled text-[10px]">{c.checkinsCount} check-ins</span>
                 </div>
               </div>
             ))}
@@ -615,13 +615,13 @@ export default function AnalyticsPage() {
 
       {/* Client progress chart */}
       <div className="card p-6">
-        <h2 className="text-sm font-semibold text-white mb-4">
+        <h2 className="text-sm font-semibold text-fg-primary mb-4">
           {metric === 'weight_kg' ? 'Evolución del peso' : 'Evolución % grasa corporal'}
         </h2>
         {activeClients.length === 0 ? (
           <div className="h-40 flex flex-col items-center justify-center gap-2 text-center">
-            <Activity className="w-8 h-8 text-slate-600" />
-            <p className="text-slate-500 text-sm">Selecciona al menos un cliente para ver la gráfica</p>
+            <Activity className="w-8 h-8 text-fg-disabled" />
+            <p className="text-fg-muted text-sm">Selecciona al menos un cliente para ver la gráfica</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={320}>
@@ -654,8 +654,8 @@ export default function AnalyticsPage() {
       {/* Client selector + table */}
       <div className="card overflow-hidden">
         <div className="p-4 border-b border-border">
-          <h2 className="text-sm font-semibold text-white">Resumen por cliente</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Haz clic para mostrar u ocultar en la gráfica</p>
+          <h2 className="text-sm font-semibold text-fg-primary">Resumen por cliente</h2>
+          <p className="text-xs text-fg-muted mt-0.5">Haz clic para mostrar u ocultar en la gráfica</p>
         </div>
         <div className="divide-y divide-border">
           {clients.map((cp, i) => {
@@ -669,13 +669,13 @@ export default function AnalyticsPage() {
               >
                 <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: color }} />
                 <Avatar name={cp.client.full_name} url={cp.client.avatar_url} size="sm" />
-                <span className="flex-1 text-sm font-medium text-white">{cp.client.full_name}</span>
-                <span className="text-xs text-slate-500">{cp.logs.length} registros</span>
+                <span className="flex-1 text-sm font-medium text-fg-primary">{cp.client.full_name}</span>
+                <span className="text-xs text-fg-muted">{cp.logs.length} registros</span>
                 {cp.latest?.weight_kg && (
-                  <span className="text-sm font-mono text-white">{cp.latest.weight_kg} kg</span>
+                  <span className="text-sm font-mono text-fg-primary">{cp.latest.weight_kg} kg</span>
                 )}
                 {cp.change !== null && (
-                  <span className={`text-sm font-mono font-bold ${cp.change < 0 ? 'text-green-400' : cp.change > 0 ? 'text-yellow-400' : 'text-slate-400'}`}>
+                  <span className={`text-sm font-mono font-bold ${cp.change < 0 ? 'text-semantic-success-text' : cp.change > 0 ? 'text-semantic-warning-text' : 'text-fg-secondary'}`}>
                     {cp.change > 0 ? '+' : ''}{cp.change} kg
                   </span>
                 )}

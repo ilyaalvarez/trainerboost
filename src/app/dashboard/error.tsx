@@ -16,11 +16,11 @@ export default function DashboardError({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
-      <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-6">
-        <AlertTriangle className="w-8 h-8 text-red-400" />
+      <div className="w-16 h-16 rounded-2xl bg-semantic-error/10 border border-semantic-error/20 flex items-center justify-center mb-6">
+        <AlertTriangle className="w-8 h-8 text-semantic-error-text" />
       </div>
-      <h2 className="text-xl font-bold text-white mb-2">Algo ha ido mal</h2>
-      <p className="text-slate-400 text-sm mb-6 max-w-sm">
+      <h2 className="text-xl font-bold text-fg-primary mb-2">Algo ha ido mal</h2>
+      <p className="text-fg-secondary text-sm mb-6 max-w-sm">
         {error.message || 'Error inesperado. Por favor, recarga la página.'}
       </p>
       <button onClick={reset} className="btn-primary">

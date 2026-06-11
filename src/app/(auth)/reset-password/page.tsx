@@ -67,7 +67,7 @@ export default function ResetPasswordPage() {
                style={{ background: '#8FD43A' }}>
             <Zap className="w-5 h-5 text-black" />
           </div>
-          <span className="text-xl font-bold text-white tracking-tight">TrainerBoost</span>
+          <span className="text-xl font-bold text-fg-primary tracking-tight">TrainerBoost</span>
         </div>
 
         <div className="card p-8" style={{ boxShadow: '0 20px 60px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)' }}>
@@ -75,16 +75,16 @@ export default function ResetPasswordPage() {
             <div className="text-center py-4 animate-fade-in">
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
                    style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(14,165,233,0.1))' }}>
-                <CheckCircle2 className="w-7 h-7 text-emerald-400" />
+                <CheckCircle2 className="w-7 h-7 text-semantic-success-text" />
               </div>
-              <h1 className="text-xl font-bold text-white mb-2">¡Contraseña actualizada!</h1>
-              <p className="text-slate-400 text-sm">Redirigiendo al dashboard...</p>
+              <h1 className="text-xl font-bold text-fg-primary mb-2">¡Contraseña actualizada!</h1>
+              <p className="text-fg-secondary text-sm">Redirigiendo al dashboard...</p>
             </div>
           ) : !ready ? (
             <div className="text-center py-8 animate-fade-in">
               <Loader2 className="w-8 h-8 animate-spin text-brand-primary mx-auto mb-4" />
-              <p className="text-slate-400 text-sm">Verificando enlace de recuperación...</p>
-              <p className="text-xs text-slate-500 mt-2">
+              <p className="text-fg-secondary text-sm">Verificando enlace de recuperación...</p>
+              <p className="text-xs text-fg-muted mt-2">
                 Si este mensaje no desaparece, el enlace puede haber expirado.{' '}
                 <Link href="/forgot-password" className="text-brand-primary hover:underline">
                   Solicitar uno nuevo
@@ -93,14 +93,14 @@ export default function ResetPasswordPage() {
             </div>
           ) : (
             <div className="animate-fade-in">
-              <h1 className="text-2xl font-bold text-white mb-1">Nueva contraseña</h1>
-              <p className="text-slate-400 text-sm mb-6">Elige una contraseña segura para tu cuenta.</p>
+              <h1 className="text-2xl font-bold text-fg-primary mb-1">Nueva contraseña</h1>
+              <p className="text-fg-secondary text-sm mb-6">Elige una contraseña segura para tu cuenta.</p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="label">Nueva contraseña</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted pointer-events-none" />
                     <input
                       type={showPwd ? 'text' : 'password'}
                       value={newPwd}
@@ -111,7 +111,7 @@ export default function ResetPasswordPage() {
                       autoComplete="new-password"
                     />
                     <button type="button" onClick={() => setShowPwd(v => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-muted hover:text-fg-secondary transition-colors">
                       {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
@@ -119,7 +119,7 @@ export default function ResetPasswordPage() {
                 <div>
                   <label className="label">Confirmar contraseña</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted pointer-events-none" />
                     <input
                       type={showPwd ? 'text' : 'password'}
                       value={confirm}
@@ -132,7 +132,7 @@ export default function ResetPasswordPage() {
                   </div>
                 </div>
                 {newPwd && confirm && (
-                  <p className={`text-xs font-medium ${newPwd === confirm ? 'text-emerald-400' : 'text-red-400'}`}>
+                  <p className={`text-xs font-medium ${newPwd === confirm ? 'text-semantic-success-text' : 'text-semantic-error-text'}`}>
                     {newPwd === confirm ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas no coinciden'}
                   </p>
                 )}

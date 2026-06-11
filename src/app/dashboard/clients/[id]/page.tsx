@@ -242,7 +242,7 @@ export default function ClientDetailPage() {
           <div className="absolute inset-0 rounded-full border-2 border-brand-primary/20" />
           <div className="absolute inset-0 rounded-full border-2 border-t-brand-primary animate-spin" />
         </div>
-        <p className="text-sm text-slate-500 animate-pulse">Cargando perfil del cliente...</p>
+        <p className="text-sm text-fg-muted animate-pulse">Cargando perfil del cliente...</p>
       </div>
     )
   }
@@ -297,7 +297,7 @@ export default function ClientDetailPage() {
       <button
         type="button"
         onClick={() => router.push('/dashboard/clients')}
-        className="group inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-200 transition-colors duration-150"
+        className="group inline-flex items-center gap-2 text-sm text-fg-muted hover:text-fg-primary transition-colors duration-150"
       >
         <ArrowLeft size={15} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
         Volver a clientes
@@ -306,8 +306,7 @@ export default function ClientDetailPage() {
       {/* ═══════════════════════════════════════════════════════════
           HERO CARD
       ═══════════════════════════════════════════════════════════ */}
-      <div className="rounded-2xl overflow-hidden border border-border/60 shadow-card-elevated"
-           style={{ background: '#1A2744' }}>
+      <div className="rounded-2xl overflow-hidden border border-border/60 shadow-card-elevated bg-surface-2">
 
         {/* Cover strip */}
         <div className="h-32 relative overflow-hidden"
@@ -329,16 +328,16 @@ export default function ClientDetailPage() {
 
             {/* Avatar + Name */}
             <div className="flex items-end gap-4">
-              <div className="ring-[3px] ring-[#1A2744] rounded-full shrink-0"
+              <div className="ring-[3px] ring-surface-2 rounded-full shrink-0"
                    style={{ filter: 'drop-shadow(0 4px 16px rgba(14,165,233,0.3))' }}>
                 <Avatar name={profile.full_name} url={profile.avatar_url} size="xl" />
               </div>
               <div className="pb-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <h1 className="text-xl font-bold text-white tracking-tight">{profile.full_name}</h1>
+                  <h1 className="text-xl font-bold text-fg-primary tracking-tight">{profile.full_name}</h1>
                   <Badge status={relation.status} />
                 </div>
-                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                <div className="flex flex-wrap items-center gap-3 text-xs text-fg-muted">
                   {profile.phone && (
                     <span className="flex items-center gap-1"><Phone size={11} /> {profile.phone}</span>
                   )}
@@ -349,7 +348,7 @@ export default function ClientDetailPage() {
                 {(relation.tags ?? []).length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-1.5">
                     {(relation.tags ?? []).map(tag => (
-                      <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full border bg-sky-500/10 text-sky-300 border-sky-500/25">
+                      <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full border bg-semantic-info/10 text-semantic-info-text border-semantic-info/20">
                         {tag}
                       </span>
                     ))}
@@ -395,8 +394,8 @@ export default function ClientDetailPage() {
                   {stat.icon}
                 </div>
                 <div>
-                  <div className="text-2xl font-bold font-mono text-white leading-none">{stat.value}</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5 leading-tight">{stat.label}</div>
+                  <div className="text-2xl font-bold font-mono text-fg-primary leading-none">{stat.value}</div>
+                  <div className="text-[11px] text-fg-muted mt-0.5 leading-tight">{stat.label}</div>
                 </div>
               </div>
             ))}
@@ -409,26 +408,26 @@ export default function ClientDetailPage() {
             )[0]
             return (
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                <span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Última medición</span>
+                <span className="text-[10px] text-fg-muted uppercase tracking-widest font-semibold">Última medición</span>
                 {latest.weight_kg != null && (
-                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold text-sky-400"
+                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold text-semantic-info-text"
                         style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.2)' }}>
                     <Scale size={10} /> {latest.weight_kg} kg
                   </span>
                 )}
                 {latest.body_fat_pct != null && (
-                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold text-amber-400"
+                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold text-semantic-warning-text"
                         style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)' }}>
                     <Percent size={10} /> {latest.body_fat_pct}%
                   </span>
                 )}
                 {latest.muscle_mass_kg != null && (
-                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold text-emerald-400"
+                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold text-semantic-success-text"
                         style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)' }}>
                     <Zap size={10} /> {latest.muscle_mass_kg} kg músculo
                   </span>
                 )}
-                <span className="text-[11px] text-slate-500">{timeAgo(latest.logged_at)}</span>
+                <span className="text-[11px] text-fg-muted">{timeAgo(latest.logged_at)}</span>
               </div>
             )
           })()}
@@ -442,10 +441,10 @@ export default function ClientDetailPage() {
         <div className="flex flex-wrap gap-2">
           {smartAlerts.map((alert, i) => {
             const cfg = alert.type === 'warn'
-              ? { icon: <AlertTriangle size={12} />, color: 'text-amber-400',  bg: 'rgba(245,158,11,0.08)',  border: 'rgba(245,158,11,0.2)',  bar: '#F59E0B' }
+              ? { icon: <AlertTriangle size={12} />, color: 'text-semantic-warning-text', bg: 'rgba(245,158,11,0.08)',  border: 'rgba(245,158,11,0.2)',  bar: '#F59E0B' }
               : alert.type === 'good'
-              ? { icon: <CheckCircle2 size={12} />, color: 'text-emerald-400', bg: 'rgba(16,185,129,0.08)',  border: 'rgba(16,185,129,0.2)',  bar: '#10B981' }
-              : { icon: <Bell size={12} />,         color: 'text-sky-400',     bg: 'rgba(14,165,233,0.08)',  border: 'rgba(14,165,233,0.2)',  bar: '#0EA5E9' }
+              ? { icon: <CheckCircle2 size={12} />, color: 'text-semantic-success-text', bg: 'rgba(16,185,129,0.08)',  border: 'rgba(16,185,129,0.2)',  bar: '#10B981' }
+              : { icon: <Bell size={12} />,         color: 'text-semantic-info-text',    bg: 'rgba(14,165,233,0.08)',  border: 'rgba(14,165,233,0.2)',  bar: '#0EA5E9' }
             return (
               <div key={i}
                    className="flex items-center gap-2 pl-0 pr-3 py-1.5 rounded-lg overflow-hidden text-xs font-medium transition-all duration-200 hover:-translate-y-0.5"
@@ -484,8 +483,8 @@ export default function ClientDetailPage() {
             >
               {action.icon}
             </div>
-            <div className="font-semibold text-sm text-white leading-tight relative">{action.label}</div>
-            <div className="text-[11px] text-slate-400 mt-0.5 relative">{action.sub}</div>
+            <div className="font-semibold text-sm text-fg-primary leading-tight relative">{action.label}</div>
+            <div className="text-[11px] text-fg-muted mt-0.5 relative">{action.sub}</div>
           </button>
         ))}
       </div>
@@ -494,8 +493,7 @@ export default function ClientDetailPage() {
           TAB NAVIGATION
       ═══════════════════════════════════════════════════════════ */}
       <div className="sticky top-0 z-20 -mx-1 px-1">
-        <div className="flex gap-0.5 border-b overflow-x-auto scrollbar-none"
-             style={{ background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(20px)', borderColor: 'rgba(51,65,85,0.5)' }}>
+        <div className="flex gap-0.5 border-b border-border/50 overflow-x-auto scrollbar-none bg-background/80 backdrop-blur-xl">
           {TABS.map(t => (
             <button
               key={t.id}
@@ -503,7 +501,7 @@ export default function ClientDetailPage() {
               onClick={() => setTab(t.id)}
               className={cn(
                 'relative flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-all duration-200 shrink-0',
-                tab === t.id ? 'text-sky-300' : 'text-slate-400 hover:text-slate-200',
+                tab === t.id ? 'text-brand-primary' : 'text-fg-muted hover:text-fg-primary',
               )}
             >
               <span className={cn('transition-transform duration-200', tab === t.id ? 'scale-110' : '')}>
@@ -514,11 +512,10 @@ export default function ClientDetailPage() {
                 <span className={cn(
                   'text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none transition-all duration-200',
                   tab === t.id
-                    ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
-                    : 'bg-surface-2 text-slate-500 border border-border/50',
+                    ? 'bg-brand-primary/10 text-brand-primary border border-brand-primary/20'
+                    : 'bg-surface-2 text-fg-disabled border border-border/50',
                 )}>{t.count}</span>
               )}
-              {/* Active underline */}
               {tab === t.id && (
                 <span
                   className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full animate-scale-in"
@@ -541,7 +538,7 @@ export default function ClientDetailPage() {
             <div className="card p-5">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-1 h-4 rounded-full bg-brand-primary" />
-                <h2 className="font-semibold text-white text-sm">Información básica</h2>
+                <h2 className="font-semibold text-fg-primary text-sm">Información básica</h2>
               </div>
               <dl className="space-y-0">
                 {[
@@ -551,12 +548,12 @@ export default function ClientDetailPage() {
                   { label: 'Cliente desde', value: formatDate(relation.started_at) },
                   ...(profile.bio ? [{ label: 'Bio', value: profile.bio }] : []),
                   ...(activeRoutine ? [{ label: 'Rutina activa', value: (
-                    <span className="flex items-center gap-1 text-sky-400 text-xs font-medium">
+                    <span className="flex items-center gap-1 text-semantic-info-text text-xs font-medium">
                       <Dumbbell size={11} /> {activeRoutine.title}
                     </span>
                   )}] : []),
                   ...(activeMealPlan ? [{ label: 'Plan activo', value: (
-                    <span className="flex items-center gap-1 text-emerald-400 text-xs font-medium">
+                    <span className="flex items-center gap-1 text-semantic-success-text text-xs font-medium">
                       <Apple size={11} /> {activeMealPlan.title}
                     </span>
                   )}] : []),
@@ -566,8 +563,8 @@ export default function ClientDetailPage() {
                          'flex items-start justify-between gap-4 py-2.5 text-sm',
                          idx < arr.length - 1 ? 'border-b border-border/40' : '',
                        )}>
-                    <dt className="text-slate-500 shrink-0 text-xs uppercase tracking-wide font-medium">{label}</dt>
-                    <dd className="text-slate-200 text-right text-xs">{value}</dd>
+                    <dt className="text-fg-muted shrink-0 text-xs uppercase tracking-wide font-medium">{label}</dt>
+                    <dd className="text-fg-secondary text-right text-xs">{value}</dd>
                   </div>
                 ))}
               </dl>
@@ -578,13 +575,13 @@ export default function ClientDetailPage() {
               <div className="rounded-xl p-4 border"
                    style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(14,165,233,0.04) 100%)', borderColor: 'rgba(124,58,237,0.25)' }}>
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock size={13} className="text-violet-400" />
-                  <span className="text-xs font-semibold text-violet-300">Próxima cita</span>
+                  <Clock size={13} className="text-[#C4B5FD]" />
+                  <span className="text-xs font-semibold text-[#C4B5FD]">Próxima cita</span>
                 </div>
-                <div className="font-semibold text-white text-sm">{formatRelative(nextAppt.scheduled_at)}</div>
-                <div className="text-xs text-slate-400 mt-0.5">{nextAppt.duration_minutes} min · {nextAppt.type}</div>
+                <div className="font-semibold text-fg-primary text-sm">{formatRelative(nextAppt.scheduled_at)}</div>
+                <div className="text-xs text-fg-muted mt-0.5">{nextAppt.duration_minutes} min · {nextAppt.type}</div>
                 {nextAppt.location && (
-                  <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                  <div className="flex items-center gap-1 text-xs text-fg-disabled mt-1">
                     <MapPin size={10} /> {nextAppt.location}
                   </div>
                 )}
@@ -597,10 +594,10 @@ export default function ClientDetailPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-1 h-4 rounded-full bg-brand-primary" />
-                <h2 className="font-semibold text-white text-sm">Notas del entrenador</h2>
+                <h2 className="font-semibold text-fg-primary text-sm">Notas del entrenador</h2>
               </div>
-              <span className="text-[10px] text-slate-500 flex items-center gap-1">
-                <CheckCircle2 size={10} className="text-emerald-500" /> Guardado automático
+              <span className="text-[10px] text-fg-disabled flex items-center gap-1">
+                <CheckCircle2 size={10} className="text-semantic-success" /> Guardado automático
               </span>
             </div>
             <textarea
@@ -618,14 +615,14 @@ export default function ClientDetailPage() {
           <div className="card p-5">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #F59E0B, #EF4444)' }} />
-              <h2 className="font-semibold text-white text-sm">Check-ins (últimos 7 días)</h2>
+              <h2 className="font-semibold text-fg-primary text-sm">Check-ins (últimos 7 días)</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-border/50">
                     {['Fecha', 'Energía', 'Ánimo', 'Sueño', 'Nota'].map(h => (
-                      <th key={h} className="text-left pb-2 text-slate-500 font-medium uppercase tracking-wide pr-4">{h}</th>
+                      <th key={h} className="text-left pb-2 text-fg-muted font-medium uppercase tracking-wide pr-4">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -635,19 +632,19 @@ export default function ClientDetailPage() {
                     const moodEmoji   = c.mood   ? ['😞','😕','😐','😊','😄'][c.mood - 1]   : '—'
                     return (
                       <tr key={c.id} className="hover:bg-surface-2/40 transition-colors">
-                        <td className="py-2 pr-4 text-slate-300 whitespace-nowrap">{new Date(c.checkin_date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</td>
+                        <td className="py-2 pr-4 text-fg-secondary whitespace-nowrap">{new Date(c.checkin_date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</td>
                         <td className="py-2 pr-4">
                           <span className="mr-1">{energyEmoji}</span>
-                          {c.energy != null && <span className="font-mono text-white">{c.energy}/5</span>}
+                          {c.energy != null && <span className="font-mono text-fg-primary">{c.energy}/5</span>}
                         </td>
                         <td className="py-2 pr-4">
                           <span className="mr-1">{moodEmoji}</span>
-                          {c.mood != null && <span className="font-mono text-white">{c.mood}/5</span>}
+                          {c.mood != null && <span className="font-mono text-fg-primary">{c.mood}/5</span>}
                         </td>
-                        <td className="py-2 pr-4 font-mono text-slate-300">
+                        <td className="py-2 pr-4 font-mono text-fg-secondary">
                           {c.sleep_hours != null ? `${c.sleep_hours}h` : '—'}
                         </td>
-                        <td className="py-2 text-slate-400 italic max-w-[200px] truncate">
+                        <td className="py-2 text-fg-muted italic max-w-[200px] truncate">
                           {c.note ?? '—'}
                         </td>
                       </tr>
@@ -668,8 +665,8 @@ export default function ClientDetailPage() {
         <div className="space-y-4 animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-semibold text-white">Rutinas de entrenamiento</h2>
-              <p className="text-xs text-slate-500 mt-0.5">{routines.length} {routines.length === 1 ? 'rutina asignada' : 'rutinas asignadas'}</p>
+              <h2 className="font-semibold text-fg-primary">Rutinas de entrenamiento</h2>
+              <p className="text-xs text-fg-muted mt-0.5">{routines.length} {routines.length === 1 ? 'rutina asignada' : 'rutinas asignadas'}</p>
             </div>
             <button type="button" className="btn-primary" onClick={() => setShowRoutineModal(true)}>
               <Plus size={15} /> Nueva rutina
@@ -688,7 +685,7 @@ export default function ClientDetailPage() {
                   <div key={routine.id}
                        className={cn(
                          'card overflow-hidden transition-all duration-200',
-                         isActive ? 'border-sky-500/20' : 'hover:border-border-bright',
+                         isActive ? 'border-brand-primary/20' : 'hover:border-border-bright',
                        )}
                        style={isActive ? { borderColor: 'rgba(143,212,58,0.2)' } : undefined}>
 
@@ -708,46 +705,46 @@ export default function ClientDetailPage() {
                     >
                       <div className={cn(
                         'w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 group-hover:scale-105',
-                        isActive ? 'text-sky-400' : 'text-slate-500',
+                        isActive ? 'text-semantic-info-text' : 'text-fg-muted',
                       )}
                            style={{ background: isActive ? 'rgba(14,165,233,0.12)' : 'rgba(51,65,85,0.4)' }}>
                         <Dumbbell size={16} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-semibold text-white text-sm">{routine.title}</span>
+                          <span className="font-semibold text-fg-primary text-sm">{routine.title}</span>
                           <Badge status={routine.status} />
                           {routine.exercises.length > 0 && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-semantic-info/10 border border-semantic-info/20 text-semantic-info-text">
                               {routine.exercises.length} ejercicios
                             </span>
                           )}
                         </div>
-                        <div className="flex flex-wrap items-center gap-3 mt-0.5 text-xs text-slate-500">
+                        <div className="flex flex-wrap items-center gap-3 mt-0.5 text-xs text-fg-muted">
                           {routine.frequency && <span>{routine.frequency}</span>}
                           <span>{formatDate(routine.created_at)}</span>
                         </div>
                       </div>
                       <ChevronDown
                         size={15}
-                        className={cn('text-slate-500 shrink-0 transition-transform duration-200', expanded ? 'rotate-180' : '')}
+                        className={cn('text-fg-muted shrink-0 transition-transform duration-200', expanded ? 'rotate-180' : '')}
                       />
                     </button>
 
                     {expanded && (
                       <div className="border-t border-border/50 px-4 pb-4 pt-3 space-y-3 animate-fade-in">
                         {routine.description && (
-                          <p className="text-sm text-slate-300 bg-surface-2/30 rounded-lg p-3">{routine.description}</p>
+                          <p className="text-sm text-fg-secondary bg-surface-2/30 rounded-lg p-3">{routine.description}</p>
                         )}
                         {routine.exercises.length === 0 ? (
-                          <p className="text-sm text-slate-500 text-center py-4">Sin ejercicios añadidos aún</p>
+                          <p className="text-sm text-fg-muted text-center py-4">Sin ejercicios añadidos aún</p>
                         ) : (
                           <div className="overflow-x-auto rounded-xl border border-border/40">
                             <table className="w-full text-sm">
                               <thead>
                                 <tr style={{ background: 'rgba(51,65,85,0.3)' }}>
                                   {['#', 'Ejercicio', 'Series', 'Reps', 'Descanso', 'Notas'].map(h => (
-                                    <th key={h} className="text-left px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{h}</th>
+                                    <th key={h} className="text-left px-3 py-2 text-[10px] font-bold text-fg-muted uppercase tracking-widest">{h}</th>
                                   ))}
                                 </tr>
                               </thead>
@@ -756,12 +753,12 @@ export default function ClientDetailPage() {
                                   <tr key={ex.id}
                                       className="border-t border-border/30 transition-colors hover:bg-surface-2/30"
                                       style={idx % 2 === 0 ? { background: 'rgba(30,41,59,0.3)' } : undefined}>
-                                    <td className="px-3 py-2.5 text-xs text-slate-600 font-mono">{idx + 1}</td>
-                                    <td className="px-3 py-2.5 font-semibold text-slate-200 text-sm">{ex.name}</td>
-                                    <td className="px-3 py-2.5 text-slate-400 text-xs font-mono">{ex.sets ?? '—'}</td>
-                                    <td className="px-3 py-2.5 text-slate-400 text-xs font-mono">{ex.reps ?? '—'}</td>
-                                    <td className="px-3 py-2.5 text-slate-400 text-xs">{ex.rest_seconds ? `${ex.rest_seconds}s` : '—'}</td>
-                                    <td className="px-3 py-2.5 text-slate-500 text-xs truncate max-w-[140px]">{ex.notes ?? '—'}</td>
+                                    <td className="px-3 py-2.5 text-xs text-fg-disabled font-mono">{idx + 1}</td>
+                                    <td className="px-3 py-2.5 font-semibold text-fg-secondary text-sm">{ex.name}</td>
+                                    <td className="px-3 py-2.5 text-fg-secondary text-xs font-mono">{ex.sets ?? '—'}</td>
+                                    <td className="px-3 py-2.5 text-fg-secondary text-xs font-mono">{ex.reps ?? '—'}</td>
+                                    <td className="px-3 py-2.5 text-fg-secondary text-xs">{ex.rest_seconds ? `${ex.rest_seconds}s` : '—'}</td>
+                                    <td className="px-3 py-2.5 text-fg-muted text-xs truncate max-w-[140px]">{ex.notes ?? '—'}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -799,8 +796,8 @@ export default function ClientDetailPage() {
         <div className="space-y-4 animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-semibold text-white">Planes de nutrición</h2>
-              <p className="text-xs text-slate-500 mt-0.5">{mealPlans.length} {mealPlans.length === 1 ? 'plan asignado' : 'planes asignados'}</p>
+              <h2 className="font-semibold text-fg-primary">Planes de nutrición</h2>
+              <p className="text-xs text-fg-muted mt-0.5">{mealPlans.length} {mealPlans.length === 1 ? 'plan asignado' : 'planes asignados'}</p>
             </div>
             <button type="button" className="btn-primary" onClick={() => setShowMealModal(true)}>
               <Plus size={15} /> Nuevo plan
@@ -825,12 +822,12 @@ export default function ClientDetailPage() {
                     {isActive && <div className="h-px -mx-5 -mt-5 mb-0 rounded-t-2xl bg-brand-accent/60" />}
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h3 className="font-semibold text-white">{plan.title}</h3>
+                        <h3 className="font-semibold text-fg-primary">{plan.title}</h3>
                         {plan.calories_target && (
                           <div className="flex items-center gap-1.5 mt-1">
-                            <Zap size={11} className="text-amber-400" />
-                            <span className="text-sm font-bold text-amber-400">{plan.calories_target}</span>
-                            <span className="text-xs text-slate-500">kcal / día</span>
+                            <Zap size={11} className="text-semantic-warning-text" />
+                            <span className="text-sm font-bold text-semantic-warning-text">{plan.calories_target}</span>
+                            <span className="text-xs text-fg-muted">kcal / día</span>
                           </div>
                         )}
                       </div>
@@ -846,7 +843,7 @@ export default function ClientDetailPage() {
                         ].map(m => (
                           <div key={m.label}>
                             <div className="flex justify-between items-center text-xs mb-1.5">
-                              <span className="text-slate-400 font-medium">{m.label}</span>
+                              <span className="text-fg-muted font-medium">{m.label}</span>
                               <span className="font-semibold" style={{ color: m.color }}>{m.value}g · {Math.round(m.pct)}%</span>
                             </div>
                             <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(51,65,85,0.5)' }}>
@@ -858,9 +855,9 @@ export default function ClientDetailPage() {
                       </div>
                     )}
                     {plan.notes && (
-                      <p className="text-xs text-slate-400 bg-surface-2/40 rounded-lg p-2.5">{plan.notes}</p>
+                      <p className="text-xs text-fg-muted bg-surface-2/40 rounded-lg p-2.5">{plan.notes}</p>
                     )}
-                    <p className="text-[11px] text-slate-600">{formatDate(plan.created_at)}</p>
+                    <p className="text-[11px] text-fg-disabled">{formatDate(plan.created_at)}</p>
                   </div>
                 )
               })}
@@ -876,8 +873,8 @@ export default function ClientDetailPage() {
         <div className="space-y-5 animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-semibold text-white">Registros de progreso</h2>
-              <p className="text-xs text-slate-500 mt-0.5">{progressLogs.length} {progressLogs.length === 1 ? 'registro guardado' : 'registros guardados'}</p>
+              <h2 className="font-semibold text-fg-primary">Registros de progreso</h2>
+              <p className="text-xs text-fg-muted mt-0.5">{progressLogs.length} {progressLogs.length === 1 ? 'registro guardado' : 'registros guardados'}</p>
             </div>
             <button type="button" className="btn-primary" onClick={() => setShowProgressModal(true)}>
               <Plus size={15} /> Registrar medida
@@ -906,9 +903,9 @@ export default function ClientDetailPage() {
                       <div key={stat.label}
                            className="rounded-xl p-4 text-center transition-all duration-200 hover:-translate-y-0.5"
                            style={{ background: stat.bg, border: `1px solid ${stat.border}` }}>
-                        <div className="text-xs text-slate-500 mb-1">{stat.label}</div>
+                        <div className="text-xs text-fg-muted mb-1">{stat.label}</div>
                         <div className="text-2xl font-bold font-mono leading-none" style={{ color: stat.accent }}>{stat.value}</div>
-                        <div className="text-[11px] text-slate-500 mt-1">{stat.sub}</div>
+                        <div className="text-[11px] text-fg-muted mt-1">{stat.sub}</div>
                       </div>
                     ))}
                   </div>
@@ -920,7 +917,7 @@ export default function ClientDetailPage() {
                 <div className="card p-5">
                   <div className="flex items-center gap-2 mb-5">
                     <div className="w-1 h-4 rounded-full bg-brand-primary" />
-                    <h3 className="text-sm font-semibold text-white">Evolución del peso</h3>
+                    <h3 className="text-sm font-semibold text-fg-primary">Evolución del peso</h3>
                   </div>
                   <ResponsiveContainer width="100%" height={200}>
                     <AreaChart data={weightData.map(l => ({ date: formatDate(l.logged_at, 'dd/MM'), kg: l.weight_kg }))}>
@@ -953,7 +950,7 @@ export default function ClientDetailPage() {
                 <div className="card p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-1 h-4 rounded-full bg-brand-primary" />
-                    <h3 className="text-sm font-semibold text-white">Historial de actividad</h3>
+                    <h3 className="text-sm font-semibold text-fg-primary">Historial de actividad</h3>
                   </div>
                   <ActivityHeatmap logDates={progressLogs.map(l => l.logged_at)} />
                 </div>
@@ -970,7 +967,7 @@ export default function ClientDetailPage() {
                   <div className="card p-5">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-1 h-4 rounded-full bg-brand-primary" />
-                      <h3 className="text-sm font-semibold text-white">Antes y ahora</h3>
+                      <h3 className="text-sm font-semibold text-fg-primary">Antes y ahora</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       {[{ log: before, label: 'Antes' }, { log: after, label: 'Ahora' }].map(({ log, label }) => (
@@ -979,16 +976,16 @@ export default function ClientDetailPage() {
                           const idx = allPhotos.indexOf(url)
                           setLightbox({ urls: allPhotos, idx: idx >= 0 ? idx : 0 })
                         }} className="text-left group">
-                          <div className="relative aspect-square rounded-xl overflow-hidden bg-surface-2 border border-border group-hover:border-sky-500/50 transition-colors">
+                          <div className="relative aspect-square rounded-xl overflow-hidden bg-surface-2 border border-border group-hover:border-semantic-info/50 transition-colors">
                             <Image src={(log.photos ?? [])[0]} alt={label} fill className="object-cover" />
                             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                              <p className="text-xs font-semibold text-white">{label}</p>
-                              <p className="text-[10px] text-slate-300">{formatDate(log.logged_at)}</p>
+                              <p className="text-xs font-semibold text-fg-primary">{label}</p>
+                              <p className="text-[10px] text-fg-secondary">{formatDate(log.logged_at)}</p>
                             </div>
                           </div>
                           {log.weight_kg != null && (
                             <div className="text-center mt-1">
-                              <span className="font-mono text-xs font-bold text-white">{log.weight_kg} kg</span>
+                              <span className="font-mono text-xs font-bold text-fg-primary">{log.weight_kg} kg</span>
                             </div>
                           )}
                         </button>
@@ -1005,7 +1002,7 @@ export default function ClientDetailPage() {
                     <thead>
                       <tr style={{ background: 'rgba(51,65,85,0.25)' }}>
                         {['Fecha', 'Peso (kg)', 'Grasa corp.', 'Masa musc.', 'Cintura', 'Pecho', 'Brazo', 'Notas', 'Fotos'].map(h => (
-                          <th key={h} className="text-left px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{h}</th>
+                          <th key={h} className="text-left px-4 py-3 text-[10px] font-bold text-fg-muted uppercase tracking-widest">{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1014,14 +1011,14 @@ export default function ClientDetailPage() {
                         <tr key={log.id}
                             className="border-t border-border/30 transition-colors hover:bg-surface-2/40"
                             style={idx % 2 === 0 ? { background: 'rgba(30,41,59,0.2)' } : undefined}>
-                          <td className="px-4 py-3 text-slate-300 text-xs font-medium">{formatDate(log.logged_at)}</td>
-                          <td className="px-4 py-3 text-sky-400 font-mono font-semibold text-xs">{log.weight_kg != null ? `${log.weight_kg}` : <span className="text-slate-600">—</span>}</td>
-                          <td className="px-4 py-3 text-amber-400 font-mono text-xs">{log.body_fat_pct != null ? `${log.body_fat_pct}%` : <span className="text-slate-600">—</span>}</td>
-                          <td className="px-4 py-3 text-emerald-400 font-mono text-xs">{log.muscle_mass_kg != null ? `${log.muscle_mass_kg}` : <span className="text-slate-600">—</span>}</td>
-                          <td className="px-4 py-3 text-violet-400 font-mono text-xs">{log.waist_cm != null ? `${log.waist_cm}cm` : <span className="text-slate-600">—</span>}</td>
-                          <td className="px-4 py-3 text-pink-400 font-mono text-xs">{log.chest_cm != null ? `${log.chest_cm}cm` : <span className="text-slate-600">—</span>}</td>
-                          <td className="px-4 py-3 text-cyan-400 font-mono text-xs">{log.arm_cm != null ? `${log.arm_cm}cm` : <span className="text-slate-600">—</span>}</td>
-                          <td className="px-4 py-3 text-slate-400 text-xs truncate max-w-[180px]">{log.notes ?? <span className="text-slate-600">—</span>}</td>
+                          <td className="px-4 py-3 text-fg-secondary text-xs font-medium">{formatDate(log.logged_at)}</td>
+                          <td className="px-4 py-3 text-semantic-info-text font-mono font-semibold text-xs">{log.weight_kg != null ? `${log.weight_kg}` : <span className="text-fg-disabled">—</span>}</td>
+                          <td className="px-4 py-3 text-semantic-warning-text font-mono text-xs">{log.body_fat_pct != null ? `${log.body_fat_pct}%` : <span className="text-fg-disabled">—</span>}</td>
+                          <td className="px-4 py-3 text-semantic-success-text font-mono text-xs">{log.muscle_mass_kg != null ? `${log.muscle_mass_kg}` : <span className="text-fg-disabled">—</span>}</td>
+                          <td className="px-4 py-3 text-[#C4B5FD] font-mono text-xs">{log.waist_cm != null ? `${log.waist_cm}cm` : <span className="text-fg-disabled">—</span>}</td>
+                          <td className="px-4 py-3 text-[#F9A8D4] font-mono text-xs">{log.chest_cm != null ? `${log.chest_cm}cm` : <span className="text-fg-disabled">—</span>}</td>
+                          <td className="px-4 py-3 text-semantic-info-text font-mono text-xs">{log.arm_cm != null ? `${log.arm_cm}cm` : <span className="text-fg-disabled">—</span>}</td>
+                          <td className="px-4 py-3 text-fg-muted text-xs truncate max-w-[180px]">{log.notes ?? <span className="text-fg-disabled">—</span>}</td>
                           <td className="px-4 py-3">
                             {(log.photos ?? []).length > 0 ? (
                               <div className="flex gap-1">
@@ -1031,14 +1028,14 @@ export default function ClientDetailPage() {
                                     const idx = allPhotos.indexOf(url)
                                     setLightbox({ urls: allPhotos, idx: idx >= 0 ? idx : 0 })
                                   }}>
-                                    <Image src={url} alt="Foto" width={32} height={32} className="object-cover rounded-lg border border-slate-700 hover:border-sky-500 transition-colors cursor-zoom-in" />
+                                    <Image src={url} alt="Foto" width={32} height={32} className="object-cover rounded-lg border border-border hover:border-semantic-info transition-colors cursor-zoom-in" />
                                   </button>
                                 ))}
                                 {(log.photos ?? []).length > 3 && (
-                                  <span className="w-8 h-8 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-[9px] text-slate-400">+{(log.photos ?? []).length - 3}</span>
+                                  <span className="w-8 h-8 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-[9px] text-fg-muted">+{(log.photos ?? []).length - 3}</span>
                                 )}
                               </div>
-                            ) : <span className="text-slate-600">—</span>}
+                            ) : <span className="text-fg-disabled">—</span>}
                           </td>
                         </tr>
                       ))}
@@ -1076,10 +1073,10 @@ export default function ClientDetailPage() {
                   {typeColor.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-white text-sm">{formatRelative(apt.scheduled_at)}</div>
-                  <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
+                  <div className="font-semibold text-fg-primary text-sm">{formatRelative(apt.scheduled_at)}</div>
+                  <div className="text-xs text-fg-muted mt-0.5 flex items-center gap-2">
                     <Clock size={10} /> {apt.duration_minutes} min
-                    {apt.location && <><span className="text-slate-600">·</span> <MapPin size={10} /> {apt.location}</>}
+                    {apt.location && <><span className="text-fg-disabled">·</span> <MapPin size={10} /> {apt.location}</>}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -1097,13 +1094,13 @@ export default function ClientDetailPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setAptView('upcoming')}
-                  className={cn('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors', aptView === 'upcoming' ? 'bg-brand-primary text-white' : 'text-slate-400 hover:text-white')}
+                  className={cn('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors', aptView === 'upcoming' ? 'bg-brand-primary text-black' : 'text-fg-muted hover:text-fg-primary')}
                 >
                   Próximas {upcomingApts.length > 0 && <span className="ml-1 text-xs opacity-80">({upcomingApts.length})</span>}
                 </button>
                 <button
                   onClick={() => setAptView('past')}
-                  className={cn('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors', aptView === 'past' ? 'bg-surface-2 text-white' : 'text-slate-400 hover:text-white')}
+                  className={cn('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors', aptView === 'past' ? 'bg-surface-2 text-fg-primary' : 'text-fg-muted hover:text-fg-primary')}
                 >
                   Historial {pastApts.length > 0 && <span className="ml-1 text-xs opacity-80">({pastApts.length})</span>}
                 </button>
@@ -1138,12 +1135,11 @@ export default function ClientDetailPage() {
         <div className="animate-fade-in">
           <div className="card flex flex-col overflow-hidden" style={{ height: '520px' }}>
             {/* Header */}
-            <div className="px-5 py-3.5 border-b border-border/60 shrink-0 flex items-center gap-3"
-                 style={{ background: 'rgba(30,41,59,0.6)', backdropFilter: 'blur(10px)' }}>
+            <div className="px-5 py-3.5 border-b border-border/60 shrink-0 flex items-center gap-3 bg-surface-3/60 backdrop-blur-md">
               <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
               <div>
-                <div className="font-semibold text-white text-sm">{profile.full_name}</div>
-                <div className="text-[11px] text-slate-500">Chat directo</div>
+                <div className="font-semibold text-fg-primary text-sm">{profile.full_name}</div>
+                <div className="text-[11px] text-fg-muted">Chat directo</div>
               </div>
             </div>
 
@@ -1151,11 +1147,10 @@ export default function ClientDetailPage() {
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                       style={{ background: 'rgba(51,65,85,0.5)' }}>
-                    <MessageSquare size={20} className="text-slate-500" />
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-surface-3">
+                    <MessageSquare size={20} className="text-fg-muted" />
                   </div>
-                  <p className="text-sm text-slate-500">Todavía no hay mensajes. ¡Escribe el primero!</p>
+                  <p className="text-sm text-fg-muted">Todavía no hay mensajes. ¡Escribe el primero!</p>
                 </div>
               ) : (
                 messages.map(msg => {
@@ -1169,7 +1164,7 @@ export default function ClientDetailPage() {
                         <div
                           className={cn(
                             'rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
-                            isMine ? 'text-black rounded-br-sm' : 'rounded-bl-sm text-slate-200',
+                            isMine ? 'text-black rounded-br-sm' : 'rounded-bl-sm text-fg-secondary',
                           )}
                           style={isMine
                             ? { background: '#8FD43A', color: '#000' }
@@ -1177,7 +1172,7 @@ export default function ClientDetailPage() {
                         >
                           {msg.content}
                         </div>
-                        <span className="text-[10px] text-slate-600 mt-0.5 px-1">{timeAgo(msg.created_at)}</span>
+                        <span className="text-[10px] text-fg-disabled mt-0.5 px-1">{timeAgo(msg.created_at)}</span>
                       </div>
                     </div>
                   )
@@ -1187,8 +1182,7 @@ export default function ClientDetailPage() {
             </div>
 
             {/* Compose */}
-            <div className="px-4 py-3 border-t border-border/60 shrink-0 flex gap-2"
-                 style={{ background: 'rgba(30,41,59,0.4)' }}>
+            <div className="px-4 py-3 border-t border-border/60 shrink-0 flex gap-2 bg-surface-2/40">
               <input
                 type="text"
                 value={messageText}
@@ -1408,14 +1402,14 @@ function NewMealPlanModal({ isOpen, onClose, clientId, trainerId, onSuccess }: {
         {totalCal > 0 && (
           <div className="rounded-xl p-3 text-xs space-y-2"
                style={{ background: 'rgba(51,65,85,0.25)', border: '1px solid rgba(51,65,85,0.5)' }}>
-            <p className="font-semibold text-slate-300 mb-2">Distribución de macros ({totalCal} kcal calculadas)</p>
+            <p className="font-semibold text-fg-secondary mb-2">Distribución de macros ({totalCal} kcal calculadas)</p>
             {[
               { label: 'Proteína', kcal: p * 4, color: '#0EA5E9' },
               { label: 'Carbos',   kcal: c * 4, color: '#F59E0B' },
               { label: 'Grasa',    kcal: f * 9, color: '#7C3AED' },
             ].map(m => (
               <div key={m.label} className="flex items-center gap-2">
-                <span className="w-16 text-slate-400">{m.label}</span>
+                <span className="w-16 text-fg-muted">{m.label}</span>
                 <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(51,65,85,0.6)' }}>
                   <div className="h-full rounded-full transition-all duration-500"
                        style={{ width: `${Math.round((m.kcal / totalCal) * 100)}%`, background: m.color }} />
@@ -1501,7 +1495,7 @@ function NewProgressModal({ isOpen, onClose, clientId, trainerId, onSuccess }: {
           </div>
         </div>
         <details className="mt-1">
-          <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-300">Medidas corporales (opcional)</summary>
+          <summary className="text-xs text-fg-muted cursor-pointer hover:text-fg-secondary">Medidas corporales (opcional)</summary>
           <div className="grid grid-cols-2 gap-3 mt-3">
             {([
               { key: 'waist_cm', label: 'Cintura (cm)' },
@@ -1511,7 +1505,7 @@ function NewProgressModal({ isOpen, onClose, clientId, trainerId, onSuccess }: {
               { key: 'hip_cm',   label: 'Cadera (cm)' },
             ] as const).map(m => (
               <div key={m.key}>
-                <label className="text-xs text-slate-500">{m.label}</label>
+                <label className="text-xs text-fg-muted">{m.label}</label>
                 <input type="number" step="0.1" className="input text-sm py-1.5"
                   value={form[m.key]} onChange={e => setForm(p => ({ ...p, [m.key]: e.target.value }))} />
               </div>

@@ -20,10 +20,10 @@ interface Props {
 }
 
 export default function DashboardShell({ profile, subscription, unreadMessages, pendingApts = 0, pendingCheckins = 0, children }: Props) {
-  const [sidebarOpen, setSidebarOpen]   = useState(false)
-  const [notifOpen, setNotifOpen]       = useState(false)
-  const [paletteOpen, setPaletteOpen]   = useState(false)
-  const [liveUnread, setLiveUnread]     = useState(unreadMessages)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [notifOpen, setNotifOpen]     = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [liveUnread, setLiveUnread]   = useState(unreadMessages)
 
   // Realtime unread count
   useEffect(() => {
@@ -96,18 +96,11 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
       {/* ── Main area ─────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        {/* Mobile top bar */}
-        <div
-          className="h-14 flex items-center justify-between px-4 border-b md:hidden shrink-0 backdrop-blur-xl"
-          style={{
-            background: 'rgba(15,23,42,0.85)',
-            backdropFilter: 'blur(20px)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
+        {/* Mobile top bar — usa tokens de design system, sin inline styles */}
+        <div className="h-14 flex items-center justify-between px-4 border-b border-border/60 bg-background/80 backdrop-blur-xl md:hidden shrink-0">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-surface-2 transition-all duration-200 active:scale-95"
+            className="p-2 rounded-lg text-fg-muted hover:text-fg-primary hover:bg-surface-2 transition-all duration-200 active:scale-95"
             aria-label="Toggle menu"
           >
             <div className="w-5 h-4 flex flex-col justify-between">
@@ -124,13 +117,13 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
             >
               <Zap className="w-3.5 h-3.5 text-black" />
             </div>
-            <span className="font-bold text-white text-sm tracking-tight">TrainerBoost</span>
+            <span className="font-bold text-fg-primary text-sm tracking-tight">TrainerBoost</span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPaletteOpen(true)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-surface-2 transition-all duration-150"
+              className="btn-icon"
               aria-label="Búsqueda rápida"
             >
               <Search className="w-4 h-4" />

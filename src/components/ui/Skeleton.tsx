@@ -5,13 +5,7 @@ interface SkeletonProps { className?: string }
 export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
-      className={cn(
-        'bg-gray-100 rounded-md overflow-hidden relative',
-        'before:absolute before:inset-0',
-        'before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent',
-        'before:translate-x-[-100%] before:animate-shimmer',
-        className,
-      )}
+      className={cn('skeleton rounded-md', className)}
       aria-hidden="true"
     />
   )
@@ -20,7 +14,7 @@ export function Skeleton({ className }: SkeletonProps) {
 export function SkeletonCard({ className }: { className?: string }) {
   return (
     <div
-      className={cn('rounded-xl border border-gray-200 p-4 space-y-4 bg-white shadow-sm', className)}
+      className={cn('rounded-xl border border-border p-4 space-y-4 bg-surface shadow-card', className)}
       aria-hidden="true"
     >
       <div className="flex items-center gap-3">
@@ -47,15 +41,15 @@ export function SkeletonTable({ rows = 5, cols = 4, className }: { rows?: number
 
   return (
     <div
-      className={cn('w-full rounded-xl border border-gray-200 overflow-hidden bg-white', className)}
+      className={cn('w-full rounded-xl border border-border overflow-hidden bg-surface', className)}
       aria-hidden="true"
     >
-      <div className="flex items-center gap-4 px-4 py-3 border-b border-gray-200 bg-gray-50">
+      <div className="flex items-center gap-4 px-4 py-3 border-b border-border bg-surface-2">
         {Array.from({ length: cols }).map((_, ci) => (
           <Skeleton key={`th-${ci}`} className={cn('h-3 rounded', colWidths[ci % colWidths.length])} />
         ))}
       </div>
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-border-subtle">
         {Array.from({ length: rows }).map((_, ri) => (
           <div key={`tr-${ri}`} className="flex items-center gap-4 px-4 py-3.5">
             {Array.from({ length: cols }).map((_, ci) => (

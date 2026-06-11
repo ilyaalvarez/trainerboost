@@ -44,26 +44,26 @@ function weekLabel(dateStr: string): string {
 }
 
 function ScoreBar({ value, max = 10, color }: { value: number | null; max?: number; color: string }) {
-  if (value == null) return <span className="text-slate-600 text-xs">—</span>
+  if (value == null) return <span className="text-fg-disabled text-xs">—</span>
   return (
     <div className="flex items-center gap-2">
-      <div className="w-20 h-1.5 bg-[#1E293B] rounded-full overflow-hidden">
+      <div className="w-20 h-1.5 bg-surface-2 rounded-full overflow-hidden">
         <div className="h-full rounded-full" style={{ width: `${(value / max) * 100}%`, background: color }} />
       </div>
-      <span className="text-xs font-mono text-white">{value}</span>
+      <span className="text-xs font-mono text-fg-primary">{value}</span>
     </div>
   )
 }
 
 function AdherenceBar({ value }: { value: number | null }) {
-  if (value == null) return <span className="text-slate-600 text-xs">—</span>
+  if (value == null) return <span className="text-fg-disabled text-xs">—</span>
   const color = value >= 75 ? '#10B981' : value >= 50 ? '#F59E0B' : '#EF4444'
   return (
     <div className="flex items-center gap-2">
-      <div className="w-20 h-1.5 bg-[#1E293B] rounded-full overflow-hidden">
+      <div className="w-20 h-1.5 bg-surface-2 rounded-full overflow-hidden">
         <div className="h-full rounded-full" style={{ width: `${value}%`, background: color }} />
       </div>
-      <span className="text-xs font-mono text-white">{value}%</span>
+      <span className="text-xs font-mono text-fg-primary">{value}%</span>
     </div>
   )
 }
@@ -148,14 +148,14 @@ export default function CheckinsPage() {
     <div className="animate-fade-in space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Check-ins semanales</h1>
-        <p className="text-slate-400 text-sm mt-0.5">Respuestas de tus clientes al check-in de la semana</p>
+        <h1 className="text-2xl font-bold text-fg-primary">Check-ins semanales</h1>
+        <p className="text-fg-secondary text-sm mt-0.5">Respuestas de tus clientes al check-in de la semana</p>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[160px]">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-secondary" />
           <input
             className="input pl-9"
             placeholder="Buscar cliente..."
@@ -180,11 +180,11 @@ export default function CheckinsPage() {
       {/* Stats row */}
       {checkins.length > 0 && (
         <div className="flex gap-4 text-sm">
-          <span className="text-slate-400">{filtered.length} check-ins</span>
+          <span className="text-fg-secondary">{filtered.length} check-ins</span>
           {weekFilter && (
             <>
-              <span className="text-slate-600">·</span>
-              <span className="text-slate-400">semana del {weekLabel(weekFilter)}</span>
+              <span className="text-fg-disabled">·</span>
+              <span className="text-fg-secondary">semana del {weekLabel(weekFilter)}</span>
             </>
           )}
         </div>
@@ -239,46 +239,46 @@ function CheckinCard({ checkin, expanded, onToggle }: {
           <Avatar name={checkin.client.full_name} url={checkin.client.avatar_url} size="md" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-white">{checkin.client.full_name}</span>
+              <span className="font-semibold text-fg-primary">{checkin.client.full_name}</span>
               {hasConcern && (
-                <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400">
+                <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-semantic-warning/15 text-semantic-warning-text">
                   <AlertTriangle size={10} /> Atención
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">{weekLabel(checkin.week_start)}</p>
+            <p className="text-xs text-fg-muted mt-0.5">{weekLabel(checkin.week_start)}</p>
           </div>
 
           {/* Quick stats */}
           <div className="hidden sm:flex items-center gap-4 text-xs shrink-0">
             {checkin.energy != null && (
               <div className="flex items-center gap-1">
-                <Flame size={12} className="text-amber-400" />
-                <span className={cn('font-mono font-bold', checkin.energy <= 3 ? 'text-red-400' : checkin.energy <= 6 ? 'text-amber-400' : 'text-emerald-400')}>
+                <Flame size={12} className="text-semantic-warning-text" />
+                <span className={cn('font-mono font-bold', checkin.energy <= 3 ? 'text-semantic-error-text' : checkin.energy <= 6 ? 'text-semantic-warning-text' : 'text-semantic-success-text')}>
                   {checkin.energy}/10
                 </span>
               </div>
             )}
             {checkin.routine_adherence != null && (
               <div className="flex items-center gap-1">
-                <Dumbbell size={12} className="text-sky-400" />
-                <span className={cn('font-mono font-bold', checkin.routine_adherence <= 25 ? 'text-red-400' : checkin.routine_adherence <= 50 ? 'text-amber-400' : 'text-emerald-400')}>
+                <Dumbbell size={12} className="text-semantic-info-text" />
+                <span className={cn('font-mono font-bold', checkin.routine_adherence <= 25 ? 'text-semantic-error-text' : checkin.routine_adherence <= 50 ? 'text-semantic-warning-text' : 'text-semantic-success-text')}>
                   {checkin.routine_adherence}%
                 </span>
               </div>
             )}
             {checkin.weight_kg != null && (
               <div className="flex items-center gap-1">
-                <Scale size={12} className="text-violet-400" />
-                <span className="font-mono text-slate-300">{checkin.weight_kg} kg</span>
+                <Scale size={12} className="text-[#C4B5FD]" />
+                <span className="font-mono text-fg-secondary">{checkin.weight_kg} kg</span>
               </div>
             )}
           </div>
 
           <div className="shrink-0 ml-2">
             {expanded
-              ? <ChevronUp size={16} className="text-slate-400" />
-              : <ChevronDown size={16} className="text-slate-400" />}
+              ? <ChevronUp size={16} className="text-fg-secondary" />
+              : <ChevronDown size={16} className="text-fg-secondary" />}
           </div>
         </div>
       </button>
@@ -289,8 +289,8 @@ function CheckinCard({ checkin, expanded, onToggle }: {
             {/* Energía */}
             <div className="bg-[#0F172A]/60 rounded-lg p-3 border border-[#334155]/60">
               <div className="flex items-center gap-1.5 mb-2">
-                <Flame size={13} className="text-amber-400" />
-                <span className="text-xs text-slate-400">Energía</span>
+                <Flame size={13} className="text-semantic-warning-text" />
+                <span className="text-xs text-fg-secondary">Energía</span>
               </div>
               <ScoreBar value={checkin.energy} color="#F59E0B" />
             </div>
@@ -298,8 +298,8 @@ function CheckinCard({ checkin, expanded, onToggle }: {
             {/* Adherencia rutina */}
             <div className="bg-[#0F172A]/60 rounded-lg p-3 border border-[#334155]/60">
               <div className="flex items-center gap-1.5 mb-2">
-                <Dumbbell size={13} className="text-sky-400" />
-                <span className="text-xs text-slate-400">Rutina</span>
+                <Dumbbell size={13} className="text-semantic-info-text" />
+                <span className="text-xs text-fg-secondary">Rutina</span>
               </div>
               <AdherenceBar value={checkin.routine_adherence} />
             </div>
@@ -307,8 +307,8 @@ function CheckinCard({ checkin, expanded, onToggle }: {
             {/* Adherencia dieta */}
             <div className="bg-[#0F172A]/60 rounded-lg p-3 border border-[#334155]/60">
               <div className="flex items-center gap-1.5 mb-2">
-                <UtensilsCrossed size={13} className="text-emerald-400" />
-                <span className="text-xs text-slate-400">Dieta</span>
+                <UtensilsCrossed size={13} className="text-semantic-success-text" />
+                <span className="text-xs text-fg-secondary">Dieta</span>
               </div>
               <ScoreBar value={checkin.diet_adherence} color="#10B981" />
             </div>
@@ -316,24 +316,24 @@ function CheckinCard({ checkin, expanded, onToggle }: {
             {/* Peso */}
             <div className="bg-[#0F172A]/60 rounded-lg p-3 border border-[#334155]/60">
               <div className="flex items-center gap-1.5 mb-2">
-                <Scale size={13} className="text-violet-400" />
-                <span className="text-xs text-slate-400">Peso</span>
+                <Scale size={13} className="text-[#C4B5FD]" />
+                <span className="text-xs text-fg-secondary">Peso</span>
               </div>
               {checkin.weight_kg != null
-                ? <span className="text-sm font-mono font-bold text-white">{checkin.weight_kg} kg</span>
-                : <span className="text-slate-600 text-xs">No registrado</span>
+                ? <span className="text-sm font-mono font-bold text-fg-primary">{checkin.weight_kg} kg</span>
+                : <span className="text-fg-disabled text-xs">No registrado</span>
               }
             </div>
           </div>
 
           {/* Dolor */}
           {checkin.has_pain && (
-            <div className="flex items-start gap-2 rounded-lg p-3 bg-red-500/10 border border-red-500/20">
-              <AlertTriangle size={14} className="text-red-400 mt-0.5 shrink-0" />
+            <div className="flex items-start gap-2 rounded-lg p-3 bg-semantic-error/10 border border-semantic-error/20">
+              <AlertTriangle size={14} className="text-semantic-error-text mt-0.5 shrink-0" />
               <div>
-                <p className="text-xs font-semibold text-red-400">Reportó dolor o molestias</p>
+                <p className="text-xs font-semibold text-semantic-error-text">Reportó dolor o molestias</p>
                 {checkin.pain_description && (
-                  <p className="text-xs text-slate-300 mt-0.5">{checkin.pain_description}</p>
+                  <p className="text-xs text-fg-secondary mt-0.5">{checkin.pain_description}</p>
                 )}
               </div>
             </div>
@@ -342,15 +342,15 @@ function CheckinCard({ checkin, expanded, onToggle }: {
           {/* Nota del cliente */}
           {checkin.client_note && (
             <div className="flex items-start gap-2 rounded-lg p-3 bg-[#1E293B]/60 border border-[#334155]/60">
-              <Activity size={13} className="text-slate-400 mt-0.5 shrink-0" />
+              <Activity size={13} className="text-fg-secondary mt-0.5 shrink-0" />
               <div>
-                <p className="text-xs font-semibold text-slate-400 mb-1">Nota del cliente</p>
-                <p className="text-sm text-slate-300 leading-relaxed">{checkin.client_note}</p>
+                <p className="text-xs font-semibold text-fg-secondary mb-1">Nota del cliente</p>
+                <p className="text-sm text-fg-secondary leading-relaxed">{checkin.client_note}</p>
               </div>
             </div>
           )}
 
-          <p className="text-[10px] text-slate-600">
+          <p className="text-[10px] text-fg-disabled">
             Enviado el {new Date(checkin.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>

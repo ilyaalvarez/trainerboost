@@ -67,8 +67,8 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
             <Zap className="w-4 h-4 text-black" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-white text-sm tracking-tight">TrainerBoost</div>
-            <div className="text-xs text-slate-600">Dashboard</div>
+            <div className="font-bold text-fg-primary text-sm tracking-tight">TrainerBoost</div>
+            <div className="text-xs text-fg-disabled">Dashboard</div>
           </div>
           <NotificationBell
             userId={profile.id}
@@ -80,13 +80,13 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
 
       {/* ── Plan badge ────────────────────────────────────────────────── */}
       {subscription?.status === 'active' && (
-        <div className="mx-4 mt-3 px-3 py-2 rounded-lg border border-border-bright bg-surface-2">
+        <div className="mx-4 mt-3 px-3 py-2 rounded-lg border border-border-strong bg-surface-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <Zap className="w-3 h-3 text-brand-primary" />
               <span className="text-xs font-medium text-brand-primary">Plan {planLabel}</span>
             </div>
-            <span className="text-xs text-slate-600">
+            <span className="text-xs text-fg-muted">
               {subscription.max_clients === 999999 ? '∞' : subscription.max_clients} clientes
             </span>
           </div>
@@ -100,7 +100,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
             const e = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
             window.dispatchEvent(e)
           }}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border text-slate-600 text-xs hover:border-border-bright hover:text-slate-400 transition-all bg-surface"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border text-fg-muted text-xs hover:border-border-strong hover:text-fg-secondary transition-all bg-surface"
         >
           <Search className="w-3.5 h-3.5 shrink-0" />
           <span className="flex-1 text-left">Buscar...</span>
@@ -122,12 +122,12 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
                 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group relative',
                 isActive
                   ? 'nav-pill-active'
-                  : 'text-slate-500 hover:bg-surface-2 hover:text-slate-300'
+                  : 'text-fg-muted hover:bg-surface-2 hover:text-fg-primary'
               )}
             >
               <item.icon className={cn(
                 'w-4 h-4 shrink-0',
-                isActive ? 'text-brand-primary' : 'text-slate-600 group-hover:text-slate-400'
+                isActive ? 'text-brand-primary' : 'text-fg-disabled group-hover:text-fg-muted'
               )} />
               <span>{item.label}</span>
 
@@ -137,12 +137,12 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
                 </span>
               )}
               {item.label === 'Citas' && pendingApts > 0 && (
-                <span className="ml-auto bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                <span className="ml-auto bg-semantic-warning text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {pendingApts}
                 </span>
               )}
               {item.label === 'Check-ins' && pendingCheckins > 0 && (
-                <span className="ml-auto bg-violet-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                <span className="ml-auto bg-brand-secondary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {pendingCheckins}
                 </span>
               )}
@@ -162,10 +162,10 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
               onClick={onClose}
               className={cn(
                 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group',
-                isActive ? 'bg-surface-2 text-white' : 'text-slate-500 hover:bg-surface-2 hover:text-slate-300'
+                isActive ? 'bg-surface-2 text-fg-primary' : 'text-fg-muted hover:bg-surface-2 hover:text-fg-primary'
               )}
             >
-              <item.icon className="w-4 h-4 shrink-0 text-slate-600 group-hover:text-slate-400 transition-colors" />
+              <item.icon className="w-4 h-4 shrink-0 text-fg-disabled group-hover:text-fg-muted transition-colors" />
               {item.label}
             </Link>
           )
@@ -176,13 +176,14 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
           <div className="flex items-center gap-3 px-3 py-2">
             <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-semibold text-white truncate">{profile.full_name}</div>
-              <div className="text-xs text-slate-600 truncate">Entrenador</div>
+              <div className="text-xs font-semibold text-fg-primary truncate">{profile.full_name}</div>
+              <div className="text-xs text-fg-disabled truncate">Entrenador</div>
             </div>
             <button
               onClick={logout}
-              className="p-1.5 rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-400/8 transition-all duration-150"
+              className="p-1.5 rounded-lg text-fg-disabled hover:text-semantic-error-text hover:bg-semantic-error/8 transition-all duration-150"
               title="Cerrar sesión"
+              aria-label="Cerrar sesión"
             >
               <LogOut className="w-3.5 h-3.5" />
             </button>

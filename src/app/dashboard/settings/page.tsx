@@ -23,9 +23,9 @@ const PLAN_LABELS: Record<SubscriptionPlan, string> = {
 }
 
 const PLAN_COLORS: Record<SubscriptionPlan, { pill: string; badge: string }> = {
-  starter:   { pill: 'bg-sky-500/15 text-sky-400 ring-sky-500/30',         badge: 'text-sky-400'     },
-  pro:       { pill: 'bg-violet-500/15 text-violet-400 ring-violet-500/30', badge: 'text-violet-400' },
-  unlimited: { pill: 'bg-amber-500/15 text-amber-400 ring-amber-500/30',    badge: 'text-amber-400'  },
+  starter:   { pill: 'bg-semantic-info/15 text-semantic-info-text ring-semantic-info/30',           badge: 'text-semantic-info-text'     },
+  pro:       { pill: 'bg-brand-secondary/15 text-[#C4B5FD] ring-brand-secondary/30',               badge: 'text-[#C4B5FD]'              },
+  unlimited: { pill: 'bg-semantic-warning/15 text-semantic-warning-text ring-semantic-warning/30',  badge: 'text-semantic-warning-text'  },
 }
 
 const ALL_SPECIALTIES = [
@@ -44,8 +44,8 @@ function Section({ title, description, children }: {
   return (
     <section className="card p-6 space-y-5">
       <div>
-        <h2 className="font-semibold text-white text-base">{title}</h2>
-        {description && <p className="text-slate-400 text-sm mt-0.5">{description}</p>}
+        <h2 className="font-semibold text-fg-primary text-base">{title}</h2>
+        {description && <p className="text-fg-secondary text-sm mt-0.5">{description}</p>}
       </div>
       <div className="border-t border-[#334155]" />
       {children}
@@ -262,7 +262,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
+        <Loader2 className="w-6 h-6 text-fg-muted animate-spin" />
       </div>
     )
   }
@@ -275,8 +275,8 @@ export default function SettingsPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Ajustes</h1>
-        <p className="text-slate-400 text-sm mt-0.5">Gestiona tu perfil y preferencias de cuenta.</p>
+        <h1 className="text-2xl font-bold text-fg-primary">Ajustes</h1>
+        <p className="text-fg-secondary text-sm mt-0.5">Gestiona tu perfil y preferencias de cuenta.</p>
       </div>
 
       {/* ══════════════════════════════════════════════════════
@@ -386,7 +386,7 @@ export default function SettingsPage() {
               placeholder="Cuéntanos sobre ti y tu experiencia..."
               maxLength={500}
             />
-            <p className={cn('text-xs text-right mt-1', bio.length > 450 ? 'text-amber-400' : 'text-slate-600')}>{bio.length}/500</p>
+            <p className={cn('text-xs text-right mt-1', bio.length > 450 ? 'text-semantic-warning-text' : 'text-fg-disabled')}>{bio.length}/500</p>
           </div>
 
           {/* Specialties */}
@@ -409,7 +409,7 @@ export default function SettingsPage() {
                       'px-2.5 py-1 rounded-full text-xs font-medium border transition-all',
                       selected
                         ? 'bg-[#0EA5E9] border-[#0EA5E9] text-white'
-                        : 'bg-[#0F172A] border-[#334155] text-slate-400 hover:border-slate-400'
+                        : 'bg-surface border-border text-fg-secondary hover:border-fg-secondary'
                     )}
                   >
                     {s}
@@ -480,7 +480,7 @@ export default function SettingsPage() {
           {/* Plan badge */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-400">Plan activo</p>
+              <p className="text-sm text-fg-secondary">Plan activo</p>
               {plan ? (
                 <span className={cn(
                   'inline-flex items-center gap-1.5 mt-1 px-3 py-1 rounded-full text-sm font-semibold ring-1 ring-inset',
@@ -490,15 +490,15 @@ export default function SettingsPage() {
                   {PLAN_LABELS[plan]}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 mt-1 px-3 py-1 rounded-full text-sm font-semibold ring-1 ring-inset bg-slate-700/50 text-slate-300 ring-slate-600">
+                <span className="inline-flex items-center gap-1.5 mt-1 px-3 py-1 rounded-full text-sm font-semibold ring-1 ring-inset bg-surface-3 text-fg-secondary ring-border-bright">
                   Gratuito
                 </span>
               )}
             </div>
             {plan && (
               <div className="text-right">
-                <p className="text-xs text-slate-500">Precio mensual</p>
-                <p className="text-xl font-bold text-white">{PLAN_PRICES[plan]}€<span className="text-sm text-slate-400 font-normal">/mes</span></p>
+                <p className="text-xs text-fg-muted">Precio mensual</p>
+                <p className="text-xl font-bold text-fg-primary">{PLAN_PRICES[plan]}€<span className="text-sm text-fg-secondary font-normal">/mes</span></p>
               </div>
             )}
           </div>
@@ -506,16 +506,16 @@ export default function SettingsPage() {
           {/* Limits */}
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-[#0F172A] border border-[#334155] rounded-xl p-4">
-              <p className="text-xs text-slate-500 mb-1">Clientes permitidos</p>
-              <p className="text-2xl font-bold text-white font-mono">
+              <p className="text-xs text-fg-muted mb-1">Clientes permitidos</p>
+              <p className="text-2xl font-bold text-fg-primary font-mono">
                 {maxClients === 999999 ? '∞' : maxClients}
               </p>
             </div>
             <div className="bg-[#0F172A] border border-[#334155] rounded-xl p-4">
-              <p className="text-xs text-slate-500 mb-1">Estado</p>
+              <p className="text-xs text-fg-muted mb-1">Estado</p>
               <p className={cn(
                 'text-sm font-semibold mt-1',
-                subscription?.status === 'active' ? 'text-[#10B981]' : 'text-amber-400'
+                subscription?.status === 'active' ? 'text-[#10B981]' : 'text-semantic-warning-text'
               )}>
                 {subscription?.status === 'active' ? 'Activo' :
                  subscription?.status === 'past_due' ? 'Pago pendiente' :
@@ -526,9 +526,9 @@ export default function SettingsPage() {
 
           {/* Renews */}
           {subscription?.current_period_end && (
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-fg-muted">
               Se renueva el{' '}
-              <span className="text-slate-300">
+              <span className="text-fg-secondary">
                 {new Date(subscription.current_period_end).toLocaleDateString('es-ES', {
                   day: 'numeric', month: 'long', year: 'numeric',
                 })}
@@ -542,7 +542,7 @@ export default function SettingsPage() {
               href="/pricing"
               className={cn(
                 'inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold',
-                'bg-[#1E293B] border border-[#334155] text-slate-200',
+                'bg-surface border border-border text-fg-primary',
                 'hover:border-[#0EA5E9] hover:text-[#0EA5E9] transition-all'
               )}
             >
@@ -571,7 +571,7 @@ export default function SettingsPage() {
               />
               <button type="button" onClick={() => setShowPwd(v => !v)}
                 aria-label={showPwd ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-muted hover:text-fg-secondary transition-colors">
                 {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
@@ -608,14 +608,14 @@ export default function SettingsPage() {
           {newPwd && confirmPwd && (
             <p className={cn(
               'text-xs font-medium',
-              newPwd === confirmPwd ? 'text-[#10B981]' : 'text-red-400'
+              newPwd === confirmPwd ? 'text-[#10B981]' : 'text-semantic-error-text'
             )}>
               {newPwd === confirmPwd ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas no coinciden'}
             </p>
           )}
 
           {pwdError && (
-            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+            <p className="text-sm text-semantic-error-text bg-semantic-error/10 border border-semantic-error/20 rounded-lg px-3 py-2">
               {pwdError}
             </p>
           )}
@@ -637,8 +637,8 @@ export default function SettingsPage() {
           SECTION 4 — Active sessions
       ══════════════════════════════════════════════════════ */}
       <div className="card p-5">
-        <h3 className="text-sm font-semibold text-white mb-1">Sesiones activas</h3>
-        <p className="text-xs text-slate-400 mb-4">Cierra sesión en todos los dispositivos si crees que tu cuenta está comprometida.</p>
+        <h3 className="text-sm font-semibold text-fg-primary mb-1">Sesiones activas</h3>
+        <p className="text-xs text-fg-secondary mb-4">Cierra sesión en todos los dispositivos si crees que tu cuenta está comprometida.</p>
         <button
           onClick={signOutAllDevices}
           disabled={signingOut}
@@ -653,19 +653,19 @@ export default function SettingsPage() {
       ══════════════════════════════════════════════════════ */}
       <section className="card p-6 border-red-500/30">
         <div className="flex items-start gap-3">
-          <ShieldAlert className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+          <ShieldAlert className="w-5 h-5 text-semantic-error-text shrink-0 mt-0.5" />
           <div className="flex-1 space-y-4">
             <div>
-              <h2 className="font-semibold text-white text-base">Zona de peligro</h2>
-              <p className="text-slate-400 text-sm mt-0.5">
+              <h2 className="font-semibold text-fg-primary text-base">Zona de peligro</h2>
+              <p className="text-fg-secondary text-sm mt-0.5">
                 Las acciones de esta sección son irreversibles. Procede con cuidado.
               </p>
             </div>
-            <div className="border-t border-red-500/20" />
+            <div className="border-t border-semantic-error/20" />
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div>
-                <p className="text-sm font-medium text-white">Eliminar cuenta</p>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-sm font-medium text-fg-primary">Eliminar cuenta</p>
+                <p className="text-xs text-fg-muted mt-0.5">
                   Borra todos tus datos permanentemente.
                 </p>
               </div>
@@ -689,9 +689,9 @@ export default function SettingsPage() {
         size="sm"
       >
         <div className="space-y-5">
-          <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-            <ShieldAlert className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-red-300 leading-relaxed">
+          <div className="flex items-start gap-3 p-3 bg-semantic-error/10 border border-semantic-error/20 rounded-xl">
+            <ShieldAlert className="w-5 h-5 text-semantic-error-text shrink-0 mt-0.5" />
+            <p className="text-sm text-semantic-error-text leading-relaxed">
               Esta acción <strong>no se puede deshacer</strong>. Se eliminarán
               todos tus clientes, rutinas, citas y mensajes permanentemente.
             </p>
@@ -699,7 +699,7 @@ export default function SettingsPage() {
 
           <div>
             <label className="label">
-              Escribe <span className="text-red-400 font-bold">ELIMINAR</span> para confirmar
+              Escribe <span className="text-semantic-error-text font-bold">ELIMINAR</span> para confirmar
             </label>
             <input
               type="text"

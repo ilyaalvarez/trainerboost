@@ -46,14 +46,14 @@ export default function ProgressChart({ logs }: Props) {
         <div className="flex gap-1.5">
           {METRICS.map(m => (
             <button key={m.key} onClick={() => setMetric(m.key)}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-150 ${metric === m.key ? 'text-white' : 'text-slate-500 hover:text-slate-300 bg-surface-2'}`}
+              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-150 ${metric === m.key ? 'text-white' : 'text-fg-muted hover:text-fg-secondary bg-surface-2'}`}
               style={metric === m.key ? { background: m.color } : undefined}>{m.label}</button>
           ))}
         </div>
         <div className="flex gap-1 border border-border/60 rounded-lg p-0.5 bg-surface-2">
           {RANGES.map(r => (
             <button key={r.value} onClick={() => setRange(r.value)}
-              className={`px-2.5 py-0.5 rounded-md text-xs font-medium transition-all ${range === r.value ? 'bg-surface text-white' : 'text-slate-500 hover:text-slate-300'}`}>{r.label}</button>
+              className={`px-2.5 py-0.5 rounded-md text-xs font-medium transition-all ${range === r.value ? 'bg-surface text-fg-primary' : 'text-fg-muted hover:text-fg-secondary'}`}>{r.label}</button>
           ))}
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function ProgressChart({ logs }: Props) {
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-150 ${
                 metric === m.key
                   ? 'text-white'
-                  : 'text-slate-500 hover:text-slate-300 bg-surface-2'
+                  : 'text-fg-muted hover:text-fg-secondary bg-surface-2'
               }`}
               style={metric === m.key ? { background: m.color, boxShadow: `0 0 10px ${m.color}40` } : undefined}
             >
@@ -92,8 +92,8 @@ export default function ProgressChart({ logs }: Props) {
               onClick={() => setRange(r.value)}
               className={`px-2.5 py-0.5 rounded-md text-xs font-medium transition-all duration-150 ${
                 range === r.value
-                  ? 'bg-surface text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'bg-surface text-fg-primary shadow-sm'
+                  : 'text-fg-muted hover:text-fg-secondary'
               }`}
             >
               {r.label}
@@ -153,8 +153,8 @@ export default function ProgressChart({ logs }: Props) {
           { label: 'Máximo', value: max },
         ].map(s => (
           <div key={s.label} className="bg-surface-2 rounded-lg py-2">
-            <div className="font-mono text-sm font-bold text-white">{s.value} {cfg.unit}</div>
-            <div className="text-[10px] text-slate-500 mt-0.5">{s.label}</div>
+            <div className="font-mono text-sm font-bold text-fg-primary">{s.value} {cfg.unit}</div>
+            <div className="text-[10px] text-fg-muted mt-0.5">{s.label}</div>
           </div>
         ))}
       </div>

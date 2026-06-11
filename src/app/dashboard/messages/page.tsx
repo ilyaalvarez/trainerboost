@@ -333,7 +333,7 @@ export default function MessagesPage() {
           <div className="px-4 py-4 border-b border-[#334155]">
             <h2 className="font-semibold text-white text-base mb-3">Mensajes</h2>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-fg-muted pointer-events-none" />
               <input
                 type="text"
                 placeholder="Buscar..."
@@ -348,12 +348,12 @@ export default function MessagesPage() {
           <div className="flex-1 overflow-y-auto">
             {convoLoading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
+                <Loader2 className="w-5 h-5 text-fg-muted animate-spin" />
               </div>
             ) : filteredConvos.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center gap-2">
-                <MessageSquare className="w-8 h-8 text-slate-600" />
-                <p className="text-slate-500 text-sm">Sin conversaciones</p>
+                <MessageSquare className="w-8 h-8 text-fg-disabled" />
+                <p className="text-fg-muted text-sm">Sin conversaciones</p>
               </div>
             ) : (
               filteredConvos.map(convo => {
@@ -381,18 +381,18 @@ export default function MessagesPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1 mb-0.5">
-                        <span className={cn('text-sm truncate', isUnread ? 'font-semibold text-white' : 'font-medium text-slate-300')}>
+                        <span className={cn('text-sm truncate', isUnread ? 'font-semibold text-fg-primary' : 'font-medium text-fg-secondary')}>
                           {convo.partner.full_name}
                         </span>
-                        <span className="text-[10px] text-slate-500 shrink-0">
+                        <span className="text-[10px] text-fg-muted shrink-0">
                           {timeAgo(convo.lastMessage.created_at)}
                         </span>
                       </div>
                       <p className={cn(
                         'text-xs truncate',
-                        isUnread ? 'text-slate-200' : 'text-slate-500'
+                        isUnread ? 'text-fg-primary' : 'text-fg-muted'
                       )}>
-                        {isMine && <span className="text-slate-600">Tú: </span>}
+                        {isMine && <span className="text-fg-disabled">Tú: </span>}
                         {convo.lastMessage.content}
                       </p>
                     </div>
@@ -413,7 +413,7 @@ export default function MessagesPage() {
               <div className="px-5 py-3.5 border-b border-[#334155] flex items-center gap-3 shrink-0">
                 <button
                   onClick={() => { setMobilePanelView('list'); setActiveConvo(null) }}
-                  className="md:hidden p-1 -ml-1 text-slate-400 hover:text-white transition-colors"
+                  className="md:hidden p-1 -ml-1 text-fg-secondary hover:text-fg-primary transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </button>
@@ -423,8 +423,8 @@ export default function MessagesPage() {
                   size="sm"
                 />
                 <div>
-                  <div className="font-semibold text-white text-sm">{activeConvo.partner.full_name}</div>
-                  <div className="text-xs text-slate-500">Cliente</div>
+                  <div className="font-semibold text-fg-primary text-sm">{activeConvo.partner.full_name}</div>
+                  <div className="text-xs text-fg-muted">Cliente</div>
                 </div>
               </div>
 
@@ -432,12 +432,12 @@ export default function MessagesPage() {
               <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1">
                 {threadLoading ? (
                   <div className="flex items-center justify-center py-16">
-                    <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
+                    <Loader2 className="w-5 h-5 text-fg-muted animate-spin" />
                   </div>
                 ) : messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full gap-2 text-center">
-                    <MessageSquare className="w-8 h-8 text-slate-600" />
-                    <p className="text-slate-500 text-sm">No hay mensajes todavía. ¡Di hola!</p>
+                    <MessageSquare className="w-8 h-8 text-fg-disabled" />
+                    <p className="text-fg-muted text-sm">No hay mensajes todavía. ¡Di hola!</p>
                   </div>
                 ) : (
                   groupByDay(messages).map(({ date, msgs }) => (
@@ -445,7 +445,7 @@ export default function MessagesPage() {
                       {/* Day separator */}
                       <div className="flex items-center gap-3 my-4">
                         <div className="flex-1 h-px bg-[#334155]" />
-                        <span className="text-[11px] text-slate-500 font-medium px-2">
+                        <span className="text-[11px] text-fg-muted font-medium px-2">
                           {formatDate(date, 'EEE dd MMM')}
                         </span>
                         <div className="flex-1 h-px bg-[#334155]" />
@@ -483,12 +483,12 @@ export default function MessagesPage() {
                                   'px-3.5 py-2 rounded-2xl text-sm leading-relaxed animate-message-in',
                                   isMine
                                     ? 'bg-[#0EA5E9] text-white rounded-br-sm'
-                                    : 'bg-[#334155] text-slate-100 rounded-bl-sm'
+                                    : 'bg-surface-3 text-fg-primary rounded-bl-sm'
                                 )}
                               >
                                 {msg.content}
                               </div>
-                              <span className="text-[10px] text-slate-600 mt-0.5 px-1">
+                              <span className="text-[10px] text-fg-disabled mt-0.5 px-1">
                                 {formatDate(msg.created_at, 'HH:mm')}
                                 {isMine && msg.read_at && (
                                   <span className="ml-1 text-[#0EA5E9]">✓✓</span>
@@ -539,7 +539,7 @@ export default function MessagesPage() {
                     }
                   </button>
                 </div>
-                <p className="text-[10px] text-slate-600 mt-1.5 text-right">
+                <p className="text-[10px] text-fg-disabled mt-1.5 text-right">
                   Shift+Enter para nueva línea
                 </p>
               </div>
@@ -548,11 +548,11 @@ export default function MessagesPage() {
             /* No active conversation */
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
               <div className="w-16 h-16 rounded-2xl bg-[#334155] flex items-center justify-center">
-                <MessageSquare className="w-7 h-7 text-slate-500" />
+                <MessageSquare className="w-7 h-7 text-fg-muted" />
               </div>
               <div>
-                <h3 className="font-semibold text-slate-200 mb-1">Selecciona una conversación</h3>
-                <p className="text-slate-500 text-sm">
+                <h3 className="font-semibold text-fg-primary mb-1">Selecciona una conversación</h3>
+                <p className="text-fg-muted text-sm">
                   Elige un cliente de la lista para ver y enviar mensajes.
                 </p>
               </div>

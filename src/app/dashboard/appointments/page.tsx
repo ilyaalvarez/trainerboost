@@ -308,8 +308,8 @@ export default function AppointmentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Citas</h1>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-fg-primary">Citas</h1>
+          <p className="text-fg-secondary text-sm mt-0.5">
             {upcoming.length} próxima{upcoming.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -322,11 +322,11 @@ export default function AppointmentsPage() {
       {/* View toggle */}
       <div className="inline-flex rounded-lg border border-border/60 p-1 bg-surface">
         <button onClick={() => setView('list')}
-          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'list' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}>
+          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'list' ? 'bg-semantic-info text-white' : 'text-fg-secondary hover:text-fg-primary'}`}>
           <List className="w-4 h-4 inline mr-1.5" />Lista
         </button>
         <button onClick={() => setView('calendar')}
-          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'calendar' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}>
+          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'calendar' ? 'bg-semantic-info text-white' : 'text-fg-secondary hover:text-fg-primary'}`}>
           <CalendarDays className="w-4 h-4 inline mr-1.5" />Calendario
         </button>
       </div>
@@ -348,7 +348,7 @@ export default function AppointmentsPage() {
               'px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
               tab === t.value
                 ? 'text-[#0EA5E9] border-[#0EA5E9]'
-                : 'text-slate-400 border-transparent hover:text-slate-200'
+                : 'text-fg-secondary border-transparent hover:text-fg-primary'
             )}
           >
             {t.label}
@@ -389,7 +389,7 @@ export default function AppointmentsPage() {
                 id={`apt-${apt.id}`}
                 className={cn(
                   'card px-5 py-4 flex items-center gap-4 flex-wrap transition-shadow',
-                  highlightedId === apt.id && 'ring-2 ring-sky-500'
+                  highlightedId === apt.id && 'ring-2 ring-semantic-info'
                 )}
               >
                 {/* Avatar + name */}
@@ -400,32 +400,32 @@ export default function AppointmentsPage() {
                     size="md"
                   />
                   <div className="min-w-0">
-                    <div className="font-semibold text-white text-sm leading-tight truncate">
+                    <div className="font-semibold text-fg-primary text-sm leading-tight truncate">
                       {client?.full_name ?? '—'}
                     </div>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <span className="flex items-center gap-1 text-xs text-slate-400">
+                      <span className="flex items-center gap-1 text-xs text-fg-secondary">
                         <Clock className="w-3 h-3" />
                         {formatRelative(apt.scheduled_at)}
                       </span>
-                      <span className="text-slate-600 text-xs">·</span>
-                      <span className="text-xs text-slate-400">{apt.duration_minutes} min</span>
+                      <span className="text-fg-disabled text-xs">·</span>
+                      <span className="text-xs text-fg-secondary">{apt.duration_minutes} min</span>
                       {apt.location && (
                         <>
-                          <span className="text-slate-600 text-xs">·</span>
+                          <span className="text-fg-disabled text-xs">·</span>
                           {apt.type === 'online' && apt.location.startsWith('http') ? (
                             <a
                               href={apt.location}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-1 text-xs text-sky-400 hover:text-sky-300 font-medium transition-colors"
+                              className="flex items-center gap-1 text-xs text-semantic-info-text hover:text-semantic-info-text/80 font-medium transition-colors"
                               onClick={e => e.stopPropagation()}
                             >
                               <Video className="w-3 h-3" />
                               Unirse a videollamada
                             </a>
                           ) : (
-                            <span className="flex items-center gap-1 text-xs text-slate-400">
+                            <span className="flex items-center gap-1 text-xs text-fg-secondary">
                               <MapPin className="w-3 h-3" />
                               {apt.location}
                             </span>
@@ -434,7 +434,7 @@ export default function AppointmentsPage() {
                       )}
                     </div>
                     {apt.notes && (
-                      <div className="flex items-center gap-1 mt-1 text-xs text-slate-500">
+                      <div className="flex items-center gap-1 mt-1 text-xs text-fg-muted">
                         <FileText className="w-3 h-3 shrink-0" />
                         <span className="truncate">{apt.notes}</span>
                       </div>
@@ -474,8 +474,8 @@ export default function AppointmentsPage() {
                         disabled={!!actionLoading}
                         className={cn(
                           'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold',
-                          'bg-sky-500/10 text-sky-400 border border-sky-500/20',
-                          'hover:bg-sky-500/20 transition-colors disabled:opacity-50'
+                          'bg-semantic-info/10 text-semantic-info-text border border-semantic-info/20',
+                          'hover:bg-semantic-info/20 transition-colors disabled:opacity-50'
                         )}
                       >
                         {isLoadingDone
@@ -491,8 +491,8 @@ export default function AppointmentsPage() {
                         disabled={!!actionLoading}
                         className={cn(
                           'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold',
-                          'bg-red-500/10 text-red-400 border border-red-500/20',
-                          'hover:bg-red-500/20 transition-colors disabled:opacity-50'
+                          'bg-semantic-error/10 text-semantic-error-text border border-semantic-error/20',
+                          'hover:bg-semantic-error/20 transition-colors disabled:opacity-50'
                         )}
                       >
                         {isLoadingCancel
@@ -530,10 +530,10 @@ export default function AppointmentsPage() {
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <div className="text-center">
-                  <p className="text-sm font-semibold text-white">
+                  <p className="text-sm font-semibold text-fg-primary">
                     {weekDays[0].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} - {weekDays[6].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                   </p>
-                  <button onClick={goToday} className="text-xs text-sky-400 hover:text-sky-300">Hoy</button>
+                  <button onClick={goToday} className="text-xs text-semantic-info-text hover:text-semantic-info-text/80">Hoy</button>
                 </div>
                 <button onClick={nextWeek} className="btn-ghost p-2" aria-label="Semana siguiente">
                   <ChevronRight className="w-4 h-4" />
@@ -551,12 +551,12 @@ export default function AppointmentsPage() {
                     return (
                       <div key={day.toISOString()} className="min-h-[120px]">
                         <div className={cn('text-center mb-2 pb-2 border-b', isToday ? 'border-sky-500' : 'border-border/40')}>
-                          <p className="text-xs text-slate-500 uppercase">{day.toLocaleDateString('es-ES', { weekday: 'short' })}</p>
-                          <p className={cn('text-lg font-bold', isToday ? 'text-sky-400' : 'text-white')}>{day.getDate()}</p>
+                          <p className="text-xs text-fg-muted uppercase">{day.toLocaleDateString('es-ES', { weekday: 'short' })}</p>
+                          <p className={cn('text-lg font-bold', isToday ? 'text-semantic-info-text' : 'text-fg-primary')}>{day.getDate()}</p>
                         </div>
                         <div className="space-y-1.5">
                           {dayApts.length === 0 && (
-                            <p className="text-[10px] text-slate-700 text-center pt-2">Sin citas</p>
+                            <p className="text-[10px] text-fg-disabled text-center pt-2">Sin citas</p>
                           )}
                           {dayApts.map(apt => {
                             const colorMap: Record<AppointmentType, string> = {
@@ -576,10 +576,10 @@ export default function AppointmentsPage() {
                                 className="w-full text-left p-2 rounded-lg text-xs transition-transform hover:scale-[1.02]"
                                 style={{ background: colorMap[apt.type], borderLeft: `2px solid ${borderMap[apt.type]}` }}
                               >
-                                <p className="font-semibold text-white truncate">
+                                <p className="font-semibold text-fg-primary truncate">
                                   {new Date(apt.scheduled_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                                 </p>
-                                <p className="text-slate-300 truncate">{apt.client?.full_name ?? '—'}</p>
+                                <p className="text-fg-secondary truncate">{apt.client?.full_name ?? '—'}</p>
                               </button>
                             )
                           })}
@@ -620,10 +620,10 @@ export default function AppointmentsPage() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted pointer-events-none" />
             </div>
             {clients.length === 0 && (
-              <p className="text-xs text-amber-400 mt-1">No tienes clientes activos.</p>
+              <p className="text-xs text-semantic-warning-text mt-1">No tienes clientes activos.</p>
             )}
           </div>
 
@@ -665,7 +665,7 @@ export default function AppointmentsPage() {
                     'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all',
                     form.duration_minutes === d
                       ? 'bg-[#0EA5E9] border-[#0EA5E9] text-white'
-                      : 'bg-[#0F172A] border-[#334155] text-slate-400 hover:border-slate-400'
+                      : 'bg-surface border-border text-fg-secondary hover:border-fg-secondary'
                   )}
                 >
                   {d} min
@@ -687,7 +687,7 @@ export default function AppointmentsPage() {
                     'flex-1 px-3 py-2 rounded-lg text-sm font-medium border transition-all',
                     form.type === opt.value
                       ? 'bg-[#0EA5E9] border-[#0EA5E9] text-white'
-                      : 'bg-[#0F172A] border-[#334155] text-slate-400 hover:border-slate-400'
+                      : 'bg-surface border-border text-fg-secondary hover:border-fg-secondary'
                   )}
                 >
                   {opt.label}
@@ -722,7 +722,7 @@ export default function AppointmentsPage() {
 
           {/* Error */}
           {formError && (
-            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+            <p className="text-sm text-semantic-error-text bg-semantic-error/10 border border-semantic-error/20 rounded-lg px-3 py-2">
               {formError}
             </p>
           )}

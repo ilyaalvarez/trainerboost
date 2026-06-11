@@ -251,8 +251,8 @@ export default function RoutinesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-white">Rutinas</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Gestiona los programas de entrenamiento</p>
+          <h1 className="text-2xl font-bold text-fg-primary">Rutinas</h1>
+          <p className="text-fg-secondary text-sm mt-0.5">Gestiona los programas de entrenamiento</p>
         </div>
         {activeTab === 'routines' && (
           <button type="button" className="btn-primary" onClick={() => setShowModal(true)}>
@@ -275,7 +275,7 @@ export default function RoutinesPage() {
             'flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
             activeTab === 'routines'
               ? 'border-[#0EA5E9] text-[#0EA5E9]'
-              : 'border-transparent text-slate-400 hover:text-slate-200',
+              : 'border-transparent text-fg-secondary hover:text-fg-primary',
           )}
         >
           <Dumbbell size={15} /> Rutinas
@@ -287,7 +287,7 @@ export default function RoutinesPage() {
             'flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
             activeTab === 'library'
               ? 'border-[#0EA5E9] text-[#0EA5E9]'
-              : 'border-transparent text-slate-400 hover:text-slate-200',
+              : 'border-transparent text-fg-secondary hover:text-fg-primary',
           )}
         >
           <BookOpen size={15} /> Biblioteca de ejercicios
@@ -300,7 +300,7 @@ export default function RoutinesPage() {
           {/* Filters */}
           <div className="flex flex-wrap gap-3">
             <div className="relative flex-1 min-w-[180px]">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-secondary" />
               <input
                 className="input pl-9"
                 placeholder="Buscar rutinas..."
@@ -329,11 +329,11 @@ export default function RoutinesPage() {
 
           {/* Stats */}
           <div className="flex gap-4 text-sm">
-            <span className="text-slate-400">{filtered.length} rutinas</span>
-            <span className="text-slate-500">·</span>
-            <span className="text-slate-400">{routines.filter(r => r.status === 'active').length} activas</span>
-            <span className="text-slate-500">·</span>
-            <span className="text-slate-400">{routines.filter(r => r.status === 'archived').length} archivadas</span>
+            <span className="text-fg-secondary">{filtered.length} rutinas</span>
+            <span className="text-fg-muted">·</span>
+            <span className="text-fg-secondary">{routines.filter(r => r.status === 'active').length} activas</span>
+            <span className="text-fg-muted">·</span>
+            <span className="text-fg-secondary">{routines.filter(r => r.status === 'archived').length} archivadas</span>
           </div>
 
           {/* Grid */}
@@ -443,16 +443,16 @@ function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDu
           </div>
           <div className="flex-1 min-w-0 text-left">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-semibold text-white truncate">{routine.title}</span>
+              <span className="font-semibold text-fg-primary truncate">{routine.title}</span>
               <Badge status={routine.status} />
             </div>
             {routine.client && (
               <div className="flex items-center gap-2 mt-1.5">
                 <Avatar name={routine.client.full_name} url={routine.client.avatar_url} size="sm" />
-                <span className="text-sm text-slate-400">{routine.client.full_name}</span>
+                <span className="text-sm text-fg-secondary">{routine.client.full_name}</span>
               </div>
             )}
-            <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
+            <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-fg-muted">
               {routine.frequency && <span>{routine.frequency}</span>}
               <span>{routine.exercises.length} ejercicios</span>
               {routine.starts_at && <span>Inicio: {formatDate(routine.starts_at)}</span>}
@@ -461,8 +461,8 @@ function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDu
           </div>
           <div className="shrink-0 ml-2">
             {expanded
-              ? <ChevronUp size={16} className="text-slate-400" />
-              : <ChevronDown size={16} className="text-slate-400" />
+              ? <ChevronUp size={16} className="text-fg-secondary" />
+              : <ChevronDown size={16} className="text-fg-secondary" />
             }
           </div>
         </div>
@@ -472,35 +472,35 @@ function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDu
       {expanded && (
         <div className="border-t border-[#334155] px-5 pb-5 pt-4 space-y-3">
           {routine.description && (
-            <p className="text-sm text-slate-300">{routine.description}</p>
+            <p className="text-sm text-fg-secondary">{routine.description}</p>
           )}
           {routine.exercises.length === 0 ? (
-            <p className="text-sm text-slate-500 text-center py-4">Sin ejercicios añadidos</p>
+            <p className="text-sm text-fg-muted text-center py-4">Sin ejercicios añadidos</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[#334155]">
-                    <th className="text-left pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wide pr-3">#</th>
-                    <th className="text-left pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wide pr-3">Ejercicio</th>
-                    <th className="text-left pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wide pr-3">Series</th>
-                    <th className="text-left pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wide pr-3">Reps</th>
-                    <th className="text-left pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wide pr-3">Descanso</th>
+                    <th className="text-left pb-2 text-xs font-semibold text-fg-secondary uppercase tracking-wide pr-3">#</th>
+                    <th className="text-left pb-2 text-xs font-semibold text-fg-secondary uppercase tracking-wide pr-3">Ejercicio</th>
+                    <th className="text-left pb-2 text-xs font-semibold text-fg-secondary uppercase tracking-wide pr-3">Series</th>
+                    <th className="text-left pb-2 text-xs font-semibold text-fg-secondary uppercase tracking-wide pr-3">Reps</th>
+                    <th className="text-left pb-2 text-xs font-semibold text-fg-secondary uppercase tracking-wide pr-3">Descanso</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#334155]/40">
                   {routine.exercises.map((ex, i) => (
                     <tr key={ex.id} className="group">
-                      <td className="py-2 pr-3 text-slate-500 text-xs">{i + 1}</td>
+                      <td className="py-2 pr-3 text-fg-muted text-xs">{i + 1}</td>
                       <td className="py-2 pr-3">
                         <div>
-                          <span className="text-slate-200 font-medium">{ex.name}</span>
-                          {ex.notes && <p className="text-xs text-slate-500 mt-0.5 truncate max-w-[160px]">{ex.notes}</p>}
+                          <span className="text-fg-primary font-medium">{ex.name}</span>
+                          {ex.notes && <p className="text-xs text-fg-muted mt-0.5 truncate max-w-[160px]">{ex.notes}</p>}
                         </div>
                       </td>
-                      <td className="py-2 pr-3 text-slate-400">{ex.sets ?? '—'}</td>
-                      <td className="py-2 pr-3 text-slate-400">{ex.reps ?? '—'}</td>
-                      <td className="py-2 text-slate-400">{ex.rest_seconds ? `${ex.rest_seconds}s` : '—'}</td>
+                      <td className="py-2 pr-3 text-fg-secondary">{ex.sets ?? '—'}</td>
+                      <td className="py-2 pr-3 text-fg-secondary">{ex.reps ?? '—'}</td>
+                      <td className="py-2 text-fg-secondary">{ex.rest_seconds ? `${ex.rest_seconds}s` : '—'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -707,7 +707,7 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
           <div>
             <label className="label flex items-center gap-1"><Users size={11} /> Cliente *</label>
             {clients.length === 0 ? (
-              <p className="text-sm text-slate-400 py-2">No tienes clientes activos.</p>
+              <p className="text-sm text-fg-secondary py-2">No tienes clientes activos.</p>
             ) : (
               <select className="input" value={form.client_id} onChange={e => setForm(p => ({ ...p, client_id: e.target.value }))}>
                 <option value="">Seleccionar cliente...</option>
@@ -738,8 +738,8 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
       {step === 2 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-300">Añade los ejercicios a la rutina <span className="font-semibold text-white">&ldquo;{form.title}&rdquo;</span></p>
-            <span className="text-xs text-slate-500">{exercises.length} ejercicios</span>
+            <p className="text-sm text-fg-secondary">Añade los ejercicios a la rutina <span className="font-semibold text-fg-primary">&ldquo;{form.title}&rdquo;</span></p>
+            <span className="text-xs text-fg-muted">{exercises.length} ejercicios</span>
           </div>
 
           <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
@@ -747,14 +747,14 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
               <div key={ex.id} className="rounded-lg border border-[#334155] bg-[#0F172A]/40 p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <div className="flex flex-col gap-0.5">
-                    <button type="button" onClick={() => moveExercise(i, -1)} disabled={i === 0} className="text-slate-500 hover:text-slate-200 disabled:opacity-25 transition-colors">
+                    <button type="button" onClick={() => moveExercise(i, -1)} disabled={i === 0} className="text-fg-muted hover:text-fg-primary disabled:opacity-25 transition-colors">
                       <ChevronUp size={14} />
                     </button>
-                    <button type="button" onClick={() => moveExercise(i, 1)} disabled={i === exercises.length - 1} className="text-slate-500 hover:text-slate-200 disabled:opacity-25 transition-colors">
+                    <button type="button" onClick={() => moveExercise(i, 1)} disabled={i === exercises.length - 1} className="text-fg-muted hover:text-fg-primary disabled:opacity-25 transition-colors">
                       <ChevronDown size={14} />
                     </button>
                   </div>
-                  <GripVertical size={15} className="text-slate-600" />
+                  <GripVertical size={15} className="text-fg-disabled" />
                   <div className="flex-1 min-w-0">
                     <input
                       className="input text-sm"
@@ -763,7 +763,7 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
                       onChange={e => updateExercise(ex.id, 'name', e.target.value)}
                     />
                   </div>
-                  <button type="button" onClick={() => removeExercise(ex.id)} className="text-slate-500 hover:text-red-400 transition-colors shrink-0">
+                  <button type="button" onClick={() => removeExercise(ex.id)} className="text-fg-muted hover:text-semantic-error-text transition-colors shrink-0">
                     <X size={16} />
                   </button>
                 </div>
@@ -789,7 +789,7 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <LinkIcon size={12} className="text-slate-500 shrink-0" />
+                  <LinkIcon size={12} className="text-fg-muted shrink-0" />
                   <input className="input text-xs" placeholder="URL vídeo (opcional)" value={ex.video_url} onChange={e => updateExercise(ex.id, 'video_url', e.target.value)} />
                 </div>
               </div>
@@ -968,7 +968,7 @@ function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
           <div>
             <label className="label flex items-center gap-1"><Users size={11} /> Cliente *</label>
             {clients.length === 0 ? (
-              <p className="text-sm text-slate-400 py-2">No tienes clientes activos.</p>
+              <p className="text-sm text-fg-secondary py-2">No tienes clientes activos.</p>
             ) : (
               <select className="input" value={form.client_id} onChange={e => setForm(p => ({ ...p, client_id: e.target.value }))}>
                 <option value="">Seleccionar cliente...</option>
@@ -999,8 +999,8 @@ function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
       {step === 2 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-300">Ejercicios de <span className="font-semibold text-white">&ldquo;{form.title}&rdquo;</span></p>
-            <span className="text-xs text-slate-500">{exercises.length} ejercicios</span>
+            <p className="text-sm text-fg-secondary">Ejercicios de <span className="font-semibold text-fg-primary">&ldquo;{form.title}&rdquo;</span></p>
+            <span className="text-xs text-fg-muted">{exercises.length} ejercicios</span>
           </div>
 
           {loadingExercises ? (
@@ -1013,14 +1013,14 @@ function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
                 <div key={ex.id} className="rounded-lg border border-[#334155] bg-[#0F172A]/40 p-4 space-y-3">
                   <div className="flex items-center gap-2">
                     <div className="flex flex-col gap-0.5">
-                      <button type="button" onClick={() => moveExercise(i, -1)} disabled={i === 0} className="text-slate-500 hover:text-slate-200 disabled:opacity-25 transition-colors">
+                      <button type="button" onClick={() => moveExercise(i, -1)} disabled={i === 0} className="text-fg-muted hover:text-fg-primary disabled:opacity-25 transition-colors">
                         <ChevronUp size={14} />
                       </button>
-                      <button type="button" onClick={() => moveExercise(i, 1)} disabled={i === exercises.length - 1} className="text-slate-500 hover:text-slate-200 disabled:opacity-25 transition-colors">
+                      <button type="button" onClick={() => moveExercise(i, 1)} disabled={i === exercises.length - 1} className="text-fg-muted hover:text-fg-primary disabled:opacity-25 transition-colors">
                         <ChevronDown size={14} />
                       </button>
                     </div>
-                    <GripVertical size={15} className="text-slate-600" />
+                    <GripVertical size={15} className="text-fg-disabled" />
                     <div className="flex-1 min-w-0">
                       <input
                         className="input text-sm"
@@ -1029,7 +1029,7 @@ function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
                         onChange={e => updateExercise(ex.id, 'name', e.target.value)}
                       />
                     </div>
-                    <button type="button" onClick={() => removeExercise(ex.id)} className="text-slate-500 hover:text-red-400 transition-colors shrink-0">
+                    <button type="button" onClick={() => removeExercise(ex.id)} className="text-fg-muted hover:text-semantic-error-text transition-colors shrink-0">
                       <X size={16} />
                     </button>
                   </div>
@@ -1055,7 +1055,7 @@ function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <LinkIcon size={12} className="text-slate-500 shrink-0" />
+                    <LinkIcon size={12} className="text-fg-muted shrink-0" />
                     <input className="input text-xs" placeholder="URL vídeo (opcional)" value={ex.video_url} onChange={e => updateExercise(ex.id, 'video_url', e.target.value)} />
                   </div>
                 </div>
@@ -1113,7 +1113,7 @@ const EQUIP_LABELS: Record<string, string> = {
   bodyweight: 'Peso corporal', cable: 'Cable / Polea', kettlebell: 'Kettlebell',
 }
 const DIFF_COLORS: Record<string, string> = {
-  principiante: 'text-emerald-400', intermedio: 'text-amber-400', avanzado: 'text-red-400',
+  principiante: 'text-semantic-success-text', intermedio: 'text-semantic-warning-text', avanzado: 'text-semantic-error-text',
 }
 
 interface LibraryFormState {
@@ -1277,21 +1277,21 @@ function ExerciseLibraryPanel({
       <div className="flex gap-1 border-b border-[#334155]">
         <button type="button" onClick={() => setLibView('catalog')}
                 className={cn('flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
-                  libView === 'catalog' ? 'border-[#0EA5E9] text-[#0EA5E9]' : 'border-transparent text-slate-400 hover:text-slate-200')}>
+                  libView === 'catalog' ? 'border-[#0EA5E9] text-[#0EA5E9]' : 'border-transparent text-fg-secondary hover:text-fg-primary')}>
           <BookOpen size={14} /> Catálogo global
           <span className="ml-1 text-xs bg-[#0EA5E9]/15 text-[#0EA5E9] px-1.5 py-0.5 rounded-full font-bold">{globalExercises.length}</span>
         </button>
         <button type="button" onClick={() => setLibView('personal')}
                 className={cn('flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
-                  libView === 'personal' ? 'border-[#0EA5E9] text-[#0EA5E9]' : 'border-transparent text-slate-400 hover:text-slate-200')}>
+                  libView === 'personal' ? 'border-[#0EA5E9] text-[#0EA5E9]' : 'border-transparent text-fg-secondary hover:text-fg-primary')}>
           <Dumbbell size={14} /> Mi biblioteca
-          {exercises.length > 0 && <span className="ml-1 text-xs bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full font-bold">{exercises.length}</span>}
+          {exercises.length > 0 && <span className="ml-1 text-xs bg-surface-3 text-fg-secondary px-1.5 py-0.5 rounded-full font-bold">{exercises.length}</span>}
         </button>
       </div>
 
       {/* Search bar (shared) */}
       <div className="relative">
-        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-secondary" />
         <input className="input pl-9" placeholder={libView === 'catalog' ? 'Buscar en el catálogo...' : 'Buscar ejercicio...'}
                value={search} onChange={e => onSearchChange(e.target.value)} />
       </div>
@@ -1317,16 +1317,16 @@ function ExerciseLibraryPanel({
             </select>
             {(catFilter || equipFilter || diffFilter) && (
               <button type="button" onClick={() => { setCatFilter(''); setEquipFilter(''); setDiffFilter('') }}
-                      className="text-xs text-slate-400 hover:text-white flex items-center gap-1 px-2">
+                      className="text-xs text-fg-secondary hover:text-fg-primary flex items-center gap-1 px-2">
                 <X size={12} /> Limpiar
               </button>
             )}
           </div>
 
           {/* Stats */}
-          <div className="text-sm text-slate-400">
+          <div className="text-sm text-fg-secondary">
             {filteredGlobal.length} ejercicios
-            {(search || catFilter || equipFilter || diffFilter) && <span className="text-slate-600"> de {globalExercises.length}</span>}
+            {(search || catFilter || equipFilter || diffFilter) && <span className="text-fg-disabled"> de {globalExercises.length}</span>}
           </div>
 
           {/* Catalog grid */}
@@ -1338,12 +1338,12 @@ function ExerciseLibraryPanel({
                 <div key={ex.id} className="card p-4 flex flex-col gap-2.5 hover:border-[#334155] transition-all">
                   <div className="flex items-start gap-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white text-sm leading-snug">{ex.name}</h3>
-                      {ex.muscle_group && <p className="text-xs text-slate-400 mt-0.5 truncate">{ex.muscle_group}</p>}
+                      <h3 className="font-semibold text-fg-primary text-sm leading-snug">{ex.name}</h3>
+                      {ex.muscle_group && <p className="text-xs text-fg-secondary mt-0.5 truncate">{ex.muscle_group}</p>}
                     </div>
                     {ex.category && (
                       <span className={cn('shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full',
-                        GLOBAL_CAT_COLORS[ex.category] ?? 'bg-slate-700 text-slate-300')}>
+                        GLOBAL_CAT_COLORS[ex.category] ?? 'bg-surface-3 text-fg-secondary')}>
                         {GLOBAL_CAT_LABELS[ex.category] ?? ex.category}
                       </span>
                     )}
@@ -1351,7 +1351,7 @@ function ExerciseLibraryPanel({
 
                   <div className="flex flex-wrap gap-1.5">
                     {ex.equipment && (
-                      <span className="text-[10px] bg-[#1E293B] border border-[#334155] text-slate-400 px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] bg-[#1E293B] border border-[#334155] text-fg-secondary px-1.5 py-0.5 rounded">
                         {EQUIP_LABELS[ex.equipment] ?? ex.equipment}
                       </span>
                     )}
@@ -1363,15 +1363,15 @@ function ExerciseLibraryPanel({
                   </div>
 
                   {ex.description && (
-                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{ex.description}</p>
+                    <p className="text-xs text-fg-muted line-clamp-2 leading-relaxed">{ex.description}</p>
                   )}
 
                   {(ex.default_sets ?? ex.default_reps ?? ex.default_rest) && (
-                    <div className="flex gap-3 text-xs text-slate-500">
-                      {ex.default_sets && <span><span className="text-slate-300 font-medium">{ex.default_sets}</span> ser.</span>}
-                      {ex.default_reps && <span><span className="text-slate-300 font-medium">{ex.default_reps}</span> reps</span>}
+                    <div className="flex gap-3 text-xs text-fg-muted">
+                      {ex.default_sets && <span><span className="text-fg-secondary font-medium">{ex.default_sets}</span> ser.</span>}
+                      {ex.default_reps && <span><span className="text-fg-secondary font-medium">{ex.default_reps}</span> reps</span>}
                       {ex.default_rest !== null && ex.default_rest !== undefined && ex.default_rest > 0 && (
-                        <span><span className="text-slate-300 font-medium">{ex.default_rest}s</span> desc.</span>
+                        <span><span className="text-fg-secondary font-medium">{ex.default_rest}s</span> desc.</span>
                       )}
                     </div>
                   )}
@@ -1397,13 +1397,13 @@ function ExerciseLibraryPanel({
             <div className="flex flex-wrap gap-1.5">
               <button type="button" onClick={() => setMuscleFilter('')}
                       className={cn('text-xs px-2.5 py-1 rounded-full border transition-all',
-                        !muscleFilter ? 'bg-sky-500/20 border-sky-500/40 text-sky-300' : 'border-border/60 text-slate-500 hover:text-slate-300')}>
+                        !muscleFilter ? 'bg-semantic-info/20 border-semantic-info/40 text-semantic-info-text' : 'border-border/60 text-fg-muted hover:text-fg-secondary')}>
                 Todos
               </button>
               {uniqueMuscleGroups.map(mg => (
                 <button key={mg} type="button" onClick={() => setMuscleFilter(f => f === mg ? '' : mg)}
                         className={cn('text-xs px-2.5 py-1 rounded-full border transition-all',
-                          muscleFilter === mg ? 'bg-violet-500/20 border-violet-500/40 text-violet-300' : 'border-border/60 text-slate-500 hover:text-slate-300')}>
+                          muscleFilter === mg ? 'bg-brand-secondary/20 border-brand-secondary/40 text-[#C4B5FD]' : 'border-border/60 text-fg-muted hover:text-fg-secondary')}>
                   {mg}
                 </button>
               ))}
@@ -1412,8 +1412,8 @@ function ExerciseLibraryPanel({
 
           {/* Stats */}
           <div className="flex items-center gap-4 text-sm">
-            <span className="text-slate-400">{filtered.length} ejercicios</span>
-            {(search || muscleFilter) && <span className="text-slate-500">de {exercises.length} en biblioteca</span>}
+            <span className="text-fg-secondary">{filtered.length} ejercicios</span>
+            {(search || muscleFilter) && <span className="text-fg-muted">de {exercises.length} en biblioteca</span>}
           </div>
 
           {/* Exercise grid */}
@@ -1428,24 +1428,24 @@ function ExerciseLibraryPanel({
                 <div key={ex.id} className="card p-4 flex flex-col gap-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white truncate">{ex.name}</h3>
-                      {ex.muscle_group && <p className="text-xs text-slate-400 mt-0.5 truncate">{ex.muscle_group}</p>}
+                      <h3 className="font-semibold text-fg-primary truncate">{ex.name}</h3>
+                      {ex.muscle_group && <p className="text-xs text-fg-secondary mt-0.5 truncate">{ex.muscle_group}</p>}
                     </div>
                     {ex.category && (
                       <span className={cn('shrink-0 text-xs font-medium px-2 py-0.5 rounded-full capitalize',
-                        CATEGORY_COLORS[ex.category as Category] ?? 'bg-slate-700 text-slate-300')}>
+                        CATEGORY_COLORS[ex.category as Category] ?? 'bg-surface-3 text-fg-secondary')}>
                         {ex.category}
                       </span>
                     )}
                   </div>
                   {(ex.default_sets ?? ex.default_reps ?? ex.default_rest) && (
-                    <div className="flex gap-3 text-xs text-slate-400">
-                      {ex.default_sets && <span><span className="text-slate-200 font-medium">{ex.default_sets}</span> series</span>}
-                      {ex.default_reps && <span><span className="text-slate-200 font-medium">{ex.default_reps}</span> reps</span>}
-                      {ex.default_rest && <span><span className="text-slate-200 font-medium">{ex.default_rest}s</span> descanso</span>}
+                    <div className="flex gap-3 text-xs text-fg-secondary">
+                      {ex.default_sets && <span><span className="text-fg-primary font-medium">{ex.default_sets}</span> series</span>}
+                      {ex.default_reps && <span><span className="text-fg-primary font-medium">{ex.default_reps}</span> reps</span>}
+                      {ex.default_rest && <span><span className="text-fg-primary font-medium">{ex.default_rest}s</span> descanso</span>}
                     </div>
                   )}
-                  {ex.description && <p className="text-xs text-slate-500 line-clamp-2">{ex.description}</p>}
+                  {ex.description && <p className="text-xs text-fg-muted line-clamp-2">{ex.description}</p>}
                   <div className="flex items-center gap-1 mt-auto pt-1 border-t border-[#334155]">
                     <button type="button" onClick={() => onUse(ex)} className="btn-secondary text-xs py-1 px-2 flex items-center gap-1">
                       <Plus size={12} /> Usar
@@ -1455,11 +1455,11 @@ function ExerciseLibraryPanel({
                     </button>
                     {confirmDelete === ex.id ? (
                       <div className="flex items-center gap-1">
-                        <button type="button" onClick={() => handleDelete(ex.id)} className="btn-ghost text-xs py-1 px-2 text-red-400 hover:text-red-300">Confirmar</button>
-                        <button type="button" onClick={() => setConfirmDelete(null)} className="btn-ghost text-xs py-1 px-2 text-slate-400">No</button>
+                        <button type="button" onClick={() => handleDelete(ex.id)} className="btn-ghost text-xs py-1 px-2 text-semantic-error-text hover:text-semantic-error-text/80">Confirmar</button>
+                        <button type="button" onClick={() => setConfirmDelete(null)} className="btn-ghost text-xs py-1 px-2 text-fg-secondary">No</button>
                       </div>
                     ) : (
-                      <button type="button" onClick={() => handleDelete(ex.id)} className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 text-red-400 hover:text-red-300">
+                      <button type="button" onClick={() => handleDelete(ex.id)} className="btn-ghost text-xs py-1 px-2 flex items-center gap-1 text-semantic-error-text hover:text-semantic-error-text/80">
                         <Trash2 size={12} /> Eliminar
                       </button>
                     )}

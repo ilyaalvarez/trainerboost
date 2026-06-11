@@ -49,35 +49,32 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', h
       aria-modal="true"
       aria-labelledby="modal-title"
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 animate-fade-in bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 animate-fade-in bg-black/60 backdrop-blur-sm"
     >
-      {/* Dialog panel */}
       <div
         className={cn(
-          'relative w-full rounded-xl bg-white flex flex-col max-h-[calc(100dvh-2rem)]',
-          'animate-modal-in shadow-lg ring-1 ring-black/[0.06]',
+          'relative w-full rounded-xl bg-surface border border-border flex flex-col max-h-[calc(100dvh-2rem)]',
+          'animate-modal-in shadow-modal',
           sizeClasses[size],
           className,
         )}
       >
-        {/* Header */}
         {!hideHeader && (
-          <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-gray-200">
-            <h2 id="modal-title" className="text-gray-900 font-semibold text-base leading-snug">
+          <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-border">
+            <h2 id="modal-title" className="text-fg-primary font-semibold text-base leading-snug">
               {title}
             </h2>
             <button
               type="button"
               onClick={onClose}
               aria-label="Cerrar"
-              className="flex items-center justify-center w-7 h-7 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              className="btn-icon"
             >
               <X size={15} strokeWidth={2} />
             </button>
           </div>
         )}
 
-        {/* Body */}
         <div className="overflow-y-auto overscroll-contain flex-1 px-6 py-5">
           {children}
         </div>

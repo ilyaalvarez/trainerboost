@@ -6,14 +6,11 @@ import type { Notification } from '@/types/database'
 export function useNotifications(userId: string | null) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
-  // Stable reference — createBrowserClient is not a singleton, so we pin
-  // the instance in a ref to prevent effects from re-running on every render.
   const supabaseRef = useRef(createClient())
-  const supabase = supabaseRef.current
 
   const load = useCallback(async () => {
     if (!userId) return
-    const { data } = await supabase
+    const { data } = await supabaseRef.current
       .from('notifications')
       .select('*')
       .eq('user_id', userId)
@@ -21,7 +18,7 @@ export function useNotifications(userId: string | null) {
       .limit(30)
     if (data) setNotifications(data as Notification[])
     setLoading(false)
-  }, [userId, supabase])
+  }, [userId])
 
   useEffect(() => {
     load()
@@ -29,7 +26,8 @@ export function useNotifications(userId: string | null) {
 
   useEffect(() => {
     if (!userId) return
-    const channel = supabase
+    const client = supabaseRef.current
+    const channel = client
       .channel('notifications:' + userId)
       .on('postgres_changes', {
         event: 'INSERT',
@@ -40,20 +38,20 @@ export function useNotifications(userId: string | null) {
         setNotifications(prev => [payload.new as Notification, ...prev])
       })
       .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [userId, supabase])
+    return () => { client.removeChannel(channel) }
+  }, [userId])
 
   const markRead = useCallback(async (id: string) => {
-    await supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('id', id)
+    await supabaseRef.current.from('notifications').update({ read_at: new Date().toISOString() }).eq('id', id)
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
-  }, [supabase])
+  }, [])
 
   const markAllRead = useCallback(async () => {
     if (!userId) return
     const now = new Date().toISOString()
-    await supabase.from('notifications').update({ read_at: now }).eq('user_id', userId).is('read_at', null)
+    await supabaseRef.current.from('notifications').update({ read_at: now }).eq('user_id', userId).is('read_at', null)
     setNotifications(prev => prev.map(n => ({ ...n, read_at: n.read_at ?? now })))
-  }, [userId, supabase])
+  }, [userId])
 
   const unreadCount = notifications.filter(n => !n.read_at).length
 

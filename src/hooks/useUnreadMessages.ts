@@ -5,27 +5,25 @@ import { createClient } from '@/lib/supabase/client'
 
 export function useUnreadMessages(userId: string | null) {
   const [unreadCount, setUnreadCount] = useState(0)
-  // Stable reference — createBrowserClient is not a singleton, pin it in a ref
-  // to prevent effects from re-running and re-subscribing on every render.
   const supabaseRef = useRef(createClient())
-  const supabase = supabaseRef.current
 
   const fetchCount = useCallback(async () => {
     if (!userId) return
-    const { count } = await supabase
+    const { count } = await supabaseRef.current
       .from('messages')
       .select('*', { count: 'exact', head: true })
       .eq('receiver_id', userId)
       .eq('read', false)
     setUnreadCount(count ?? 0)
-  }, [userId, supabase])
+  }, [userId])
 
   useEffect(() => {
     fetchCount()
 
     if (!userId) return
 
-    const channel = supabase
+    const client = supabaseRef.current
+    const channel = client
       .channel(`unread-${userId}`)
       .on(
         'postgres_changes',
@@ -50,9 +48,9 @@ export function useUnreadMessages(userId: string | null) {
       .subscribe()
 
     return () => {
-      supabase.removeChannel(channel)
+      client.removeChannel(channel)
     }
-  }, [userId, fetchCount, supabase])
+  }, [userId, fetchCount])
 
   return unreadCount
 }

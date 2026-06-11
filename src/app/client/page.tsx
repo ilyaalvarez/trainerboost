@@ -36,7 +36,7 @@ export default async function ClientHomePage() {
       .select('*, trainer:trainer_id(id, full_name, avatar_url, bio, specialties)')
       .eq('client_id', user.id)
       .eq('status', 'active')
-      .single(),
+      .maybeSingle(),
     supabase.from('progress_logs')
       .select('*')
       .eq('client_id', user.id)
@@ -49,7 +49,7 @@ export default async function ClientHomePage() {
       .neq('status', 'cancelled')
       .order('scheduled_at')
       .limit(1)
-      .single(),
+      .maybeSingle(),
     supabase.from('messages')
       .select('*', { count: 'exact', head: true })
       .eq('receiver_id', user.id)
@@ -60,7 +60,7 @@ export default async function ClientHomePage() {
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single(),
+      .maybeSingle(),
     checkinQuery,
   ])
 

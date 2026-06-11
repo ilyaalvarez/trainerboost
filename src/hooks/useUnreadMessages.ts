@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 export function useUnreadMessages(userId: string | null) {
   const [unreadCount, setUnreadCount] = useState(0)
   const supabaseRef = useRef(createClient())
+  const instanceId = useRef(Math.random().toString(36).slice(2, 9))
 
   const fetchCount = useCallback(async () => {
     if (!userId) return
@@ -24,7 +25,7 @@ export function useUnreadMessages(userId: string | null) {
 
     const client = supabaseRef.current
     const channel = client
-      .channel(`unread-${userId}`)
+      .channel(`unread:${userId}:${instanceId.current}`)
       .on(
         'postgres_changes',
         {

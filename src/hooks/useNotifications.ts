@@ -6,7 +6,11 @@ import type { Notification } from '@/types/database'
 export function useNotifications(userId: string | null) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
+  // createBrowserClient is a singleton in the browser — pin a unique instance ID
+  // so multiple mounted copies of this hook use distinct channel names and avoid
+  // the "cannot add callbacks after subscribe()" error from Supabase's registry.
   const supabaseRef = useRef(createClient())
+  const instanceId = useRef(Math.random().toString(36).slice(2, 9))
 
   const load = useCallback(async () => {
     if (!userId) return
@@ -28,7 +32,7 @@ export function useNotifications(userId: string | null) {
     if (!userId) return
     const client = supabaseRef.current
     const channel = client
-      .channel('notifications:' + userId)
+      .channel(`notifications:${userId}:${instanceId.current}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',

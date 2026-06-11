@@ -55,8 +55,7 @@ export function SetLogger({ exerciseId, clientId, defaultSets }: Props) {
   const save = async () => {
     const today = new Date().toISOString().split('T')[0]
     setSaving(true)
-    // delete today's logs, re-insert
-    await supabase.from('set_logs').delete().eq('exercise_id', exerciseId).eq('client_id', clientId).eq('logged_at', today)
+
     const rows = entries.filter(e => e.weight_kg || e.reps).map(e => ({
       exercise_id: exerciseId,
       client_id: clientId,
@@ -65,10 +64,39 @@ export function SetLogger({ exerciseId, clientId, defaultSets }: Props) {
       reps: e.reps ? parseInt(e.reps) : null,
       logged_at: today,
     }))
+
+    // Snapshot before any mutation so we can restore if insert fails
+    const { data: snapshot } = await supabase
+      .from('set_logs')
+      .select('set_number, weight_kg, reps, logged_at')
+      .eq('exercise_id', exerciseId)
+      .eq('client_id', clientId)
+      .eq('logged_at', today)
+
+    const { error: delErr } = await supabase
+      .from('set_logs')
+      .delete()
+      .eq('exercise_id', exerciseId)
+      .eq('client_id', clientId)
+      .eq('logged_at', today)
+
+    if (delErr) { toast.error('Error al guardar'); setSaving(false); return }
+
     if (rows.length > 0) {
       const { error } = await supabase.from('set_logs').insert(rows)
-      if (error) { toast.error('Error al guardar'); setSaving(false); return }
+      if (error) {
+        // Best-effort restore of previous session data
+        if (snapshot?.length) {
+          await supabase.from('set_logs').insert(
+            snapshot.map(s => ({ ...s, exercise_id: exerciseId, client_id: clientId }))
+          )
+        }
+        toast.error('Error al guardar')
+        setSaving(false)
+        return
+      }
     }
+
     toast.success('Sets guardados ✓')
     setSaving(false)
     setOpen(false)

@@ -3,14 +3,48 @@
 @tailwind utilities;
 
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   CSS CUSTOM PROPERTIES
+   Fuente de verdad para estilos que necesitan var() en CSS puro (no Tailwind).
+   Los tokens del design system viven en tailwind.config.ts — aquí solo
+   se exponen los que se necesitan en cálculos CSS o en inline styles.
+───────────────────────────────────────────────────────────────────────────── */
 :root {
+  /* Backgrounds */
   --background: #0A0A0A;
-  --foreground: #F1F5F9;
-  --surface: #111111;
-  --border: #1E1E1E;
-  --brand-primary: #8FD43A;   /* single source of truth */
-  --brand-secondary: #7C3AED;
-  --brand-accent: #10B981;
+  --surface:    #111111;
+  --surface-2:  #161616;
+  --surface-3:  #1C1C1C;
+
+  /* Borders */
+  --border:        #1E1E1E;
+  --border-subtle: #181818;
+  --border-strong: #2E2E2E;
+
+  /* Foreground / texto */
+  --foreground:   #EAEAEA;   /* actualizado desde #F1F5F9 — off-white sin cast azul */
+  --fg-primary:   #EAEAEA;
+  --fg-secondary: #94A3B8;
+  --fg-muted:     #64748B;
+  --fg-disabled:  #475569;
+
+  /* Marca */
+  --brand-primary:        #8FD43A;
+  --brand-primary-rgb:    143, 212, 58;   /* Para rgba() en conic/linear gradients */
+  --brand-secondary:      #7C3AED;
+  --brand-secondary-text: #C4B5FD;
+  --brand-accent:         #10B981;
+  --brand-rose:           #F9A8D4;
+
+  /* Semantic states — para rgba() en inline styles */
+  --success:      #22C55E;
+  --success-text: #4ADE80;
+  --warning:      #F59E0B;
+  --warning-text: #FCD34D;
+  --error:        #EF4444;
+  --error-text:   #FC8181;
+  --info:         #0EA5E9;
+  --info-text:    #38BDF8;
 }
 
 * { box-sizing: border-box; }
@@ -19,7 +53,7 @@ html { color-scheme: dark; scroll-behavior: smooth; }
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: var(--fg-primary);
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -33,12 +67,15 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
 
 /* Selection */
-::selection { background: rgba(143,212,58,0.2); color: #0A0A0A; }
+::selection { background: rgba(143,212,58,0.18); color: var(--fg-primary); }
 
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   UTILITIES LAYER
+───────────────────────────────────────────────────────────────────────────── */
 @layer utilities {
-  .text-balance { text-wrap: balance; }
 
-  /* ─── Gradient text — use ONLY for the logo wordmark ──────── */
+  /* ─── Gradient text — SOLO para el logotipo wordmark ──────────── */
   .gradient-text {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -57,21 +94,22 @@ body {
     background-clip: text;
     background-image: linear-gradient(90deg, #F59E0B 0%, #EF4444 100%);
   }
+  .text-balance { text-wrap: balance; }
 
-  /* ─── Cards ────────────────────────────────────────────────── */
+  /* ─── Cards ────────────────────────────────────────────────────── */
   .card {
     @apply bg-surface border border-border rounded-xl shadow-card;
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
   }
   .card:hover {
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    border-color: #2C2C2C;
+    border-color: var(--border-strong);
   }
   .card-hover {
     @apply card transition-all duration-300 ease-smooth-out cursor-pointer;
   }
   .card-hover:hover {
-    @apply shadow-card-hover -translate-y-0.5 border-border-bright;
+    @apply shadow-card-hover -translate-y-0.5 border-border-strong;
   }
   .card-interactive {
     @apply card transition-all duration-200 ease-smooth-out cursor-pointer;
@@ -79,42 +117,51 @@ body {
   .card-interactive:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 28px rgba(0,0,0,0.45);
-    border-color: #2C2C2C;
+    border-color: var(--border-strong);
   }
   .card-interactive:active {
     transform: translateY(-1px);
   }
+  /* Card plana — sin elevación, para secciones dentro de otras cards */
+  .card-flat {
+    @apply bg-surface-2 border border-border rounded-lg;
+  }
 
-  /* ─── Buttons ──────────────────────────────────────────────── */
+  /* ─── Buttons ──────────────────────────────────────────────────── */
   .btn-primary {
-    background: #8FD43A;
+    background: var(--brand-primary);
     @apply text-black font-semibold rounded-lg
-           px-4 py-2 text-sm ease-smooth-out
+           px-4 py-2.5 text-sm ease-smooth-out
            disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none
            flex items-center gap-2 justify-center;
     transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
   }
   .btn-primary:not(:disabled):hover {
     background: #9EE048;
-    box-shadow: 0 4px 12px rgba(143,212,58,0.2);
+    box-shadow: 0 4px 12px rgba(143,212,58,0.22);
     transform: translateY(-1px);
   }
   .btn-primary:not(:disabled):active {
     transform: scale(0.98);
     box-shadow: none;
   }
-  /* btn-gradient: alias de btn-primary (mismo visual, sin gradiente) */
+  .btn-primary:focus-visible {
+    outline: 2px solid rgba(143,212,58,0.6);
+    outline-offset: 2px;
+  }
+
+  /* btn-gradient: alias semántico de btn-primary */
   .btn-gradient {
-    background: #8FD43A;
+    background: var(--brand-primary);
     @apply text-black font-semibold rounded-lg
-           px-4 py-2 text-sm ease-smooth-out
+           px-4 py-2.5 text-sm ease-smooth-out
            disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none
            flex items-center gap-2 justify-center;
     transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
   }
   .btn-gradient:not(:disabled):hover {
     background: #9EE048;
-    box-shadow: 0 4px 12px rgba(143,212,58,0.2);
+    box-shadow: 0 4px 12px rgba(143,212,58,0.22);
     transform: translateY(-1px);
   }
   .btn-gradient:not(:disabled):active {
@@ -127,77 +174,119 @@ body {
   }
 
   .btn-secondary {
-    @apply bg-surface border border-border text-slate-300
-           font-semibold rounded-lg px-4 py-2 text-sm
+    @apply bg-surface border border-border text-fg-secondary
+           font-semibold rounded-lg px-4 py-2.5 text-sm
            transition-all duration-150 ease-smooth-out
            disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none
            flex items-center gap-2 justify-center;
   }
   .btn-secondary:not(:disabled):hover {
-    @apply bg-surface-2 border-border-bright text-slate-100;
+    @apply bg-surface-2 border-border-strong text-fg-primary;
   }
   .btn-secondary:not(:disabled):active {
     transform: scale(0.98);
   }
-  .btn-danger {
-    @apply bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg
-           px-4 py-2 text-sm transition-all duration-150
-           disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 justify-center;
-  }
-  .btn-ghost {
-    @apply text-slate-400 hover:text-white font-medium rounded-lg
-           px-4 py-2 text-sm transition-all duration-150 flex items-center gap-2 justify-center;
-  }
-  .btn-ghost:hover {
-    background: rgba(255,255,255,0.04);
-  }
-
-  /* Focus rings for keyboard navigation */
-  .btn-primary:focus-visible,
-  .btn-secondary:focus-visible,
-  .btn-ghost:focus-visible,
-  .btn-danger:focus-visible {
+  .btn-secondary:focus-visible {
     outline: 2px solid rgba(143,212,58,0.6);
     outline-offset: 2px;
   }
 
-  /* ─── Inputs ───────────────────────────────────────────────── */
+  .btn-danger {
+    @apply bg-semantic-error text-white font-semibold rounded-lg
+           px-4 py-2.5 text-sm transition-all duration-150
+           disabled:opacity-40 disabled:cursor-not-allowed
+           flex items-center gap-2 justify-center;
+  }
+  .btn-danger:not(:disabled):hover {
+    background: #DC2626;
+    transform: translateY(-1px);
+  }
+  .btn-danger:not(:disabled):active {
+    transform: scale(0.98);
+  }
+  .btn-danger:focus-visible {
+    outline: 2px solid rgba(239,68,68,0.6);
+    outline-offset: 2px;
+  }
+
+  .btn-ghost {
+    @apply text-fg-muted hover:text-fg-primary font-medium rounded-lg
+           px-4 py-2.5 text-sm transition-all duration-150
+           flex items-center gap-2 justify-center;
+  }
+  .btn-ghost:hover {
+    background: rgba(255,255,255,0.04);
+  }
+  .btn-ghost:focus-visible {
+    outline: 2px solid rgba(143,212,58,0.6);
+    outline-offset: 2px;
+  }
+
+  /* Botón solo icono — hit area ≥ 36px desktop, ≥ 44px mobile */
+  .btn-icon {
+    @apply flex items-center justify-center
+           w-9 h-9 rounded-lg text-fg-muted
+           transition-all duration-150 ease-smooth-out
+           hover:text-fg-primary hover:bg-surface-2
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-icon:focus-visible {
+    outline: 2px solid rgba(143,212,58,0.6);
+    outline-offset: 2px;
+  }
+
+  /* ─── Inputs ───────────────────────────────────────────────────── */
   .input {
-    @apply bg-surface border border-border rounded-lg px-3 py-2 text-sm text-slate-100
-           placeholder:text-slate-600 w-full;
+    @apply bg-surface border border-border rounded-lg px-3 py-2.5 text-sm
+           text-fg-primary placeholder:text-fg-muted w-full;
     transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
   }
   .input:focus {
     border-color: rgba(143,212,58,0.5);
-    box-shadow: 0 0 0 2px rgba(143,212,58,0.08);
+    box-shadow: 0 0 0 3px rgba(143,212,58,0.08);
     outline: none;
   }
+  .input:disabled {
+    @apply opacity-50 cursor-not-allowed bg-surface-2;
+  }
+  .input-error {
+    border-color: rgba(239,68,68,0.6);
+  }
+  .input-error:focus {
+    border-color: rgba(239,68,68,0.6);
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.08);
+  }
   .label {
-    @apply text-xs font-medium text-slate-500 mb-1.5 block;
+    @apply text-xs font-medium text-fg-muted mb-1.5 block;
+  }
+  .label-error {
+    @apply text-xs text-semantic-error-text mt-1.5 block;
   }
 
-  /* ─── Badges ───────────────────────────────────────────────── */
+  /* ─── Badges — dark mode nativo ────────────────────────────────── */
+  /* Patrón: bg-semantic-X/10 + text-semantic-X-text + border-semantic-X/20 */
   .badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5;
+    @apply text-xs font-medium whitespace-nowrap;
   }
-  .badge-active  { @apply badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20; }
-  .badge-paused  { @apply badge bg-amber-500/10 text-amber-400 border border-amber-500/20; }
-  .badge-ended   { @apply badge bg-red-500/10 text-red-400 border border-red-500/20; }
-  .badge-pending { @apply badge bg-surface-3 text-slate-400 border border-border-bright; }
-  .badge-pro     { @apply badge bg-violet-500/10 text-violet-300 border border-violet-500/20; }
-  .badge-info    { @apply badge bg-sky-500/10 text-sky-400 border border-sky-500/20; }
+  .badge-active  { @apply badge bg-semantic-success/10 text-semantic-success-text border border-semantic-success/20; }
+  .badge-paused  { @apply badge bg-semantic-warning/10 text-semantic-warning-text border border-semantic-warning/20; }
+  .badge-ended   { @apply badge bg-semantic-error/10   text-semantic-error-text   border border-semantic-error/20;   }
+  .badge-pending { @apply badge bg-surface-3 text-fg-muted    border border-border-strong; }
+  .badge-pro     { @apply badge bg-brand-secondary/10 text-brand-secondary-text border border-brand-secondary/20; }
+  .badge-info    { @apply badge bg-semantic-info/10   text-semantic-info-text    border border-semantic-info/20;    }
 
-  .badge-confirmed  { @apply badge bg-sky-500/10 text-sky-400 border border-sky-500/20; }
-  .badge-done       { @apply badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20; }
-  .badge-cancelled  { @apply badge bg-red-500/10 text-red-400 border border-red-500/20; }
-  .badge-archived   { @apply badge bg-surface-3 text-slate-500 border border-border-bright; }
-  .badge-inactive   { @apply badge bg-surface-3 text-slate-500 border border-border-bright; }
-  .badge-past_due   { @apply badge bg-amber-500/10 text-amber-400 border border-amber-500/20; }
-  .badge-presencial { @apply badge bg-violet-500/10 text-violet-400 border border-violet-500/20; }
-  .badge-online     { @apply badge bg-sky-500/10 text-sky-400 border border-sky-500/20; }
-  .badge-llamada    { @apply badge bg-teal-500/10 text-teal-400 border border-teal-500/20; }
+  .badge-confirmed  { @apply badge bg-semantic-info/10    text-semantic-info-text    border border-semantic-info/20;    }
+  .badge-done       { @apply badge bg-semantic-success/10 text-semantic-success-text border border-semantic-success/20; }
+  .badge-cancelled  { @apply badge bg-semantic-error/10   text-semantic-error-text   border border-semantic-error/20;   }
+  .badge-archived   { @apply badge bg-surface-3 text-fg-disabled border border-border-strong; }
+  .badge-inactive   { @apply badge bg-surface-3 text-fg-disabled border border-border-strong; }
+  .badge-past_due   { @apply badge bg-semantic-warning/10 text-semantic-warning-text border border-semantic-warning/20; }
+  .badge-presencial { @apply badge bg-semantic-info/10    text-semantic-info-text    border border-semantic-info/20;    }
+  .badge-online     { @apply badge bg-brand-secondary/10  text-brand-secondary-text border border-brand-secondary/20; }
+  .badge-llamada    { @apply badge bg-semantic-warning/10 text-semantic-warning-text border border-semantic-warning/20; }
 
-  /* ─── Chip — use max once per page section as category marker ─ */
+  /* ─── Chips — max uno por sección como marcador de categoría ──── */
   .chip {
     @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
            bg-brand-primary/10 border border-brand-primary/20 text-brand-primary;
@@ -208,16 +297,17 @@ body {
   }
   .chip-purple {
     @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
-           bg-violet-500/10 border border-violet-500/20 text-violet-400;
+           bg-brand-secondary/10 border border-brand-secondary/20;
+    color: #C4B5FD;
   }
 
-  /* ─── Divider ──────────────────────────────────────────────── */
+  /* ─── Divider ──────────────────────────────────────────────────── */
   .divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, #2C2C2C 20%, #2C2C2C 80%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, var(--border-strong) 20%, var(--border-strong) 80%, transparent 100%);
   }
 
-  /* ─── Hover lift ───────────────────────────────────────────── */
+  /* ─── Hover lift ───────────────────────────────────────────────── */
   .hover-lift {
     @apply transition-all duration-200 ease-smooth-out;
   }
@@ -226,7 +316,7 @@ body {
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
   }
 
-  /* ─── Gradient border ──────────────────────────────────────── */
+  /* ─── Gradient border — uso deliberado, no decorativo ─────────── */
   .gradient-border {
     position: relative;
   }
@@ -243,7 +333,7 @@ body {
     pointer-events: none;
   }
 
-  /* ─── Glass effect ─────────────────────────────────────────── */
+  /* ─── Glass — fondos translúcidos ──────────────────────────────── */
   .glass {
     background: rgba(15, 23, 42, 0.55);
     backdrop-filter: blur(20px) saturate(160%);
@@ -252,21 +342,40 @@ body {
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 20px 40px -12px rgba(0,0,0,0.5);
   }
 
-  /* ─── Animation utilities ──────────────────────────────────── */
+  /* ─── Skeleton helpers — dark mode ─────────────────────────────── */
+  /* Componente Skeleton.tsx usa estas clases en PASO 3.3 */
+  .skeleton-card {
+    @apply rounded-xl border border-border p-4 space-y-4 bg-surface shadow-card;
+  }
+  .skeleton-table {
+    @apply w-full rounded-xl border border-border overflow-hidden bg-surface;
+  }
+  .skeleton-table-header {
+    @apply flex items-center gap-4 px-4 py-3 border-b border-border bg-surface-2;
+  }
+  .skeleton-table-row {
+    @apply flex items-center gap-4 px-4 py-3.5;
+  }
+
+  /* ─── Animation utilities ──────────────────────────────────────── */
   .animate-fade-in-up  { animation: fadeInUp  0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .animate-fade-in     { animation: fadeIn    0.3s ease both; }
   .animate-slide-left  { animation: slideLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .animate-slide-right { animation: slideRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .animate-slide-up    { animation: slideUp   0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .animate-scale-in    { animation: scaleIn   0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-  .animate-shimmer     {
-    background: linear-gradient(90deg, #111111 25%, #1A1A1A 50%, #111111 75%);
+  .animate-shimmer {
+    background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
     background-size: 400% 100%;
     animation: shimmer 1.8s ease-in-out infinite;
   }
+  .animate-message-in {
+    animation: messageIn 0.2s ease-out both;
+  }
 
-  .delay-50  { animation-delay: 50ms; }
-  .delay-75  { animation-delay: 75ms; }
+  /* ─── Animation delays ─────────────────────────────────────────── */
+  .delay-50  { animation-delay:  50ms; }
+  .delay-75  { animation-delay:  75ms; }
   .delay-100 { animation-delay: 100ms; }
   .delay-150 { animation-delay: 150ms; }
   .delay-200 { animation-delay: 200ms; }
@@ -277,13 +386,13 @@ body {
   .delay-700 { animation-delay: 700ms; }
   .delay-800 { animation-delay: 800ms; }
 
-  /* ─── Focus ring ───────────────────────────────────────────── */
+  /* ─── Focus ring ───────────────────────────────────────────────── */
   .focus-ring:focus-visible {
     @apply outline-none;
     box-shadow: 0 0 0 2px rgba(143,212,58,0.5);
   }
 
-  /* ─── Grain texture overlay ────────────────────────────────── */
+  /* ─── Grain texture overlay ────────────────────────────────────── */
   .grain {
     position: relative;
   }
@@ -297,9 +406,13 @@ body {
     pointer-events: none;
     border-radius: inherit;
   }
-}
 
-/* ─── Keyframes ────────────────────────────────────────────── */
+}  /* end @layer utilities */
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   KEYFRAMES
+───────────────────────────────────────────────────────────────────────────── */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0);    }
@@ -328,34 +441,42 @@ body {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
 }
+@keyframes tabSlideIn {
+  from { opacity: 0; transform: scaleX(0.3); transform-origin: left center; }
+  to   { opacity: 1; transform: scaleX(1);   transform-origin: left center; }
+}
+@keyframes messageIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1);      }
+}
+@keyframes skeletonShimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1);   }
+  50%       { opacity: 0.5; transform: scale(1.3); }
+}
 
-/* ─── Nav active pill ──────────────────────────────────────── */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   COMPONENTES GLOBALES (fuera de @layer — mayor especificidad intencional)
+───────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Sidebar nav — item activo ─────────────────────────────────── */
 .nav-item-active {
   background: rgba(143,212,58,0.08);
-  color: #8FD43A;
+  color: var(--brand-primary);
 }
 .nav-item-active svg {
-  color: #8FD43A;
+  color: var(--brand-primary);
 }
 
-/* ─── Glass card (auth pages + modals) ────────────────────── */
-.glass-card {
-  background: rgba(10, 10, 10, 0.75);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 1rem;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.05),
-    inset 0 -1px 0 rgba(0,0,0,0.2),
-    0 24px 64px -16px rgba(0,0,0,0.7);
-}
-
-/* ─── Sidebar active nav pill ──────────────────────────────── */
+/* ─── Sidebar nav — pill activo con línea izquierda ─────────────── */
 .nav-pill-active {
   position: relative;
   background: rgba(143,212,58,0.07);
-  color: #8FD43A !important;
+  color: var(--brand-primary) !important;
 }
 .nav-pill-active::before {
   content: '';
@@ -368,28 +489,45 @@ body {
   min-height: 14px;
   max-height: 24px;
   border-radius: 0 2px 2px 0;
-  background: #8FD43A;
+  background: var(--brand-primary);
   box-shadow: 0 0 5px rgba(143,212,58,0.25);
 }
 
-/* ─── Tab underline indicator ──────────────────────────────── */
+/* ─── Glass card — auth pages y modals ──────────────────────────── */
+.glass-card {
+  background: rgba(10, 10, 10, 0.80);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    inset 0 -1px 0 rgba(0,0,0,0.2),
+    0 24px 64px -16px rgba(0,0,0,0.7);
+}
+
+/* ─── Tab — underline indicator ──────────────────────────────────── */
 .tab-btn {
   position: relative;
   padding: 0.5rem 0.875rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #64748B;
-  transition: color 0.15s ease;
+  color: var(--fg-muted);
+  transition: color 0.15s ease, background 0.15s ease;
   white-space: nowrap;
   border-bottom: 2px solid transparent;
   border-radius: 6px 6px 0 0;
 }
 .tab-btn:hover {
-  color: #94A3B8;
+  color: var(--fg-secondary);
   background: rgba(255,255,255,0.03);
 }
+.tab-btn:focus-visible {
+  outline: 2px solid rgba(143,212,58,0.5);
+  outline-offset: -2px;
+}
 .tab-btn-active {
-  color: #8FD43A;
+  color: var(--brand-primary);
   background: rgba(143,212,58,0.04);
 }
 .tab-btn-active::after {
@@ -399,18 +537,18 @@ body {
   left: 0.5rem;
   right: 0.5rem;
   height: 2px;
-  background: #8FD43A;
+  background: var(--brand-primary);
   border-radius: 2px 2px 0 0;
   animation: tabSlideIn 0.22s cubic-bezier(0.16,1,0.3,1) both;
 }
 
-/* ─── Staggered card grid animations ──────────────────────── */
+/* ─── Stagger grid animations ────────────────────────────────────── */
 .stagger-children > * {
   animation: fadeInUp 0.45s cubic-bezier(0.16,1,0.3,1) both;
   opacity: 0;
 }
-.stagger-children > *:nth-child(1) { animation-delay: 30ms; }
-.stagger-children > *:nth-child(2) { animation-delay: 90ms; }
+.stagger-children > *:nth-child(1) { animation-delay:  30ms; }
+.stagger-children > *:nth-child(2) { animation-delay:  90ms; }
 .stagger-children > *:nth-child(3) { animation-delay: 150ms; }
 .stagger-children > *:nth-child(4) { animation-delay: 210ms; }
 .stagger-children > *:nth-child(5) { animation-delay: 270ms; }
@@ -419,44 +557,22 @@ body {
 .stagger-children > *:nth-child(8) { animation-delay: 450ms; }
 .stagger-children > *:nth-child(n+9) { animation-delay: 500ms; }
 
-/* ─── Glow utilities — use only on interactive focus states ── */
+/* ─── Glow utilities — solo en estados interactivos, nunca decorativos ── */
 .glow-primary   { box-shadow: 0 0 12px rgba(143,212,58,0.12), 0 0 4px rgba(143,212,58,0.06); }
-.glow-accent    { box-shadow: 0 0 12px rgba(16,185,129,0.12), 0 0 4px rgba(16,185,129,0.05); }
-.glow-secondary { box-shadow: 0 0 12px rgba(124,58,237,0.12), 0 0 4px rgba(124,58,237,0.05); }
+.glow-accent    { box-shadow: 0 0 12px rgba(16,185,129,0.12),  0 0 4px rgba(16,185,129,0.05); }
+.glow-secondary { box-shadow: 0 0 12px rgba(124,58,237,0.12),  0 0 4px rgba(124,58,237,0.05); }
 
-/* ─── Skeleton shimmer ──────────────────────────────────────── */
+/* ─── Skeleton shimmer — dark mode ──────────────────────────────── */
 .skeleton {
-  background: linear-gradient(90deg, #111111 25%, #1A1A1A 50%, #111111 75%);
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
   background-size: 400px 100%;
   animation: skeletonShimmer 1.4s ease-in-out infinite;
 }
-@keyframes skeletonShimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
 
-/* ─── Status badge dot ──────────────────────────────────────── */
+/* ─── Status badge dot — con animación de pulso ─────────────────── */
 .badge-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   animation: statusPulse 2.5s ease-in-out infinite;
-}
-@keyframes statusPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(1.3); }
-}
-
-/* ─── Additional keyframes ──────────────────────────────────── */
-@keyframes tabSlideIn {
-  from { opacity: 0; transform: scaleX(0.3); transform-origin: left center; }
-  to   { opacity: 1; transform: scaleX(1);   transform-origin: left center; }
-}
-
-@keyframes messageIn {
-  from { opacity: 0; transform: translateY(6px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-.animate-message-in {
-  animation: messageIn 0.2s ease-out both;
 }

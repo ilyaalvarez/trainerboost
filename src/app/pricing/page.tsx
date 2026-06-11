@@ -81,13 +81,13 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         onClick={() => setOpen(v => !v)}
         className="w-full flex items-center justify-between gap-4 py-5 px-1 text-left group"
       >
-        <span className={cn('font-medium text-sm leading-snug transition-colors duration-150', open ? 'text-white' : 'text-slate-200 group-hover:text-white')}>
+        <span className={cn('font-medium text-sm leading-snug transition-colors duration-150', open ? 'text-fg-primary' : 'text-fg-secondary group-hover:text-fg-primary')}>
           {q}
         </span>
-        <ChevronDown className={cn('w-4 h-4 text-slate-500 shrink-0 transition-transform duration-300', open && 'rotate-180 text-brand-primary')} />
+        <ChevronDown className={cn('w-4 h-4 text-fg-disabled shrink-0 transition-transform duration-300', open && 'rotate-180 text-brand-primary')} />
       </button>
       <div className={cn('overflow-hidden transition-all duration-300', open ? 'max-h-40 pb-5' : 'max-h-0')}>
-        <p className="text-sm text-slate-400 leading-relaxed pr-8">{a}</p>
+        <p className="text-sm text-fg-muted leading-relaxed pr-8">{a}</p>
       </div>
     </div>
   )
@@ -125,18 +125,17 @@ export default function PricingPage() {
       <nav className="border-b border-border/50 bg-background/90 backdrop-blur-xl sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                 style={{ background: '#8FD43A' }}>
+            <div className="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center shrink-0">
               <Zap className="w-4 h-4 text-black" />
             </div>
-            <span className="font-bold text-base tracking-tight text-white">TrainerBoost</span>
+            <span className="font-bold text-base tracking-tight text-fg-primary">TrainerBoost</span>
           </Link>
           <div className="flex items-center gap-1">
-            <Link href="/contact" className="text-sm text-slate-400 hover:text-white transition-colors duration-150 hidden sm:block px-3 py-2 rounded-lg hover:bg-surface/70">
+            <Link href="/contact" className="text-sm text-fg-muted hover:text-fg-primary transition-colors duration-150 hidden sm:block px-3 py-2 rounded-lg hover:bg-surface/70">
               Contacto
             </Link>
             <div className="w-px h-4 bg-border mx-2 hidden sm:block" />
-            <Link href="/login" className="text-sm text-slate-400 hover:text-white transition-colors duration-150 px-3 py-2 rounded-lg hover:bg-surface/70 hidden sm:block">
+            <Link href="/login" className="text-sm text-fg-muted hover:text-fg-primary transition-colors duration-150 px-3 py-2 rounded-lg hover:bg-surface/70 hidden sm:block">
               Entrar
             </Link>
             <Link href="/register" className="btn-gradient text-sm py-2 px-4 ml-1">
@@ -150,17 +149,17 @@ export default function PricingPage() {
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="text-center mb-16 animate-fade-in-up">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-5 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-fg-primary mb-5 tracking-tight">
             Empieza gratis, crece cuando quieras
           </h1>
-          <p className="text-lg text-slate-500 max-w-lg mx-auto leading-relaxed">
+          <p className="text-lg text-fg-muted max-w-lg mx-auto leading-relaxed">
             Sin tarjeta de crédito. Sin sorpresas. Cancela en 1 clic.
           </p>
         </div>
 
         {/* ── Billing toggle ─────────────────────────────────────────────── */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <span className={`text-sm ${!annual ? 'text-white' : 'text-slate-400'}`}>Mensual</span>
+          <span className={`text-sm ${!annual ? 'text-fg-primary' : 'text-fg-muted'}`}>Mensual</span>
           <button
             onClick={() => setAnnual(v => !v)}
             className={`relative w-11 h-6 rounded-full transition-colors ${annual ? 'bg-brand-primary' : 'bg-surface-3'}`}
@@ -168,12 +167,12 @@ export default function PricingPage() {
           >
             <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${annual ? 'translate-x-6' : 'translate-x-1'}`} />
           </button>
-          <span className={`text-sm ${annual ? 'text-white' : 'text-slate-400'}`}>
-            Anual <span className="text-emerald-400 font-semibold">-20%</span>
+          <span className={`text-sm ${annual ? 'text-fg-primary' : 'text-fg-muted'}`}>
+            Anual <span className="text-semantic-success-text font-semibold">-20%</span>
           </span>
         </div>
         {annual && (
-          <p className="text-center text-xs text-slate-500 -mt-4 mb-8">
+          <p className="text-center text-xs text-fg-muted -mt-4 mb-8">
             Escríbenos y te aplicamos el descuento anual en tu próxima factura.
           </p>
         )}
@@ -184,12 +183,12 @@ export default function PricingPage() {
           {/* FREE */}
           <div className="relative flex flex-col rounded-2xl border border-border/80 bg-surface p-6 transition-all duration-300 hover:-translate-y-1 hover:border-border-bright">
             <div className="mb-5">
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Gratis</div>
+              <div className="text-xs font-semibold text-fg-muted uppercase tracking-wider mb-2">Gratis</div>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-bold font-mono text-white">0€</span>
-                <span className="text-slate-400 text-sm">/mes</span>
+                <span className="text-4xl font-bold font-mono text-fg-primary">0€</span>
+                <span className="text-fg-muted text-sm">/mes</span>
               </div>
-              <p className="text-xs text-slate-500 mt-2">Para probar sin compromiso</p>
+              <p className="text-xs text-fg-muted mt-2">Para probar sin compromiso</p>
             </div>
 
             <div className="divider mb-5" />
@@ -197,10 +196,10 @@ export default function PricingPage() {
             <ul className="space-y-2.5 flex-1 mb-6">
               {FREE_FEATURES.map(feat => (
                 <li key={feat} className="flex items-start gap-2.5 text-xs">
-                  <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${feat.startsWith('Sin') ? 'bg-slate-700/80' : 'bg-brand-accent/20'}`}>
-                    <Check className={`w-2 h-2 ${feat.startsWith('Sin') ? 'text-slate-500' : 'text-brand-accent'}`} />
+                  <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${feat.startsWith('Sin') ? 'bg-fg-disabled/30' : 'bg-brand-accent/20'}`}>
+                    <Check className={`w-2 h-2 ${feat.startsWith('Sin') ? 'text-fg-disabled' : 'text-brand-accent'}`} />
                   </div>
-                  <span className={feat.startsWith('Sin') ? 'text-slate-500 line-through' : 'text-slate-300'}>{feat}</span>
+                  <span className={feat.startsWith('Sin') ? 'text-fg-disabled line-through' : 'text-fg-secondary'}>{feat}</span>
                 </li>
               ))}
             </ul>
@@ -242,19 +241,19 @@ export default function PricingPage() {
                 )}
 
                 <div className="mb-5">
-                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{plan.name}</div>
+                  <div className="text-xs font-semibold text-fg-muted uppercase tracking-wider mb-2">{plan.name}</div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold font-mono text-white">
+                    <span className="text-4xl font-bold font-mono text-fg-primary">
                       {annual ? Math.floor(plan.price * 0.8) : plan.price}€
                     </span>
-                    <span className="text-slate-400 text-sm">/mes</span>
+                    <span className="text-fg-muted text-sm">/mes</span>
                   </div>
                   {annual && (
-                    <p className="text-xs text-emerald-400 mt-1">
+                    <p className="text-xs text-semantic-success-text mt-1">
                       {Math.floor(plan.price * 0.8 * 12)}€/año · ahorras {Math.floor(plan.price * 0.2 * 12)}€
                     </p>
                   )}
-                  <p className="text-xs text-slate-500 mt-2">
+                  <p className="text-xs text-fg-muted mt-2">
                     {key === 'unlimited' ? 'Clientes ilimitados' : `Hasta ${plan.maxClients} clientes`}
                   </p>
                 </div>
@@ -267,7 +266,7 @@ export default function PricingPage() {
                       <div className="w-3.5 h-3.5 rounded-full bg-brand-accent/20 flex items-center justify-center shrink-0 mt-0.5">
                         <Check className="w-2 h-2 text-brand-accent" />
                       </div>
-                      <span className="text-slate-300">{feat}</span>
+                      <span className="text-fg-secondary">{feat}</span>
                     </li>
                   ))}
                 </ul>
@@ -279,7 +278,7 @@ export default function PricingPage() {
                       'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2',
                       isPopular
                         ? 'btn-gradient'
-                        : 'bg-surface-2 border border-border hover:border-border-bright text-white hover:bg-surface-3 hover:-translate-y-0.5',
+                        : 'bg-surface-2 border border-border hover:border-border-bright text-fg-primary hover:bg-surface-3 hover:-translate-y-0.5',
                     )}
                   >
                     Avísame del precio anual
@@ -292,7 +291,7 @@ export default function PricingPage() {
                       'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2',
                       isPopular
                         ? 'btn-gradient'
-                        : 'bg-surface-2 border border-border hover:border-border-bright text-white hover:bg-surface-3 hover:-translate-y-0.5',
+                        : 'bg-surface-2 border border-border hover:border-border-bright text-fg-primary hover:bg-surface-3 hover:-translate-y-0.5',
                     )}
                   >
                     {loadingPlan === key
@@ -300,7 +299,7 @@ export default function PricingPage() {
                       : 'Probar 14 días gratis'}
                   </button>
                 )}
-                <p className="text-xs text-slate-500 mt-1 text-center">
+                <p className="text-xs text-fg-muted mt-1 text-center">
                   {annual ? 'Te contactamos en 24h · Sin compromiso' : '14 días gratis · Sin compromiso'}
                 </p>
               </div>
@@ -311,7 +310,7 @@ export default function PricingPage() {
         {/* ── Trust badges ───────────────────────────────────────────────── */}
         <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 py-8 mb-12 border-y border-border/40 animate-fade-in-up delay-300">
           {TRUST_BADGES.map(({ icon: Icon, text }) => (
-            <div key={text} className="flex items-center gap-2 text-sm text-slate-400">
+            <div key={text} className="flex items-center gap-2 text-sm text-fg-muted">
               <div className="w-6 h-6 rounded-lg bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center">
                 <Icon className="w-3 h-3 text-brand-accent" />
               </div>
@@ -326,20 +325,20 @@ export default function PricingPage() {
             <div key={t.name} className="card p-5 flex flex-col gap-4 hover:-translate-y-0.5 transition-transform duration-200">
               <div className="flex items-center gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <svg key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" viewBox="0 0 20 20">
+                  <svg key={i} className="w-3.5 h-3.5 text-semantic-warning-text fill-current" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
               </div>
-              <p className="text-sm text-slate-300 leading-relaxed flex-1">&ldquo;{t.text}&rdquo;</p>
+              <p className="text-sm text-fg-secondary leading-relaxed flex-1">&ldquo;{t.text}&rdquo;</p>
               <div className="flex items-center justify-between pt-2 border-t border-border/50">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-full bg-brand-primary/20 border border-brand-primary/30 flex items-center justify-center text-xs font-bold text-brand-primary shrink-0">
                     {t.initials}
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-white">{t.name}</div>
-                    <div className="text-xs text-slate-500">{t.role}</div>
+                    <div className="text-sm font-semibold text-fg-primary">{t.name}</div>
+                    <div className="text-xs text-fg-muted">{t.role}</div>
                   </div>
                 </div>
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-primary/10 text-brand-primary border border-brand-primary/20">
@@ -360,22 +359,21 @@ export default function PricingPage() {
             <div key={label} className="card p-5 hover:-translate-y-0.5 transition-transform duration-200">
               <Icon className="w-5 h-5 text-brand-primary mx-auto mb-2" />
               <div className="text-2xl font-bold font-mono text-brand-primary mb-1">{value}</div>
-              <div className="text-xs text-slate-400">{label}</div>
+              <div className="text-xs text-fg-muted">{label}</div>
             </div>
           ))}
         </div>
 
         {/* ── ROI argument ───────────────────────────────────────────────── */}
         <div className="max-w-2xl mx-auto mb-16 animate-fade-in-up delay-400">
-          <div className="rounded-2xl p-8 border border-brand-primary/20 text-center"
-               style={{ background: 'linear-gradient(135deg, rgba(143,212,58,0.06), rgba(14,165,233,0.04))' }}>
+          <div className="rounded-2xl p-8 border border-brand-primary/20 text-center bg-gradient-to-br from-brand-primary/[0.06] to-semantic-info/[0.04]">
             <div className="text-xs font-semibold text-brand-primary uppercase tracking-widest mb-4">ROI real</div>
-            <h3 className="text-xl font-bold text-white mb-3 tracking-tight">
+            <h3 className="text-xl font-bold text-fg-primary mb-3 tracking-tight">
               ¿Por qué 19€/mes es la mejor inversión que puedes hacer?
             </h3>
-            <p className="text-slate-400 text-sm leading-relaxed max-w-lg mx-auto">
+            <p className="text-fg-muted text-sm leading-relaxed max-w-lg mx-auto">
               Si tienes 10 clientes a 150€/mes, ingresas 1.500€. Si TrainerBoost te ayuda a retener
-              un cliente <span className="text-white font-semibold">2 meses más al año</span>, ya recuperaste
+              un cliente <span className="text-fg-primary font-semibold">2 meses más al año</span>, ya recuperaste
               12 veces el coste de la app. Y si te ahorra 8 horas a la semana en gestión...
               {' '}<span className="text-brand-primary font-semibold">¿cuánto vale tu hora?</span>
             </p>
@@ -385,8 +383,8 @@ export default function PricingPage() {
         {/* ── FAQ ────────────────────────────────────────────────────────── */}
         <div className="max-w-2xl mx-auto animate-fade-in-up delay-400">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold text-white mb-3 tracking-tight">Preguntas frecuentes</h2>
-            <p className="text-slate-400 text-sm">
+            <h2 className="text-2xl font-bold text-fg-primary mb-3 tracking-tight">Preguntas frecuentes</h2>
+            <p className="text-fg-muted text-sm">
               ¿No encuentras lo que buscas?{' '}
               <a href="mailto:hola@trainerboost.es" className="text-brand-primary hover:underline">Escríbenos</a>.
             </p>
@@ -403,8 +401,8 @@ export default function PricingPage() {
         <div className="text-center mt-16 animate-fade-in-up delay-500">
           <div className="card p-8 max-w-md mx-auto border-brand-primary/20">
             <Zap className="w-8 h-8 text-brand-primary mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-white mb-2">¿Quieres verlo antes de decidir?</h3>
-            <p className="text-sm text-slate-400 mb-5">Prueba la demo completa sin registro y sin tarjeta.</p>
+            <h3 className="text-lg font-bold text-fg-primary mb-2">¿Quieres verlo antes de decidir?</h3>
+            <p className="text-sm text-fg-muted mb-5">Prueba la demo completa sin registro y sin tarjeta.</p>
             <Link href="/demo" className="btn-secondary w-full justify-center">
               Explorar demo gratuita →
             </Link>

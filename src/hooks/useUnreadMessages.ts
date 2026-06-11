@@ -1,11 +1,14 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 export function useUnreadMessages(userId: string | null) {
   const [unreadCount, setUnreadCount] = useState(0)
-  const supabase = createClient()
+  // Stable reference — createBrowserClient is not a singleton, pin it in a ref
+  // to prevent effects from re-running and re-subscribing on every render.
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
 
   const fetchCount = useCallback(async () => {
     if (!userId) return

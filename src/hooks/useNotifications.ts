@@ -1,12 +1,15 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Notification } from '@/types/database'
 
 export function useNotifications(userId: string | null) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  // Stable reference — createBrowserClient is not a singleton, so we pin
+  // the instance in a ref to prevent effects from re-running on every render.
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
 
   const load = useCallback(async () => {
     if (!userId) return

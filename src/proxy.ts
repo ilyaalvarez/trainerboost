@@ -74,6 +74,11 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user && (path === '/login' || path === '/register' || path === '/')) {
+    // Invited user landing on /register?code=XXX while already logged in:
+    // let the page redirect them to /onboarding?code=XXX instead of forcing /dashboard
+    if (path === '/register' && request.nextUrl.searchParams.get('code')) {
+      return supabaseResponse
+    }
     try {
       const { data: profile } = await supabase
         .from('profiles').select('role').eq('id', user.id).single()

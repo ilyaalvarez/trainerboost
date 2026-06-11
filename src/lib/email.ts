@@ -43,11 +43,11 @@ export async function sendInvitationEmail(to: string, trainerName: string, code:
   <div style="max-width:600px;margin:0 auto;padding:40px 16px;">
 
     <div style="text-align:center;margin-bottom:28px;">
-      <div style="display:inline-flex;align-items:center;gap:8px;">
-        <div style="width:32px;height:32px;background:#8FD43A;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;">
-          <span style="color:#0F172A;font-size:14px;font-weight:900;">⚡</span>
-        </div>
-        <span style="color:#0F172A;font-size:18px;font-weight:800;letter-spacing:-0.5px;">TrainerBoost</span>
+      <div style="display:inline-block;">
+        <table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;vertical-align:middle;">
+          <tr><td style="width:34px;height:34px;background:#8FD43A;border-radius:8px;text-align:center;vertical-align:middle;font-size:18px;color:#0F172A;font-weight:900;">⚡</td></tr>
+        </table>
+        <span style="color:#0F172A;font-size:18px;font-weight:800;letter-spacing:-0.5px;vertical-align:middle;margin-left:8px;">TrainerBoost</span>
       </div>
     </div>
 

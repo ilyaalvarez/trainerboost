@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -40,6 +40,15 @@ export default function RegisterPage() {
   const [pwdError, setPwdError]     = useState<string | null>(null)
 
   const strength = passwordStrength(password)
+
+  // If user is already logged in and has an invite code, skip registration
+  useEffect(() => {
+    if (!inviteCode) return
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) router.replace(`/onboarding?code=${encodeURIComponent(inviteCode)}`)
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()

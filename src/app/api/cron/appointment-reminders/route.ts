@@ -4,8 +4,13 @@ import { sendAppointmentReminderEmail } from '@/lib/email'
 
 // Vercel Cron Job — runs daily at 7:00 AM UTC (configured in vercel.json)
 export async function GET(request: Request) {
+  const cronSecret = process.env.CRON_SECRET
+  if (!cronSecret) {
+    console.error('[cron/appointment-reminders] CRON_SECRET not set')
+    return NextResponse.json({ error: 'Cron no configurado' }, { status: 503 })
+  }
   const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

@@ -142,20 +142,29 @@ export default function ClientNutritionPage() {
   const totalFoodsCount = plan?.meals.reduce((acc, m) => acc + (m.foods as FoodItem[]).length, 0) ?? 0
   const allMealsDone = totalFoodsCount > 0 && checkedFoods.size >= totalFoodsCount
 
-  // Notify trainer once per day when all meals are completed
+  // Notify trainer once per day when all meals are completed.
+  // Uses a DB check instead of localStorage so it's device-agnostic.
   useEffect(() => {
     if (!allMealsDone || !trainerId || !userId || !plan) return
     const today = new Date().toISOString().split('T')[0]
-    const key = `nutrition-notif-${plan.id}-${today}`
-    if (localStorage.getItem(key)) return
-    localStorage.setItem(key, '1')
-    supabase.from('notifications').insert({
-      user_id: trainerId,
-      type: 'system',
-      title: '¡Plan de nutrición completado!',
-      body: 'Tu cliente ha completado todos los alimentos del día.',
-      link: `/dashboard/clients/${userId}`,
-    }).then(() => {})
+    ;(async () => {
+      const { data: existing } = await supabase
+        .from('notifications')
+        .select('id')
+        .eq('user_id', trainerId)
+        .eq('type', 'system')
+        .eq('link', `/dashboard/clients/${userId}`)
+        .gte('created_at', today)
+        .maybeSingle()
+      if (existing) return
+      supabase.from('notifications').insert({
+        user_id: trainerId,
+        type: 'system',
+        title: '¡Plan de nutrición completado!',
+        body: 'Tu cliente ha completado todos los alimentos del día.',
+        link: `/dashboard/clients/${userId}`,
+      }).then(() => {})
+    })()
   }, [allMealsDone, trainerId, userId, plan, supabase])
 
   if (loading) {

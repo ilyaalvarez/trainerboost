@@ -55,7 +55,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (user && (path === '/login' || path === '/register')) {
+  if (user && (path === '/login' || path === '/register' || path === '/')) {
     const { data: profile } = await supabase
       .from('profiles').select('role').eq('id', user.id).single()
     if (!profile) return NextResponse.redirect(new URL('/onboarding', request.url))

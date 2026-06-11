@@ -33,10 +33,10 @@ const PRESET_TAGS = [
   { label: 'Pérdida de peso',   color: 'bg-semantic-warning/20 text-semantic-warning-text border border-semantic-warning/30' },
   { label: 'Ganancia muscular', color: 'bg-semantic-info/20 text-semantic-info-text border border-semantic-info/30' },
   { label: 'Resistencia',       color: 'bg-semantic-success/20 text-semantic-success-text border border-semantic-success/30' },
-  { label: 'Rehabilitación',    color: 'bg-brand-secondary/20 text-[#C4B5FD] border border-brand-secondary/30' },
-  { label: 'Tonificación',      color: 'bg-[#EC4899]/20 text-[#F9A8D4] border border-[#EC4899]/30' },
+  { label: 'Rehabilitación',    color: 'bg-brand-secondary/20 text-brand-secondary-text border border-brand-secondary/30' },
+  { label: 'Tonificación',      color: 'bg-brand-rose/15 text-brand-rose border border-brand-rose/30' },
   { label: 'Principiante',      color: 'bg-surface-4 text-fg-secondary border border-border-strong' },
-  { label: 'Senior',            color: 'bg-[#F97316]/20 text-[#FDBA74] border border-[#F97316]/30' },
+  { label: 'Senior',            color: 'bg-semantic-warning/20 text-semantic-warning-text border border-semantic-warning/30' },
   { label: 'Online',            color: 'bg-semantic-info/20 text-semantic-info-text border border-semantic-info/30' },
 ] as const
 const TAG_COLOR: Record<string, string> = Object.fromEntries(PRESET_TAGS.map(t => [t.label, t.color]))

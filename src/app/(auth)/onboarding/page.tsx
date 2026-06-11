@@ -115,8 +115,7 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
       {/* Header */}
       <div className="relative z-10 h-14 flex items-center px-6 border-b border-border/40">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-               style={{ background: '#8FD43A' }}>
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-brand-primary">
             <Zap className="w-3.5 h-3.5 text-black" />
           </div>
           <span className="font-bold text-fg-primary text-sm tracking-tight">TrainerBoost</span>
@@ -180,13 +179,13 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
 
               <div className="space-y-3 mb-8 text-left">
                 {[
-                  { icon: Dumbbell,      color: 'text-[#C4B5FD]',           bg: 'rgba(124,58,237,0.15)', text: 'Tus especialidades — para que tus clientes te encuentren' },
-                  { icon: Users,         color: 'text-semantic-info-text',    bg: 'rgba(14,165,233,0.15)',  text: 'Invita a tu primer cliente — recibirá el acceso por email' },
-                  { icon: BarChart2,     color: 'text-semantic-success-text', bg: 'rgba(16,185,129,0.15)', text: 'Dashboard activo — rutinas, citas y mensajes te esperan' },
-                ].map(({ icon: Icon, color, bg, text }) => (
+                  { icon: Dumbbell,  iconBg: 'bg-brand-secondary/15', iconColor: 'text-brand-secondary-text', text: 'Tus especialidades — para que tus clientes te encuentren' },
+                  { icon: Users,     iconBg: 'bg-semantic-info/15',    iconColor: 'text-semantic-info-text',   text: 'Invita a tu primer cliente — recibirá el acceso por email' },
+                  { icon: BarChart2, iconBg: 'bg-brand-accent/15',     iconColor: 'text-semantic-success-text', text: 'Dashboard activo — rutinas, citas y mensajes te esperan' },
+                ].map(({ icon: Icon, iconBg, iconColor, text }) => (
                   <div key={text} className="flex items-center gap-3 p-3 rounded-xl border border-border/40 bg-surface/40">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: bg }}>
-                      <Icon className={`w-4 h-4 ${color}`} />
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}>
+                      <Icon className={`w-4 h-4 ${iconColor}`} />
                     </div>
                     <span className="text-sm text-fg-secondary">{text}</span>
                     <CheckCircle2 className="w-4 h-4 text-brand-accent ml-auto shrink-0" />

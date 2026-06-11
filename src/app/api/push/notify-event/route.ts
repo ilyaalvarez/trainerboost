@@ -25,6 +25,22 @@ export async function POST(request: Request) {
   }
   const { userId, title, body, url } = parsed.data
 
+  // Verify the caller has an active trainer–client relationship with the target user.
+  const { data: relationship } = await supabase
+    .from('trainer_clients')
+    .select('id')
+    .or(
+      `and(trainer_id.eq.${user.id},client_id.eq.${userId}),` +
+      `and(client_id.eq.${user.id},trainer_id.eq.${userId})`
+    )
+    .eq('status', 'active')
+    .limit(1)
+    .maybeSingle()
+
+  if (!relationship) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
+  }
+
   const secret = process.env.INTERNAL_API_SECRET
   if (!secret) return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 })
 

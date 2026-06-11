@@ -1,25 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
-  const code  = searchParams.get('code')
+  const code = searchParams.get('code')
 
-  if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles').select('role').eq('id', user.id).single()
-        if (!profile) {
-          return NextResponse.redirect(`${origin}/onboarding`)
-        }
-        return NextResponse.redirect(`${origin}${profile.role === 'client' ? '/client' : '/dashboard'}`)
-      }
+  if (!code) return NextResponse.redirect(`${origin}/login?error=auth_failed`)
+
+  // The response must be created before the client so cookies from
+  // exchangeCodeForSession are written directly onto it (not into next/headers,
+  // which doesn't transfer to a separate NextResponse.redirect).
+  const response = NextResponse.redirect(`${origin}/dashboard`)
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll() },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
     }
-  }
+  )
 
-  return NextResponse.redirect(`${origin}/login?error=auth_failed`)
+  const { error } = await supabase.auth.exchangeCodeForSession(code)
+  if (error) return NextResponse.redirect(`${origin}/login?error=auth_failed`)
+
+  // The proxy (src/proxy.ts) handles role-based routing:
+  // no profile → /onboarding, client → /client, trainer → /dashboard
+  return response
 }

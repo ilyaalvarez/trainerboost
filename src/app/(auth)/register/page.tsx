@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Mail, Lock, User, ArrowRight, Loader2, Users, Zap, ArrowLeft, CheckCircle2, Eye, EyeOff } from 'lucide-react'
@@ -26,9 +26,11 @@ function passwordStrength(pwd: string): { score: number; label: string; color: s
 export default function RegisterPage() {
   const router = useRouter()
   const supabase = createClient()
+  const searchParams = useSearchParams()
+  const inviteCode = searchParams.get('code') ?? ''
 
-  const [step, setStep]             = useState<Step>(1)
-  const [role, setRole]             = useState<Role>('trainer')
+  const [step, setStep]             = useState<Step>(() => inviteCode ? 2 : 1)
+  const [role, setRole]             = useState<Role>(() => inviteCode ? 'client' : 'trainer')
   const [name, setName]             = useState('')
   const [email, setEmail]           = useState('')
   const [password, setPassword]     = useState('')
@@ -75,7 +77,7 @@ export default function RegisterPage() {
           body: JSON.stringify({ name, role }),
         }).catch(() => undefined)
         toast.success('¡Cuenta creada! Completa tu perfil')
-        router.push('/onboarding')
+        router.push(inviteCode ? `/onboarding?code=${encodeURIComponent(inviteCode)}` : '/onboarding')
       }
     } finally {
       setLoading(false)
@@ -192,18 +194,27 @@ export default function RegisterPage() {
             </div>
           ) : (
             <div className="animate-fade-in">
-              <button
-                onClick={() => setStep(1)}
-                className="text-sm text-fg-secondary hover:text-fg-primary mb-5 flex items-center gap-1.5 transition-colors group"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-                Cambiar rol
-              </button>
+              {!inviteCode && (
+                <button
+                  onClick={() => setStep(1)}
+                  className="text-sm text-fg-secondary hover:text-fg-primary mb-5 flex items-center gap-1.5 transition-colors group"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+                  Cambiar rol
+                </button>
+              )}
 
               <h1 className="text-2xl font-bold text-fg-primary mb-1">Tus datos</h1>
-              <p className="text-fg-secondary text-sm mb-6">
-                {role === 'trainer' ? 'Configura tu perfil de entrenador' : 'Únete con el código de tu entrenador después'}
-              </p>
+              {inviteCode ? (
+                <div className="flex items-center gap-2 text-sm bg-semantic-success/10 border border-semantic-success/20 text-semantic-success-text px-3 py-2 rounded-lg mb-6">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  Invitación detectada — tu cuenta se creará como cliente
+                </div>
+              ) : (
+                <p className="text-fg-secondary text-sm mb-6">
+                  {role === 'trainer' ? 'Configura tu perfil de entrenador' : 'Únete con el código de tu entrenador después'}
+                </p>
+              )}
 
               <form onSubmit={handleRegister} className="space-y-4">
                 <div>

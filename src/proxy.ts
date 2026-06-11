@@ -5,6 +5,13 @@ import { getRatelimiter } from '@/lib/ratelimit'
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
 
+  // Pass through OAuth callback without any Supabase interaction — calling
+  // getUser() here before exchangeCodeForSession runs in the route handler
+  // can corrupt the PKCE code-verifier cookie and break the flow.
+  if (path.startsWith('/auth')) {
+    return NextResponse.next({ request })
+  }
+
   // ── Rate limiting (runs before auth to fail-fast on blocked IPs) ─────────
   const rl = getRatelimiter(path)
   if (rl) {

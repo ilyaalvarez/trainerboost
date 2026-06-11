@@ -112,9 +112,10 @@ export default function ClientAppointmentsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          trainerId,
-          event: 'appointment_request',
-          message: 'Un cliente ha solicitado una nueva cita.',
+          userId: trainerId,
+          title: 'Nueva solicitud de cita',
+          body: 'Un cliente ha solicitado una nueva cita.',
+          url: '/dashboard/appointments',
         }),
       })
     } catch {

@@ -136,7 +136,7 @@ export default async function ClientHomePage() {
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold text-fg-primary">Sin entrenador asignado</div>
             <div className="text-xs text-fg-secondary mt-0.5 mb-3">¿Tienes un código de invitación? Introdúcelo para vincularte con tu entrenador.</div>
-            <Link href="/onboarding" className="btn-primary text-xs py-1.5 px-3 inline-flex">
+            <Link href="/onboarding" className="btn-primary text-xs py-1.5 px-3 inline-flex items-center gap-2">
               Introducir código
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -257,7 +257,7 @@ export default async function ClientHomePage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-fg-primary text-sm">{activeRoutine.title}</div>
-                <div className="text-xs text-fg-muted">{exList.length} ejercicios{activeRoutine.frequency ? ` · ${activeRoutine.frequency}` : ''}</div>
+                <div className="text-xs text-fg-muted">{exList.length} {exList.length === 1 ? 'ejercicio' : 'ejercicios'}{activeRoutine.frequency ? ` · ${activeRoutine.frequency}` : ''}</div>
               </div>
               <ChevronRight className="w-4 h-4 text-fg-muted shrink-0" />
             </div>

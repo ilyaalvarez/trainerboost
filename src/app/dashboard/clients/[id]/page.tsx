@@ -738,7 +738,7 @@ export default function ClientDetailPage() {
                           <Badge status={routine.status} />
                           {routine.exercises.length > 0 && (
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-semantic-info/10 border border-semantic-info/20 text-semantic-info-text">
-                              {routine.exercises.length} ejercicios
+                              {routine.exercises.length} {routine.exercises.length === 1 ? 'ejercicio' : 'ejercicios'}
                             </span>
                           )}
                         </div>
@@ -1084,7 +1084,7 @@ export default function ClientDetailPage() {
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #8FD43A, #0EA5E9)' }} />
                       <h3 className="text-sm font-semibold text-fg-primary">Actividad de entrenamientos</h3>
-                      <span className="text-[10px] text-fg-muted ml-auto">{sessions.length} sesiones recientes</span>
+                      <span className="text-[10px] text-fg-muted ml-auto">{sessions.length} {sessions.length === 1 ? 'sesión reciente' : 'sesiones recientes'}</span>
                     </div>
                     <div className="space-y-3">
                       {sessions.map(session => {
@@ -1099,7 +1099,7 @@ export default function ClientDetailPage() {
                                 {new Date(session.date + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}
                               </span>
                               <div className="flex items-center gap-3 text-[11px] text-fg-muted">
-                                <span>{session.exercises.length} ejercicios</span>
+                                <span>{session.exercises.length} {session.exercises.length === 1 ? 'ejercicio' : 'ejercicios'}</span>
                                 {totalVol > 0 && <span className="text-semantic-info-text font-mono font-semibold">{totalVol.toLocaleString()} kg vol.</span>}
                               </div>
                             </div>

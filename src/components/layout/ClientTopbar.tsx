@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   Home, Dumbbell, UtensilsCrossed, CalendarDays,
-  MessageSquare, Zap, LogOut, Settings,
+  MessageSquare, Zap, LogOut, TrendingUp,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -51,8 +51,8 @@ export default function ClientTopbar({ profile }: Props) {
     { href: '/client/routine',       icon: Dumbbell,        label: 'Rutina',    badge: 0 },
     { href: '/client/nutrition',     icon: UtensilsCrossed, label: 'Nutrición', badge: 0 },
     { href: '/client/appointments',  icon: CalendarDays,    label: 'Citas',     badge: 0 },
+    { href: '/client/progress',      icon: TrendingUp,      label: 'Progreso',  badge: 0 },
     { href: '/client/messages',      icon: MessageSquare,   label: 'Mensajes',  badge: unreadMessages },
-    { href: '/client/settings',      icon: Settings,        label: 'Perfil',    badge: 0 },
   ]
 
   async function logout() {
@@ -109,14 +109,14 @@ export default function ClientTopbar({ profile }: Props) {
 
             {/* User area */}
             <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-2.5 px-2 py-1 rounded-lg hover:bg-surface-2 transition-colors cursor-default">
+              <Link href="/client/settings" className="hidden sm:flex items-center gap-2.5 px-2 py-1 rounded-lg hover:bg-surface-2 transition-colors">
                 <div className="ring-2 ring-brand-primary/25 rounded-full">
                   <Avatar name={profile.full_name} url={profile.avatar_url} size="sm" />
                 </div>
                 <span className="text-xs text-fg-muted font-medium">
                   {profile.full_name.split(' ')[0]}
                 </span>
-              </div>
+              </Link>
               <NotificationBell userId={profile.id} isOpen={notifOpen} onToggle={() => setNotifOpen(v => !v)} />
               <button onClick={logout} title="Cerrar sesión"
                       className="p-1.5 rounded-lg text-fg-disabled hover:text-semantic-error-text hover:bg-semantic-error/8 transition-all duration-150">

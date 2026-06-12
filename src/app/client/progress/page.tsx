@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Plus, Loader2, Scale, Flame, TrendingDown, TrendingUp, ClipboardList, X, ChevronLeft, ChevronRight, Target, Pencil, Medal, Dumbbell, ChevronDown } from 'lucide-react'
+import { Plus, Loader2, Scale, Flame, TrendingDown, TrendingUp, X, ChevronLeft, ChevronRight, Target, Pencil, Medal, Dumbbell, ChevronDown } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { ProgressLog } from '@/types/database'
 import { formatDate } from '@/lib/utils'
@@ -18,6 +18,40 @@ interface WorkoutSession {
   date: string
   exercises: { name: string; sets: Array<{ set_number: number; weight_kg: number | null; reps: number | null }> }[]
   totalSets: number
+}
+
+function computeSessionVolume(session: WorkoutSession): number | null {
+  let total = 0
+  let hasAny = false
+  for (const ex of session.exercises) {
+    for (const set of ex.sets) {
+      if (set.weight_kg != null && set.reps != null) {
+        total += set.weight_kg * set.reps
+        hasAny = true
+      }
+    }
+  }
+  return hasAny ? total : null
+}
+
+function getWeekLabel(dateStr: string): string {
+  const d = new Date(dateStr.length === 10 ? dateStr + 'T00:00:00' : dateStr)
+  d.setHours(0, 0, 0, 0)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const dayMs = 86400000
+  const dow = today.getDay() || 7
+  const startOfThisWeek = new Date(today.getTime() - (dow - 1) * dayMs)
+  const startOfLastWeek = new Date(startOfThisWeek.getTime() - 7 * dayMs)
+  if (d >= startOfThisWeek) return 'Esta semana'
+  if (d >= startOfLastWeek) return 'Semana pasada'
+  const wStart = new Date(d)
+  const wDow = d.getDay() || 7
+  wStart.setDate(d.getDate() - (wDow - 1))
+  const wEnd = new Date(wStart)
+  wEnd.setDate(wStart.getDate() + 6)
+  const fmt = (dt: Date) => dt.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+  return `${fmt(wStart)} – ${fmt(wEnd)}`
 }
 
 function computeStreak(dates: string[]): number {
@@ -259,11 +293,11 @@ export default function ClientProgressPage() {
 
           <div className="card p-5 flex items-center gap-4 bg-gradient-to-br from-brand-secondary/[0.08] to-semantic-info/[0.05] border-brand-secondary/25">
             <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-brand-secondary/20 to-semantic-info/[0.12]">
-              <ClipboardList className="w-6 h-6 text-brand-secondary" />
+              <Dumbbell className="w-6 h-6 text-brand-secondary" />
             </div>
             <div>
-              <div className="text-2xl font-bold font-mono text-brand-secondary">{logs.length}</div>
-              <div className="text-xs text-fg-muted">Registros</div>
+              <div className="text-2xl font-bold font-mono text-brand-secondary">{workoutSessions.length || logs.length}</div>
+              <div className="text-xs text-fg-muted">{workoutSessions.length > 0 ? 'Entrenamientos' : 'Registros'}</div>
             </div>
           </div>
         </div>
@@ -358,10 +392,15 @@ export default function ClientProgressPage() {
       )}
 
       {/* Activity heatmap */}
-      {logs.length > 0 && (
+      {(logs.length > 0 || workoutSessions.length > 0) && (
         <div className="card p-5">
-          <h2 className="font-semibold text-fg-primary mb-3">Historial de actividad</h2>
-          <ActivityHeatmap logDates={logs.map(l => l.logged_at)} />
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-fg-primary">Historial de actividad</h2>
+            <span className="text-xs text-fg-muted">
+              {new Set([...logs.map(l => l.logged_at.slice(0, 10)), ...workoutSessions.map(s => s.date.slice(0, 10))]).size} días activos
+            </span>
+          </div>
+          <ActivityHeatmap logDates={[...logs.map(l => l.logged_at), ...workoutSessions.map(s => s.date)]} />
         </div>
       )}
 
@@ -501,7 +540,17 @@ export default function ClientProgressPage() {
 
       {/* Workout session history */}
       {workoutSessions.length > 0 && (() => {
-        const visible = showAllSessions ? workoutSessions : workoutSessions.slice(0, 7)
+        const visible = showAllSessions ? workoutSessions : workoutSessions.slice(0, 8)
+
+        // Group by week
+        const groups: { label: string; sessions: WorkoutSession[] }[] = []
+        for (const session of visible) {
+          const label = getWeekLabel(session.date)
+          const last = groups[groups.length - 1]
+          if (last && last.label === label) last.sessions.push(session)
+          else groups.push({ label, sessions: [session] })
+        }
+
         return (
           <div>
             <div className="flex items-center justify-between mb-3">
@@ -511,53 +560,84 @@ export default function ClientProgressPage() {
               </div>
               <span className="text-xs text-fg-muted">{workoutSessions.length} sesiones</span>
             </div>
-            <div className="space-y-2">
-              {visible.map(session => {
-                const isOpen = expandedSession === session.date
-                return (
-                  <div key={session.date} className="card overflow-hidden">
-                    <button
-                      onClick={() => setExpandedSession(isOpen ? null : session.date)}
-                      className="w-full flex items-center gap-3 p-4 text-left hover:bg-surface-2/50 transition-colors"
-                    >
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-semantic-info/10 border border-semantic-info/20">
-                        <Dumbbell className="w-4 h-4 text-brand-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-fg-primary capitalize text-sm">
-                          {formatDate(session.date, "EEEE d MMM yyyy")}
-                        </div>
-                        <div className="text-xs text-fg-muted mt-0.5">
-                          {session.exercises.length} {session.exercises.length === 1 ? 'ejercicio' : 'ejercicios'} · {session.totalSets} sets
-                        </div>
-                      </div>
-                      <ChevronDown className={`w-4 h-4 text-fg-muted transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    {isOpen && (
-                      <div className="border-t border-border/50 px-4 pb-4 pt-3 space-y-4">
-                        {session.exercises.map((ex, ei) => (
-                          <div key={ei}>
-                            <div className="text-xs font-semibold text-fg-secondary uppercase tracking-wide mb-2">{ex.name}</div>
-                            <div className="flex flex-wrap gap-2">
-                              {ex.sets.map((s, si) => (
-                                <div key={si} className="px-2.5 py-1.5 rounded-lg text-xs font-mono bg-semantic-info/[0.07] border border-semantic-info/[0.18]">
-                                  <span className="text-fg-muted mr-1">S{s.set_number}</span>
-                                  {s.weight_kg != null && <span className="text-fg-primary font-semibold">{s.weight_kg}kg</span>}
-                                  {s.weight_kg != null && s.reps != null && <span className="text-fg-muted mx-0.5">×</span>}
-                                  {s.reps != null && <span className="text-fg-secondary">{s.reps}</span>}
-                                  {s.weight_kg == null && s.reps == null && <span className="text-fg-muted">—</span>}
+            <div className="space-y-5">
+              {groups.map(group => (
+                <div key={group.label}>
+                  {/* Week header */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[11px] font-semibold text-fg-muted uppercase tracking-wider">{group.label}</span>
+                    <div className="flex-1 h-px bg-border/40" />
+                    <span className="text-[10px] text-fg-disabled">{group.sessions.length} {group.sessions.length === 1 ? 'sesión' : 'sesiones'}</span>
+                  </div>
+                  <div className="space-y-2">
+                    {group.sessions.map(session => {
+                      const isOpen = expandedSession === session.date
+                      const volume = computeSessionVolume(session)
+                      const sessionDate = new Date(session.date.length === 10 ? session.date + 'T00:00:00' : session.date)
+                      const dayAbbr = sessionDate.toLocaleDateString('es-ES', { weekday: 'short' }).toUpperCase().slice(0, 3)
+                      const dayNum = sessionDate.getDate()
+                      return (
+                        <div key={session.date} className="card overflow-hidden">
+                          <button
+                            onClick={() => setExpandedSession(isOpen ? null : session.date)}
+                            className="w-full flex items-center gap-3 p-4 text-left hover:bg-surface-2/50 transition-colors"
+                          >
+                            {/* Date badge */}
+                            <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center shrink-0 bg-brand-primary/10 border border-brand-primary/20">
+                              <span className="text-[9px] font-bold text-brand-primary leading-none">{dayAbbr}</span>
+                              <span className="text-sm font-bold text-fg-primary leading-none mt-0.5">{dayNum}</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-medium text-fg-primary text-sm">
+                                  {session.exercises.length} {session.exercises.length === 1 ? 'ejercicio' : 'ejercicios'} · {session.totalSets} sets
+                                </span>
+                                {volume != null && (
+                                  <span className="text-[11px] font-semibold text-semantic-success-text bg-semantic-success/10 px-1.5 py-0.5 rounded-md">
+                                    {volume >= 1000 ? `${(volume / 1000).toFixed(1)}t` : `${Math.round(volume)}kg`} vol.
+                                  </span>
+                                )}
+                              </div>
+                              {/* Exercise chips */}
+                              <div className="flex flex-wrap gap-1 mt-1.5">
+                                {session.exercises.slice(0, 3).map((ex, i) => (
+                                  <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-surface-2 text-fg-muted border border-border/50 truncate max-w-[120px]">{ex.name}</span>
+                                ))}
+                                {session.exercises.length > 3 && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-2 text-fg-disabled">+{session.exercises.length - 3} más</span>
+                                )}
+                              </div>
+                            </div>
+                            <ChevronDown className={`w-4 h-4 text-fg-muted transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                          {isOpen && (
+                            <div className="border-t border-border/50 px-4 pb-4 pt-3 space-y-4">
+                              {session.exercises.map((ex, ei) => (
+                                <div key={ei}>
+                                  <div className="text-xs font-semibold text-fg-secondary uppercase tracking-wide mb-2">{ex.name}</div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {ex.sets.map((s, si) => (
+                                      <div key={si} className="px-2.5 py-1.5 rounded-lg text-xs font-mono bg-semantic-info/[0.07] border border-semantic-info/[0.18]">
+                                        <span className="text-fg-muted mr-1">S{s.set_number}</span>
+                                        {s.weight_kg != null && <span className="text-fg-primary font-semibold">{s.weight_kg}kg</span>}
+                                        {s.weight_kg != null && s.reps != null && <span className="text-fg-muted mx-0.5">×</span>}
+                                        {s.reps != null && <span className="text-fg-secondary">{s.reps}</span>}
+                                        {s.weight_kg == null && s.reps == null && <span className="text-fg-muted">—</span>}
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               ))}
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
-                )
-              })}
+                </div>
+              ))}
             </div>
-            {workoutSessions.length > 7 && (
+            {workoutSessions.length > 8 && (
               <button
                 onClick={() => setShowAllSessions(v => !v)}
                 className="mt-3 w-full text-xs text-brand-primary hover:text-semantic-info-text transition-colors py-2 text-center"

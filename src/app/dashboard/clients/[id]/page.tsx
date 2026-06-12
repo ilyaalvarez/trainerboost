@@ -75,6 +75,7 @@ export default function ClientDetailPage() {
 
   // Appointments view toggle
   const [aptView, setAptView] = useState<'upcoming' | 'past'>('upcoming')
+  const [, setExporting] = useState(false)
 
   // Set logs (client workout logs visible to trainer)
   type SetLogWithName = SetLog & { exercise_name: string }

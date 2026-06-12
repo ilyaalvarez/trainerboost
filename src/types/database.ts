@@ -131,6 +131,7 @@ export interface Appointment {
   status: AppointmentStatus
   location: string | null
   notes: string | null
+  trainer_notes: string | null
   created_at: string
 }
 

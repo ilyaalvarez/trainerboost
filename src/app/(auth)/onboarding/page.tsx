@@ -328,12 +328,11 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
   )
 }
 
-// ─── Client form (unchanged flow) ─────────────────────────────────────────────
+// ─── Client form ──────────────────────────────────────────────────────────────
 
-function ClientForm({ userId }: { userId: string }) {
+function ClientForm({ userId: _userId }: { userId: string }) {
   const router       = useRouter()
   const searchParams = useSearchParams()
-  const supabase     = useMemo(() => createClient(), [])
   const [inviteCode, setInviteCode] = useState(() => searchParams.get('code') ?? '')
   const [phone,      setPhone]      = useState('')
   const [loading,    setLoading]    = useState(false)
@@ -347,33 +346,17 @@ function ClientForm({ userId }: { userId: string }) {
     }
     setLoading(true)
     try {
-      const { data: inv, error: invErr } = await supabase
-        .from('invitations')
-        .select('*, trainer:trainer_id(id, full_name)')
-        .eq('code', trimmedCode)
-        .is('used_at', null)
-        .gte('expires_at', new Date().toISOString())
-        .single()
-
-      if (invErr || !inv) { toast.error('Código inválido o expirado'); return }
-
-      const [{ data: trainerSub }, { count: trainerClientCount }] = await Promise.all([
-        supabase.from('subscriptions').select('max_clients').eq('user_id', inv.trainer_id).single(),
-        supabase.from('trainer_clients').select('*', { count: 'exact', head: true })
-          .eq('trainer_id', inv.trainer_id).eq('status', 'active'),
-      ])
-      if ((trainerClientCount ?? 0) >= (trainerSub?.max_clients ?? 0)) {
-        toast.error('Tu entrenador ha alcanzado el límite de clientes. Pídele que actualice su plan.')
+      const res = await fetch('/api/invite/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: trimmedCode, phone: phone.trim() || undefined }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        toast.error(json.error ?? 'Error al verificar el código')
         return
       }
-
-      await Promise.all([
-        supabase.from('invitations').update({ used_at: new Date().toISOString() }).eq('id', inv.id),
-        supabase.from('trainer_clients').insert({ trainer_id: inv.trainer_id, client_id: userId }),
-        phone ? supabase.from('profiles').update({ phone }).eq('id', userId) : Promise.resolve(),
-      ])
-
-      toast.success(`¡Te has unido con ${(inv.trainer as { full_name: string }).full_name}!`)
+      toast.success(`¡Te has unido con ${json.trainerName}!`)
       router.push('/client')
     } finally {
       setLoading(false)
@@ -463,8 +446,9 @@ function ClientForm({ userId }: { userId: string }) {
 // ─── Root component ────────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
-  const router   = useRouter()
-  const supabase = useMemo(() => createClient(), [])
+  const router       = useRouter()
+  const searchParams = useSearchParams()
+  const supabase     = useMemo(() => createClient(), [])
 
   const [role,         setRole]         = useState<'trainer' | 'client' | null>(null)
   const [userId,       setUserId]       = useState<string | null>(null)
@@ -478,12 +462,20 @@ export default function OnboardingPage() {
       setUserId(user.id)
 
       const { data: p } = await supabase.from('profiles').select('role, full_name').eq('id', user.id).single()
-      setRole(p?.role ?? 'trainer')
+      const resolvedRole = p?.role ?? 'trainer'
+      setRole(resolvedRole)
       setFirstName((p?.full_name ?? '').split(' ')[0] || 'hola')
       setFetchingRole(false)
+
+      // A trainer landing here with an invite code means they tested their own link.
+      // Send them to the dashboard — trainers can't join another trainer as a client.
+      if (resolvedRole === 'trainer' && searchParams.get('code')) {
+        router.replace('/dashboard')
+      }
     }
     fetchRole()
-  }, [router, supabase])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (fetchingRole || !userId) {
     return (

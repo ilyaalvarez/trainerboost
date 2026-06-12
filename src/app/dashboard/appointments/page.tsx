@@ -171,6 +171,21 @@ export default function AppointmentsPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
+  // Realtime: re-fetch when any of this trainer's appointments change
+  useEffect(() => {
+    if (!userId) return
+    const channel = supabase
+      .channel(`trainer-appointments:${userId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'appointments',
+        filter: `trainer_id=eq.${userId}`,
+      }, () => fetchData())
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [userId]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Derived lists ────────────────────────────────────────────────────────
 
   const now = new Date().toISOString()
@@ -253,9 +268,9 @@ export default function AppointmentsPage() {
           scheduled_at:     scheduledAt,
           duration_minutes: form.duration_minutes,
           type:             form.type,
-          status:           'pending',
+          status:           'confirmed',
           location:         form.location || null,
-          notes:            form.notes    || null,
+          trainer_notes:    form.notes    || null,
         })
         .select('*, client:client_id(*), trainer:trainer_id(*)')
         .single()
@@ -435,10 +450,16 @@ export default function AppointmentsPage() {
                         </>
                       )}
                     </div>
-                    {apt.notes && (
+                    {apt.trainer_notes && (
                       <div className="flex items-center gap-1 mt-1 text-xs text-fg-muted">
                         <FileText className="w-3 h-3 shrink-0" />
-                        <span className="truncate">{apt.notes}</span>
+                        <span className="truncate italic">{apt.trainer_notes}</span>
+                      </div>
+                    )}
+                    {apt.notes && (
+                      <div className="flex items-center gap-1 mt-1 text-xs text-semantic-info-text/70">
+                        <FileText className="w-3 h-3 shrink-0" />
+                        <span className="truncate">Cliente: {apt.notes}</span>
                       </div>
                     )}
                   </div>
@@ -710,9 +731,9 @@ export default function AppointmentsPage() {
             />
           </div>
 
-          {/* Notes */}
+          {/* Trainer notes — internal only, not shown to client */}
           <div>
-            <label className="label">Notas</label>
+            <label className="label">Notas internas <span className="text-fg-disabled font-normal">(solo tú las ves)</span></label>
             <textarea
               rows={2}
               value={form.notes}

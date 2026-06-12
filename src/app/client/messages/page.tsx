@@ -117,26 +117,49 @@ export default function ClientMessagesPage() {
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault()
     if (!input.trim() || !trainer || !myId) return
-    setSending(true)
 
-    const { error } = await supabase.from('messages').insert({
+    const content = input.trim()
+    setSending(true)
+    setInput('')
+
+    // Optimistic: show message immediately
+    const tempId = `temp-${Date.now()}`
+    const optimistic: MessageWithSender = {
+      id: tempId,
       sender_id: myId,
       receiver_id: trainer.id,
-      content: input.trim(),
-    })
+      content,
+      read_at: null,
+      created_at: new Date().toISOString(),
+      sender: { full_name: '', avatar_url: null },
+    }
+    setMessages(prev => [...prev, optimistic])
+    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
 
-    setSending(false)
-    if (error) { toast.error(error.message); return }
+    try {
+      const { data, error } = await supabase.from('messages')
+        .insert({ sender_id: myId, receiver_id: trainer.id, content })
+        .select('*, sender:sender_id(full_name, avatar_url)')
+        .single()
 
-    // Fire push notification to trainer (fire-and-forget)
-    fetch('/api/push/notify-message', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ receiverId: trainer.id, content: input.trim() }),
-    }).catch(() => {})
+      if (error) throw error
 
-    setInput('')
-    fetchMessages(myId)
+      // Replace optimistic with confirmed message
+      setMessages(prev => prev.map(m => m.id === tempId ? (data as MessageWithSender) : m))
+
+      // Fire push notification to trainer (fire-and-forget)
+      fetch('/api/push/notify-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ receiverId: trainer.id, content }),
+      }).catch(() => {})
+    } catch {
+      toast.error('Error al enviar el mensaje')
+      setMessages(prev => prev.filter(m => m.id !== tempId))
+      setInput(content)
+    } finally {
+      setSending(false)
+    }
   }
 
   if (loading) {

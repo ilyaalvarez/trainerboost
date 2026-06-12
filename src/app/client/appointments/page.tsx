@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Loader2, CalendarDays, CheckCircle, X, Plus } from 'lucide-react'
+import { Loader2, CalendarDays, X, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import type { Appointment } from '@/types/database'
@@ -63,15 +63,20 @@ export default function ClientAppointmentsPage() {
 
   useEffect(() => { fetchApts() }, [fetchApts])
 
-  async function confirmApt(id: string) {
-    setActing(id)
-    const { error } = await supabase.from('appointments')
-      .update({ status: 'confirmed' }).eq('id', id)
-    setActing(null)
-    if (error) { toast.error(error.message); return }
-    toast.success('Cita confirmada ✓')
-    fetchApts()
-  }
+  // Realtime: re-fetch when any appointment for this client changes
+  useEffect(() => {
+    if (!userId) return
+    const channel = supabase
+      .channel(`client-appointments:${userId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'appointments',
+        filter: `client_id=eq.${userId}`,
+      }, () => fetchApts())
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [userId, supabase, fetchApts])
 
   async function cancelApt(id: string) {
     if (confirmCancel !== id) { setConfirmCancel(id); return }
@@ -119,11 +124,10 @@ export default function ClientAppointmentsPage() {
         }),
       })
     } catch {
-      // push notification is best-effort; don't block on failure
+      // push notification is best-effort
     }
     setShowRequest(false)
     setReqForm({ date: '', time: '', type: 'presencial', notes: '' })
-    fetchApts()
   }
 
   const currentList = tab === 'upcoming' ? upcoming : past
@@ -248,7 +252,7 @@ export default function ClientAppointmentsPage() {
         <EmptyState
           icon={<CalendarDays className="w-8 h-8 text-fg-muted" />}
           title={tab === 'upcoming' ? 'Sin citas próximas' : 'Sin historial'}
-          description={tab === 'upcoming' ? 'Tu entrenador agendará la próxima sesión.' : 'Las citas pasadas aparecerán aquí.'}
+          description={tab === 'upcoming' ? 'Solicita una nueva cita con tu entrenador.' : 'Las citas pasadas aparecerán aquí.'}
         />
       ) : (
         <div className="space-y-3">
@@ -270,6 +274,7 @@ export default function ClientAppointmentsPage() {
                         </a></>
                       ) : apt.location ? ` · ${apt.location}` : null}
                     </div>
+                    {/* Only show client-facing notes (notes field, not trainer_notes) */}
                     {apt.notes && (
                       <div className="text-xs text-fg-muted mt-1 italic">{apt.notes}</div>
                     )}
@@ -277,18 +282,9 @@ export default function ClientAppointmentsPage() {
                 </div>
                 <div className="flex flex-col items-end gap-2 shrink-0">
                   <Badge status={apt.status} />
-                  {tab === 'upcoming' && apt.status === 'pending' && (
+                  {/* Clients can cancel pending or confirmed upcoming appointments */}
+                  {tab === 'upcoming' && (apt.status === 'pending' || apt.status === 'confirmed') && (
                     <div className="flex gap-2 items-center">
-                      <button
-                        onClick={() => confirmApt(apt.id)}
-                        disabled={acting === apt.id}
-                        className="flex items-center gap-1 text-xs text-semantic-success-text hover:text-semantic-success-text/80 transition-colors"
-                      >
-                        {acting === apt.id
-                          ? <Loader2 className="w-3 h-3 animate-spin" />
-                          : <CheckCircle className="w-3 h-3" />}
-                        Confirmar
-                      </button>
                       {confirmCancel === apt.id ? (
                         <>
                           <span className="text-xs font-medium text-semantic-warning-text">¿Seguro?</span>
@@ -297,7 +293,7 @@ export default function ClientAppointmentsPage() {
                             disabled={acting === apt.id}
                             className="flex items-center gap-1 text-xs text-semantic-error-text hover:text-semantic-error-text/80 transition-colors font-semibold"
                           >
-                            Sí, cancelar
+                            {acting === apt.id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Sí, cancelar'}
                           </button>
                           <button
                             onClick={() => setConfirmCancel(null)}

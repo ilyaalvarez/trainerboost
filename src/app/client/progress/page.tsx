@@ -397,7 +397,7 @@ export default function ClientProgressPage() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold text-fg-primary">Historial de actividad</h2>
             <span className="text-xs text-fg-muted">
-              {new Set([...logs.map(l => l.logged_at.slice(0, 10)), ...workoutSessions.map(s => s.date.slice(0, 10))]).size} días activos
+              {(() => { const n = new Set([...logs.map(l => l.logged_at.slice(0, 10)), ...workoutSessions.map(s => s.date.slice(0, 10))]).size; return `${n} ${n === 1 ? 'día activo' : 'días activos'}` })()}
             </span>
           </div>
           <ActivityHeatmap logDates={[...logs.map(l => l.logged_at), ...workoutSessions.map(s => s.date)]} />

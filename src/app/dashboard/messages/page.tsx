@@ -323,14 +323,14 @@ export default function MessagesPage() {
 
   return (
     <div className="animate-fade-in -m-6 lg:-m-8 h-[calc(100vh-0px)]" style={{ height: 'calc(100vh - 0px)' }}>
-      <div className="flex h-full border border-[#334155] rounded-xl overflow-hidden bg-[#1E293B]">
+      <div className="flex h-full border border-border/60 rounded-xl overflow-hidden bg-surface">
 
         {/* ═══════════════════════════════════════════════════════════════
             LEFT PANEL — Conversation list
         ═══════════════════════════════════════════════════════════════ */}
-        <div className={cn("flex-shrink-0 flex flex-col border-r border-[#334155] w-full md:w-72", mobilePanelView === 'thread' ? 'hidden md:flex' : 'flex')}>
+        <div className={cn("flex-shrink-0 flex flex-col border-r border-border/60 w-full md:w-72", mobilePanelView === 'thread' ? 'hidden md:flex' : 'flex')}>
           {/* Header */}
-          <div className="px-4 py-4 border-b border-[#334155]">
+          <div className="px-4 py-4 border-b border-border/60">
             <h2 className="font-semibold text-white text-base mb-3">Mensajes</h2>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-fg-muted pointer-events-none" />
@@ -367,16 +367,16 @@ export default function MessagesPage() {
                     onClick={() => openConversation(convo)}
                     className={cn(
                       'w-full flex items-start gap-3 px-4 py-3 text-left transition-all duration-150',
-                      'border-b border-[#334155]/50',
+                      'border-b border-border/60/50',
                       isActive
-                        ? 'bg-[#0EA5E9]/10 border-l-2 border-l-[#0EA5E9]'
-                        : 'hover:bg-[#334155]/30'
+                        ? 'bg-brand-primary/10 border-l-2 border-l-brand-primary'
+                        : 'hover:bg-surface-2/40'
                     )}
                   >
                     <div className="relative shrink-0 mt-0.5">
                       <Avatar name={convo.partner.full_name} url={convo.partner.avatar_url} size="sm" />
                       {isUnread && (
-                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#0EA5E9] border-2 border-[#1E293B]" />
+                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-brand-primary border-2 border-surface" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -410,7 +410,7 @@ export default function MessagesPage() {
           {activeConvo ? (
             <>
               {/* Thread header */}
-              <div className="px-5 py-3.5 border-b border-[#334155] flex items-center gap-3 shrink-0">
+              <div className="px-5 py-3.5 border-b border-border/60 flex items-center gap-3 shrink-0">
                 <button
                   onClick={() => { setMobilePanelView('list'); setActiveConvo(null) }}
                   className="md:hidden p-1 -ml-1 text-fg-secondary hover:text-fg-primary transition-colors"
@@ -444,11 +444,11 @@ export default function MessagesPage() {
                     <div key={date}>
                       {/* Day separator */}
                       <div className="flex items-center gap-3 my-4">
-                        <div className="flex-1 h-px bg-[#334155]" />
+                        <div className="flex-1 h-px bg-border/50" />
                         <span className="text-[11px] text-fg-muted font-medium px-2">
                           {formatDate(date, 'EEE dd MMM')}
                         </span>
-                        <div className="flex-1 h-px bg-[#334155]" />
+                        <div className="flex-1 h-px bg-border/50" />
                       </div>
 
                       {msgs.map((msg, idx) => {
@@ -482,7 +482,7 @@ export default function MessagesPage() {
                                 className={cn(
                                   'px-3.5 py-2 rounded-2xl text-sm leading-relaxed animate-message-in',
                                   isMine
-                                    ? 'bg-[#0EA5E9] text-white rounded-br-sm'
+                                    ? 'bg-brand-primary text-black rounded-br-sm'
                                     : 'bg-surface-3 text-fg-primary rounded-bl-sm'
                                 )}
                               >
@@ -491,7 +491,7 @@ export default function MessagesPage() {
                               <span className="text-[10px] text-fg-disabled mt-0.5 px-1">
                                 {formatDate(msg.created_at, 'HH:mm')}
                                 {isMine && msg.read_at && (
-                                  <span className="ml-1 text-[#0EA5E9]">✓✓</span>
+                                  <span className="ml-1 text-brand-primary">✓✓</span>
                                 )}
                               </span>
                             </div>
@@ -505,7 +505,7 @@ export default function MessagesPage() {
               </div>
 
               {/* Compose area */}
-              <div className="shrink-0 px-4 py-3 border-t border-[#334155]">
+              <div className="shrink-0 px-4 py-3 border-t border-border/60">
                 <div className="flex items-end gap-2">
                   <textarea
                     ref={inputRef}
@@ -547,7 +547,7 @@ export default function MessagesPage() {
           ) : (
             /* No active conversation */
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
-              <div className="w-16 h-16 rounded-2xl bg-[#334155] flex items-center justify-center">
+              <div className="w-16 h-16 rounded-2xl bg-surface-2 flex items-center justify-center">
                 <MessageSquare className="w-7 h-7 text-fg-muted" />
               </div>
               <div>

@@ -41,6 +41,7 @@ export default function ClientAppointmentsPage() {
         .eq('client_id', user.id)
         .gte('scheduled_at', now)
         .neq('status', 'cancelled')
+        .neq('status', 'done')
         .order('scheduled_at'),
       supabase.from('appointments')
         .select('*, trainer:trainer_id(full_name)')

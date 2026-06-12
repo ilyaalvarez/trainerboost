@@ -24,7 +24,7 @@ import {
 } from 'recharts'
 import type {
   Profile, TrainerClient, Routine, RoutineExercise,
-  MealPlan, ProgressLog, Appointment, Message, DailyCheckin,
+  MealPlan, ProgressLog, Appointment, Message, DailyCheckin, SetLog,
 } from '@/types/database'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -79,6 +79,10 @@ export default function ClientDetailPage() {
   // PDF report export
   const [exporting, setExporting] = useState(false)
 
+  // Set logs (client workout logs visible to trainer)
+  type SetLogWithName = SetLog & { exercise_name: string }
+  const [clientSetLogs, setClientSetLogs] = useState<SetLogWithName[]>([])
+
   // Photo lightbox
   const [lightbox, setLightbox] = useState<{ urls: string[]; idx: number } | null>(null)
 
@@ -111,6 +115,7 @@ export default function ClientDetailPage() {
       { data: appointmentsData },
       { data: messagesData },
       { data: checkinsData },
+      { data: setLogsData },
     ] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', clientId).single(),
       supabase.from('trainer_clients').select('*')
@@ -133,6 +138,13 @@ export default function ClientDetailPage() {
         .eq('client_id', clientId)
         .gte('checkin_date', sevenDaysAgo)
         .order('checkin_date', { ascending: false }),
+      supabase.from('set_logs')
+        .select('*, routine_exercises!exercise_id(name)')
+        .eq('client_id', clientId)
+        .order('logged_at', { ascending: false })
+        .order('exercise_id')
+        .order('set_number')
+        .limit(150),
     ])
 
     if (!profileData || !relationData) { router.push('/dashboard/clients'); return }
@@ -154,6 +166,13 @@ export default function ClientDetailPage() {
       checkins:     (checkinsData ?? []) as DailyCheckin[],
     })
     setNotes(relationData.notes ?? '')
+
+    type SetLogRow = SetLog & { routine_exercises: { name: string } | null }
+    setClientSetLogs(((setLogsData ?? []) as unknown as SetLogRow[]).map(r => ({
+      ...r,
+      exercise_name: (r.routine_exercises as { name: string } | null)?.name ?? 'Ejercicio',
+    })))
+
     setLoading(false)
   }, [clientId]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -177,6 +196,27 @@ export default function ClientDetailPage() {
           const newLog = payload.new as ProgressLog
           setData(prev => prev ? { ...prev, progressLogs: [...prev.progressLogs, newLog] } : prev)
           toast.info('Nuevo registro de progreso del cliente', { duration: 2500 })
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [trainerId, clientId, supabase])
+
+  // ── Realtime: live set_logs updates from client ────────────────────────────
+  useEffect(() => {
+    if (!trainerId) return
+    const channel = supabase
+      .channel(`set-logs-${clientId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'set_logs', filter: `client_id=eq.${clientId}` },
+        (payload) => {
+          const row = payload.new as SetLog
+          setClientSetLogs(prev => [{
+            ...row,
+            exercise_name: prev.find(l => l.exercise_id === row.exercise_id)?.exercise_name ?? 'Ejercicio',
+          }, ...prev])
+          toast.info('El cliente está entrenando ahora', { duration: 3000 })
         }
       )
       .subscribe()
@@ -254,7 +294,7 @@ export default function ClientDetailPage() {
 
   // ── Smart alerts ───────────────────────────────────────────────────────────
   const nowIso         = new Date().toISOString()
-  const upcomingApts   = appointments.filter(a => a.scheduled_at >= nowIso).sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))
+  const upcomingApts   = appointments.filter(a => a.scheduled_at >= nowIso && a.status !== 'done').sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))
   const activeRoutine  = routines.find(r => r.status === 'active')
   const activeMealPlan = mealPlans.find(m => m.status === 'active')
   const lastLog        = progressLogs.length > 0 ? progressLogs[progressLogs.length - 1] : null
@@ -357,25 +397,6 @@ export default function ClientDetailPage() {
               </div>
             </div>
 
-            {/* Action buttons */}
-            <div className="flex items-center gap-2 pb-1 flex-wrap">
-              <button type="button" onClick={() => setTab('mensajes')}
-                      className="btn-secondary text-xs py-1.5 px-3 gap-1.5">
-                <MessageSquare size={13} /> Mensaje
-              </button>
-              <button type="button" onClick={() => setShowAppointmentModal(true)}
-                      className="btn-secondary text-xs py-1.5 px-3 gap-1.5">
-                <CalendarDays size={13} /> Cita
-              </button>
-              <button type="button" onClick={handleExportPdf} disabled={exporting}
-                      className="btn-secondary text-xs py-1.5 px-3 gap-1.5 disabled:opacity-60">
-                <FileDown size={13} /> {exporting ? 'Generando...' : 'Informe PDF'}
-              </button>
-              <button type="button" onClick={() => setShowRoutineModal(true)}
-                      className="btn-gradient text-xs py-1.5 px-3 gap-1.5">
-                <Plus size={13} /> Rutina
-              </button>
-            </div>
           </div>
 
           {/* ── KPI strip ────────────────────────────────────────── */}
@@ -435,6 +456,38 @@ export default function ClientDetailPage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════
+          QUICK ACTIONS
+      ═══════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {([
+          { label: 'Nueva rutina',      sub: 'Asignar ejercicios',  icon: <Dumbbell size={22} />,      gradient: 'linear-gradient(135deg, #0EA5E9 0%, #06B6D4 100%)', glow: 'rgba(14,165,233,0.2)',  onClick: () => setShowRoutineModal(true)     },
+          { label: 'Plan nutricional',  sub: 'Crear o editar dieta', icon: <Apple size={22} />,          gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', glow: 'rgba(16,185,129,0.2)',  onClick: () => setShowMealModal(true)        },
+          { label: 'Agendar cita',      sub: 'Programar sesión',    icon: <CalendarDays size={22} />,   gradient: 'linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)', glow: 'rgba(124,58,237,0.2)', onClick: () => setShowAppointmentModal(true) },
+          { label: 'Registrar progreso',sub: 'Nueva medición',      icon: <TrendingUp size={22} />,    gradient: 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)', glow: 'rgba(245,158,11,0.2)', onClick: () => setShowProgressModal(true)    },
+          { label: 'Enviar mensaje',    sub: 'Chat directo',        icon: <MessageSquare size={22} />, gradient: 'linear-gradient(135deg, #8FD43A 0%, #65A30D 100%)', glow: 'rgba(143,212,58,0.2)', onClick: () => setTab('mensajes')            },
+          { label: 'Informe PDF',       sub: 'Exportar datos',      icon: <FileDown size={22} />,      gradient: 'linear-gradient(135deg, #64748B 0%, #475569 100%)', glow: 'rgba(100,116,139,0.2)', onClick: handleExportPdf                   },
+        ] as { label: string; sub: string; icon: React.ReactNode; gradient: string; glow: string; onClick: () => void }[]).map(action => (
+          <button
+            key={action.label}
+            type="button"
+            onClick={action.onClick}
+            className="group relative card border overflow-hidden text-center p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover"
+            style={{ borderColor: 'rgba(51,65,85,0.8)' }}
+          >
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-surface-2 pointer-events-none" />
+            <div
+              className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-white relative transition-transform duration-200 group-hover:scale-110"
+              style={{ background: action.gradient, boxShadow: `0 6px 20px -4px ${action.glow}` }}
+            >
+              {action.icon}
+            </div>
+            <div className="font-semibold text-sm text-fg-primary leading-tight relative">{action.label}</div>
+            <div className="text-[11px] text-fg-muted mt-0.5 relative">{action.sub}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════
           SMART ALERTS
       ═══════════════════════════════════════════════════════════ */}
       {smartAlerts.length > 0 && (
@@ -447,7 +500,7 @@ export default function ClientDetailPage() {
               : { icon: <Bell size={12} />,         color: 'text-semantic-info-text',    bg: 'rgba(14,165,233,0.08)',  border: 'rgba(14,165,233,0.2)',  bar: '#0EA5E9' }
             return (
               <div key={i}
-                   className="flex items-center gap-2 pl-0 pr-3 py-1.5 rounded-lg overflow-hidden text-xs font-medium transition-all duration-200 hover:-translate-y-0.5"
+                   className="flex items-center gap-2 pl-0 pr-3 py-1.5 rounded-lg overflow-hidden text-xs font-medium"
                    style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}>
                 <div className="w-1 self-stretch rounded-full mr-1" style={{ background: cfg.bar }} />
                 <span className={cfg.color}>{cfg.icon}</span>
@@ -457,37 +510,6 @@ export default function ClientDetailPage() {
           })}
         </div>
       )}
-
-      {/* ═══════════════════════════════════════════════════════════
-          QUICK ACTIONS
-      ═══════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {([
-          { label: 'Nueva rutina',      sub: 'Asignar ejercicios',  icon: <Dumbbell size={22} />,    gradient: 'linear-gradient(135deg, #0EA5E9 0%, #06B6D4 100%)', glow: 'rgba(14,165,233,0.2)',  onClick: () => setShowRoutineModal(true)     },
-          { label: 'Plan nutricional',  sub: 'Crear o editar dieta', icon: <Apple size={22} />,        gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', glow: 'rgba(16,185,129,0.2)',  onClick: () => setShowMealModal(true)        },
-          { label: 'Agendar cita',      sub: 'Programar sesión',    icon: <CalendarDays size={22} />, gradient: 'linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)', glow: 'rgba(124,58,237,0.2)', onClick: () => setShowAppointmentModal(true) },
-          { label: 'Registrar progreso',sub: 'Nueva medición',      icon: <TrendingUp size={22} />,  gradient: 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)', glow: 'rgba(245,158,11,0.2)', onClick: () => setShowProgressModal(true)    },
-        ] as { label: string; sub: string; icon: React.ReactNode; gradient: string; glow: string; onClick: () => void }[]).map(action => (
-          <button
-            key={action.label}
-            type="button"
-            onClick={action.onClick}
-            className="group relative card border overflow-hidden text-center p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover"
-            style={{ borderColor: 'rgba(51,65,85,0.8)' }}
-          >
-            {/* Hover background */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-surface-2" />
-            <div
-              className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-white relative transition-transform duration-200 group-hover:scale-110"
-              style={{ background: action.gradient, boxShadow: `0 6px 20px -4px ${action.glow}` }}
-            >
-              {action.icon}
-            </div>
-            <div className="font-semibold text-sm text-fg-primary leading-tight relative">{action.label}</div>
-            <div className="text-[11px] text-fg-muted mt-0.5 relative">{action.sub}</div>
-          </button>
-        ))}
-      </div>
 
       {/* ═══════════════════════════════════════════════════════════
           TAB NAVIGATION
@@ -1043,6 +1065,63 @@ export default function ClientDetailPage() {
                   </table>
                 </div>
               </div>
+              {/* Set logs — recent workout activity */}
+              {clientSetLogs.length > 0 && (() => {
+                type SessionEx = { name: string; sets: Array<{ set_number: number; weight_kg: number | null; reps: number | null }> }
+                const sessionsMap = new Map<string, Map<string, SessionEx>>()
+                for (const log of clientSetLogs) {
+                  const date = log.logged_at.slice(0, 10)
+                  if (!sessionsMap.has(date)) sessionsMap.set(date, new Map())
+                  const dayMap = sessionsMap.get(date)!
+                  if (!dayMap.has(log.exercise_id)) dayMap.set(log.exercise_id, { name: log.exercise_name, sets: [] })
+                  dayMap.get(log.exercise_id)!.sets.push({ set_number: log.set_number, weight_kg: log.weight_kg, reps: log.reps })
+                }
+                const sessions = Array.from(sessionsMap.entries())
+                  .map(([date, exMap]) => ({ date, exercises: Array.from(exMap.values()) }))
+                  .slice(0, 10)
+                return (
+                  <div className="card p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-1 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, #8FD43A, #0EA5E9)' }} />
+                      <h3 className="text-sm font-semibold text-fg-primary">Actividad de entrenamientos</h3>
+                      <span className="text-[10px] text-fg-muted ml-auto">{sessions.length} sesiones recientes</span>
+                    </div>
+                    <div className="space-y-3">
+                      {sessions.map(session => {
+                        const totalVol = session.exercises.reduce((acc, ex) =>
+                          acc + ex.sets.reduce((s, set) => s + (set.weight_kg ?? 0) * (set.reps ?? 0), 0), 0)
+                        return (
+                          <div key={session.date} className="rounded-xl border border-border/40 overflow-hidden"
+                               style={{ background: 'rgba(30,41,59,0.3)' }}>
+                            <div className="flex items-center justify-between px-4 py-2.5"
+                                 style={{ background: 'rgba(51,65,85,0.3)' }}>
+                              <span className="text-xs font-semibold text-fg-primary">
+                                {new Date(session.date + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}
+                              </span>
+                              <div className="flex items-center gap-3 text-[11px] text-fg-muted">
+                                <span>{session.exercises.length} ejercicios</span>
+                                {totalVol > 0 && <span className="text-semantic-info-text font-mono font-semibold">{totalVol.toLocaleString()} kg vol.</span>}
+                              </div>
+                            </div>
+                            <div className="px-4 py-2 flex flex-wrap gap-2">
+                              {session.exercises.map(ex => {
+                                const maxW = Math.max(0, ...ex.sets.map(s => s.weight_kg ?? 0))
+                                return (
+                                  <span key={ex.name} className="text-[11px] px-2.5 py-1 rounded-full font-medium"
+                                        style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.2)', color: '#7DD3FC' }}>
+                                    {ex.name}
+                                    {maxW > 0 && <span className="ml-1 opacity-70 font-mono">{maxW}kg×{ex.sets.length}</span>}
+                                  </span>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })()}
             </>
           )}
         </div>
@@ -1053,8 +1132,8 @@ export default function ClientDetailPage() {
       ═══════════════════════════════════════════════════════════ */}
       {tab === 'citas' && (() => {
         const now = new Date().toISOString()
-        const upcomingApts = appointments.filter(a => a.scheduled_at >= now).sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))
-        const pastApts = appointments.filter(a => a.scheduled_at < now).sort((a, b) => b.scheduled_at.localeCompare(a.scheduled_at))
+        const upcomingApts = appointments.filter(a => a.scheduled_at >= now && a.status !== 'done').sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))
+        const pastApts = appointments.filter(a => a.scheduled_at < now || a.status === 'done' || a.status === 'cancelled').sort((a, b) => b.scheduled_at.localeCompare(a.scheduled_at))
         const visibleApts = aptView === 'upcoming' ? upcomingApts : pastApts
 
         function AptCard({ apt, idx }: { apt: Appointment; idx: number }) {

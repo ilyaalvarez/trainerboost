@@ -709,10 +709,28 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
             {clients.length === 0 ? (
               <p className="text-sm text-fg-secondary py-2">No tienes clientes activos.</p>
             ) : (
-              <select className="input" value={form.client_id} onChange={e => setForm(p => ({ ...p, client_id: e.target.value }))}>
-                <option value="">Seleccionar cliente...</option>
-                {clients.map(c => <option key={c.id} value={c.id}>{c.full_name}</option>)}
-              </select>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1">
+                {clients.map(c => {
+                  const selected = form.client_id === c.id
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setForm(p => ({ ...p, client_id: c.id }))}
+                      className={[
+                        'flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all duration-150',
+                        selected
+                          ? 'border-brand-primary bg-brand-primary/10 text-fg-primary'
+                          : 'border-border/60 hover:border-border-bright hover:bg-surface-2/60 text-fg-secondary',
+                      ].join(' ')}
+                    >
+                      <Avatar name={c.full_name} url={c.avatar_url} size="sm" />
+                      <span className="text-xs font-medium leading-tight truncate flex-1">{c.full_name.split(' ')[0]}</span>
+                      {selected && <span className="text-brand-primary shrink-0 text-[10px] font-bold">✓</span>}
+                    </button>
+                  )
+                })}
+              </div>
             )}
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -970,10 +988,28 @@ function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
             {clients.length === 0 ? (
               <p className="text-sm text-fg-secondary py-2">No tienes clientes activos.</p>
             ) : (
-              <select className="input" value={form.client_id} onChange={e => setForm(p => ({ ...p, client_id: e.target.value }))}>
-                <option value="">Seleccionar cliente...</option>
-                {clients.map(c => <option key={c.id} value={c.id}>{c.full_name}</option>)}
-              </select>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1">
+                {clients.map(c => {
+                  const selected = form.client_id === c.id
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setForm(p => ({ ...p, client_id: c.id }))}
+                      className={[
+                        'flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all duration-150',
+                        selected
+                          ? 'border-brand-primary bg-brand-primary/10 text-fg-primary'
+                          : 'border-border/60 hover:border-border-bright hover:bg-surface-2/60 text-fg-secondary',
+                      ].join(' ')}
+                    >
+                      <Avatar name={c.full_name} url={c.avatar_url} size="sm" />
+                      <span className="text-xs font-medium leading-tight truncate flex-1">{c.full_name.split(' ')[0]}</span>
+                      {selected && <span className="text-brand-primary shrink-0 text-[10px] font-bold">✓</span>}
+                    </button>
+                  )
+                })}
+              </div>
             )}
           </div>
           <div className="grid grid-cols-2 gap-3">

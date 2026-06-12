@@ -50,6 +50,7 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
 
   useEffect(() => {
     if (!isOpen) return
+    if (unreadCount > 0) markAllRead()
     function handleClick(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         onToggle()
@@ -57,7 +58,7 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [isOpen, onToggle])
+  }, [isOpen, onToggle]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleRowClick(id: string, link: string | null) {
     await markRead(id)

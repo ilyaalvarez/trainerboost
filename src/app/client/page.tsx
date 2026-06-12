@@ -129,13 +129,17 @@ export default async function ClientHomePage() {
           )}
         </div>
       ) : (
-        <div className="card p-5 flex items-center gap-4 opacity-70 border-dashed border-fg-muted/60">
-          <div className="w-12 h-12 rounded-full bg-surface-2 border border-border flex items-center justify-center shrink-0">
-            <MessageSquare className="w-5 h-5 text-fg-disabled" />
+        <div className="card p-5 flex items-start gap-4 border-dashed border-brand-primary/30 bg-brand-primary/5">
+          <div className="w-12 h-12 rounded-full bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center shrink-0">
+            <Dumbbell className="w-5 h-5 text-brand-primary" />
           </div>
-          <div>
-            <div className="text-sm font-medium text-fg-muted">Sin entrenador asignado</div>
-            <div className="text-xs text-fg-disabled mt-0.5">Cuando tu entrenador te añada, aparecerá aquí.</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold text-fg-primary">Sin entrenador asignado</div>
+            <div className="text-xs text-fg-secondary mt-0.5 mb-3">¿Tienes un código de invitación? Introdúcelo para vincularte con tu entrenador.</div>
+            <Link href="/onboarding" className="btn-primary text-xs py-1.5 px-3 inline-flex">
+              Introducir código
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
       )}

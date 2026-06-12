@@ -236,7 +236,7 @@ export default function ClientRoutinePage() {
               }, 0)
               const estMins = Math.ceil(estSecs / 60)
               return (
-                <p className="text-xs text-fg-muted mt-0.5">{exercises.length} ejercicios · {totalSets} series · ~{estMins} min</p>
+                <p className="text-xs text-fg-muted mt-0.5">{exercises.length} {exercises.length === 1 ? 'ejercicio' : 'ejercicios'} · {totalSets} {totalSets === 1 ? 'serie' : 'series'} · ~{estMins} min</p>
               )
             })()}
           </div>
@@ -315,7 +315,7 @@ export default function ClientRoutinePage() {
                   })()}
                 </div>
                 <div className="flex items-center gap-3 mt-1 flex-wrap">
-                  {ex.sets && <span className="text-xs text-fg-muted">{ex.sets} series</span>}
+                  {ex.sets && <span className="text-xs text-fg-muted">{ex.sets} {ex.sets === 1 ? 'serie' : 'series'}</span>}
                   {ex.reps && <span className="text-xs text-fg-muted">× {ex.reps} reps</span>}
                   {ex.rest_seconds && (
                     timer?.exerciseId === ex.id ? (

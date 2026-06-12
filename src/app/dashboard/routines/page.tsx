@@ -329,11 +329,11 @@ export default function RoutinesPage() {
 
           {/* Stats */}
           <div className="flex gap-4 text-sm">
-            <span className="text-fg-secondary">{filtered.length} rutinas</span>
+            <span className="text-fg-secondary">{filtered.length} {filtered.length === 1 ? 'rutina' : 'rutinas'}</span>
             <span className="text-fg-muted">·</span>
-            <span className="text-fg-secondary">{routines.filter(r => r.status === 'active').length} activas</span>
+            {(() => { const n = routines.filter(r => r.status === 'active').length; return <span className="text-fg-secondary">{n} {n === 1 ? 'activa' : 'activas'}</span> })()}
             <span className="text-fg-muted">·</span>
-            <span className="text-fg-secondary">{routines.filter(r => r.status === 'archived').length} archivadas</span>
+            {(() => { const n = routines.filter(r => r.status === 'archived').length; return <span className="text-fg-secondary">{n} {n === 1 ? 'archivada' : 'archivadas'}</span> })()}
           </div>
 
           {/* Grid */}
@@ -454,7 +454,7 @@ function RoutineCard({ routine, expanded, onToggle, onArchive, onDuplicate, isDu
             )}
             <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-fg-muted">
               {routine.frequency && <span>{routine.frequency}</span>}
-              <span>{routine.exercises.length} ejercicios</span>
+              <span>{routine.exercises.length} {routine.exercises.length === 1 ? 'ejercicio' : 'ejercicios'}</span>
               {routine.starts_at && <span>Inicio: {formatDate(routine.starts_at)}</span>}
               <span>Creada {formatDate(routine.created_at)}</span>
             </div>
@@ -757,7 +757,7 @@ function NewRoutineModal({ isOpen, onClose, trainerId, clients, onSuccess, prefi
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-sm text-fg-secondary">Añade los ejercicios a la rutina <span className="font-semibold text-fg-primary">&ldquo;{form.title}&rdquo;</span></p>
-            <span className="text-xs text-fg-muted">{exercises.length} ejercicios</span>
+            <span className="text-xs text-fg-muted">{exercises.length} {exercises.length === 1 ? 'ejercicio' : 'ejercicios'}</span>
           </div>
 
           <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
@@ -1036,7 +1036,7 @@ function EditRoutineModal({ routine, onClose, clients, onSuccess }: {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-sm text-fg-secondary">Ejercicios de <span className="font-semibold text-fg-primary">&ldquo;{form.title}&rdquo;</span></p>
-            <span className="text-xs text-fg-muted">{exercises.length} ejercicios</span>
+            <span className="text-xs text-fg-muted">{exercises.length} {exercises.length === 1 ? 'ejercicio' : 'ejercicios'}</span>
           </div>
 
           {loadingExercises ? (
@@ -1361,7 +1361,7 @@ function ExerciseLibraryPanel({
 
           {/* Stats */}
           <div className="text-sm text-fg-secondary">
-            {filteredGlobal.length} ejercicios
+            {filteredGlobal.length} {filteredGlobal.length === 1 ? 'ejercicio' : 'ejercicios'}
             {(search || catFilter || equipFilter || diffFilter) && <span className="text-fg-disabled"> de {globalExercises.length}</span>}
           </div>
 
@@ -1448,7 +1448,7 @@ function ExerciseLibraryPanel({
 
           {/* Stats */}
           <div className="flex items-center gap-4 text-sm">
-            <span className="text-fg-secondary">{filtered.length} ejercicios</span>
+            <span className="text-fg-secondary">{filtered.length} {filtered.length === 1 ? 'ejercicio' : 'ejercicios'}</span>
             {(search || muscleFilter) && <span className="text-fg-muted">de {exercises.length} en biblioteca</span>}
           </div>
 

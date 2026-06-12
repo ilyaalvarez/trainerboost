@@ -168,7 +168,7 @@ const INIT_CHAT: ChatMsg[] = [
   { from: 'trainer', text: 'Perfecto. Esta semana intenta llegar a las 8h de sueño, es clave para la recuperación muscular.', time: '09:35' },
   { from: 'client',  text: '¡Entendido! ¿La rutina de mañana es igual que la de hoy?', time: '10:02' },
   { from: 'trainer', text: 'No, mañana es descanso activo. Pasado mañana toca Cardio + Core. Te lo subo a la app 👍', time: '10:05' },
-  { from: 'client',  text: 'Perfecto, gracias! A ver si llego al objetivo antes del verano 😄', time: '10:28' },
+  { from: 'client',  text: '¡Perfecto, gracias! A ver si llego al objetivo antes del verano 😄', time: '10:28' },
 ]
 
 const TRAINER_REPLIES = [

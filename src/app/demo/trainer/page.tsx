@@ -142,12 +142,12 @@ const INIT_CONVERSATIONS: Conversation[] = [
     ] },
   { id: 2, initials: 'PL', colorClass: 'bg-violet-500/20 text-violet-300',  name: 'Pedro López',     unread: true,  lastTime: '09:15',
     thread: [
-      { from: 'trainer', text: 'Buenos días Pedro! ¿Cómo te fue con el nuevo plan de cardio?', time: '08:00' },
+      { from: 'trainer', text: '¡Buenos días, Pedro! ¿Cómo te fue con el nuevo plan de cardio?', time: '08:00' },
       { from: 'client',  text: '¿Podemos cambiar la cita del jueves al viernes?', time: '09:15' },
     ] },
   { id: 3, initials: 'MF', colorClass: 'bg-emerald-500/20 text-emerald-300',name: 'María Fernández', unread: false, lastTime: 'Ayer',
     thread: [
-      { from: 'trainer', text: 'Buenos días María! ¿Cómo te fue con la rutina de ayer?', time: '08:00' },
+      { from: 'trainer', text: '¡Buenos días, María! ¿Cómo te fue con la rutina de ayer?', time: '08:00' },
       { from: 'client',  text: 'Ya hice las medidas esta mañana, te las mando ahora. ¡−0.8 kg!', time: 'Ayer' },
       { from: 'trainer', text: '¡Increíble! Sigue así con la alimentación esta semana 🙌', time: 'Ayer' },
     ] },

@@ -558,7 +558,7 @@ export default function ClientProgressPage() {
                 <Dumbbell className="w-4 h-4 text-brand-primary" />
                 <h2 className="font-semibold text-fg-primary">Historial de entrenamientos</h2>
               </div>
-              <span className="text-xs text-fg-muted">{workoutSessions.length} sesiones</span>
+              <span className="text-xs text-fg-muted">{workoutSessions.length} {workoutSessions.length === 1 ? 'sesión' : 'sesiones'}</span>
             </div>
             <div className="space-y-5">
               {groups.map(group => (
@@ -651,7 +651,7 @@ export default function ClientProgressPage() {
 
       {/* Table */}
       {loading ? (
-        <div className="flex justify-center py-12">
+        <div className="flex items-center justify-center py-12">
           <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
         </div>
       ) : logs.length === 0 ? (

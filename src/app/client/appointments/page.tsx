@@ -246,7 +246,7 @@ export default function ClientAppointmentsPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12">
+        <div className="flex items-center justify-center py-12">
           <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
         </div>
       ) : currentList.length === 0 ? (

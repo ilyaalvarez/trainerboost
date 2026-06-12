@@ -2,9 +2,19 @@ import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
+function safeNextPath(raw: string | null): string | null {
+  if (!raw) return null
+  // Must be a relative path starting with / but not // (open-redirect guard)
+  if (!raw.startsWith('/') || raw.startsWith('//')) return null
+  // Must not contain a protocol-like pattern after a slash
+  if (/[a-zA-Z][a-zA-Z0-9+.-]*:/.test(raw)) return null
+  return raw
+}
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code          = searchParams.get('code')
+  const next          = safeNextPath(searchParams.get('next'))
   const errorParam    = searchParams.get('error')
   const errorDesc     = searchParams.get('error_description')
 
@@ -19,7 +29,6 @@ export async function GET(request: Request) {
 
   const cookieStore = await cookies()
 
-  // Collect cookies written by Supabase so we can attach them to the redirect
   const newCookies: Array<{ name: string; value: string; options: Parameters<typeof cookieStore.set>[2] }> = []
 
   const supabase = createServerClient(
@@ -46,11 +55,11 @@ export async function GET(request: Request) {
   }
 
   const role = (data.session.user?.user_metadata?.role as string | undefined) ?? null
-  const destination = role === 'client' ? `${origin}/client` : `${origin}/dashboard`
+  const defaultDestination = role === 'client' ? `${origin}/onboarding` : `${origin}/dashboard`
+  const destination = next ? `${origin}${next}` : defaultDestination
 
   const response = NextResponse.redirect(destination)
 
-  // Attach session cookies to the redirect so the browser sends them with the next request
   newCookies.forEach(({ name, value, options }) => {
     response.cookies.set(name, value, options)
   })

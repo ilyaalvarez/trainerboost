@@ -38,6 +38,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [pwdError, setPwdError]     = useState<string | null>(null)
+  const [emailSent, setEmailSent]   = useState(false)
 
   const strength = passwordStrength(password)
 
@@ -65,28 +66,39 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
+      const nextPath = inviteCode
+        ? `/onboarding?code=${encodeURIComponent(inviteCode)}`
+        : '/onboarding'
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: { full_name: name, role },
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${nextPath}`,
         },
       })
       if (error) { toast.error(error.message); return }
       if (data.user) {
-        await supabase.from('profiles').upsert({
-          id: data.user.id,
-          full_name: name,
-          role,
-        })
-        // Fire-and-forget welcome email (non-blocking)
+        // The DB trigger creates the profile on auth.users INSERT.
+        // The upsert below updates full_name/role in case the trigger already ran with defaults.
+        await supabase.from('profiles').upsert({ id: data.user.id, full_name: name, role })
+
         fetch('/api/email/welcome', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, role }),
         }).catch(() => undefined)
+
+        if (!data.session) {
+          // Email confirmation required — show a check-your-email screen
+          setEmailSent(true)
+          return
+        }
+
+        // Auto-confirmed (no email verification) — go straight to onboarding
         toast.success('¡Cuenta creada! Completa tu perfil')
-        router.push(inviteCode ? `/onboarding?code=${encodeURIComponent(inviteCode)}` : '/onboarding')
+        router.push(nextPath)
       }
     } finally {
       setLoading(false)
@@ -200,6 +212,22 @@ export default function RegisterPage() {
                 <ArrowRight className="w-4 h-4" />
                 Continuar como {role === 'trainer' ? 'entrenador' : 'cliente'}
               </button>
+            </div>
+          ) : emailSent ? (
+            <div className="animate-fade-in text-center py-4">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   style={{ background: 'rgba(143,212,58,0.15)', border: '1px solid rgba(143,212,58,0.3)' }}>
+                <Mail className="w-8 h-8" style={{ color: '#8FD43A' }} />
+              </div>
+              <h2 className="text-xl font-bold text-fg-primary mb-2">Revisa tu email</h2>
+              <p className="text-fg-secondary text-sm leading-relaxed mb-2">
+                Hemos enviado un enlace de confirmación a<br />
+                <strong className="text-fg-primary">{email}</strong>
+              </p>
+              <p className="text-xs text-fg-muted">
+                Haz clic en el enlace del email para activar tu cuenta.
+                {inviteCode && ' Serás vinculado automáticamente con tu entrenador.'}
+              </p>
             </div>
           ) : (
             <div className="animate-fade-in">

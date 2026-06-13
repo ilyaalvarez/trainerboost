@@ -40,10 +40,7 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
   async function saveSpecialties() {
     setSavingSpec(true)
     await supabase.from('profiles').update({ specialties: selectedSpec }).eq('id', userId)
-    await supabase.from('subscriptions').upsert(
-      { user_id: userId, status: 'inactive', max_clients: FREE_MAX_CLIENTS },
-      { onConflict: 'user_id' }
-    )
+    await fetch('/api/free-plan', { method: 'POST' })
     setSavingSpec(false)
     setStep(2)
   }
@@ -90,11 +87,7 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
 
   async function goToDashboard() {
     setGoingToBoard(true)
-    // Ensure subscription is created even if user skipped step 1
-    await supabase.from('subscriptions').upsert(
-      { user_id: userId, status: 'inactive', max_clients: FREE_MAX_CLIENTS },
-      { onConflict: 'user_id' }
-    )
+    await fetch('/api/free-plan', { method: 'POST' })
     router.push('/dashboard')
   }
 

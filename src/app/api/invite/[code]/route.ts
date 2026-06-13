@@ -42,6 +42,5 @@ export async function GET(
     valid: true,
     trainerId: data.trainer_id,
     trainerName,
-    email: data.email,
   })
 }

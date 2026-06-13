@@ -1,4 +1,4 @@
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     }
     const { name, email, type, message } = parsed.data
 
-    const supabase = createServiceClient()
+    const supabase = await createClient()
     const { error } = await supabase.from('contact_requests').insert({
       name:    name.trim(),
       email:   email.trim().toLowerCase(),

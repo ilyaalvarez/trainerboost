@@ -76,6 +76,7 @@ export default function ClientDetailPage() {
   // Appointments view toggle
   const [aptView, setAptView] = useState<'upcoming' | 'past'>('upcoming')
   const [, setExporting] = useState(false)
+  const [trainerPlan, setTrainerPlan] = useState<string | null>(null)
 
   // Set logs (client workout logs visible to trainer)
   type SetLogWithName = SetLog & { exercise_name: string }
@@ -114,6 +115,7 @@ export default function ClientDetailPage() {
       { data: messagesData },
       { data: checkinsData },
       { data: setLogsData },
+      { data: subData },
     ] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', clientId).single(),
       supabase.from('trainer_clients').select('*')
@@ -143,6 +145,7 @@ export default function ClientDetailPage() {
         .order('exercise_id')
         .order('set_number')
         .limit(150),
+      supabase.from('subscriptions').select('plan').eq('user_id', user.id).maybeSingle(),
     ])
 
     if (!profileData || !relationData) { router.push('/dashboard/clients'); return }
@@ -164,6 +167,7 @@ export default function ClientDetailPage() {
       checkins:     (checkinsData ?? []) as DailyCheckin[],
     })
     setNotes(relationData.notes ?? '')
+    setTrainerPlan(subData?.plan ?? null)
 
     type SetLogRow = SetLog & { routine_exercises: { name: string } | null }
     setClientSetLogs(((setLogsData ?? []) as unknown as SetLogRow[]).map(r => ({
@@ -252,6 +256,11 @@ export default function ClientDetailPage() {
 
   const handleExportPdf = async () => {
     if (!data) return
+    if (!trainerPlan) {
+      toast.error('Exportar PDFs requiere un plan de pago')
+      router.push('/pricing')
+      return
+    }
     setExporting(true)
     try {
       const { exportProgressReportPdf } = await import('@/lib/exportPdf')
@@ -789,6 +798,7 @@ export default function ClientDetailPage() {
                           <button
                             type="button"
                             onClick={async () => {
+                              if (!trainerPlan) { router.push('/pricing'); return }
                               try {
                                 const { exportRoutinePdf } = await import('@/lib/exportPdf')
                                 await exportRoutinePdf({ ...routine, exercises: routine.exercises }, profile.full_name)

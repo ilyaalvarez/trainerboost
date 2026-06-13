@@ -149,8 +149,8 @@ export default async function DashboardPage() {
           <div className="flex items-center gap-3">
             <Zap className="w-5 h-5 text-brand-primary shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-fg-primary">Activa tu plan para empezar a usar TrainerBoost</p>
-              <p className="text-xs text-fg-muted mt-0.5">Gestiona hasta 10 clientes desde 19€/mes</p>
+              <p className="text-sm font-semibold text-fg-primary">Completa tu configuración para empezar</p>
+              <p className="text-xs text-fg-muted mt-0.5">Empieza gratis con 3 clientes, o amplía tu plan desde 19€/mes</p>
             </div>
           </div>
           <Link href="/pricing" className="btn-gradient shrink-0 text-sm py-1.5 px-4 flex items-center gap-1.5">

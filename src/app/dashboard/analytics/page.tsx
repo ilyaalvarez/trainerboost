@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
 import { Skeleton } from '@/components/ui/Skeleton'
+import PlanGuard from '@/components/ui/PlanGuard'
 import type { Profile, ProgressLog } from '@/types/database'
 
 // Palette for multi-client lines
@@ -314,6 +315,14 @@ export default function AnalyticsPage() {
         </div>
         <Skeleton className="h-80 rounded-xl" />
       </div>
+    )
+  }
+
+  if (!subscription?.plan) {
+    return (
+      <PlanGuard requiredPlan="starter" currentPlan={null}>
+        <div />
+      </PlanGuard>
     )
   }
 

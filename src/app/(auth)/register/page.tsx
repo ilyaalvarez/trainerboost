@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -39,6 +39,7 @@ export default function RegisterPage() {
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [pwdError, setPwdError]     = useState<string | null>(null)
   const [emailSent, setEmailSent]   = useState(false)
+  const redirectingRef = useRef(false)
 
   const strength = passwordStrength(password)
 
@@ -50,6 +51,22 @@ export default function RegisterPage() {
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // When waiting for email confirmation, auto-redirect once the user confirms
+  useEffect(() => {
+    if (!emailSent) return
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session && !redirectingRef.current) {
+        redirectingRef.current = true
+        const dest = inviteCode
+          ? `/onboarding?code=${encodeURIComponent(inviteCode)}`
+          : '/onboarding'
+        router.replace(dest)
+      }
+    })
+    return () => subscription.unsubscribe()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [emailSent])
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
@@ -70,12 +87,14 @@ export default function RegisterPage() {
         ? `/onboarding?code=${encodeURIComponent(inviteCode)}`
         : '/onboarding'
 
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: { full_name: name, role },
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${nextPath}`,
+          emailRedirectTo: `${appUrl}/auth/callback?next=${encodeURIComponent(nextPath)}`,
         },
       })
       if (error) { toast.error(error.message); return }
@@ -224,10 +243,14 @@ export default function RegisterPage() {
                 Hemos enviado un enlace de confirmación a<br />
                 <strong className="text-fg-primary">{email}</strong>
               </p>
-              <p className="text-xs text-fg-muted">
+              <p className="text-xs text-fg-muted mb-4">
                 Haz clic en el enlace del email para activar tu cuenta.
                 {inviteCode && ' Serás vinculado automáticamente con tu entrenador.'}
               </p>
+              <div className="flex items-center justify-center gap-2 text-xs text-fg-disabled">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Esperando confirmación…
+              </div>
             </div>
           ) : (
             <div className="animate-fade-in">

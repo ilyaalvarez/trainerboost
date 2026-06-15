@@ -139,6 +139,46 @@ export default function ClientsPage() {
 
   useEffect(() => { fetchClients() }, [fetchClients])
 
+  // ── Realtime: new client joins or status changes ─────────────────────────
+  useEffect(() => {
+    if (!userId) return
+
+    const channel = supabase
+      .channel(`trainer-clients-rt:${userId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'trainer_clients', filter: `trainer_id=eq.${userId}` },
+        async (payload) => {
+          const { data: newRow } = await supabase
+            .from('trainer_clients')
+            .select('*, profile:client_id(*)')
+            .eq('id', payload.new.id)
+            .single()
+          if (newRow) {
+            setClients(prev => [{ ...(newRow as ClientWithProfile), lastRoutine: null, lastProgressLog: null }, ...prev])
+            toast.success(`Nuevo cliente: ${(newRow as ClientWithProfile).profile?.full_name ?? 'Cliente'}`)
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'trainer_clients', filter: `trainer_id=eq.${userId}` },
+        async (payload) => {
+          const { data: updatedRow } = await supabase
+            .from('trainer_clients')
+            .select('*, profile:client_id(*)')
+            .eq('id', payload.new.id)
+            .single()
+          if (updatedRow) {
+            setClients(prev => prev.map(c => c.id === payload.new.id ? { ...c, ...(updatedRow as ClientWithProfile) } : c))
+          }
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [userId, supabase])
+
   // ── Filtered + paginated ─────────────────────────────────────────────────
 
   const filtered = useMemo(() => {

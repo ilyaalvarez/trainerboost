@@ -4,11 +4,13 @@ import { cookies } from 'next/headers'
 
 function safeNextPath(raw: string | null): string | null {
   if (!raw) return null
+  let decoded: string
+  try { decoded = decodeURIComponent(raw) } catch { return null }
   // Must be a relative path starting with / but not // (open-redirect guard)
-  if (!raw.startsWith('/') || raw.startsWith('//')) return null
+  if (!decoded.startsWith('/') || decoded.startsWith('//')) return null
   // Must not contain a protocol-like pattern after a slash
-  if (/[a-zA-Z][a-zA-Z0-9+.-]*:/.test(raw)) return null
-  return raw
+  if (/[a-zA-Z][a-zA-Z0-9+.-]*:/.test(decoded)) return null
+  return decoded
 }
 
 export async function GET(request: Request) {

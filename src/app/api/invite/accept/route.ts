@@ -69,8 +69,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Error al vincular con el entrenador' }, { status: 500 })
   }
 
-  const { data: trainerProfile } = await admin
-    .from('profiles').select('full_name').eq('id', inv.trainer_id).single()
+  const [{ data: trainerProfile }, { data: clientProfile }] = await Promise.all([
+    admin.from('profiles').select('full_name').eq('id', inv.trainer_id).single(),
+    admin.from('profiles').select('full_name').eq('id', user.id).single(),
+  ])
+
+  // Notify the trainer that a client has joined
+  await admin.from('notifications').insert({
+    user_id:    inv.trainer_id,
+    type:       'system',
+    title:      `Nuevo cliente: ${clientProfile?.full_name ?? 'Cliente'}`,
+    body:       'Ha aceptado tu invitación y se ha unido a tu equipo.',
+    link:       `/dashboard/clients/${user.id}`,
+  })
 
   return NextResponse.json({
     success: true,

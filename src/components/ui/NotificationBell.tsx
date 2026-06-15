@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Bell,
@@ -47,9 +47,20 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications(userId)
   const router = useRouter()
   const containerRef = useRef<HTMLDivElement>(null)
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null)
+
+  const calcPosition = useCallback(() => {
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    setDropdownPos({
+      top:   rect.bottom + 8,
+      right: Math.max(8, window.innerWidth - rect.right),
+    })
+  }, [])
 
   useEffect(() => {
     if (!isOpen) return
+    calcPosition()
     if (unreadCount > 0) markAllRead()
     function handleClick(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -58,7 +69,7 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [isOpen, onToggle]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen, onToggle, calcPosition]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleRowClick(id: string, link: string | null) {
     await markRead(id)
@@ -81,8 +92,11 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
         )}
       </button>
 
-      {isOpen && (
-        <div className="fixed right-4 top-14 sm:absolute sm:right-0 sm:top-full sm:mt-2 w-[min(20rem,calc(100vw-2rem))] z-[200] card shadow-2xl overflow-hidden">
+      {isOpen && dropdownPos && (
+        <div
+          className="fixed w-[min(20rem,calc(100vw-1rem))] z-[200] card shadow-2xl overflow-hidden"
+          style={{ top: dropdownPos.top, right: dropdownPos.right }}
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
             <span className="text-sm font-semibold text-white">Notificaciones</span>

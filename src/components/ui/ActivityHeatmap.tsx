@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useRef, useEffect, useState } from 'react'
 
 interface Props {
   /** ISO date strings like "2025-05-31T..." from progress_logs.logged_at */
@@ -9,7 +9,7 @@ interface Props {
   weeks?: number
 }
 
-const DAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'] // Mon–Sun labels
+const DAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
 
 function toLocalISODate(d: Date) {
   const y = d.getFullYear()
@@ -19,25 +19,42 @@ function toLocalISODate(d: Date) {
 }
 
 export function ActivityHeatmap({ logDates, weeks = 16 }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [cellSize, setCellSize] = useState(14)
+
+  // Measure container width and derive cell size
+  useEffect(() => {
+    const DAY_LABEL_W = 22
+    const GAP = 3
+
+    function measure() {
+      if (!containerRef.current) return
+      const available = containerRef.current.clientWidth - DAY_LABEL_W - GAP
+      const size = Math.floor((available - (weeks - 1) * GAP) / weeks)
+      setCellSize(Math.max(10, Math.min(size, 18)))
+    }
+
+    measure()
+    const ro = new ResizeObserver(measure)
+    if (containerRef.current) ro.observe(containerRef.current)
+    return () => ro.disconnect()
+  }, [weeks])
+
   const { grid, monthLabels } = useMemo(() => {
     const logSet = new Set(logDates.map(d => d.slice(0, 10)))
 
-    // Build a grid of `weeks` × 7 days ending today
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    // Align end date to Sunday (end of current week)
-    const dayOfWeek = today.getDay() // 0=Sun, 1=Mon … 6=Sat
-    // We want Mon as start of week. Move today to end of current Mon-Sun week (Sunday).
+    // Align end to Sunday so each column is a full Mon–Sun week
+    const dayOfWeek = today.getDay()
     const daysToSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek
     const endDate = new Date(today)
     endDate.setDate(today.getDate() + daysToSunday)
 
-    const totalDays = weeks * 7
     const startDate = new Date(endDate)
-    startDate.setDate(endDate.getDate() - totalDays + 1)
+    startDate.setDate(endDate.getDate() - weeks * 7 + 1)
 
-    // Build columns (each column = one week Mon-Sun)
     const cols: { date: string; hasLog: boolean; isFuture: boolean }[][] = []
     const todayStr = toLocalISODate(today)
     const months: { label: string; colIdx: number }[] = []
@@ -49,13 +66,11 @@ export function ActivityHeatmap({ logDates, weeks = 16 }: Props) {
         const date = new Date(startDate)
         date.setDate(startDate.getDate() + w * 7 + d)
         const dateStr = toLocalISODate(date)
-        col.push({
-          date: dateStr,
-          hasLog: logSet.has(dateStr),
-          isFuture: dateStr > todayStr,
-        })
+        col.push({ date: dateStr, hasLog: logSet.has(dateStr), isFuture: dateStr > todayStr })
         if (d === 0 && date.getMonth() !== prevMonth) {
-          months.push({ label: date.toLocaleString('es-ES', { month: 'short' }), colIdx: w })
+          // Remove trailing dot from Spanish short month names (e.g. "ene." → "ene")
+          const label = date.toLocaleString('es-ES', { month: 'short' }).replace('.', '')
+          months.push({ label, colIdx: w })
           prevMonth = date.getMonth()
         }
       }
@@ -71,55 +86,66 @@ export function ActivityHeatmap({ logDates, weeks = 16 }: Props) {
     return 'rgba(51,65,85,0.6)'
   }
 
+  const GAP = 3
+  const DAY_LABEL_W = 22
+  const cellTotal = cellSize + GAP
+
   return (
-    <div className="overflow-x-auto">
-      <div className="min-w-max">
-        {/* Month labels */}
-        <div className="flex mb-1 pl-6">
-          {grid.map((_, colIdx) => {
-            const m = monthLabels.find(ml => ml.colIdx === colIdx)
-            return (
-              <div key={colIdx} className="w-[14px] mr-[3px] text-[9px] text-slate-500 capitalize truncate">
-                {m ? m.label : ''}
-              </div>
-            )
-          })}
+    <div ref={containerRef} className="w-full">
+
+      {/* Month labels — absolutely positioned so they never truncate */}
+      <div className="relative h-4 mb-1" style={{ paddingLeft: DAY_LABEL_W + GAP }}>
+        {monthLabels.map((m, i) => (
+          <span
+            key={i}
+            className="absolute text-[10px] text-slate-500 capitalize whitespace-nowrap"
+            style={{ left: DAY_LABEL_W + GAP + m.colIdx * cellTotal }}
+          >
+            {m.label}
+          </span>
+        ))}
+      </div>
+
+      {/* Grid */}
+      <div className="flex">
+
+        {/* Day labels — match cell height exactly */}
+        <div className="flex flex-col shrink-0" style={{ width: DAY_LABEL_W, gap: GAP, marginRight: GAP }}>
+          {DAYS.map((day, i) => (
+            <div
+              key={i}
+              className="text-[10px] text-slate-600 flex items-center justify-end"
+              style={{ height: cellSize }}
+            >
+              {i % 2 === 0 ? day : ''}
+            </div>
+          ))}
         </div>
 
-        {/* Grid */}
-        <div className="flex gap-0">
-          {/* Day labels */}
-          <div className="flex flex-col gap-[3px] mr-1.5 pt-0.5">
-            {DAYS.map((day, i) => (
-              <div key={i} className="h-[14px] text-[9px] text-slate-600 flex items-center">
-                {i % 2 === 0 ? day : ''}
-              </div>
-            ))}
-          </div>
-
-          {/* Cells */}
+        {/* Cells */}
+        <div className="flex" style={{ gap: GAP }}>
           {grid.map((col, colIdx) => (
-            <div key={colIdx} className="flex flex-col gap-[3px] mr-[3px]">
+            <div key={colIdx} className="flex flex-col" style={{ gap: GAP }}>
               {col.map((cell, rowIdx) => (
                 <div
                   key={rowIdx}
-                  title={cell.date + (cell.hasLog ? ' · registro de progreso' : '')}
-                  className="w-[14px] h-[14px] rounded-[3px] transition-colors cursor-default"
-                  style={{ background: cellColor(cell) }}
+                  title={`${cell.date}${cell.hasLog ? ' · registro de progreso' : ''}`}
+                  className="rounded-[2px] cursor-default transition-opacity hover:opacity-80"
+                  style={{ width: cellSize, height: cellSize, background: cellColor(cell) }}
                 />
               ))}
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Legend */}
-        <div className="flex items-center gap-2 mt-2 pl-6">
-          <span className="text-[10px] text-slate-600">Menos</span>
-          {['rgba(51,65,85,0.6)', 'rgba(16,185,129,0.3)', 'rgba(16,185,129,0.6)', '#10B981'].map((c, i) => (
-            <div key={i} className="w-[12px] h-[12px] rounded-sm" style={{ background: c }} />
-          ))}
-          <span className="text-[10px] text-slate-600">Más</span>
-        </div>
+      {/* Legend */}
+      <div className="flex items-center gap-2 mt-2" style={{ paddingLeft: DAY_LABEL_W + GAP }}>
+        <span className="text-[10px] text-slate-600">Menos</span>
+        {['rgba(51,65,85,0.6)', 'rgba(16,185,129,0.3)', 'rgba(16,185,129,0.6)', '#10B981'].map((c, i) => (
+          <div key={i} className="rounded-sm" style={{ width: 12, height: 12, background: c }} />
+        ))}
+        <span className="text-[10px] text-slate-600">Más</span>
       </div>
     </div>
   )

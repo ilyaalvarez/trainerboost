@@ -47,15 +47,30 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications(userId)
   const router = useRouter()
   const containerRef = useRef<HTMLDivElement>(null)
-  const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null)
+  const [dropdownPos, setDropdownPos] = useState<{
+    top: number
+    left?: number
+    right?: number
+  } | null>(null)
 
   const calcPosition = useCallback(() => {
     if (!containerRef.current) return
     const rect = containerRef.current.getBoundingClientRect()
-    setDropdownPos({
-      top:   rect.bottom + 8,
-      right: Math.max(8, window.innerWidth - rect.right),
-    })
+    const dropdownW = Math.min(320, window.innerWidth - 16)
+
+    if (window.innerWidth - rect.left >= dropdownW) {
+      // Enough space to the right (e.g. sidebar bell) → open rightward
+      setDropdownPos({
+        top:  rect.bottom + 8,
+        left: Math.min(rect.left, window.innerWidth - dropdownW - 8),
+      })
+    } else {
+      // Near the right edge (e.g. mobile topbar) → open leftward
+      setDropdownPos({
+        top:   rect.bottom + 8,
+        right: Math.max(8, window.innerWidth - rect.right),
+      })
+    }
   }, [])
 
   useEffect(() => {
@@ -95,7 +110,12 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
       {isOpen && dropdownPos && (
         <div
           className="fixed w-[min(20rem,calc(100vw-1rem))] z-[200] card shadow-2xl overflow-hidden"
-          style={{ top: dropdownPos.top, right: dropdownPos.right }}
+          style={{
+            top: dropdownPos.top,
+            ...(dropdownPos.left !== undefined
+              ? { left: dropdownPos.left }
+              : { right: dropdownPos.right }),
+          }}
         >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">

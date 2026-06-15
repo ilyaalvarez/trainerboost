@@ -82,7 +82,7 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 z-50 card shadow-2xl overflow-hidden">
+        <div className="fixed right-4 top-14 sm:absolute sm:right-0 sm:top-full sm:mt-2 w-[min(20rem,calc(100vw-2rem))] z-[200] card shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
             <span className="text-sm font-semibold text-white">Notificaciones</span>
@@ -97,7 +97,7 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
           </div>
 
           {/* List */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[60vh] sm:max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="py-10 text-center text-slate-500 text-sm">
                 Sin notificaciones

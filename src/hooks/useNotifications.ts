@@ -41,6 +41,16 @@ export function useNotifications(userId: string | null) {
       }, (payload) => {
         setNotifications(prev => [payload.new as Notification, ...prev])
       })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${userId}`,
+      }, (payload) => {
+        setNotifications(prev =>
+          prev.map(n => n.id === (payload.new as Notification).id ? payload.new as Notification : n)
+        )
+      })
       .subscribe()
     return () => { client.removeChannel(channel) }
   }, [userId])

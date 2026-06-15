@@ -55,7 +55,20 @@ export async function GET(request: Request) {
   }
 
   const role = (data.session.user?.user_metadata?.role as string | undefined) ?? null
-  const defaultDestination = role === 'client' ? `${origin}/onboarding` : `${origin}/dashboard`
+
+  let defaultDestination: string
+  if (role === 'client') {
+    // If the client already has a trainer relationship, skip onboarding
+    const { count } = await supabase
+      .from('trainer_clients')
+      .select('*', { count: 'exact', head: true })
+      .eq('client_id', data.session.user.id)
+      .eq('status', 'active')
+    defaultDestination = (count ?? 0) > 0 ? `${origin}/client` : `${origin}/onboarding`
+  } else {
+    defaultDestination = `${origin}/dashboard`
+  }
+
   const destination = next ? `${origin}${next}` : defaultDestination
 
   const response = NextResponse.redirect(destination)

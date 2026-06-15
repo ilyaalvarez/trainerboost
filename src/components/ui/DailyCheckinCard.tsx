@@ -37,13 +37,12 @@ export function DailyCheckinCard({ clientId, trainerId, existingCheckin }: Props
     setSaving(false)
     if (error) { toast.error('Error al guardar'); return }
     toast.success('¡Check-in guardado! 🎯')
-    // Notify trainer if a note was written
-    if (note.trim() && trainerId) {
+    if (trainerId) {
       supabase.from('notifications').insert({
         user_id: trainerId,
-        type: 'system',
-        title: 'Nota de check-in',
-        body: note.trim().slice(0, 100),
+        type: 'progress',
+        title: 'Check-in completado',
+        body: note.trim() ? note.trim().slice(0, 100) : `Energía ${energy}/5 · Ánimo ${mood}/5`,
         link: `/dashboard/clients/${clientId}`,
       }).then(() => {})
     }

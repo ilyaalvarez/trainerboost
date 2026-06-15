@@ -455,7 +455,12 @@ export default function ClientDetailPage() {
                     <Zap size={10} /> {latest.muscle_mass_kg} kg músculo
                   </span>
                 )}
-                <span className="text-[11px] text-fg-muted">{timeAgo(latest.logged_at)}</span>
+                <span
+                  className="text-[11px] text-fg-muted cursor-default"
+                  title={formatDate(latest.logged_at, "d MMM yyyy 'a las' HH:mm")}
+                >
+                  {timeAgo(latest.logged_at)}
+                </span>
               </div>
             )
           })()}

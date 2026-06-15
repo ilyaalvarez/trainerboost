@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Check, Loader2, UtensilsCrossed, Download, Droplets, Plus, Minus, Trophy } from 'lucide-react'
+import { Check, Loader2, UtensilsCrossed, Download, Droplets, Plus, Minus, Trophy, Clock, Flame } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { MealPlan, Meal, FoodItem } from '@/types/database'
+import type { MealPlan, Meal, FoodItem, DietAssignment } from '@/types/database'
 import EmptyState from '@/components/ui/EmptyState'
 
 
@@ -36,6 +36,7 @@ export default function ClientNutritionPage() {
   const [waterGlasses, setWaterGlasses] = useState(0)
   const [userId, setUserId]     = useState<string | null>(null)
   const [trainerId, setTrainerId] = useState<string | null>(null)
+  const [todayDiet, setTodayDiet] = useState<DietAssignment[]>([])
   const WATER_GOAL = 8
 
   useEffect(() => {
@@ -60,6 +61,17 @@ export default function ClientNutritionPage() {
       ])
 
       if (tc) setTrainerId(tc.trainer_id)
+
+      // Fetch today's diet assignments (recipe-based)
+      const today = new Date().toISOString().split('T')[0]
+      const { data: dietData } = await supabase
+        .from('diet_assignments')
+        .select('*, receta:receta_id(*)')
+        .eq('client_id', user.id)
+        .eq('day_date', today)
+        .order('slot')
+      if (dietData) setTodayDiet(dietData as unknown as DietAssignment[])
+
       if (data) {
         const sorted = {
           ...data,
@@ -192,8 +204,49 @@ export default function ClientNutritionPage() {
     await exportNutritionPdf({ ...plan, meals: plan.meals ?? [] }, '')
   }
 
+  const SLOT_LABELS: Record<string, string> = {
+    desayuno: 'Desayuno',
+    comida:   'Comida',
+    cena:     'Cena',
+    snack:    'Snack',
+  }
+  const SLOT_COLORS: Record<string, string> = {
+    desayuno: 'bg-amber-500/15 text-amber-400 border-amber-500/20',
+    comida:   'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
+    cena:     'bg-violet-500/15 text-violet-400 border-violet-500/20',
+    snack:    'bg-sky-500/15 text-sky-400 border-sky-500/20',
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
+
+      {/* ── Dieta de hoy (recipe-based) ─────────────────────────── */}
+      {todayDiet.length > 0 && (
+        <div className="card p-5 space-y-3">
+          <h2 className="font-semibold text-fg-primary text-sm">Dieta de hoy — asignada por tu entrenador</h2>
+          <div className="space-y-2">
+            {todayDiet.map(da => (
+              <div key={da.id} className="flex items-start gap-3 p-3 rounded-xl bg-surface-2/50 border border-border/50">
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 mt-0.5 border ${SLOT_COLORS[da.slot]}`}>
+                  {SLOT_LABELS[da.slot]}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-fg-primary text-sm">{da.receta?.nombre}</div>
+                  <div className="flex items-center gap-3 mt-0.5 text-xs text-fg-muted flex-wrap">
+                    <span className="flex items-center gap-1"><Flame className="w-3 h-3" />{da.receta?.calorias} kcal</span>
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{da.receta?.tiempo_prep} min</span>
+                    <span>{da.receta?.proteinas}g P · {da.receta?.carbohidratos}g C · {da.receta?.grasas}g G</span>
+                  </div>
+                  {da.receta?.ingredientes && (
+                    <p className="text-xs text-fg-disabled mt-1 line-clamp-1">{da.receta.ingredientes}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-fg-primary">{plan.title}</h1>

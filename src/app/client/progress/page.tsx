@@ -649,43 +649,54 @@ export default function ClientProgressPage() {
         )
       })()}
 
-      {/* Table */}
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
+      {/* Activity list */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-fg-primary">Historial de medidas</h2>
+          <span className="text-xs text-fg-muted">{logs.length} {logs.length === 1 ? 'registro' : 'registros'}</span>
         </div>
-      ) : logs.length === 0 ? (
-        <EmptyState
-          icon={<Scale className="w-8 h-8 text-fg-muted" />}
-          title="Sin registros todavía"
-          description="Registra tu primer pesaje para empezar a ver tu progreso."
-          action={{ label: 'Registrar ahora', onClick: () => setShowModal(true) }}
-        />
-      ) : (
-        <div className="card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b border-border">
-                <tr>
-                  {['Fecha', 'Peso', 'Grasa %', 'Músculo', 'Cintura', 'Pecho', 'Brazo', 'Notas', 'Fotos'].map(h => (
-                    <th key={h} className="text-left p-4 text-xs font-semibold text-fg-muted uppercase tracking-wide">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {[...logs].reverse().map(log => (
-                  <tr key={log.id} className="hover:bg-surface-2/50 transition-colors">
-                    <td className="p-4 text-fg-secondary">{formatDate(log.logged_at)}</td>
-                    <td className="p-4 font-mono font-semibold text-fg-primary">{log.weight_kg ?? '—'}{log.weight_kg ? ' kg' : ''}</td>
-                    <td className="p-4 font-mono text-fg-secondary">{log.body_fat_pct ?? '—'}{log.body_fat_pct ? '%' : ''}</td>
-                    <td className="p-4 font-mono text-fg-secondary">{log.muscle_mass_kg ?? '—'}{log.muscle_mass_kg ? ' kg' : ''}</td>
-                    <td className="p-4 font-mono text-brand-secondary-text text-xs">{log.waist_cm ?? '—'}{log.waist_cm ? 'cm' : ''}</td>
-                    <td className="p-4 font-mono text-brand-rose text-xs">{log.chest_cm ?? '—'}{log.chest_cm ? 'cm' : ''}</td>
-                    <td className="p-4 font-mono text-semantic-info-text text-xs">{log.arm_cm ?? '—'}{log.arm_cm ? 'cm' : ''}</td>
-                    <td className="p-4 text-fg-muted text-xs max-w-xs truncate">{log.notes || '—'}</td>
-                    <td className="p-4">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
+          </div>
+        ) : logs.length === 0 ? (
+          <EmptyState
+            icon={<Scale className="w-8 h-8 text-fg-muted" />}
+            title="Sin registros todavía"
+            description="Registra tu primer pesaje para empezar a ver tu progreso."
+            action={{ label: 'Registrar ahora', onClick: () => setShowModal(true) }}
+          />
+        ) : (
+          <div className="card divide-y divide-border/50 overflow-hidden">
+            {[...logs].reverse().map((log, idx) => {
+              const hasBodyMetrics = log.body_fat_pct != null || log.muscle_mass_kg != null
+              const hasMeasures = log.waist_cm != null || log.chest_cm != null || log.arm_cm != null || log.thigh_cm != null || log.hip_cm != null
+              const metricChips = [
+                log.body_fat_pct != null && { label: `${log.body_fat_pct}%`, sub: 'grasa', color: 'text-semantic-warning-text', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)' },
+                log.muscle_mass_kg != null && { label: `${log.muscle_mass_kg}kg`, sub: 'músculo', color: 'text-semantic-success-text', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)' },
+                log.waist_cm != null && { label: `${log.waist_cm}cm`, sub: 'cintura', color: 'text-brand-secondary-text', bg: 'rgba(124,58,237,0.1)', border: 'rgba(124,58,237,0.2)' },
+              ].filter(Boolean) as { label: string; sub: string; color: string; bg: string; border: string }[]
+              return (
+                <div key={log.id} className="flex items-start gap-3 px-4 py-3.5 hover:bg-surface-2/40 transition-colors">
+                  {/* Icon */}
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                       style={{ background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.2)' }}>
+                    <Scale className="w-4 h-4 text-semantic-info-text" />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    {/* First row: date + weight */}
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {/* Date badge */}
+                        <span className="text-[10px] font-semibold uppercase tracking-widest text-fg-muted">{formatDate(log.logged_at, 'dd MMM yyyy')}</span>
+                        {idx === 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-brand-primary/15 text-brand-primary font-semibold">Última</span>}
+                        {/* Weight */}
+                        {log.weight_kg != null && (
+                          <span className="font-mono font-bold text-sm text-fg-primary">{log.weight_kg} <span className="text-xs font-normal text-fg-muted">kg</span></span>
+                        )}
+                      </div>
+                      {/* Photos */}
                       <PhotoUpload
                         logId={log.id}
                         existing={log.photos ?? []}
@@ -693,18 +704,35 @@ export default function ClientProgressPage() {
                           setLogs(prev => prev.map(l => l.id === log.id ? { ...l, photos: urls } : l))
                         }}
                         onPhotoClick={(url) => {
-                          const idx = allPhotos.indexOf(url)
-                          setLightbox({ urls: allPhotos, idx: idx >= 0 ? idx : 0 })
+                          const idx2 = allPhotos.indexOf(url)
+                          setLightbox({ urls: allPhotos, idx: idx2 >= 0 ? idx2 : 0 })
                         }}
                       />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+
+                    {/* Second row: metric chips */}
+                    {(hasBodyMetrics || hasMeasures) && metricChips.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                        {metricChips.map(chip => (
+                          <span key={chip.sub} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${chip.color}`}
+                                style={{ background: chip.bg, border: `1px solid ${chip.border}` }}>
+                            {chip.label} <span className="font-normal opacity-70">{chip.sub}</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Notes */}
+                    {log.notes && (
+                      <p className="text-xs text-fg-muted mt-1 italic truncate">&ldquo;{log.notes}&rdquo;</p>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Lightbox */}
       {lightbox && (

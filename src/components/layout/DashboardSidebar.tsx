@@ -67,8 +67,8 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
             <Zap className="w-4 h-4 text-black" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-fg-primary text-sm tracking-tight">TrainerBoost</div>
-            <div className="text-xs text-fg-disabled">Dashboard</div>
+            <div className="font-bold text-fg-primary text-sm tracking-tight truncate">{profile.full_name}</div>
+            <div className="text-xs text-fg-disabled">TrainerBoost</div>
           </div>
           <NotificationBell
             userId={profile.id}

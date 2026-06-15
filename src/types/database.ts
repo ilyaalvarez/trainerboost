@@ -182,6 +182,36 @@ export interface SetLog {
   created_at: string
 }
 
+export type RecipeCategory = 'desayuno' | 'comida' | 'cena' | 'snack'
+export type DietSlot = 'desayuno' | 'comida' | 'cena' | 'snack'
+
+export interface Receta {
+  id: string
+  nombre: string
+  categoria: RecipeCategory
+  calorias: number
+  proteinas: number
+  carbohidratos: number
+  grasas: number
+  ingredientes: string
+  instrucciones: string
+  tiempo_prep: number
+  es_publica: boolean
+  created_by: string | null
+  created_at: string
+}
+
+export interface DietAssignment {
+  id: string
+  trainer_id: string
+  client_id: string
+  receta_id: string
+  slot: DietSlot
+  day_date: string
+  created_at: string
+  receta?: Receta
+}
+
 export interface PushSubscriptionRow {
   id: string
   user_id: string

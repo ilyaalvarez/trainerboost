@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import Link from 'next/link'
 import {
   Apple, Plus, Search, ChevronDown, ChevronUp,
-  Trash2, X, Clock, Flame, Users, Copy, FileDown,
+  Trash2, X, Clock, Flame, Users, Copy, FileDown, BookOpen,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -239,9 +240,14 @@ export default function NutritionPage() {
           <h1 className="text-2xl font-bold text-fg-primary">Nutrición</h1>
           <p className="text-fg-secondary text-sm mt-0.5">Gestiona los planes de alimentación</p>
         </div>
-        <button type="button" className="btn-primary" onClick={() => setShowNewPlanModal(true)}>
-          <Plus size={16} /> Nuevo plan
-        </button>
+        <div className="flex gap-2">
+          <Link href="/dashboard/nutrition/recetas" className="btn-secondary flex items-center gap-1.5 text-sm">
+            <BookOpen size={14} /> Recetario
+          </Link>
+          <button type="button" className="btn-primary" onClick={() => setShowNewPlanModal(true)}>
+            <Plus size={16} /> Nuevo plan
+          </button>
+        </div>
       </div>
 
       {/* Filters */}

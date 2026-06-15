@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Plus, Loader2, Scale, X, ChevronDown } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 
 interface Props {
   clientId: string
@@ -12,6 +13,7 @@ interface Props {
 
 export function QuickLogButton({ clientId, trainerId }: Props) {
   const supabase = createClient()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [weight, setWeight]   = useState('')
   const [bodyfat, setBodyfat] = useState('')
@@ -46,6 +48,7 @@ export function QuickLogButton({ clientId, trainerId }: Props) {
     setMuscle('')
     setShowExtra(false)
     setOpen(false)
+    router.refresh()
   }
 
   function handleClose() {

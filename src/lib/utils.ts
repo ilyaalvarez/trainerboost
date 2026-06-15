@@ -19,7 +19,10 @@ export function formatRelative(date: string | Date) {
 }
 
 export function timeAgo(date: string | Date) {
-  return formatDistanceToNow(new Date(date), { locale: es, addSuffix: true })
+  const d = typeof date === 'string'
+    ? new Date(date.includes('Z') || date.includes('+') ? date : date + 'Z')
+    : date
+  return formatDistanceToNow(d, { locale: es, addSuffix: true })
 }
 
 export function getInitials(name: string) {

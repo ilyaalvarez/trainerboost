@@ -47,6 +47,7 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications(userId)
   const router = useRouter()
   const containerRef = useRef<HTMLDivElement>(null)
+  const prevOpenRef  = useRef(false)
   const [dropdownPos, setDropdownPos] = useState<{
     top: number
     left?: number
@@ -74,17 +75,21 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
   }, [])
 
   useEffect(() => {
-    if (!isOpen) return
-    calcPosition()
-    if (unreadCount > 0) markAllRead()
-    function handleClick(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        onToggle()
+    if (isOpen) {
+      calcPosition()
+      prevOpenRef.current = true
+      function handleClick(e: MouseEvent) {
+        if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+          onToggle()
+        }
       }
+      document.addEventListener('mousedown', handleClick)
+      return () => document.removeEventListener('mousedown', handleClick)
+    } else {
+      if (prevOpenRef.current) markAllRead()
+      prevOpenRef.current = false
     }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [isOpen, onToggle, calcPosition]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen, onToggle, calcPosition, markAllRead])
 
   async function handleRowClick(id: string, link: string | null) {
     await markRead(id)
@@ -134,7 +139,7 @@ export default function NotificationBell({ userId, isOpen, onToggle }: Props) {
           <div className="max-h-[60vh] sm:max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="py-10 text-center text-slate-500 text-sm">
-                Sin notificaciones
+                Todo al día ✓
               </div>
             ) : (
               notifications.map(n => {

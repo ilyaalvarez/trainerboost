@@ -18,8 +18,9 @@ export function useNotifications(userId: string | null) {
       .from('notifications')
       .select('*')
       .eq('user_id', userId)
+      .is('read_at', null)
       .order('created_at', { ascending: false })
-      .limit(30)
+      .limit(50)
     if (data) setNotifications(data as Notification[])
     setLoading(false)
   }, [userId])
@@ -47,9 +48,13 @@ export function useNotifications(userId: string | null) {
         table: 'notifications',
         filter: `user_id=eq.${userId}`,
       }, (payload) => {
-        setNotifications(prev =>
-          prev.map(n => n.id === (payload.new as Notification).id ? payload.new as Notification : n)
-        )
+        const updated = payload.new as Notification
+        // Remove from unread list if it was marked as read
+        if (updated.read_at) {
+          setNotifications(prev => prev.filter(n => n.id !== updated.id))
+        } else {
+          setNotifications(prev => prev.map(n => n.id === updated.id ? updated : n))
+        }
       })
       .subscribe()
     return () => { client.removeChannel(channel) }
@@ -64,7 +69,7 @@ export function useNotifications(userId: string | null) {
     if (!userId) return
     const now = new Date().toISOString()
     await supabaseRef.current.from('notifications').update({ read_at: now }).eq('user_id', userId).is('read_at', null)
-    setNotifications(prev => prev.map(n => ({ ...n, read_at: n.read_at ?? now })))
+    setNotifications([])
   }, [userId])
 
   const unreadCount = notifications.filter(n => !n.read_at).length

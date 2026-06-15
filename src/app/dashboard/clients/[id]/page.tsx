@@ -326,13 +326,13 @@ export default function ClientDetailPage() {
       : []),
   ]
 
-  const TABS: { id: Tab; icon: React.ReactNode; label: string; count?: number }[] = [
-    { id: 'resumen',   icon: <User size={14} />,          label: 'Resumen'    },
-    { id: 'rutinas',   icon: <Dumbbell size={14} />,      label: 'Rutinas',   count: routines.length },
-    { id: 'nutricion', icon: <Apple size={14} />,         label: 'Nutrición', count: mealPlans.length },
-    { id: 'progreso',  icon: <TrendingUp size={14} />,    label: 'Progreso',  count: progressLogs.length },
-    { id: 'citas',     icon: <CalendarDays size={14} />,  label: 'Citas',     count: appointments.length },
-    { id: 'mensajes',  icon: <MessageSquare size={14} />, label: 'Mensajes',  count: messages.length },
+  const TABS: { id: Tab; icon: React.ReactNode; label: string }[] = [
+    { id: 'resumen',   icon: <User size={14} />,          label: 'Resumen'   },
+    { id: 'rutinas',   icon: <Dumbbell size={14} />,      label: 'Rutinas'   },
+    { id: 'nutricion', icon: <Apple size={14} />,         label: 'Nutrición' },
+    { id: 'progreso',  icon: <TrendingUp size={14} />,    label: 'Progreso'  },
+    { id: 'citas',     icon: <CalendarDays size={14} />,  label: 'Citas'     },
+    { id: 'mensajes',  icon: <MessageSquare size={14} />, label: 'Mensajes'  },
   ]
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -542,14 +542,6 @@ export default function ClientDetailPage() {
                 {t.icon}
               </span>
               {t.label}
-              {t.count !== undefined && t.count > 0 && (
-                <span className={cn(
-                  'text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none transition-all duration-200',
-                  tab === t.id
-                    ? 'bg-brand-primary/10 text-brand-primary border border-brand-primary/20'
-                    : 'bg-surface-2 text-fg-disabled border border-border/50',
-                )}>{t.count}</span>
-              )}
               {tab === t.id && (
                 <span
                   className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full animate-scale-in"

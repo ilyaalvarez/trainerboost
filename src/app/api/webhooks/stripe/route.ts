@@ -59,11 +59,14 @@ export async function POST(request: NextRequest) {
       if (insertErr.code === '23505') {
         return NextResponse.json({ received: true, duplicate: true })
       }
-      // Any other error (e.g. table not yet created) → log and proceed.
-      console.warn('stripe_events dedupe unavailable:', insertErr.message)
+      // Any other error means the dedup table is unavailable — fail-safe
+      // to prevent double-processing of financial events.
+      console.error('stripe_events dedupe error:', insertErr.message)
+      return NextResponse.json({ error: 'Dedup unavailable' }, { status: 503 })
     }
   } catch (err) {
-    console.warn('stripe_events dedupe threw:', err)
+    console.error('stripe_events dedupe threw:', err)
+    return NextResponse.json({ error: 'Dedup unavailable' }, { status: 503 })
   }
 
   try {

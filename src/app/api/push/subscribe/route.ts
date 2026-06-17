@@ -32,7 +32,10 @@ export async function POST(request: Request) {
     { user_id: user.id, endpoint, p256dh, auth },
     { onConflict: 'endpoint' }
   )
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    console.error('[push/subscribe] upsert error:', error)
+    return NextResponse.json({ error: 'Error al guardar suscripción push' }, { status: 500 })
+  }
   return NextResponse.json({ ok: true })
 }
 

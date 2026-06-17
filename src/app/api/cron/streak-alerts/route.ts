@@ -22,7 +22,8 @@ export async function GET(request: Request) {
     .eq('is_active', true)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('[streak-alerts cron] fetch error:', error)
+    return NextResponse.json({ error: 'Error interno al obtener hábitos' }, { status: 500 })
   }
 
   // Group habits by client

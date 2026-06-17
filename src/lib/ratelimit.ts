@@ -28,6 +28,7 @@ const ROUTE_LIMITS: Array<[string, keyof typeof limiters]> = [
   ['/api/invite/send',         'account'],
   ['/api/invite/',             'lookup'],
   ['/api/checkout',            'account'],
+  ['/api/free-plan',           'account'],
   ['/api/account/delete',      'account'],
   ['/api/portal',              'standard'],
   ['/api/email/welcome',       'standard'],

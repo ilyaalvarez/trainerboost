@@ -54,8 +54,9 @@ export async function POST(request: Request) {
   const url = senderProfile?.role === 'trainer' ? '/client/messages' : '/dashboard/messages'
 
   if (!secret) {
-    console.warn('[push/notify-message] INTERNAL_API_SECRET no configurado — push omitido')
+    console.error('[push/notify-message] INTERNAL_API_SECRET no configurado — push no enviado')
   } else {
+    // Fire-and-forget: the message is already in the DB; the push is a convenience.
     fetch(`${appUrl}/api/push/send`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-internal-secret': secret },

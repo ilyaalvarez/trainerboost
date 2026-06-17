@@ -28,7 +28,7 @@ export async function GET(request: Request) {
 
   if (error) {
     console.error('appointment-reminders cron error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'Error interno al obtener citas' }, { status: 500 })
   }
 
   type NotificationInsert = {

@@ -33,7 +33,7 @@ export async function POST() {
 
   if (error) {
     console.error('[free-plan] upsert error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'Error al activar el plan gratuito' }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })

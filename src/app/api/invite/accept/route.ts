@@ -4,7 +4,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 
 const schema = z.object({
   code:  z.string().min(6).max(64),
-  phone: z.string().max(20).optional(),
+  phone: z.string().regex(/^[\d\s\-()+]+$/).max(20).optional(),
 })
 
 export async function POST(request: Request) {
@@ -65,7 +65,13 @@ export async function POST(request: Request) {
     ...(phone ? [admin.from('profiles').update({ phone }).eq('id', user.id)] : []),
   ])
 
-  if ((linkResult as { error: { message: string } | null }).error) {
+  const linkError = (linkResult as { error: { message: string; code?: string } | null }).error
+  if (linkError) {
+    // Unique violation: concurrent request already created the link or limit was exceeded
+    if (linkError.code === '23505') {
+      return NextResponse.json({ error: 'Ya estás vinculado con este entrenador' }, { status: 409 })
+    }
+    console.error('[invite/accept] link insert error:', linkError)
     return NextResponse.json({ error: 'Error al vincular con el entrenador' }, { status: 500 })
   }
 

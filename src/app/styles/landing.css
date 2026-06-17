@@ -177,3 +177,405 @@ button:focus-visible {
   position: relative;
   overflow: hidden;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   WAITLIST LANDING — Gaming × Fitness
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Hero tag ────────────────────────────────────────────────────────── */
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid rgba(143, 212, 58, 0.3);
+  background: rgba(143, 212, 58, 0.06);
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8FD43A;
+}
+
+.hero-tag__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #8FD43A;
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ─── FOMO bar ────────────────────────────────────────────────────────── */
+.fomo-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 7px 12px;
+  background: rgba(143, 212, 58, 0.04);
+  border: 1px solid rgba(143, 212, 58, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.fomo-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #8FD43A;
+  flex-shrink: 0;
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+.fomo-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: var(--pct, 0%);
+  background: #8FD43A;
+  opacity: 0.5;
+  transition: width 0.6s ease;
+}
+
+/* ─── Waitlist form ───────────────────────────────────────────────────── */
+.waitlist-form-wrapper {
+  width: 100%;
+  max-width: 480px;
+}
+
+.waitlist-input-row {
+  display: flex;
+  gap: 0;
+  border: 1px solid rgba(143, 212, 58, 0.25);
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s;
+}
+
+.waitlist-input-row:focus-within {
+  border-color: rgba(143, 212, 58, 0.6);
+}
+
+.waitlist-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 13px 16px;
+  font-size: 14px;
+  color: var(--fg-primary);
+  font-family: var(--font-mono), monospace;
+}
+
+.waitlist-input::placeholder {
+  color: var(--fg-disabled);
+}
+
+.waitlist-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.waitlist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  background: #8FD43A;
+  color: #000;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-sans), sans-serif;
+  letter-spacing: 0.02em;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.waitlist-btn:hover:not(:disabled) {
+  background: #a5e850;
+}
+
+.waitlist-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.waitlist-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-top-color: #000;
+  border-radius: 999px;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.waitlist-msg {
+  margin-top: 8px;
+  font-size: 12px;
+  font-family: var(--font-mono), monospace;
+}
+
+.waitlist-msg--error {
+  color: #f87171;
+}
+
+.waitlist-legal {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--fg-disabled);
+  line-height: 1.5;
+}
+
+/* ─── Waitlist success ────────────────────────────────────────────────── */
+.waitlist-success {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(143, 212, 58, 0.3);
+  background: rgba(143, 212, 58, 0.06);
+}
+
+.waitlist-success-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(143, 212, 58, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ─── Stats bar ───────────────────────────────────────────────────────── */
+.stats-bar {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.stats-bar--visible {
+  opacity: 1;
+  transform: none;
+}
+
+.stats-bar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  gap: 4px;
+  position: relative;
+}
+
+.stats-bar__value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--fg-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-bar__label {
+  font-size: 11px;
+  color: var(--fg-disabled);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.stats-bar__divider {
+  position: absolute;
+  right: 0;
+  top: 20%;
+  height: 60%;
+  width: 1px;
+  background: var(--border);
+}
+
+@media (max-width: 640px) {
+  .stats-bar {
+    flex-wrap: wrap;
+  }
+  .stats-bar__item {
+    flex: 1 1 50%;
+  }
+  .stats-bar__divider {
+    display: none;
+  }
+}
+
+/* ─── Achievement bento grid ──────────────────────────────────────────── */
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.achievement-card {
+  background: var(--surface);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: background 0.2s;
+  opacity: 0;
+}
+
+.achievement-card:hover {
+  background: var(--surface-2);
+}
+
+.achievement-card__icon {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(143, 212, 58, 0.2);
+  background: rgba(143, 212, 58, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.achievement-card__label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8FD43A;
+}
+
+.achievement-card__title {
+  font-family: var(--font-display), 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--fg-primary);
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.achievement-card__desc {
+  font-size: 13px;
+  color: var(--fg-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .achievement-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── RGPD banner ─────────────────────────────────────────────────────── */
+.rgpd-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+}
+
+.rgpd-banner__content {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.rgpd-banner__text {
+  font-size: 12px;
+  color: var(--fg-muted);
+  flex: 1;
+  min-width: 200px;
+  line-height: 1.5;
+}
+
+.rgpd-banner__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rgpd-btn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 16px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.rgpd-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--border-bright);
+  color: var(--fg-muted);
+}
+
+.rgpd-btn--secondary:hover {
+  border-color: var(--fg-muted);
+  color: var(--fg-primary);
+}
+
+.rgpd-btn--primary {
+  background: #8FD43A;
+  color: #000;
+}
+
+.rgpd-btn--primary:hover {
+  background: #a5e850;
+}
+
+/* ─── GSAP scroll reveal ─────────────────────────────────────────────── */
+.gsap-fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+/* ─── Reduce motion overrides ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .stats-bar {
+    opacity: 1;
+    transform: none;
+  }
+  .achievement-card {
+    opacity: 1;
+  }
+  .gsap-fade-up {
+    opacity: 1;
+    transform: none;
+  }
+  .hero-tag__dot,
+  .fomo-dot {
+    animation: none;
+  }
+}

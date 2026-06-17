@@ -11,6 +11,7 @@ import {
   Phone, Plus, ChevronDown, ArrowLeft, Clock, Send,
   Scale, Percent, Zap, CheckCircle2, AlertTriangle, Bell,
   Activity, MapPin, Video, FileDown, X, ChevronLeft, ChevronRight,
+  CreditCard, ExternalLink, Loader2,
 } from 'lucide-react'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
@@ -29,7 +30,7 @@ import type {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Tab = 'resumen' | 'rutinas' | 'nutricion' | 'progreso' | 'citas' | 'mensajes'
+type Tab = 'resumen' | 'rutinas' | 'nutricion' | 'progreso' | 'citas' | 'mensajes' | 'cobros'
 
 interface ClientData {
   profile: Profile
@@ -84,6 +85,12 @@ export default function ClientDetailPage() {
 
   // Photo lightbox
   const [lightbox, setLightbox] = useState<{ urls: string[]; idx: number } | null>(null)
+
+  // Cobros (invoices)
+  interface InvoiceRow { id: string; description: string; amount_cents: number; status: string; stripe_payment_link: string | null; due_date: string | null; created_at: string }
+  const [invoices,           setInvoices]           = useState<InvoiceRow[]>([])
+  const [invoicesLoading,    setInvoicesLoading]    = useState(false)
+  const [showInvoiceModal,   setShowInvoiceModal]   = useState(false)
 
   useEffect(() => {
     if (!lightbox) return
@@ -185,6 +192,15 @@ export default function ClientDetailPage() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [tab, data?.messages])
+
+  useEffect(() => {
+    if (tab !== 'cobros') return
+    setInvoicesLoading(true)
+    fetch(`/api/stripe/connect/invoice?clientId=${clientId}`)
+      .then(r => r.json())
+      .then(d => { setInvoices(d.invoices ?? []); setInvoicesLoading(false) })
+      .catch(() => setInvoicesLoading(false))
+  }, [tab, clientId])
 
   // ── Realtime: live progress updates from client ────────────────────────────
   useEffect(() => {
@@ -333,6 +349,7 @@ export default function ClientDetailPage() {
     { id: 'progreso',  icon: <TrendingUp size={14} />,    label: 'Progreso'  },
     { id: 'citas',     icon: <CalendarDays size={14} />,  label: 'Citas'     },
     { id: 'mensajes',  icon: <MessageSquare size={14} />, label: 'Mensajes'  },
+    { id: 'cobros',    icon: <CreditCard size={14} />,    label: 'Cobros'    },
   ]
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -1288,6 +1305,74 @@ export default function ClientDetailPage() {
         </div>
       )}
 
+      {/* ═══════════════════════════════════════════════════════════
+          TAB: COBROS
+      ═══════════════════════════════════════════════════════════ */}
+      {tab === 'cobros' && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-semibold text-fg-primary">Cobros</h2>
+              <p className="text-xs text-fg-muted mt-0.5">Facturas enviadas a este cliente</p>
+            </div>
+            <button type="button" className="btn-primary" onClick={() => setShowInvoiceModal(true)}>
+              <Plus size={15} /> Nuevo cobro
+            </button>
+          </div>
+
+          {invoicesLoading ? (
+            <div className="flex items-center justify-center h-32">
+              <Loader2 className="w-5 h-5 animate-spin text-fg-muted" />
+            </div>
+          ) : invoices.length === 0 ? (
+            <EmptyState
+              icon={<CreditCard />}
+              title="Sin cobros"
+              description="Envía tu primer cobro a este cliente."
+              action={{ label: 'Nuevo cobro', onClick: () => setShowInvoiceModal(true) }}
+            />
+          ) : (
+            <div className="space-y-3">
+              {invoices.map(inv => {
+                const isPending = inv.status === 'pending'
+                const isPaid    = inv.status === 'paid'
+                const statusCfg = isPaid
+                  ? { label: 'Pagado',    cls: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' }
+                  : isPending
+                  ? { label: 'Pendiente', cls: 'text-amber-400 bg-amber-500/10 border-amber-500/20' }
+                  : { label: inv.status,  cls: 'text-fg-disabled bg-surface-2 border-border' }
+                return (
+                  <div key={inv.id} className="card p-4 flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-surface-2">
+                      <CreditCard size={16} className={isPaid ? 'text-emerald-400' : isPending ? 'text-amber-400' : 'text-fg-disabled'} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-fg-primary truncate">{inv.description}</div>
+                      <div className="text-xs text-fg-muted mt-0.5">
+                        {new Date(inv.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        {inv.due_date && ` · vence ${new Date(inv.due_date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}`}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-bold font-mono text-sm text-fg-primary">{(inv.amount_cents / 100).toFixed(2)}€</div>
+                      <span className={cn('inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full border mt-1', statusCfg.cls)}>
+                        {statusCfg.label}
+                      </span>
+                    </div>
+                    {isPending && inv.stripe_payment_link && (
+                      <a href={inv.stripe_payment_link} target="_blank" rel="noopener noreferrer"
+                         className="shrink-0 btn-ghost p-2" title="Ver enlace de pago">
+                        <ExternalLink size={14} />
+                      </a>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Modals ── */}
       {trainerId && (
         <>
@@ -1318,6 +1403,20 @@ export default function ClientDetailPage() {
             clientId={clientId}
             trainerId={trainerId}
             onSuccess={() => { setShowAppointmentModal(false); loadData() }}
+          />
+          <NewInvoiceModal
+            isOpen={showInvoiceModal}
+            onClose={() => setShowInvoiceModal(false)}
+            clientId={clientId}
+            clientName={data?.profile.full_name ?? ''}
+            onSuccess={() => {
+              setShowInvoiceModal(false)
+              setTab('cobros')
+              fetch(`/api/stripe/connect/invoice?clientId=${clientId}`)
+                .then(r => r.json())
+                .then(d => setInvoices(d.invoices ?? []))
+                .catch(() => null)
+            }}
           />
         </>
       )}
@@ -1680,6 +1779,70 @@ function NewAppointmentModal({ isOpen, onClose, clientId, trainerId, onSuccess }
           <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancelar</button>
           <button type="submit" disabled={saving} className="btn-primary flex-1">
             {saving ? 'Guardando...' : 'Agendar'}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  )
+}
+
+// ─── New Invoice Modal ─────────────────────────────────────────────────────────
+
+function NewInvoiceModal({ isOpen, onClose, clientId, clientName, onSuccess }: {
+  isOpen: boolean; onClose: () => void; clientId: string; clientName: string; onSuccess: () => void
+}) {
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({ description: '', amountEur: '', dueDate: '' })
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    const amount = parseFloat(form.amountEur)
+    if (!form.description.trim()) { setError('La descripción es obligatoria'); return }
+    if (!amount || amount <= 0) { setError('El importe debe ser mayor que 0'); return }
+    setSaving(true)
+    try {
+      const res = await fetch('/api/stripe/connect/invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, description: form.description.trim(), amountEur: amount, dueDate: form.dueDate || undefined }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error || 'Error al crear el cobro'); setSaving(false); return }
+      toast.success('Cobro enviado al cliente')
+      setForm({ description: '', amountEur: '', dueDate: '' })
+      onSuccess()
+    } catch {
+      setError('Error de conexión')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={`Nuevo cobro · ${clientName}`} size="sm">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="label">Descripción *</label>
+          <input className="input" placeholder="Ej: Sesiones de julio" value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} />
+        </div>
+        <div>
+          <label className="label">Importe (€) *</label>
+          <input type="number" step="0.01" min="1" max="10000" className="input" placeholder="120.00" value={form.amountEur} onChange={e => setForm(p => ({ ...p, amountEur: e.target.value }))} />
+          <p className="text-[11px] text-fg-disabled mt-1">TrainerBoost retiene un 5% de comisión</p>
+        </div>
+        <div>
+          <label className="label">Fecha límite de pago</label>
+          <input type="date" className="input" value={form.dueDate} onChange={e => setForm(p => ({ ...p, dueDate: e.target.value }))} />
+        </div>
+        {error && (
+          <p className="text-sm text-semantic-error-text bg-semantic-error/10 border border-semantic-error/20 rounded-lg px-3 py-2">{error}</p>
+        )}
+        <div className="flex gap-3 pt-2">
+          <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancelar</button>
+          <button type="submit" disabled={saving} className="btn-primary flex-1">
+            {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Enviando…</> : <><CreditCard className="w-4 h-4" /> Enviar cobro</>}
           </button>
         </div>
       </form>

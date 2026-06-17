@@ -16,6 +16,8 @@ export interface Profile {
   phone: string | null
   bio: string | null
   specialties: string[]
+  stripe_connect_account_id?: string | null
+  stripe_connect_status?: 'not_connected' | 'pending' | 'active' | 'restricted' | null
   created_at: string
   updated_at: string
 }
@@ -253,6 +255,28 @@ export interface RoutineWithExercises extends Routine {
 
 export interface MealPlanWithMeals extends MealPlan {
   meals: Meal[]
+}
+
+// ─── Invoices (migration 024) ────────────────────────────────────────────────
+
+export type InvoiceStatus = 'pending' | 'paid' | 'cancelled' | 'expired'
+export type StripeConnectStatus = 'not_connected' | 'pending' | 'active' | 'restricted'
+
+export interface Invoice {
+  id: string
+  trainer_id: string
+  client_id: string
+  stripe_payment_link: string | null
+  stripe_price_id: string | null
+  stripe_product_id: string | null
+  amount_cents: number
+  currency: string
+  description: string
+  status: InvoiceStatus
+  due_date: string | null
+  paid_at: string | null
+  created_at: string
+  updated_at: string
 }
 
 // ─── New tables (migration 023) ──────────────────────────────────────────────

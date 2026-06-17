@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import {
   User, Phone, FileText, Tag, CreditCard, Trash2, KeyRound,
   Camera, Loader2, Plus, X, ShieldAlert, ExternalLink, Save, Eye, EyeOff,
+  Banknote, CheckCircle2, AlertCircle, Clock,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -84,6 +85,11 @@ export default function SettingsPage() {
   const [pwdError,      setPwdError]      = useState<string | null>(null)
   const [showPwd,       setShowPwd]       = useState(false)
 
+  // ── Stripe Connect ───────────────────────────────────────────────────────
+  const [connectStatus,  setConnectStatus]  = useState<'not_connected' | 'pending' | 'active' | 'restricted'>('not_connected')
+  const [connecting,     setConnecting]     = useState(false)
+  const [connectSuccess, setConnectSuccess] = useState(false)
+
   // ── Active sessions ──────────────────────────────────────────────────────
   const [signingOut,    setSigningOut]    = useState(false)
 
@@ -115,8 +121,15 @@ export default function SettingsPage() {
         setBio(prof.bio ?? '')
         setSpecialties(prof.specialties ?? [])
         setAvatarUrl(prof.avatar_url ?? '')
+        if (prof.stripe_connect_status) setConnectStatus(prof.stripe_connect_status)
       }
       if (s) setSubscription(s as Subscription)
+
+      // Check if redirected from Stripe onboarding
+      if (typeof window !== 'undefined' && window.location.search.includes('connect=success')) {
+        setConnectSuccess(true)
+        window.history.replaceState(null, '', window.location.pathname)
+      }
     } catch (err: unknown) {
       toast.error('Error al cargar los ajustes')
       console.error(err)
@@ -159,6 +172,26 @@ export default function SettingsPage() {
       toast.error(msg)
     } finally {
       setSavingProfile(false)
+    }
+  }
+
+  // ── Stripe Connect ──────────────────────────────────────────────────────
+
+  async function startConnect() {
+    setConnecting(true)
+    try {
+      const res = await fetch('/api/stripe/connect/onboard', { method: 'POST' })
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({ error: null }))
+        toast.error(error || 'Error al iniciar el proceso de cobros')
+        return
+      }
+      const { url } = await res.json()
+      window.location.href = url
+    } catch {
+      toast.error('Error de conexión')
+    } finally {
+      setConnecting(false)
     }
   }
 
@@ -269,6 +302,7 @@ export default function SettingsPage() {
 
   const plan = subscription?.plan ?? null
   const maxClients = subscription?.max_clients ?? 0
+  const isTrainer = profile?.role === 'trainer'
 
   return (
     <div className="animate-fade-in space-y-6 max-w-2xl">
@@ -554,7 +588,76 @@ export default function SettingsPage() {
       </Section>
 
       {/* ══════════════════════════════════════════════════════
-          SECTION 3 — Password
+          SECTION 3 — Stripe Connect (trainers only)
+      ══════════════════════════════════════════════════════ */}
+      {isTrainer && (
+        <Section title="Cobros directos a clientes" description="Acepta pagos de tus clientes y recibe el dinero en tu cuenta. TrainerBoost retiene un 5% como comisión de plataforma.">
+
+          {connectSuccess && (
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-semantic-success/10 border border-semantic-success/20">
+              <CheckCircle2 className="w-5 h-5 text-semantic-success-text shrink-0" />
+              <p className="text-sm text-semantic-success-text">¡Cuenta conectada correctamente! Ya puedes enviar cobros a tus clientes.</p>
+            </div>
+          )}
+
+          <div className="flex items-center gap-4">
+            <div className={cn(
+              'w-10 h-10 rounded-xl flex items-center justify-center shrink-0',
+              connectStatus === 'active' ? 'bg-semantic-success/15' : 'bg-surface-2',
+            )}>
+              <Banknote className={cn('w-5 h-5', connectStatus === 'active' ? 'text-semantic-success-text' : 'text-fg-muted')} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-fg-primary">
+                {connectStatus === 'active' ? 'Cuenta de cobros activa' :
+                 connectStatus === 'pending' ? 'Verificación pendiente' :
+                 connectStatus === 'restricted' ? 'Cuenta restringida' :
+                 'Sin cuenta de cobros'}
+              </p>
+              <p className="text-xs text-fg-muted mt-0.5">
+                {connectStatus === 'active' ? 'Puedes enviar facturas y cobrar directamente a tus clientes.' :
+                 connectStatus === 'pending' ? 'Stripe está verificando tu información. Puede tardar unas horas.' :
+                 connectStatus === 'restricted' ? 'Tu cuenta tiene restricciones. Contacta con soporte de Stripe.' :
+                 'Conecta tu cuenta bancaria para cobrar a tus clientes.'}
+              </p>
+            </div>
+            <div className="shrink-0">
+              {connectStatus === 'active' ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-semantic-success/15 text-semantic-success-text border border-semantic-success/20">
+                  <CheckCircle2 className="w-3 h-3" /> Activo
+                </span>
+              ) : connectStatus === 'pending' ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <Clock className="w-3 h-3" /> Pendiente
+                </span>
+              ) : connectStatus === 'restricted' ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-semantic-error/10 text-semantic-error-text border border-semantic-error/20">
+                  <AlertCircle className="w-3 h-3" /> Restringido
+                </span>
+              ) : null}
+            </div>
+          </div>
+
+          {connectStatus !== 'active' && (
+            <button
+              type="button"
+              onClick={startConnect}
+              disabled={connecting}
+              className="btn-primary w-full sm:w-auto"
+            >
+              {connecting
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirigiendo…</>
+                : connectStatus === 'pending'
+                ? <><ExternalLink className="w-4 h-4" /> Continuar verificación</>
+                : <><Banknote className="w-4 h-4" /> Activar cobros</>
+              }
+            </button>
+          )}
+        </Section>
+      )}
+
+      {/* ══════════════════════════════════════════════════════
+          SECTION 4 — Password
       ══════════════════════════════════════════════════════ */}
       <Section title="Cambiar contraseña" description="Actualiza tu contraseña de acceso.">
         <form onSubmit={changePassword} className="space-y-4">

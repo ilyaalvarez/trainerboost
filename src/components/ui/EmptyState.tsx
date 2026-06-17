@@ -4,11 +4,13 @@ interface EmptyStateProps {
   icon: React.ReactNode
   title: string
   description: string
-  action?: {
-    label: string
-    onClick: () => void
-  }
+  /** Pass a ReactNode directly, or an object {label, onClick} for the default button style */
+  action?: React.ReactNode | { label: string; onClick: () => void }
   className?: string
+}
+
+function isActionObject(action: NonNullable<EmptyStateProps['action']>): action is { label: string; onClick: () => void } {
+  return typeof action === 'object' && !Array.isArray(action) && 'label' in (action as object) && 'onClick' in (action as object)
 }
 
 export default function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
@@ -37,13 +39,9 @@ export default function EmptyState({ icon, title, description, action, className
 
       {/* CTA */}
       {action && (
-        <button
-          type="button"
-          onClick={action.onClick}
-          className="mt-1 btn-secondary text-sm"
-        >
-          {action.label}
-        </button>
+        isActionObject(action)
+          ? <button type="button" onClick={action.onClick} className="mt-1 btn-secondary text-sm">{action.label}</button>
+          : <div className="mt-1">{action}</div>
       )}
     </div>
   )

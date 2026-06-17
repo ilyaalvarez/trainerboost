@@ -255,6 +255,187 @@ export interface MealPlanWithMeals extends MealPlan {
   meals: Meal[]
 }
 
+// ─── New tables (migration 023) ──────────────────────────────────────────────
+
+export interface WorkoutTemplate {
+  id: string
+  trainer_id: string
+  name: string
+  description: string | null
+  category: 'fuerza' | 'cardio' | 'hiit' | 'rehabilitación' | 'funcional' | 'flexibilidad' | null
+  difficulty: 'principiante' | 'intermedio' | 'avanzado' | null
+  duration_minutes: number | null
+  exercises: WorkoutTemplateExercise[]
+  tags: string[]
+  times_used: number
+  is_public: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface WorkoutTemplateExercise {
+  name: string
+  sets: number
+  reps: string
+  weight_kg: number | null
+  rest_seconds: number
+  notes: string | null
+  order: number
+}
+
+export interface WorkoutSession {
+  id: string
+  routine_id: string | null
+  client_id: string
+  trainer_id: string
+  scheduled_for: string | null
+  completed_at: string | null
+  duration_minutes: number | null
+  exercises_log: WorkoutSessionExercise[]
+  client_notes: string | null
+  trainer_notes: string | null
+  effort_level: number | null
+  status: 'completed' | 'skipped' | 'cancelled'
+  created_at: string
+}
+
+export interface WorkoutSessionExercise {
+  exercise_id: string | null
+  name: string
+  sets: Array<{ reps: number | null; weight_kg: number | null; completed: boolean }>
+  notes: string | null
+}
+
+export interface Challenge {
+  id: string
+  trainer_id: string
+  name: string
+  description: string | null
+  type: 'individual' | 'group'
+  duration_days: number
+  start_date: string | null
+  end_date: string | null
+  price: number
+  max_participants: number | null
+  workout_template_id: string | null
+  goals: string[]
+  cover_image_url: string | null
+  is_active: boolean
+  created_at: string
+}
+
+export interface ChallengeParticipant {
+  id: string
+  challenge_id: string
+  client_id: string
+  enrolled_at: string
+  completed_at: string | null
+  progress_pct: number
+  payment_status: 'pending' | 'paid' | 'refunded'
+}
+
+export interface Habit {
+  id: string
+  trainer_id: string
+  client_id: string
+  name: string
+  icon: string
+  target_days_per_week: number
+  reminder_time: string | null
+  is_active: boolean
+  created_at: string
+}
+
+export interface HabitLog {
+  id: string
+  habit_id: string
+  client_id: string
+  logged_date: string
+  completed: boolean
+  notes: string | null
+  created_at: string
+}
+
+export interface WeeklyCheckin {
+  id: string
+  trainer_id: string
+  client_id: string
+  week_start: string
+  energy_level: number | null
+  mood: number | null
+  sleep_hours: number | null
+  adherence_pct: number | null
+  biggest_win: string | null
+  biggest_challenge: string | null
+  questions_for_trainer: string | null
+  trainer_response: string | null
+  photos: string[]
+  submitted_at: string
+  responded_at: string | null
+}
+
+export interface TrainerPublicProfile {
+  id: string
+  trainer_id: string
+  slug: string
+  headline: string | null
+  about: string | null
+  services: PublicService[]
+  testimonials: PublicTestimonial[]
+  gallery_urls: string[]
+  booking_enabled: boolean
+  contact_method: 'form' | 'whatsapp' | 'email'
+  contact_value: string | null
+  calendly_url: string | null
+  social_links: {
+    instagram?: string
+    youtube?: string
+    tiktok?: string
+    web?: string
+  }
+  seo_title: string | null
+  seo_description: string | null
+  is_published: boolean
+  views_count: number
+  leads_count: number
+  updated_at: string
+}
+
+export interface PublicService {
+  name: string
+  description: string
+  price: number | null
+  duration: number | null
+  type: 'presencial' | 'online'
+}
+
+export interface PublicTestimonial {
+  name: string
+  text: string
+  stars: number
+  avatar_url: string | null
+  verified: boolean
+}
+
+export interface Achievement {
+  id: string
+  key: string
+  name: string
+  description: string
+  icon: string
+  category: 'sesiones' | 'racha' | 'progreso' | 'habitos' | 'social'
+  threshold: number | null
+  created_at: string
+}
+
+export interface ClientAchievement {
+  id: string
+  client_id: string
+  achievement_id: string
+  unlocked_at: string
+  achievement?: Achievement
+}
+
 // Derived from the single source of truth in `@/lib/plans` so prices and
 // limits never drift between the pricing page, settings and the Stripe webhook.
 export const PLAN_LIMITS: Record<SubscriptionPlan, number> = {

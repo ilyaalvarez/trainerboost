@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, Users, Dumbbell, UtensilsCrossed,
-  CalendarDays, MessageSquare, Settings, LogOut, CreditCard, Zap, BarChart2, Search, ClipboardList,
+  CalendarDays, MessageSquare, Settings, LogOut, CreditCard, Zap, BarChart2, Search, ClipboardList, Globe, Trophy, CheckSquare,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -22,7 +22,10 @@ const NAV_ITEMS = [
   { href: '/dashboard/appointments', icon: CalendarDays,    label: 'Citas' },
   { href: '/dashboard/messages',     icon: MessageSquare,   label: 'Mensajes' },
   { href: '/dashboard/checkins',     icon: ClipboardList,   label: 'Check-ins' },
-  { href: '/dashboard/analytics',    icon: BarChart2,       label: 'Analytics' },
+  { href: '/dashboard/challenges',      icon: Trophy,          label: 'Retos' },
+  { href: '/dashboard/habits',          icon: CheckSquare,     label: 'Hábitos' },
+  { href: '/dashboard/analytics',       icon: BarChart2,       label: 'Analytics' },
+  { href: '/dashboard/public-profile',  icon: Globe,           label: 'Mi página' },
 ]
 
 const BOTTOM_ITEMS = [

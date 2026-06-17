@@ -1,9 +1,12 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import {
   Zap, Users, Dumbbell, UtensilsCrossed, CalendarDays,
   MessageSquare, ArrowRight, TrendingUp, CheckCircle2, Star,
   Play, Shield, Clock, BarChart3, ChevronRight,
-  Smartphone, X,
+  Smartphone, X, Building2,
 } from 'lucide-react'
 import { PLAN_CONFIG } from '@/lib/plans'
 
@@ -110,6 +113,90 @@ const SOLUTION_POINTS = [
   'Cobro automático con Stripe, sin gestionar nada',
   'Gráficas de evolución, fotos y métricas en un lugar',
 ]
+
+// ── Video Demo carousel ───────────────────────────────────────────────────────
+function VideoDemo() {
+  const [step, setStep] = useState(0)
+  const steps = [
+    { emoji: '✏️', title: 'Creas la rutina', desc: 'Builder drag & drop en 5 minutos', bg: 'from-sky-500/10 to-sky-500/5 border-sky-500/20' },
+    { emoji: '📤', title: 'La asignas con un clic', desc: 'Al cliente, con fecha de inicio', bg: 'from-violet-500/10 to-violet-500/5 border-violet-500/20' },
+    { emoji: '📱', title: 'El cliente la ve en su móvil', desc: 'Portal web, sin instalar nada', bg: 'from-emerald-500/10 to-emerald-500/5 border-emerald-500/20' },
+    { emoji: '🔔', title: 'Recibes la notificación', desc: 'Sabe en tiempo real qué completó', bg: 'from-amber-500/10 to-amber-500/5 border-amber-500/20' },
+  ]
+  return (
+    <div className="relative">
+      <div className={`rounded-2xl border bg-gradient-to-br p-8 text-center ${steps[step].bg} transition-all duration-500`}>
+        <div className="text-5xl mb-4">{steps[step].emoji}</div>
+        <div className="text-xl font-bold text-fg-primary mb-2">{steps[step].title}</div>
+        <div className="text-fg-muted text-sm">{steps[step].desc}</div>
+      </div>
+      <div className="flex justify-center gap-2 mt-4">
+        {steps.map((_, i) => (
+          <button key={i} onClick={() => setStep(i)}
+                  className={`w-2 h-2 rounded-full transition-all duration-200 ${i === step ? 'bg-brand-primary w-6' : 'bg-border-bright hover:bg-fg-disabled'}`} />
+        ))}
+      </div>
+      <div className="flex justify-center gap-3 mt-4">
+        {steps.map((s, i) => (
+          <button key={i} onClick={() => setStep(i)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-all ${i === step ? 'bg-brand-primary/10 border-brand-primary/30 text-brand-primary font-medium' : 'border-border text-fg-disabled hover:text-fg-muted'}`}>
+            {i + 1}. {s.title}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── ROI Calculator ────────────────────────────────────────────────────────────
+function RoiCalculator() {
+  const [clients, setClients] = useState(8)
+  const [price, setPrice] = useState(80)
+  const revenue = clients * price
+  const tbCost = 19
+  const daysToRecover = Math.ceil((tbCost / price) * 30)
+  return (
+    <div className="card p-6 md:p-8 max-w-2xl mx-auto">
+      <h3 className="text-lg font-semibold text-fg-primary mb-1 text-center">Calcula tu retorno</h3>
+      <p className="text-sm text-fg-muted text-center mb-6">¿Cuánto tardas en recuperar el coste de TrainerBoost?</p>
+      <div className="grid md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <label className="block text-xs font-medium text-fg-muted mb-2">Clientes activos</label>
+          <div className="flex items-center gap-3">
+            <input type="range" min={1} max={30} value={clients} onChange={e => setClients(Number(e.target.value))}
+                   className="flex-1 accent-brand-primary" />
+            <span className="text-lg font-bold text-fg-primary font-mono w-8 text-right">{clients}</span>
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-fg-muted mb-2">Precio por cliente/mes</label>
+          <div className="flex items-center gap-3">
+            <input type="range" min={30} max={300} step={5} value={price} onChange={e => setPrice(Number(e.target.value))}
+                   className="flex-1 accent-brand-primary" />
+            <span className="text-lg font-bold text-fg-primary font-mono w-14 text-right">{price}€</span>
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3 text-center">
+        <div className="rounded-xl bg-surface-2 p-4 border border-border">
+          <div className="text-2xl font-bold text-fg-primary font-mono">{revenue.toLocaleString('es-ES')}€</div>
+          <div className="text-xs text-fg-muted mt-1">Ingresos mensuales</div>
+        </div>
+        <div className="rounded-xl bg-brand-primary/5 border border-brand-primary/20 p-4">
+          <div className="text-2xl font-bold text-brand-primary font-mono">{tbCost}€</div>
+          <div className="text-xs text-fg-muted mt-1">Coste TrainerBoost</div>
+        </div>
+        <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-4">
+          <div className="text-2xl font-bold text-emerald-400 font-mono">{daysToRecover}d</div>
+          <div className="text-xs text-fg-muted mt-1">Para recuperarlo</div>
+        </div>
+      </div>
+      <p className="text-center text-xs text-fg-disabled mt-4">
+        Si TrainerBoost te ayuda a retener <strong className="text-fg-secondary">1 cliente más al mes</strong>, recuperas el coste en {daysToRecover} días.
+      </p>
+    </div>
+  )
+}
 
 export default function LandingPage() {
   return (
@@ -455,6 +542,26 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Video demo ───────────────────────────────────────────────────── */}
+      <section className="py-24 border-t border-border/50">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-fg-primary mb-4 tracking-tight">
+              ¿Cómo funciona en la práctica?
+            </h2>
+            <p className="text-fg-muted max-w-lg mx-auto">
+              El flujo completo desde que creas la rutina hasta que el cliente la completa.
+            </p>
+          </div>
+          <VideoDemo />
+          <div className="text-center mt-8">
+            <Link href="/demo/trainer" className="btn-primary inline-flex items-center gap-2">
+              <Play className="w-4 h-4" /> Ver demo completa en vivo
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── Mobile preview ───────────────────────────────────────────────── */}
       <section className="py-24 border-t border-border/50">
         <div className="max-w-6xl mx-auto px-6">
@@ -713,6 +820,77 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Para tu equipo ───────────────────────────────────────────────── */}
+      <section className="py-24 border-t border-border/50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Building2 className="w-4 h-4 text-brand-primary" />
+                <span className="text-xs font-semibold text-brand-primary uppercase tracking-widest">Para centros y equipos</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-fg-primary mb-5 tracking-tight">
+                ¿Sois más de uno en el equipo?
+              </h2>
+              <p className="text-fg-muted mb-8 leading-relaxed">
+                TrainerBoost Equipo permite que varios entrenadores compartan
+                clientes, citas y panel desde un solo lugar.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Todos los entrenadores ven el historial completo de cada cliente',
+                  'Gestión de citas por entrenador con vista global del centro',
+                  'Si uno no puede, cualquier otro le cubre sin perder contexto',
+                  'Facturación centralizada del centro',
+                  'Panel del dueño con vista de todos los entrenadores y clientes',
+                ].map(item => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-fg-secondary">
+                    <CheckCircle2 className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/pricing#equipo" className="btn-secondary inline-flex items-center gap-2">
+                Ver plan Equipo <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="card p-6 space-y-4">
+              <div className="flex items-center gap-3 pb-4 border-b border-border/50">
+                <div className="w-9 h-9 rounded-xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center shrink-0">
+                  <Building2 className="w-4 h-4 text-brand-primary" />
+                </div>
+                <div>
+                  <div className="font-semibold text-fg-primary text-sm">Panel global del centro</div>
+                  <div className="text-xs text-fg-muted">3 entrenadores · 42 clientes activos</div>
+                </div>
+              </div>
+              {[
+                { name: 'Carlos M.', clients: 18, color: 'bg-sky-500/15 text-sky-300' },
+                { name: 'Raquel S.', clients: 14, color: 'bg-violet-500/15 text-violet-300' },
+                { name: 'David P.',  clients: 10, color: 'bg-emerald-500/15 text-emerald-300' },
+              ].map(t => (
+                <div key={t.name} className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${t.color}`}>
+                    {t.name.slice(0, 2)}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-fg-primary">{t.name}</div>
+                    <div className="h-1.5 bg-surface-2 rounded-full mt-1.5 overflow-hidden">
+                      <div className="h-full rounded-full bg-brand-primary/50" style={{ width: `${(t.clients / 18) * 100}%` }} />
+                    </div>
+                  </div>
+                  <div className="text-xs font-mono text-fg-muted shrink-0">{t.clients} clientes</div>
+                </div>
+              ))}
+              <div className="pt-2 text-xs text-fg-disabled text-center border-t border-border/50">
+                Vista global del centro · Plan Equipo
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Trust signals ────────────────────────────────────────────────── */}
       <section className="py-12 border-t border-border/50">
         <div className="max-w-5xl mx-auto px-6">
@@ -785,6 +963,11 @@ export default function LandingPage() {
           <Link href="/register" className="text-brand-primary hover:underline">Crea una cuenta gratis</Link>{' '}
           y gestiona hasta 3 clientes sin tarjeta.
         </p>
+      </section>
+
+      {/* ── ROI calculator ───────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-6 py-16 border-t border-border/50">
+        <RoiCalculator />
       </section>
 
       {/* ── FAQ ──────────────────────────────────────────────────────────── */}

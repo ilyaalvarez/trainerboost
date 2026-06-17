@@ -65,7 +65,7 @@ export default async function proxy(request: NextRequest) {
     // page-level auth guard handle it — don't crash the middleware
   }
 
-  const publicPrefixes = ['/_next', '/favicon', '/api/webhooks', '/pricing', '/demo', '/auth']
+  const publicPrefixes = ['/_next', '/favicon', '/api/webhooks', '/api/health', '/pricing', '/demo', '/auth', '/p/']
   const publicExact = ['/', '/login', '/register', '/onboarding', '/forgot-password', '/reset-password', '/privacy', '/terms', '/contact', '/manifest.json', '/sw.js', '/icon-192.png', '/icon-512.png']
   const isPublic = publicPrefixes.some(p => path.startsWith(p)) || publicExact.includes(path)
 

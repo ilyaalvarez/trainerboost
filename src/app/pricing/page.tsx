@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import {
   Check, Zap, Loader2, ChevronDown,
   Shield, Clock, TrendingUp, Users, Award,
+  Calculator,
 } from 'lucide-react'
 import { PLANS, type PlanKey } from '@/lib/stripe'
 import { cn } from '@/lib/utils'
@@ -72,6 +73,92 @@ const FAQ = [
     a: 'Estamos trabajando en ello. Si te interesa, escríbenos y te avisaremos cuando lancemos los planes anuales con descuento.',
   },
 ]
+
+function RoiCalculator() {
+  const [clients, setClients] = useState(10)
+  const [pricePerClient, setPricePerClient] = useState(150)
+
+  const result = useMemo(() => {
+    const monthlyRevenue = clients * pricePerClient
+    const appCost = 19
+    const extraClientRevenue = pricePerClient * 2
+    const roiDaysRaw = (appCost / monthlyRevenue) * 30
+    const roiDays = roiDaysRaw < 1 ? '< 1' : String(Math.round(roiDaysRaw))
+    const returnMultiple = Math.round(extraClientRevenue / appCost)
+    return { monthlyRevenue, roiDays, returnMultiple }
+  }, [clients, pricePerClient])
+
+  return (
+    <div className="max-w-2xl mx-auto mb-16 animate-fade-in-up delay-400">
+      <div className="rounded-2xl p-8 border border-brand-primary/20 bg-gradient-to-br from-brand-primary/[0.06] to-semantic-info/[0.04]">
+        <div className="flex items-center gap-2 mb-1">
+          <Calculator className="w-4 h-4 text-brand-primary" />
+          <div className="text-xs font-semibold text-brand-primary uppercase tracking-widest">Calculadora de ROI</div>
+        </div>
+        <h3 className="text-xl font-bold text-fg-primary mb-6 tracking-tight">
+          ¿Cuánto tarda TrainerBoost en pagarse solo?
+        </h3>
+
+        <div className="grid sm:grid-cols-2 gap-6 mb-6">
+          <div>
+            <div className="flex justify-between mb-2">
+              <label className="text-sm text-fg-secondary">Clientes actuales</label>
+              <span className="text-sm font-bold text-brand-primary">{clients}</span>
+            </div>
+            <input
+              type="range" min={1} max={50} value={clients}
+              onChange={e => setClients(Number(e.target.value))}
+              className="w-full accent-[#8FD43A] cursor-pointer"
+            />
+            <div className="flex justify-between text-xs text-fg-disabled mt-1">
+              <span>1</span><span>50</span>
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between mb-2">
+              <label className="text-sm text-fg-secondary">Precio por cliente/mes</label>
+              <span className="text-sm font-bold text-brand-primary">{pricePerClient}€</span>
+            </div>
+            <input
+              type="range" min={50} max={400} step={10} value={pricePerClient}
+              onChange={e => setPricePerClient(Number(e.target.value))}
+              className="w-full accent-[#8FD43A] cursor-pointer"
+            />
+            <div className="flex justify-between text-xs text-fg-disabled mt-1">
+              <span>50€</span><span>400€</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 p-5 rounded-xl bg-background/60 border border-border/50">
+          <div className="text-center">
+            <div className="text-2xl font-bold font-mono text-fg-primary">
+              {result.monthlyRevenue.toLocaleString('es-ES')}€
+            </div>
+            <div className="text-xs text-fg-muted mt-1">Ingresos/mes</div>
+          </div>
+          <div className="text-center border-x border-border/50">
+            <div className="text-2xl font-bold font-mono text-semantic-success-text">
+              {result.roiDays} días
+            </div>
+            <div className="text-xs text-fg-muted mt-1">Para amortizar la app</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold font-mono text-brand-primary">
+              {result.returnMultiple}×
+            </div>
+            <div className="text-xs text-fg-muted mt-1">Retorno por cliente extra</div>
+          </div>
+        </div>
+
+        <p className="text-xs text-fg-muted mt-4 text-center">
+          Si TrainerBoost retiene <strong className="text-fg-secondary">1 cliente extra 2 meses más</strong>,
+          recuperas {result.returnMultiple}× el coste anual de la app.
+        </p>
+      </div>
+    </div>
+  )
+}
 
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
@@ -380,21 +467,8 @@ export default function PricingPage() {
           ))}
         </div>
 
-        {/* ── ROI argument ───────────────────────────────────────────────── */}
-        <div className="max-w-2xl mx-auto mb-16 animate-fade-in-up delay-400">
-          <div className="rounded-2xl p-8 border border-brand-primary/20 text-center bg-gradient-to-br from-brand-primary/[0.06] to-semantic-info/[0.04]">
-            <div className="text-xs font-semibold text-brand-primary uppercase tracking-widest mb-4">ROI real</div>
-            <h3 className="text-xl font-bold text-fg-primary mb-3 tracking-tight">
-              ¿Por qué 19€/mes es la mejor inversión que puedes hacer?
-            </h3>
-            <p className="text-fg-muted text-sm leading-relaxed max-w-lg mx-auto">
-              Si tienes 10 clientes a 150€/mes, ingresas 1.500€. Si TrainerBoost te ayuda a retener
-              un cliente <span className="text-fg-primary font-semibold">2 meses más al año</span>, ya recuperaste
-              12 veces el coste de la app. Y si te ahorra 8 horas a la semana en gestión...
-              {' '}<span className="text-brand-primary font-semibold">¿cuánto vale tu hora?</span>
-            </p>
-          </div>
-        </div>
+        {/* ── ROI Calculator ─────────────────────────────────────────────── */}
+        <RoiCalculator />
 
         {/* ── FAQ ────────────────────────────────────────────────────────── */}
         <div className="max-w-2xl mx-auto animate-fade-in-up delay-400">

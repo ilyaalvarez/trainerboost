@@ -1,0 +1,179 @@
+/* ─── Landing page — CSS específico de la landing ─────────────────────────
+   Solo clases NUEVAS no definidas en globals.css.
+   Variables apuntan a los tokens de globals.css para no duplicar.
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* Spotlight radial en pricing card Pro — animado con GSAP CSS vars */
+.pricing-card-pro {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  background:
+    radial-gradient(
+      circle at var(--mouse-x) var(--mouse-y),
+      rgba(143, 212, 58, 0.09),
+      transparent 60%
+    ),
+    var(--surface);
+  border: 1px solid var(--brand-primary);
+  position: relative;
+}
+
+/* Badge "Más popular" */
+.pricing-popular-badge {
+  background: var(--brand-primary);
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+/* Números métricos grandes */
+.metric-number {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  color: var(--brand-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Números decorativos de fondo (01, 02, 03) */
+.step-number-bg {
+  font-size: clamp(6rem, 16vw, 12rem);
+  font-weight: 900;
+  color: var(--brand-primary);
+  opacity: 0.05;
+  position: absolute;
+  top: -0.2em;
+  left: 50%;
+  transform: translateX(-50%);
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+  will-change: transform;
+}
+
+/* Pulse ring del último avatar en el hero */
+.hero-avatar-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid var(--brand-primary);
+  pointer-events: none;
+}
+
+/* SVG path conector entre steps */
+.steps-connector-path {
+  stroke: var(--brand-primary);
+  stroke-width: 1.5;
+  fill: none;
+  opacity: 0.35;
+}
+
+/* Panel "Con TrainerBoost" — clip-path reveal via GSAP */
+.after-panel {
+  clip-path: inset(0 0% 0 0);
+}
+
+/* ─── Accesibilidad: reduce motion ────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-badge,
+  .hero-h1,
+  .hero-h1-accent,
+  .hero-subheadline,
+  .hero-avatar,
+  .hero-cta-primary,
+  .hero-cta-secondary,
+  .hero-trust,
+  .hero-dashboard,
+  .section-fade-up,
+  .feature-card,
+  .metric-card,
+  .after-panel,
+  .step-number-bg {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
+
+/* ─── Focus ring global para accesibilidad ────────────────────────────── */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #8FD43A;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── CTA final — sección verde ───────────────────────────────────────── */
+.cta-final-section {
+  background: #8FD43A;
+  color: #000;
+}
+
+.cta-final-section .cta-title {
+  color: #000;
+}
+
+.cta-final-section .cta-sub {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.cta-final-section .btn-cta-black {
+  background: #000;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 14px 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.cta-final-section .btn-cta-black:hover {
+  background: #111;
+}
+
+.cta-final-section .btn-cta-link {
+  color: rgba(0, 0, 0, 0.7);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cta-final-section .btn-cta-link:hover {
+  color: #000;
+}
+
+.cta-final-section .trust-item {
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── Trust badges strip ──────────────────────────────────────────────── */
+.trust-badge-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.trust-badge-strip span {
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+
+/* ─── Steps step-card relative wrapper ───────────────────────────────── */
+.step-card-wrapper {
+  position: relative;
+  overflow: hidden;
+}

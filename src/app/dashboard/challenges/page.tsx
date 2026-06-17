@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import {
-  Trophy, Plus, Users, Calendar, Flame, Target,
+  Trophy, Plus, Users, Calendar, Target,
   ChevronDown, ChevronUp, Loader2, Trash2, Play, Pause,
 } from 'lucide-react'
 import Modal from '@/components/ui/Modal'

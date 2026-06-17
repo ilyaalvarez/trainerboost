@@ -4,11 +4,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import {
-  Globe, Eye, EyeOff, Save, Plus, Trash2, ExternalLink,
+  Eye, EyeOff, Save, Plus, Trash2, ExternalLink,
   Star, ChevronDown, ChevronUp, BarChart2, Loader2,
 } from 'lucide-react'
 import type { TrainerPublicProfile, PublicService, PublicTestimonial } from '@/types/database'
-import EmptyState from '@/components/ui/EmptyState'
 
 const BLANK_SERVICE: PublicService = { name: '', description: '', price: null, duration: null, type: 'presencial' }
 const BLANK_TESTIMONIAL: PublicTestimonial = { name: '', text: '', stars: 5, avatar_url: null, verified: false }

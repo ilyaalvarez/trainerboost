@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { CheckCircle2, Circle, Loader2, Flame, BarChart2 } from 'lucide-react'
-import type { Habit, HabitLog } from '@/types/database'
+import { CheckCircle2, Loader2, Flame } from 'lucide-react'
+import type { Habit } from '@/types/database'
 import { cn } from '@/lib/utils'
 
 interface HabitWithToday extends Habit {
@@ -24,8 +24,6 @@ export default function ClientHabitsPage() {
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-
-    const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]
 
     const { data: rawHabits } = await supabase
       .from('habits')

@@ -2,10 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import {
-  Star, MapPin, Zap, Phone, Mail,
+  Star, Zap,
   Globe, CheckCircle2, Send, ArrowRight, Calendar, Link2,
 } from 'lucide-react'
 import type { TrainerPublicProfile, Profile } from '@/types/database'
@@ -21,7 +20,6 @@ const GOALS = [
 ]
 
 export default function PublicProfileClient({ pub, profile }: Props) {
-  const router = useRouter()
   const [form, setForm] = useState({ name: '', email: '', phone: '', goal: '', message: '' })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)

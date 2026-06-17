@@ -101,7 +101,7 @@ export default function HabitsPage() {
     }))
   }
 
-  function usePreset(preset: typeof PRESET_HABITS[0]) {
+  function applyPreset(preset: typeof PRESET_HABITS[0]) {
     setForm(f => ({ ...f, name: preset.name, icon: preset.icon }))
   }
 
@@ -236,7 +236,7 @@ export default function HabitsPage() {
             <label className="block text-xs font-medium text-fg-muted mb-2">Sugerencias rápidas</label>
             <div className="flex flex-wrap gap-2">
               {PRESET_HABITS.map(p => (
-                <button type="button" key={p.name} onClick={() => usePreset(p)}
+                <button type="button" key={p.name} onClick={() => applyPreset(p)}
                         className="text-xs px-2.5 py-1.5 rounded-lg border border-border text-fg-muted hover:border-brand-primary/30 hover:text-brand-primary transition-all flex items-center gap-1">
                   {p.icon} {p.name.split(' ').slice(0, 3).join(' ')}…
                 </button>

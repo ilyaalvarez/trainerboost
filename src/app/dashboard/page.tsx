@@ -179,22 +179,27 @@ export default async function DashboardPage() {
               { done: hasSubscription, label: 'Activa un plan', desc: 'Desbloquea todas las funciones', href: '/pricing' },
               { done: hasProfile, label: 'Completa tu perfil', desc: 'Añade bio, teléfono y especialidades', href: '/dashboard/settings' },
               { done: hasClients, label: 'Invita a tu primer cliente', desc: 'Genera un enlace de invitación', href: '/dashboard/clients' },
-            ].map((step, i) => (
-              <Link key={i} href={step.done ? '#' : step.href}
-                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${step.done ? 'border-semantic-success/20 opacity-60' : 'border-border-strong hover:border-border'}`}
-                    style={{ background: step.done ? 'rgba(34,197,94,0.04)' : 'rgba(255,255,255,0.02)' }}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${step.done ? 'bg-semantic-success/10' : 'bg-surface-3'}`}>
-                  {step.done
-                    ? <CheckCircle2 className="w-4 h-4 text-semantic-success-text" />
-                    : <span className="text-xs font-bold text-fg-disabled">{i + 1}</span>}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium ${step.done ? 'text-fg-muted line-through' : 'text-fg-primary'}`}>{step.label}</p>
-                  <p className="text-xs text-fg-disabled">{step.desc}</p>
-                </div>
-                {!step.done && <ChevronRight className="w-4 h-4 text-fg-disabled shrink-0" />}
-              </Link>
-            ))}
+            ].map((step, i) => {
+              const cls = `flex items-center gap-3 p-3 rounded-xl border transition-all ${step.done ? 'border-semantic-success/20 opacity-60' : 'border-border-strong hover:border-border'}`
+              const sty = { background: step.done ? 'rgba(34,197,94,0.04)' : 'rgba(255,255,255,0.02)' }
+              const inner = (
+                <>
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${step.done ? 'bg-semantic-success/10' : 'bg-surface-3'}`}>
+                    {step.done
+                      ? <CheckCircle2 className="w-4 h-4 text-semantic-success-text" />
+                      : <span className="text-xs font-bold text-fg-disabled">{i + 1}</span>}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium ${step.done ? 'text-fg-muted line-through' : 'text-fg-primary'}`}>{step.label}</p>
+                    <p className="text-xs text-fg-disabled">{step.desc}</p>
+                  </div>
+                  {!step.done && <ChevronRight className="w-4 h-4 text-fg-disabled shrink-0" />}
+                </>
+              )
+              return step.done
+                ? <div key={i} className={cls} style={sty}>{inner}</div>
+                : <Link key={i} href={step.href} className={cls} style={sty}>{inner}</Link>
+            })}
           </div>
         </div>
       )}

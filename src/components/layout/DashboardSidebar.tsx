@@ -47,6 +47,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
   const router   = useRouter()
   const supabase = createClient()
   const [notifOpen, setNotifOpen] = useState(false)
+  const [logoutConfirm, setLogoutConfirm] = useState(false)
 
   async function logout() {
     await supabase.auth.signOut()
@@ -183,7 +184,7 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
               <div className="text-xs text-fg-disabled truncate">Entrenador</div>
             </div>
             <button
-              onClick={logout}
+              onClick={() => setLogoutConfirm(true)}
               className="p-1.5 rounded-lg text-fg-disabled hover:text-semantic-error-text hover:bg-semantic-error/8 transition-all duration-150"
               title="Cerrar sesión"
               aria-label="Cerrar sesión"
@@ -193,6 +194,22 @@ export default function DashboardSidebar({ profile, subscription, unreadMessages
           </div>
         </div>
       </div>
+
+      {/* Logout confirmation overlay */}
+      {logoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setLogoutConfirm(false)}>
+          <div className="bg-surface border border-border rounded-2xl p-6 w-full max-w-xs shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h3 className="font-semibold text-fg-primary mb-1">¿Cerrar sesión?</h3>
+            <p className="text-sm text-fg-muted mb-5">Tendrás que volver a iniciar sesión para acceder a tu cuenta.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setLogoutConfirm(false)} className="btn-secondary flex-1 text-sm">Cancelar</button>
+              <button onClick={logout} className="flex-1 px-4 py-2 rounded-lg bg-semantic-error/10 border border-semantic-error/20 text-semantic-error-text text-sm font-semibold hover:bg-semantic-error/20 transition-colors">
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   )
 }

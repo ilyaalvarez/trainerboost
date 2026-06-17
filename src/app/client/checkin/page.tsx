@@ -223,7 +223,14 @@ export default function CheckinPage() {
       </div>
 
       {/* Step indicators */}
-      <div className="flex gap-1 mb-2">
+      <div
+        className="flex gap-1 mb-2"
+        role="progressbar"
+        aria-label="Progreso del check-in"
+        aria-valuenow={step + 1}
+        aria-valuemin={1}
+        aria-valuemax={STEPS.length}
+      >
         {STEPS.map((s, i) => (
           <div key={s.label} className={cn('flex-1 h-1.5 rounded-full transition-all duration-300',
             i < step ? 'bg-brand-primary' : i === step ? 'bg-brand-primary/60' : 'bg-surface-2')} />
@@ -323,7 +330,7 @@ export default function CheckinPage() {
         {/* STEP 4 — Mayor logro */}
         {step === 4 && (
           <div>
-            <h2 className="font-semibold text-fg-primary mb-1">Tu mayor logro esta semana</h2>
+            <h2 className="font-semibold text-fg-primary mb-1">Tu mayor logro esta semana <span className="text-semantic-error-text" aria-label="obligatorio">*</span></h2>
             <p className="text-sm text-fg-muted mb-5">
               Puede ser algo físico, de hábitos, o simplemente haber aparecido. Todo cuenta.
             </p>
@@ -342,7 +349,7 @@ export default function CheckinPage() {
         {/* STEP 5 — Mayor reto */}
         {step === 5 && (
           <div>
-            <h2 className="font-semibold text-fg-primary mb-1">Tu mayor dificultad</h2>
+            <h2 className="font-semibold text-fg-primary mb-1">Tu mayor dificultad <span className="text-semantic-error-text" aria-label="obligatorio">*</span></h2>
             <p className="text-sm text-fg-muted mb-5">
               ¿Qué fue lo más difícil? Ser honesto aquí ayuda a tu entrenador a ajustar el plan.
             </p>

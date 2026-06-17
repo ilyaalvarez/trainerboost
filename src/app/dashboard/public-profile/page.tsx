@@ -17,6 +17,7 @@ export default function PublicProfilePage() {
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [dirty, setDirty] = useState(false)
   const [profile, setProfile] = useState<Partial<TrainerPublicProfile>>({
     slug: '',
     headline: '',
@@ -67,8 +68,10 @@ export default function PublicProfilePage() {
 
   useEffect(() => { load() }, [load])
 
-  const set = <K extends keyof TrainerPublicProfile>(key: K, value: TrainerPublicProfile[K]) =>
+  const set = <K extends keyof TrainerPublicProfile>(key: K, value: TrainerPublicProfile[K]) => {
     setProfile(p => ({ ...p, [key]: value }))
+    setDirty(true)
+  }
 
   async function save() {
     if (!trainerId) return
@@ -82,13 +85,17 @@ export default function PublicProfilePage() {
       toast.error(error.message.includes('unique') ? 'Ese enlace ya está en uso, elige otro' : error.message)
     } else {
       toast.success('Perfil guardado')
+      setDirty(false)
       await load()
     }
     setSaving(false)
   }
 
   function addService() { set('services', [...(profile.services ?? []), { ...BLANK_SERVICE }]) }
-  function removeService(i: number) { set('services', (profile.services ?? []).filter((_, x) => x !== i)) }
+  function removeService(i: number) {
+    if (!confirm('¿Eliminar este servicio?')) return
+    set('services', (profile.services ?? []).filter((_, x) => x !== i))
+  }
   function updateService(i: number, k: keyof PublicService, v: string | number | null) {
     const updated = [...(profile.services ?? [])]
     updated[i] = { ...updated[i], [k]: v }
@@ -96,7 +103,10 @@ export default function PublicProfilePage() {
   }
 
   function addTestimonial() { set('testimonials', [...(profile.testimonials ?? []), { ...BLANK_TESTIMONIAL }]) }
-  function removeTestimonial(i: number) { set('testimonials', (profile.testimonials ?? []).filter((_, x) => x !== i)) }
+  function removeTestimonial(i: number) {
+    if (!confirm('¿Eliminar este testimonio?')) return
+    set('testimonials', (profile.testimonials ?? []).filter((_, x) => x !== i))
+  }
   function updateTestimonial(i: number, k: keyof PublicTestimonial, v: string | number | boolean | null) {
     const updated = [...(profile.testimonials ?? [])]
     updated[i] = { ...updated[i], [k]: v }
@@ -113,6 +123,16 @@ export default function PublicProfilePage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-10">
+      {/* Unsaved changes banner */}
+      {dirty && (
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 backdrop-blur">
+          <span className="text-xs text-amber-400 font-medium">Tienes cambios sin guardar</span>
+          <button onClick={save} disabled={saving} className="text-xs px-3 py-1 rounded-lg bg-brand-primary text-black font-semibold hover:bg-brand-primary/90 transition-opacity disabled:opacity-60">
+            {saving ? 'Guardando...' : 'Guardar ahora'}
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
@@ -323,7 +343,7 @@ export default function PublicProfilePage() {
                  className="accent-brand-primary" />
           <span className="text-sm text-fg-secondary">Mostrar formulario de contacto en la página</span>
         </label>
-        {profile.booking_enabled && profile.calendly_url !== undefined && (
+        {profile.booking_enabled && (
           <Field label="Link de Calendly (opcional)">
             <input className="input w-full" placeholder="https://calendly.com/tu-usuario"
                    value={profile.calendly_url ?? ''}

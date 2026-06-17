@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Loader2, Lock, Star } from 'lucide-react'
+import { Loader2, Lock, Star, Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Achievement, ClientAchievement } from '@/types/database'
 
@@ -61,6 +61,16 @@ export default function AchievementsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-6 h-6 animate-spin text-fg-muted" />
+      </div>
+    )
+  }
+
+  if (achievements.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center px-6">
+        <Trophy className="w-10 h-10 text-fg-disabled mb-3" />
+        <h2 className="font-semibold text-fg-primary mb-1">Sin logros disponibles</h2>
+        <p className="text-sm text-fg-muted">Tu entrenador aún no ha configurado logros. ¡Vuelve pronto!</p>
       </div>
     )
   }

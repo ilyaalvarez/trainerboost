@@ -24,6 +24,7 @@ export default function ClientTopbar({ profile }: Props) {
   const supabase    = createClient()
   const [notifOpen, setNotifOpen] = useState(false)
   const [unreadMessages, setUnreadMessages] = useState(0)
+  const [logoutConfirm, setLogoutConfirm] = useState(false)
 
   useEffect(() => {
     async function fetchUnread() {
@@ -117,7 +118,7 @@ export default function ClientTopbar({ profile }: Props) {
                 </span>
               </Link>
               <NotificationBell userId={profile.id} isOpen={notifOpen} onToggle={() => setNotifOpen(v => !v)} />
-              <button onClick={logout} title="Cerrar sesión"
+              <button onClick={() => setLogoutConfirm(true)} title="Cerrar sesión"
                       className="p-1.5 rounded-lg text-fg-disabled hover:text-semantic-error-text hover:bg-semantic-error/8 transition-all duration-150">
                 <LogOut className="w-3.5 h-3.5" />
               </button>
@@ -161,6 +162,21 @@ export default function ClientTopbar({ profile }: Props) {
           })}
         </div>
       </nav>
+      {/* Logout confirmation overlay */}
+      {logoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setLogoutConfirm(false)}>
+          <div className="bg-surface border border-border rounded-2xl p-6 w-full max-w-xs shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h3 className="font-semibold text-fg-primary mb-1">¿Cerrar sesión?</h3>
+            <p className="text-sm text-fg-muted mb-5">Tendrás que volver a iniciar sesión para acceder a tu cuenta.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setLogoutConfirm(false)} className="btn-secondary flex-1 text-sm">Cancelar</button>
+              <button onClick={logout} className="flex-1 px-4 py-2 rounded-lg bg-semantic-error/10 border border-semantic-error/20 text-semantic-error-text text-sm font-semibold hover:bg-semantic-error/20 transition-colors">
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

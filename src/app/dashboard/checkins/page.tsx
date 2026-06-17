@@ -145,16 +145,18 @@ export default function CheckinsPage() {
 
       if (error) { toast.error(error.message); return }
 
-      // Notify client
-      await supabase.from('notifications').insert({
-        user_id: checkin.client_id,
-        type:    'checkin_response',
-        title:   'Tu entrenador respondió tu check-in',
-        body:    'Revisa la respuesta de tu entrenador al último check-in.',
-        link:    '/client/checkin',
-      })
+      // Notify client only on first response (no duplicate on update)
+      if (!checkin.trainer_response) {
+        await supabase.from('notifications').insert({
+          user_id: checkin.client_id,
+          type:    'checkin_response',
+          title:   'Tu entrenador respondió tu check-in',
+          body:    'Revisa la respuesta de tu entrenador al último check-in.',
+          link:    '/client/checkin',
+        })
+      }
 
-      toast.success('Respuesta enviada')
+      toast.success(checkin.trainer_response ? 'Respuesta actualizada' : 'Respuesta enviada')
       setCheckins(prev => prev.map(c =>
         c.id === checkin.id ? { ...c, trainer_response: text } : c
       ))

@@ -29,6 +29,7 @@ export default function ChallengesPage() {
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   // Form state
   const [form, setForm] = useState({
@@ -147,15 +148,18 @@ export default function ChallengesPage() {
   }
 
   async function deleteChallenge(id: string) {
-    if (!confirm('¿Eliminar este reto? Se eliminan también los participantes.')) return
     await supabase.from('challenges').delete().eq('id', id)
+    setDeleteConfirmId(null)
     await load()
     toast.success('Reto eliminado')
   }
 
   async function updateProgress(participantId: string, pct: number) {
     await supabase.from('challenge_participants').update({ progress_pct: pct }).eq('id', participantId)
-    await load()
+    setChallenges(prev => prev.map(ch => ({
+      ...ch,
+      participants: ch.participants.map(p => p.id === participantId ? { ...p, progress_pct: pct } : p),
+    })))
   }
 
   if (loading) return (
@@ -168,7 +172,7 @@ export default function ChallengesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-fg-primary">Retos</h1>
-          <p className="text-fg-muted text-sm mt-1">Programas de {challenges.length} duración definida para tus clientes</p>
+          <p className="text-fg-muted text-sm mt-1">Programas de duración definida para motivar a tus clientes</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn-primary text-sm flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Nuevo reto
@@ -241,7 +245,7 @@ export default function ChallengesPage() {
                                 ch.is_active ? 'border-amber-500/20 text-amber-400 hover:bg-amber-500/10' : 'border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10')}>
                         {ch.is_active ? <><Pause className="w-3 h-3" /> Pausar</> : <><Play className="w-3 h-3" /> Reactivar</>}
                       </button>
-                      <button onClick={() => deleteChallenge(ch.id)}
+                      <button onClick={() => setDeleteConfirmId(ch.id)}
                               className="text-xs px-3 py-1.5 rounded-lg border border-semantic-error/20 text-semantic-error-text hover:bg-semantic-error/10 transition-all flex items-center gap-1">
                         <Trash2 className="w-3 h-3" /> Eliminar
                       </button>
@@ -277,10 +281,7 @@ export default function ChallengesPage() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
-                                <input type="number" min={0} max={100}
-                                       className="w-14 input text-xs text-center py-1 px-1.5"
-                                       value={p.progress_pct}
-                                       onChange={e => updateProgress(p.id, Math.min(100, Math.max(0, Number(e.target.value))))} />
+                                <ProgressInput id={p.id} value={p.progress_pct} onUpdate={updateProgress} />
                                 <span className="text-xs text-fg-muted">%</span>
                               </div>
                             </div>
@@ -297,6 +298,18 @@ export default function ChallengesPage() {
           })}
         </div>
       )}
+
+      {/* Confirm delete */}
+      <Modal isOpen={!!deleteConfirmId} onClose={() => setDeleteConfirmId(null)} title="¿Eliminar reto?">
+        <p className="text-sm text-fg-secondary mb-5">Se eliminarán también todos los participantes y su progreso. Esta acción no se puede deshacer.</p>
+        <div className="flex gap-3">
+          <button onClick={() => setDeleteConfirmId(null)} className="btn-secondary flex-1">Cancelar</button>
+          <button onClick={() => deleteConfirmId && deleteChallenge(deleteConfirmId)}
+                  className="flex-1 px-4 py-2 rounded-lg bg-semantic-error/10 border border-semantic-error/20 text-semantic-error-text text-sm font-semibold hover:bg-semantic-error/20 transition-colors">
+            Eliminar
+          </button>
+        </div>
+      </Modal>
 
       {/* Modal crear reto */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Nuevo reto">
@@ -393,5 +406,19 @@ export default function ChallengesPage() {
         </form>
       </Modal>
     </div>
+  )
+}
+
+function ProgressInput({ id, value, onUpdate }: { id: string; value: number; onUpdate: (id: string, pct: number) => void }) {
+  const [local, setLocal] = useState(value)
+  useEffect(() => { setLocal(value) }, [value])
+  return (
+    <input
+      type="number" min={0} max={100}
+      className="w-14 input text-xs text-center py-1 px-1.5"
+      value={local}
+      onChange={e => setLocal(Math.min(100, Math.max(0, Number(e.target.value))))}
+      onBlur={() => { if (local !== value) onUpdate(id, local) }}
+    />
   )
 }

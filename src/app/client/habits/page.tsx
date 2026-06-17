@@ -88,6 +88,7 @@ export default function ClientHabitsPage() {
         .eq('client_id', user.id)
         .eq('logged_date', today)
       setHabits(h => h.map(x => x.id === habit.id ? { ...x, completedToday: false } : x))
+      toast.success('Hábito desmarcado')
     } else {
       const { error } = await supabase.from('habit_logs').upsert({
         habit_id: habit.id,

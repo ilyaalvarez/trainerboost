@@ -273,7 +273,8 @@ export default function ClientsPage() {
 
   async function updateTags(clientId: string, tags: string[]) {
     if (!userId) return
-    await supabase.from('trainer_clients').update({ tags }).eq('id', clientId).eq('trainer_id', userId)
+    const { error } = await supabase.from('trainer_clients').update({ tags }).eq('id', clientId).eq('trainer_id', userId)
+    if (error) { toast.error('No se pudieron guardar las etiquetas'); return }
     setClients(prev => prev.map(c => c.id === clientId ? { ...c, tags } : c))
   }
 

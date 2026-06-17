@@ -36,6 +36,7 @@ export default function HabitsPage() {
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [filterClient, setFilterClient] = useState<string>('all')
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   const [form, setForm] = useState({
     name: '',
@@ -82,7 +83,7 @@ export default function HabitsPage() {
 
     const habitsWithStats: HabitWithStats[] = (h ?? []).map((habit: HabitWithStats) => ({
       ...habit,
-      adherence_30d: Math.round(((countByHabit[habit.id] ?? 0) / 30) * 100),
+      adherence_30d: Math.min(100, Math.round(((countByHabit[habit.id] ?? 0) / Math.max(1, (habit.target_days_per_week / 7) * 30)) * 100)),
     }))
 
     setHabits(habitsWithStats)
@@ -136,6 +137,7 @@ export default function HabitsPage() {
 
   async function deleteHabit(id: string) {
     await supabase.from('habits').update({ is_active: false }).eq('id', id)
+    setDeleteConfirmId(null)
     await load()
     toast.success('Hábito desactivado')
   }
@@ -199,7 +201,7 @@ export default function HabitsPage() {
                     <div className="text-xs text-fg-muted">{h.client_profile.full_name}</div>
                   </div>
                 </div>
-                <button onClick={() => deleteHabit(h.id)}
+                <button onClick={() => setDeleteConfirmId(h.id)}
                         className="w-7 h-7 flex items-center justify-center rounded-lg border border-transparent text-fg-disabled hover:border-semantic-error/20 hover:text-semantic-error-text hover:bg-semantic-error/8 transition-all shrink-0">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -227,6 +229,18 @@ export default function HabitsPage() {
           ))}
         </div>
       )}
+
+      {/* Confirm delete */}
+      <Modal isOpen={!!deleteConfirmId} onClose={() => setDeleteConfirmId(null)} title="¿Desactivar hábito?">
+        <p className="text-sm text-fg-secondary mb-5">El hábito dejará de aparecer en el portal del cliente. Puedes volver a asignarlo cuando quieras.</p>
+        <div className="flex gap-3">
+          <button onClick={() => setDeleteConfirmId(null)} className="btn-secondary flex-1">Cancelar</button>
+          <button onClick={() => deleteConfirmId && deleteHabit(deleteConfirmId)}
+                  className="flex-1 px-4 py-2 rounded-lg bg-semantic-error/10 border border-semantic-error/20 text-semantic-error-text text-sm font-semibold hover:bg-semantic-error/20 transition-colors">
+            Desactivar
+          </button>
+        </div>
+      </Modal>
 
       {/* Modal */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Asignar hábito">

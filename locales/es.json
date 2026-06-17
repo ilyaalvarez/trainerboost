@@ -1,0 +1,169 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "loading": "Cargando...",
+    "error": "Ha ocurrido un error",
+    "success": "¡Listo!",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "send": "Enviar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No",
+    "optional": "Opcional",
+    "required": "Obligatorio",
+    "search": "Buscar...",
+    "all": "Todos",
+    "none": "Ninguno",
+    "add": "Añadir",
+    "remove": "Quitar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "publish": "Publicar",
+    "unpublish": "Ocultar"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "clients": "Clientes",
+    "routines": "Rutinas",
+    "nutrition": "Nutrición",
+    "appointments": "Citas",
+    "messages": "Mensajes",
+    "checkins": "Check-ins",
+    "challenges": "Retos",
+    "habits": "Hábitos",
+    "analytics": "Analytics",
+    "publicProfile": "Mi página",
+    "settings": "Ajustes",
+    "plan": "Plan",
+    "logout": "Cerrar sesión"
+  },
+  "client": {
+    "nav": {
+      "home": "Inicio",
+      "routine": "Rutina",
+      "habits": "Hábitos",
+      "achievements": "Logros",
+      "progress": "Progreso",
+      "messages": "Mensajes"
+    }
+  },
+  "checkin": {
+    "title": "Check-in semanal",
+    "subtitle": "¿Cómo fue tu semana?",
+    "description": "{{trainerName}} revisa esto para ajustar tu plan.",
+    "questionOf": "Pregunta {{current}} de {{total}}",
+    "alreadyDone": {
+      "title": "¡Ya enviaste tu check-in!",
+      "description": "Esta semana ya está registrada. Vuelve el próximo lunes."
+    },
+    "success": {
+      "title": "¡Enviado! 🎉",
+      "description": "{{trainerName}} lo recibirá y te responderá pronto."
+    },
+    "disabled": {
+      "title": "Check-in no activado",
+      "description": "Tu entrenador aún no ha activado los check-ins semanales para ti."
+    },
+    "questions": {
+      "energy": {
+        "label": "Energía",
+        "title": "Nivel de energía",
+        "description": "¿Cómo estuvo tu energía general esta semana?",
+        "low": "Sin energía",
+        "high": "Al máximo"
+      },
+      "mood": {
+        "label": "Ánimo",
+        "title": "Estado de ánimo",
+        "description": "¿Cómo te sentiste emocionalmente esta semana?",
+        "low": "Muy bajo",
+        "high": "Excelente"
+      },
+      "sleep": {
+        "label": "Sueño",
+        "title": "Horas de sueño",
+        "description": "¿Cuántas horas dormiste de media esta semana?"
+      },
+      "adherence": {
+        "label": "Rutina",
+        "title": "Adherencia a la rutina",
+        "description": "¿Qué porcentaje de los entrenamientos completaste?"
+      },
+      "biggestWin": {
+        "label": "Logro",
+        "title": "Tu mayor logro esta semana",
+        "description": "Puede ser algo físico, de hábitos, o simplemente haber aparecido. Todo cuenta.",
+        "placeholder": "Ej: Completé todos los entrenamientos de la semana sin fallar..."
+      },
+      "biggestChallenge": {
+        "label": "Reto",
+        "title": "Tu mayor dificultad",
+        "description": "¿Qué fue lo más difícil? Ser honesto aquí ayuda a tu entrenador a ajustar el plan.",
+        "placeholder": "Ej: Tuve mucho trabajo y no pude dormir bien los días de entreno..."
+      },
+      "questionsForTrainer": {
+        "label": "Preguntas",
+        "title": "Preguntas para tu entrenador",
+        "description": "Opcional — si tienes dudas sobre la rutina, la dieta o cualquier otra cosa.",
+        "placeholder": "Ej: ¿Debería aumentar el peso en press de banca? ¿Puedo sustituir el pollo por pavo?"
+      }
+    }
+  },
+  "habits": {
+    "title": "Hábitos de hoy",
+    "empty": {
+      "title": "Sin hábitos todavía",
+      "description": "Tu entrenador aún no ha asignado hábitos. ¡Pronto estarán aquí!"
+    },
+    "allDone": "🎉 ¡Todos los hábitos completados hoy!",
+    "streakMilestone": "🔥 ¡{{days}} días de racha! Sigue así.",
+    "completed": "{{icon}} ¡{{name}} completado!"
+  },
+  "achievements": {
+    "title": "Logros",
+    "subtitle": "Tu progreso a lo largo del tiempo",
+    "unlockedOf": "de {{total}} desbloqueados",
+    "categories": {
+      "sesiones": "Sesiones",
+      "racha": "Rachas",
+      "progreso": "Progreso",
+      "habitos": "Hábitos",
+      "social": "Social"
+    }
+  },
+  "challenges": {
+    "title": "Retos",
+    "subtitle": "Motiva a tus clientes con desafíos colectivos e individuales.",
+    "empty": {
+      "title": "Sin retos activos",
+      "description": "Crea un reto para motivar a tus clientes y aumentar la adherencia."
+    },
+    "create": "Nuevo reto"
+  },
+  "plans": {
+    "starter": {
+      "name": "Independiente",
+      "description": "Para entrenadores que empiezan"
+    },
+    "pro": {
+      "name": "Profesional",
+      "description": "Para entrenadores consolidados"
+    },
+    "unlimited": {
+      "name": "Equipo",
+      "description": "Para centros y equipos"
+    }
+  },
+  "errors": {
+    "generic": "Ha ocurrido un error. Por favor, inténtalo de nuevo.",
+    "unauthorized": "No tienes permiso para realizar esta acción.",
+    "notFound": "No encontrado.",
+    "networkError": "Error de conexión. Comprueba tu internet."
+  }
+}

@@ -101,7 +101,8 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded-lg text-fg-muted hover:text-fg-primary hover:bg-surface-2 transition-all duration-200 active:scale-95"
-            aria-label="Toggle menu"
+            aria-label={sidebarOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={sidebarOpen}
           >
             <div className="w-5 h-4 flex flex-col justify-between">
               <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 origin-left ${sidebarOpen ? 'rotate-45 translate-x-0.5' : ''}`} />
@@ -140,7 +141,7 @@ export default function DashboardShell({ profile, subscription, unreadMessages, 
         </div>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
+        <main id="main-content" className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
             {children}
           </div>

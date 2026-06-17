@@ -22,12 +22,12 @@ export const FREE_MAX_CLIENTS = 3
 
 export const PLAN_CONFIG: Record<PlanKey, PlanConfig> = {
   starter: {
-    name: 'Starter',
+    name: 'Independiente',
     price: 19,
     maxClients: 10,
     features: [
       'Hasta 10 clientes',
-      'Rutinas ilimitadas',
+      'Rutinas y plantillas ilimitadas',
       'Planes nutricionales',
       'Mensajería con clientes',
       'Gestión de citas',
@@ -35,12 +35,12 @@ export const PLAN_CONFIG: Record<PlanKey, PlanConfig> = {
     ],
   },
   pro: {
-    name: 'Pro',
+    name: 'Profesional',
     price: 39,
     maxClients: 30,
     features: [
       'Hasta 30 clientes',
-      'Todo de Starter',
+      'Todo de Independiente',
       'Analytics avanzados',
       'Exportar datos a PDF',
       'Soporte prioritario',
@@ -48,14 +48,15 @@ export const PLAN_CONFIG: Record<PlanKey, PlanConfig> = {
     ],
   },
   unlimited: {
-    name: 'Business',
+    name: 'Equipo',
     price: 79,
     maxClients: 999999,
     features: [
       'Clientes ilimitados',
-      'Todo de Pro',
-      'API access',
-      'Integraciones premium',
+      'Todo de Profesional',
+      'Hasta 5 entrenadores en un panel',
+      'Vista global del centro',
+      'Gestión de retos grupales',
       'Onboarding dedicado',
       'SLA garantizado',
     ],

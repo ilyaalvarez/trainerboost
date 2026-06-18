@@ -94,53 +94,6 @@ function DrawSep() {
   )
 }
 
-// ─── Ticker ───────────────────────────────────────────────────────────────────
-const TICKER_ITEMS = [
-  'GESTIÓN DE CLIENTES',
-  'COBROS CON STRIPE',
-  'RUTINAS PERSONALIZADAS',
-  'PORTAL WEB PARA CLIENTES',
-  'SEGUIMIENTO DE PROGRESO',
-  'SERVIDORES EN EUROPA',
-  'CHAT DIRECTO',
-  '100% EN ESPAÑOL',
-  'RGPD COMPLIANT',
-  '0% COMISIÓN EN COBROS',
-]
-
-function Ticker() {
-  const trackRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    let lastY = window.scrollY
-    const onScroll = () => {
-      const velocity = Math.abs(window.scrollY - lastY)
-      lastY = window.scrollY
-      if (!trackRef.current) return
-      if (velocity > 12) {
-        trackRef.current.classList.add('ticker-track--fast')
-      } else {
-        trackRef.current.classList.remove('ticker-track--fast')
-      }
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS]
-  return (
-    <div className="ticker-section" aria-hidden="true">
-      <div ref={trackRef} className="ticker-track">
-        {items.map((item, i) => (
-          <span key={i} className="ticker-item">
-            <span className="ticker-sep" />
-            {item}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const PROBLEMS = [
@@ -165,31 +118,24 @@ const FEATURES = [
   },
 ]
 
-// ─── Competitor comparison ────────────────────────────────────────────────────
-// Deliberately no competitor brand names — legal safety + cleaner messaging
-const COMP_COLS = ['APPS INTERNACIONALES', 'SOFTWARE DE CENTRO', 'GESTIÓN BÁSICA']
-
-type CV = boolean | string
-
-const COMP_ROWS: { label: string; tb: CV; c: [CV, CV, CV] }[] = [
-  { label: 'Idioma de la plataforma',     tb: 'ESPAÑOL',   c: ['INGLÉS',   'PARCIAL',  'INGLÉS']   },
-  { label: 'Para entrenadores individuales', tb: true,     c: [true,        false,      false]      },
-  { label: 'Portal web para tu cliente',  tb: true,        c: [false,       false,      false]      },
-  { label: 'Cobros e historial integrado',tb: true,        c: [false,       true,       false]      },
-  { label: 'Comisión en cobros',          tb: '0%',        c: ['2 – 5 %',  '3 – 8 %',  '—']        },
-  { label: 'RGPD · Servidores en Europa', tb: true,        c: [false,       false,      false]      },
-  { label: 'Soporte en español',          tb: true,        c: [false,       false,      false]      },
-  { label: 'Precio desde (mes)',          tb: '19 €',      c: ['80 €+',    '129 €+',   '30 €+']    },
-  { label: 'Configuración inicial',       tb: '< 1 HORA',  c: ['DÍAS',     'SEMANAS',  'HORAS']    },
+// ─── Ventaja editorial ────────────────────────────────────────────────────────
+const EDGE_ITEMS = [
+  {
+    num: '01',
+    claim: '0% DE COMISIÓN.',
+    contrast: 'Las demás plataformas retienen entre el 2% y el 8% de cada cobro que haces. TrainerBoost no toca tus ingresos. Lo que cobras es tuyo.',
+  },
+  {
+    num: '02',
+    claim: 'TODO EN ESPAÑOL.',
+    contrast: 'Las apps internacionales operan en inglés, cobran en dólares y el soporte está en otra zona horaria. Nosotros estamos aquí.',
+  },
+  {
+    num: '03',
+    claim: 'LISTO EN < 1 HORA.',
+    contrast: 'El software para centros tarda semanas en configurarse. Aquí entras, configuras y tienes el primer cliente ese mismo día.',
+  },
 ]
-
-function CompCell({ val, isOwn }: { val: CV; isOwn: boolean }) {
-  if (val === true) return (
-    <span className={isOwn ? 'cval cval--yes' : 'cval cval--yes-dim'}>✓</span>
-  )
-  if (val === false) return <span className="cval cval--no">✗</span>
-  return <span className={isOwn ? 'cval cval--text cval--amber' : 'cval cval--text'}>{val}</span>
-}
 
 const FAQS = [
   {
@@ -395,49 +341,16 @@ export default function LandingPage() {
             }
           )
 
-          // ── 9. Power bars — fill left to right ───────────────────────────
-          gsap.utils.toArray<HTMLElement>('.feature-power-fill').forEach((bar) => {
-            gsap.fromTo(bar,
-              { width: '0%' },
-              {
-                width: '100%', duration: 1.3, ease: 'power2.out',
-                scrollTrigger: {
-                  trigger: bar,
-                  start: 'top 92%',
-                  toggleActions: 'play none none reverse',
-                },
-              }
-            )
-          })
-
-          // ── 10. Comparison — intro word flip + row stagger, bidirectional ─
-          const compIntro = document.querySelector<HTMLElement>('.comp-intro')
-          if (compIntro) {
-            const compWords = new SplitText(compIntro, { type: 'words' })
-            gsap.fromTo(compWords.words,
-              { opacity: 0, rotateX: -70, transformPerspective: 900, transformOrigin: 'top center', y: 18 },
-              {
-                opacity: 1, rotateX: 0, y: 0,
-                duration: 0.65, ease: 'expo.out',
-                stagger: { amount: 0.2, from: 'start' },
-                scrollTrigger: {
-                  trigger: compIntro,
-                  start: 'top 86%',
-                  toggleActions: 'play none none reverse',
-                },
-              }
-            )
-          }
-
-          gsap.fromTo('.comp-row',
-            { opacity: 0, x: -20 },
+          // ── 9. Edge items — slide up stagger, bidirectional ──────────────
+          gsap.fromTo('.edge-item',
+            { opacity: 0, y: 40 },
             {
-              opacity: 1, x: 0,
-              duration: 0.38, ease: 'power2.out',
-              stagger: { amount: 0.4, ease: 'power1.out' },
+              opacity: 1, y: 0,
+              duration: 0.9, ease: 'expo.out',
+              stagger: { amount: 0.35, ease: 'power2.out' },
               scrollTrigger: {
-                trigger: '.comp-body',
-                start: 'top 80%',
+                trigger: '.edge-list',
+                start: 'top 78%',
                 toggleActions: 'play none none reverse',
               },
             }
@@ -549,8 +462,6 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* ── Ticker ───────────────────────────────────────────────────── */}
-          <Ticker />
 
           {/* ── Problem ──────────────────────────────────────────────────── */}
           <section className="lp-section">
@@ -577,69 +488,35 @@ export default function LandingPage() {
               <span className="section-label">EL ARSENAL</span>
               <div className="feature-list">
                 {FEATURES.map(({ statement, detail }, i) => (
-                  <div key={i} className="feature-item hud-frame" style={{ padding: '32px 28px' }}>
+                  <div key={i} className="feature-item">
                     <div>
                       <div className="feature-index">0{i + 1}</div>
                       <p className="feature-statement">{statement}</p>
                     </div>
                     <p className="feature-detail">{detail}</p>
-                    <div className="feature-power-bar" style={{ gridColumn: '1 / -1', marginTop: 0 }}>
-                      <div className="feature-power-fill" />
-                    </div>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          {/* ── Comparativa ──────────────────────────────────────────────── */}
-          <section className="lp-section comp-section">
+          {/* ── La ventaja ───────────────────────────────────────────────── */}
+          <section className="lp-section">
             <div className="lp-container">
               <DrawSep />
               <span className="level-badge">LVL.03</span>
-              <span className="section-label">COMPARATIVA</span>
-
-              <h2 className="comp-intro">
-                LA DIFERENCIA<br />
-                <span style={{ color: 'var(--amber)' }}>ES CLARA.</span>
-              </h2>
-
-              <div className="comp-table-wrap">
-                {/* Header */}
-                <div className="comp-header-row">
-                  <div className="comp-hcell comp-hcell--label" />
-                  <div className="comp-hcell comp-hcell--own">TRAINERBOOST</div>
-                  {COMP_COLS.map(c => (
-                    <div key={c} className="comp-hcell comp-hcell--other">{c}</div>
-                  ))}
-                </div>
-
-                {/* Rows */}
-                <div className="comp-body">
-                  {COMP_ROWS.map(({ label, tb, c }) => (
-                    <div key={label} className="comp-row">
-                      <div className="comp-cell comp-cell--label">{label}</div>
-                      <div className="comp-cell comp-cell--own">
-                        <CompCell val={tb} isOwn />
-                      </div>
-                      {c.map((v, j) => (
-                        <div key={j} className="comp-cell comp-cell--other">
-                          <CompCell val={v} isOwn={false} />
-                        </div>
-                      ))}
+              <span className="section-label">LA VENTAJA</span>
+              <div className="edge-list">
+                {EDGE_ITEMS.map(({ num, claim, contrast }) => (
+                  <div key={num} className="edge-item">
+                    <span className="edge-num">{num}</span>
+                    <div>
+                      <p className="edge-claim">{claim}</p>
+                      <p className="edge-contrast">{contrast}</p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-
-              {count > 0 && (
-                <p style={{
-                  fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.1em',
-                  color: 'var(--smoke)', marginTop: '32px', textTransform: 'uppercase',
-                }}>
-                  {count} entrenadores ya en lista
-                </p>
-              )}
             </div>
           </section>
 
@@ -664,7 +541,6 @@ export default function LandingPage() {
           <section className="cta-section lp-section">
             <div className="lp-container">
               <DrawSep />
-              <span className="level-badge">SPAWN POINT</span>
               <h2 className="cta-h2">
                 <span className="cta-h2-line">APÚNTATE</span>
                 <span className="cta-h2-line cta-h2-line--amber">AHORA.</span>

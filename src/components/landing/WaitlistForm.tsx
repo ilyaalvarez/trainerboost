@@ -23,7 +23,7 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
     fetch('/api/waitlist')
       .then((r) => r.json())
       .then((d) => {
-        if (typeof d.spotsLeft === 'number') setSpotsLeft(d.spotsLeft)
+        if (typeof d.total === 'number') setSpotsLeft(d.total)
       })
       .catch(() => {})
   }, [])
@@ -56,12 +56,10 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
 
       setState('success')
       if (data.alreadyJoined) {
-        setMessage('¡Ya estás en la lista! Te avisaremos cuando abramos.')
+        setMessage('Ya estás en la lista. Te avisamos cuando abramos.')
       } else {
-        setMessage('¡Estás dentro! Te avisaremos antes del lanzamiento.')
-        if (typeof data.total === 'number') {
-          setSpotsLeft(Math.max(0, siteConfig.waitlist.totalSpots - data.total))
-        }
+        setMessage('Recibido. Te avisamos antes del lanzamiento.')
+        if (typeof data.total === 'number') setSpotsLeft(data.total)
       }
       onSuccess?.(data.total ?? siteConfig.waitlist.seedCount)
     } catch {
@@ -72,17 +70,12 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
 
   return (
     <div className={`waitlist-form-wrapper ${className}`}>
-      {/* FOMO spots counter */}
       {spotsLeft !== null && spotsLeft > 0 && state !== 'success' && (
-        <div className="fomo-bar">
-          <span className="fomo-dot" />
-          <span className="font-mono text-[11px] text-brand-primary">
-            {spotsLeft} plazas restantes de {siteConfig.waitlist.totalSpots}
+        <div className="waitlist-count-bar">
+          <span className="waitlist-count-dot" />
+          <span className="waitlist-count-text">
+            {spotsLeft} entrenadores ya en lista
           </span>
-          <div
-            className="fomo-progress"
-            style={{ '--pct': `${((siteConfig.waitlist.totalSpots - spotsLeft) / siteConfig.waitlist.totalSpots) * 100}%` } as React.CSSProperties}
-          />
         </div>
       )}
 
@@ -148,14 +141,14 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
         <div className="waitlist-success" role="status">
           <div className="waitlist-success-icon" aria-hidden="true">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M5 13l4 4L19 7" stroke="#8FD43A" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M5 13l4 4L19 7" stroke="#D4892A" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <div>
             <p className="text-sm font-semibold text-fg-primary">{message}</p>
             {spotsLeft !== null && (
               <p className="text-xs text-fg-muted mt-1 font-mono">
-                Quedan {spotsLeft} plazas de las {siteConfig.waitlist.totalSpots} de lanzamiento
+                {spotsLeft} personas en la lista de espera
               </p>
             )}
           </div>

@@ -23,8 +23,8 @@ export default function LogoFull({ height = 28, animated = true, className = '',
           lineHeight: 1,
         }}
       >
-        <span style={{ color: '#E8FFD8' }}>TRAINER</span>
-        <span style={{ color: '#C8FF47' }}>BOOST</span>
+        <span style={{ color: '#E8E4D9' }}>TRAINER</span>
+        <span style={{ color: '#D4892A' }}>BOOST</span>
       </div>
     </div>
   )

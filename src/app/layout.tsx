@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, JetBrains_Mono, Barlow_Condensed } from 'next/font/google'
+import { Inter, JetBrains_Mono, Barlow_Condensed, Bebas_Neue } from 'next/font/google'
 import Script from 'next/script'
 import { Toaster } from 'sonner'
 import { Analytics } from '@vercel/analytics/next'
@@ -24,6 +24,13 @@ const barlowCondensed = Barlow_Condensed({
   subsets: ['latin'],
   weight: ['600', '700', '800'],
   variable: '--font-display',
+  display: 'swap',
+})
+
+const bebasNeue = Bebas_Neue({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-impact',
   display: 'swap',
 })
 
@@ -62,7 +69,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#8FD43A',
+  themeColor: '#D4892A',
 }
 
 const jsonLd = {
@@ -93,7 +100,7 @@ const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`dark ${inter.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable}`}>
+    <html lang="es" className={`dark ${inter.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable} ${bebasNeue.variable}`}>
       <head>
         <script
           type="application/ld+json"

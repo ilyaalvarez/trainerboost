@@ -129,13 +129,6 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
             <p className="waitlist-msg waitlist-msg--error" role="alert">{message}</p>
           )}
 
-          <p className="waitlist-legal">
-            Sin spam. Sin tarjeta. Cancelas cuando quieras.
-            {' '}
-            <a href="/privacy" className="underline underline-offset-2 opacity-60 hover:opacity-100 transition-opacity">
-              Privacidad
-            </a>
-          </p>
         </form>
       ) : (
         <div className="waitlist-success" role="status">

@@ -21,14 +21,15 @@ export async function getGSAPWithSplit() {
 }
 
 export async function getGSAPFull() {
-  const [{ gsap }, { ScrollTrigger }, { SplitText }, { ScrambleTextPlugin }, { DrawSVGPlugin }] =
+  const [{ gsap }, { ScrollTrigger }, { SplitText }, { ScrambleTextPlugin }, { DrawSVGPlugin }, { Observer }] =
     await Promise.all([
       import('gsap'),
       import('gsap/ScrollTrigger'),
       import('gsap/SplitText'),
       import('gsap/ScrambleTextPlugin'),
       import('gsap/DrawSVGPlugin'),
+      import('gsap/Observer'),
     ])
-  gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin, DrawSVGPlugin)
-  return { gsap, ScrollTrigger, SplitText, ScrambleTextPlugin, DrawSVGPlugin }
+  gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin, DrawSVGPlugin, Observer)
+  return { gsap, ScrollTrigger, SplitText, ScrambleTextPlugin, DrawSVGPlugin, Observer }
 }

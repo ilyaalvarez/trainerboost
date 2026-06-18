@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   TRAINERBOOST LANDING v3 — THE FORGE
-   ForgeTales × Everesting — dark amber, editorial, zero AI aesthetics
-   Scoped to .landing-root to avoid dashboard bleed.
+   TRAINERBOOST LANDING v4 — THE FORGE
+   Bebas Neue × JetBrains Mono × Barlow Condensed
+   Crosshair cursor · Velocity skew · Bidirectional scroll
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─── Root tokens ──────────────────────────────────────────────────────────── */
@@ -14,69 +14,115 @@
   --smoke:        #7A7A8A;
   --ivory:        #E8E4D9;
   --ivory-dim:    rgba(232, 228, 217, 0.5);
-  --ivory-ghost:  rgba(232, 228, 217, 0.08);
+  --ivory-ghost:  rgba(232, 228, 217, 0.06);
   --amber:        #D4892A;
   --amber-bright: #F0C040;
   --amber-dim:    rgba(212, 137, 42, 0.45);
-  --amber-ghost:  rgba(212, 137, 42, 0.08);
+  --amber-ghost:  rgba(212, 137, 42, 0.07);
   --amber-border: rgba(212, 137, 42, 0.18);
 
   background: var(--void);
   color: var(--ivory);
   min-height: 100vh;
   position: relative;
-  /* Hide real cursor on desktop — replaced by magnetic cursor */
 }
 
+/* ─── Hide system cursor (desktop pointer devices only) ────────────────────── */
 @media (pointer: fine) {
-  .landing-root { cursor: none; }
+  .landing-root,
+  .landing-root *,
   .landing-root a,
   .landing-root button,
-  .landing-root input { cursor: none; }
+  .landing-root input { cursor: none !important; }
 }
 
-/* ─── Atmospheric depth layers ─────────────────────────────────────────────── */
+/* ─── Atmospheric glow — top-center light source ───────────────────────────── */
 .landing-root::before {
   content: '';
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: 60vh;
-  background: radial-gradient(ellipse 60% 60% at 50% -5%, rgba(212, 137, 42, 0.07) 0%, transparent 70%);
+  height: 55vh;
+  background: radial-gradient(ellipse 55% 55% at 50% -5%, rgba(212, 137, 42, 0.06) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
 
-/* ─── Magnetic cursor ───────────────────────────────────────────────────────── */
-.mag-cursor {
+/* ─── Inner scroll wrapper (for velocity skew) ─────────────────────────────── */
+.landing-inner {
+  will-change: transform;
+}
+
+/* ─── Scroll progress — left edge ──────────────────────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  z-index: 200;
+  pointer-events: none;
+  background: rgba(212, 137, 42, 0.08);
+}
+
+.scroll-progress-fill {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(to bottom, rgba(212, 137, 42, 0.2) 0%, var(--amber) 100%);
+  transform-origin: top;
+}
+
+/* ─── Crosshair cursor ──────────────────────────────────────────────────────── */
+.crosshair-cursor {
   position: fixed;
   top: 0; left: 0;
-  width: 36px; height: 36px;
-  border: 1px solid rgba(212, 137, 42, 0.5);
-  border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  mix-blend-mode: normal;
-  transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease, background 0.25s ease;
   will-change: transform;
+  transition: opacity 0.3s;
 }
 
-.mag-cursor--hover {
-  width: 64px; height: 64px;
-  border-color: var(--amber);
-  background: rgba(212, 137, 42, 0.06);
+.crosshair-cursor svg {
+  overflow: visible;
+  transition: transform 0.2s ease;
 }
 
-.mag-cursor-dot {
-  position: fixed;
-  top: 0; left: 0;
-  width: 4px; height: 4px;
-  background: var(--amber);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%);
-  will-change: transform;
+.crosshair-arm {
+  stroke: var(--amber);
+  stroke-width: 1;
+  transition: stroke-dashoffset 0.25s ease, stroke 0.2s;
+  stroke-dasharray: 16;
+  stroke-dashoffset: 0;
+}
+
+.crosshair-ring {
+  stroke: var(--amber);
+  stroke-width: 0.6;
+  fill: none;
+  opacity: 0.3;
+  transition: opacity 0.25s ease, r 0.25s ease;
+}
+
+.crosshair-dot {
+  fill: var(--amber);
+  transition: r 0.2s ease;
+}
+
+/* Hover state — elements trigger this via JS class toggle */
+.crosshair-cursor--hover .crosshair-arm {
+  stroke: var(--amber-bright);
+  stroke-dashoffset: -4;
+}
+.crosshair-cursor--hover .crosshair-ring {
+  opacity: 0.55;
+}
+.crosshair-cursor--hover .crosshair-dot {
+  r: 3;
+}
+.crosshair-cursor--hover svg {
+  transform: scale(1.3);
 }
 
 /* ─── Scanline ─────────────────────────────────────────────────────────────── */
@@ -87,7 +133,7 @@
   background: linear-gradient(90deg, transparent 0%, var(--amber) 35%, var(--amber-bright) 50%, var(--amber) 65%, transparent 100%);
   z-index: 9998;
   pointer-events: none;
-  animation: scanline-run 0.8s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  animation: scanline-run 0.85s cubic-bezier(0.4, 0, 0.6, 1) forwards;
 }
 
 @keyframes scanline-run {
@@ -101,7 +147,7 @@
   top: 0;
   z-index: 50;
   border-bottom: 1px solid var(--amber-border);
-  background: rgba(8, 8, 16, 0.92);
+  background: rgba(8, 8, 16, 0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -132,11 +178,9 @@
   gap: 6px;
 }
 
-.lp-nav-link:hover {
-  color: var(--ivory);
-}
+.lp-nav-link:hover { color: var(--ivory); }
 
-/* ─── Section scaffolding ──────────────────────────────────────────────────── */
+/* ─── Layout containers ─────────────────────────────────────────────────────── */
 .lp-section {
   position: relative;
   z-index: 1;
@@ -149,7 +193,7 @@
   padding: 0 clamp(20px, 5vw, 60px);
 }
 
-/* ─── Section label (mono tag) ─────────────────────────────────────────────── */
+/* ─── Section label (mono tag with line) ────────────────────────────────────── */
 .section-label {
   display: inline-flex;
   align-items: center;
@@ -172,13 +216,15 @@
   flex-shrink: 0;
 }
 
-/* ─── Decorative SVG draw lines ────────────────────────────────────────────── */
+/* ─── DrawSVG separators ────────────────────────────────────────────────────── */
 .draw-separator {
   width: 100%;
+  display: block;
   overflow: visible;
+  margin-bottom: 48px;
 }
 
-.draw-separator line {
+.draw-sep-line {
   stroke: var(--amber-border);
   stroke-width: 1;
 }
@@ -194,17 +240,17 @@
   padding: clamp(100px, 14vw, 160px) 0 clamp(60px, 8vw, 100px);
 }
 
-/* Large ambient text behind hero */
+/* Ghost "BOOST" behind hero — parallax target */
 .hero-bg-text {
   position: absolute;
   top: 50%;
   left: -2%;
   transform: translateY(-50%);
-  font-family: var(--font-display, 'Barlow Condensed', sans-serif);
-  font-weight: 800;
-  font-size: clamp(8rem, 22vw, 20rem);
+  font-family: var(--font-impact, 'Bebas Neue', sans-serif);
+  font-weight: 400;
+  font-size: clamp(10rem, 28vw, 24rem);
   text-transform: uppercase;
-  letter-spacing: -0.04em;
+  letter-spacing: 0.02em;
   line-height: 0.85;
   color: var(--ivory);
   opacity: 0.025;
@@ -220,35 +266,33 @@
   z-index: 1;
 }
 
-/* ─── Hero headline ─────────────────────────────────────────────────────────── */
+/* ─── Hero headline — Bebas Neue ────────────────────────────────────────────── */
 .hero-h1 {
-  font-family: var(--font-display, 'Barlow Condensed', sans-serif);
-  font-size: clamp(5rem, 13.5vw, 11rem);
-  font-weight: 800;
-  line-height: 0.88;
-  letter-spacing: -0.04em;
+  font-family: var(--font-impact, 'Bebas Neue', sans-serif);
+  font-size: clamp(5.5rem, 14.5vw, 12.5rem);
+  font-weight: 400; /* Bebas Neue is inherently heavy */
+  line-height: 0.9;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
   color: var(--ivory);
   margin: 0;
-  /* Each line wraps in a span for SplitText */
 }
 
 .hero-h1-line {
   display: block;
-  overflow: hidden; /* clips SplitText chars on enter */
 }
 
 .hero-h1-line--amber {
   color: var(--amber);
 }
 
-/* ─── Hero layout grid ──────────────────────────────────────────────────────── */
+/* ─── Hero grid ─────────────────────────────────────────────────────────────── */
 .hero-bottom-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: clamp(32px, 5vw, 80px);
   align-items: end;
-  margin-top: clamp(32px, 5vw, 56px);
+  margin-top: clamp(36px, 5vw, 60px);
 }
 
 @media (max-width: 720px) {
@@ -257,7 +301,7 @@
 
 .hero-sub {
   font-size: 15px;
-  line-height: 1.75;
+  line-height: 1.8;
   color: var(--ivory-dim);
   max-width: 420px;
 }
@@ -267,7 +311,6 @@
   font-weight: 600;
 }
 
-/* ─── Divider rule ──────────────────────────────────────────────────────────── */
 .hero-rule {
   height: 1px;
   background: linear-gradient(90deg, var(--amber-dim) 0%, rgba(212, 137, 42, 0.08) 60%, transparent 100%);
@@ -285,9 +328,12 @@
 
 .ticker-track {
   display: flex;
-  gap: 0;
-  animation: ticker-scroll 28s linear infinite;
+  animation: ticker-scroll 30s linear infinite;
   width: max-content;
+}
+
+.ticker-track--fast {
+  animation-duration: 12s;
 }
 
 @keyframes ticker-scroll {
@@ -319,9 +365,7 @@
 }
 
 /* ─── Problem section ───────────────────────────────────────────────────────── */
-.problem-list {
-  margin-top: 8px;
-}
+.problem-list { margin-top: 8px; }
 
 .problem-item {
   display: grid;
@@ -330,7 +374,8 @@
   align-items: baseline;
   padding: 28px 0;
   border-bottom: 1px solid var(--amber-ghost);
-  opacity: 0; /* animated by GSAP */
+  opacity: 0; /* GSAP animated */
+  transform-style: preserve-3d;
 }
 
 @media (max-width: 700px) {
@@ -343,13 +388,13 @@
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(212, 137, 42, 0.4);
+  color: rgba(212, 137, 42, 0.35);
 }
 
 .problem-text {
   font-family: var(--font-display, 'Barlow Condensed', sans-serif);
-  font-size: clamp(1.4rem, 3vw, 1.9rem);
-  font-weight: 700;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: -0.01em;
   color: var(--ivory);
@@ -357,23 +402,24 @@
 }
 
 /* ─── Feature statements ────────────────────────────────────────────────────── */
-.feature-list {
-  margin-top: 8px;
-}
+.feature-list { margin-top: 8px; }
 
 .feature-item {
   padding: 36px 0;
   border-bottom: 1px solid var(--amber-ghost);
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 32px;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
   align-items: center;
-  /* clip-path animated by GSAP */
+}
+
+@media (max-width: 860px) {
+  .feature-item { grid-template-columns: 1fr; }
 }
 
 .feature-statement {
   font-family: var(--font-display, 'Barlow Condensed', sans-serif);
-  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-size: clamp(1.6rem, 3.5vw, 2.5rem);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: -0.02em;
@@ -384,14 +430,12 @@
 .feature-detail {
   font-size: 13px;
   color: var(--ivory-dim);
-  line-height: 1.6;
-  max-width: 320px;
+  line-height: 1.7;
   text-align: right;
 }
 
-@media (max-width: 700px) {
-  .feature-item { grid-template-columns: 1fr; }
-  .feature-detail { text-align: left; max-width: none; }
+@media (max-width: 860px) {
+  .feature-detail { text-align: left; }
 }
 
 .feature-index {
@@ -428,11 +472,10 @@
 }
 
 .status-live-dot {
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--amber);
-  animation: status-pulse 2s ease-in-out infinite;
+  animation: status-pulse 2.2s ease-in-out infinite;
 }
 
 @keyframes status-pulse {
@@ -443,17 +486,14 @@
 .status-row {
   display: grid;
   grid-template-columns: 220px 1fr;
-  gap: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  opacity: 0; /* GSAP */
+  opacity: 0; /* GSAP animated */
 }
 
-.status-row:last-child {
-  border-bottom: none;
-}
+.status-row:last-child { border-bottom: none; }
 
 .status-key {
-  padding: 16px 24px;
+  padding: 15px 24px;
   font-family: var(--font-mono), monospace;
   font-size: 10px;
   font-weight: 700;
@@ -464,7 +504,7 @@
 }
 
 .status-val {
-  padding: 16px 24px;
+  padding: 15px 24px;
   font-family: var(--font-mono), monospace;
   font-size: 13px;
   font-weight: 600;
@@ -475,6 +515,27 @@
 .status-val--amber { color: var(--amber); }
 
 /* ─── FAQ ───────────────────────────────────────────────────────────────────── */
+.faq-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: clamp(32px, 6vw, 80px);
+}
+
+@media (max-width: 700px) {
+  .faq-grid { grid-template-columns: 1fr; }
+}
+
+.faq-heading {
+  font-family: var(--font-display, 'Barlow Condensed', sans-serif);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--ivory);
+  margin: 0;
+}
+
 .faq-row {
   border-bottom: 1px solid var(--amber-ghost);
 }
@@ -488,7 +549,7 @@
   padding: 24px 0;
   background: none;
   border: none;
-  cursor: pointer;
+  cursor: none;
   text-align: left;
 }
 
@@ -502,8 +563,7 @@
 .faq-icon {
   flex-shrink: 0;
   margin-top: 3px;
-  width: 18px;
-  height: 18px;
+  width: 18px; height: 18px;
   border: 1px solid var(--amber-border);
   border-radius: 50%;
   display: flex;
@@ -526,7 +586,25 @@
   max-width: 680px;
 }
 
-/* ─── Waitlist form (recoloured) ────────────────────────────────────────────── */
+/* ─── CTA section ───────────────────────────────────────────────────────────── */
+.cta-h2 {
+  font-family: var(--font-impact, 'Bebas Neue', sans-serif);
+  font-size: clamp(4.5rem, 12vw, 10rem);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.88;
+  margin: 0 0 clamp(40px, 6vw, 64px);
+}
+
+.cta-h2-line { display: block; color: var(--ivory); }
+.cta-h2-line--amber { color: var(--amber); }
+
+.cta-form-wrap {
+  max-width: 480px;
+}
+
+/* ─── Waitlist form ─────────────────────────────────────────────────────────── */
 .waitlist-count-bar {
   display: flex;
   align-items: center;
@@ -535,12 +613,11 @@
 }
 
 .waitlist-count-dot {
-  width: 5px;
-  height: 5px;
+  width: 5px; height: 5px;
   border-radius: 50%;
   background: var(--amber);
   flex-shrink: 0;
-  animation: status-pulse 2s ease-in-out infinite;
+  animation: status-pulse 2.2s ease-in-out infinite;
 }
 
 .waitlist-count-text {
@@ -552,21 +629,18 @@
   color: var(--amber-dim);
 }
 
-.waitlist-form-wrapper {
-  width: 100%;
-  max-width: 500px;
-}
+.waitlist-form-wrapper { width: 100%; max-width: 500px; }
 
 .waitlist-input-row {
   display: flex;
-  gap: 0;
   border: 1px solid var(--amber-border);
   background: rgba(255, 255, 255, 0.02);
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .waitlist-input-row:focus-within {
   border-color: rgba(212, 137, 42, 0.55);
+  box-shadow: 0 0 0 3px rgba(212, 137, 42, 0.06);
 }
 
 .waitlist-input {
@@ -598,19 +672,18 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   border: none;
-  cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
+  cursor: none;
+  transition: background 0.2s;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .waitlist-btn:hover:not(:disabled) { background: var(--amber-bright); }
-.waitlist-btn:disabled { opacity: 0.45; }
+.waitlist-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .waitlist-spinner {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 14px; height: 14px;
   border: 2px solid rgba(8, 8, 16, 0.3);
   border-top-color: #080810;
   border-radius: 50%;
@@ -645,8 +718,7 @@
 }
 
 .waitlist-success-icon {
-  width: 34px;
-  height: 34px;
+  width: 34px; height: 34px;
   border-radius: 50%;
   border: 1px solid var(--amber-border);
   display: flex;
@@ -655,27 +727,46 @@
   flex-shrink: 0;
 }
 
-/* ─── Magnetic CTA button ───────────────────────────────────────────────────── */
-.magnetic-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 18px 36px;
-  background: var(--amber);
-  color: #080810;
-  font-family: var(--font-mono), monospace;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  border: none;
-  text-decoration: none;
-  cursor: pointer;
-  will-change: transform;
-  transition: background 0.2s;
+/* ─── Footer ────────────────────────────────────────────────────────────────── */
+.lp-footer {
+  border-top: 1px solid var(--amber-border);
+  padding: 32px 0;
+  position: relative;
+  z-index: 1;
 }
 
-.magnetic-cta:hover { background: var(--amber-bright); }
+.lp-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.lp-footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.lp-footer-link {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ash);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.lp-footer-link:hover { color: var(--ivory-dim); }
+
+/* ─── Logo orbit ────────────────────────────────────────────────────────────── */
+.logo-orbit-outer { animation: orbit-cw 14s linear infinite; transform-origin: center; }
+.logo-orbit-inner { animation: orbit-ccw 7s linear infinite; transform-origin: center; }
+
+@keyframes orbit-cw  { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes orbit-ccw { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
 
 /* ─── RGPD banner ───────────────────────────────────────────────────────────── */
 .rgpd-banner {
@@ -714,7 +805,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 8px 16px;
-  cursor: pointer;
+  cursor: none;
   border: none;
   transition: background 0.2s, color 0.2s;
 }
@@ -725,97 +816,13 @@
   color: var(--smoke);
 }
 
-.rgpd-btn--secondary:hover {
-  border-color: var(--smoke);
-  color: var(--ivory);
-}
+.rgpd-btn--secondary:hover { border-color: var(--smoke); color: var(--ivory); }
 
-.rgpd-btn--primary {
-  background: var(--amber);
-  color: #080810;
-}
-
+.rgpd-btn--primary { background: var(--amber); color: #080810; }
 .rgpd-btn--primary:hover { background: var(--amber-bright); }
 
-/* ─── Logo orbit animations ─────────────────────────────────────────────────── */
-.logo-orbit-outer { animation: orbit-cw 14s linear infinite; transform-origin: center; }
-.logo-orbit-inner { animation: orbit-ccw 7s linear infinite; transform-origin: center; }
-
-@keyframes orbit-cw  { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes orbit-ccw { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
-
-/* ─── FAQ grid ──────────────────────────────────────────────────────────────── */
-.faq-grid {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: clamp(32px, 6vw, 80px);
-}
-
-@media (max-width: 700px) {
-  .faq-grid { grid-template-columns: 1fr; }
-}
-
-.faq-heading {
-  font-family: var(--font-display, 'Barlow Condensed', sans-serif);
-  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-  color: var(--ivory);
-  margin: 0;
-}
-
-/* ─── CTA section ───────────────────────────────────────────────────────────── */
-.cta-h2 {
-  font-family: var(--font-display, 'Barlow Condensed', sans-serif);
-  font-size: clamp(4rem, 11vw, 9rem);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -0.04em;
-  line-height: 0.88;
-  margin: 0 0 clamp(40px, 6vw, 64px);
-}
-
-.cta-h2-line { display: block; color: var(--ivory); }
-.cta-h2-line--amber { color: var(--amber); }
-
-.cta-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 48px;
-  align-items: flex-start;
-}
-
-.cta-perks {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding-top: 6px;
-}
-
-/* ─── Footer ────────────────────────────────────────────────────────────────── */
-.lp-footer {
-  border-top: 1px solid var(--amber-border);
-  padding: 40px 0;
-  position: relative;
-  z-index: 1;
-}
-
-.lp-footer-inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-/* ─── GSAP utility classes ──────────────────────────────────────────────────── */
-.gsap-fade-up { opacity: 0; transform: translateY(24px); }
-
 /* ─── Focus ring ────────────────────────────────────────────────────────────── */
-a:focus-visible,
-button:focus-visible {
+a:focus-visible, button:focus-visible {
   outline: 2px solid var(--amber);
   outline-offset: 3px;
   border-radius: 2px;
@@ -828,4 +835,6 @@ button:focus-visible {
   .status-live-dot, .waitlist-count-dot { animation: none; }
   .ticker-track { animation: none; }
   .problem-item, .status-row { opacity: 1; }
+  .landing-root, .landing-root * { cursor: auto !important; }
+  .crosshair-cursor { display: none; }
 }

@@ -9,10 +9,9 @@ import './styles/landing.css'
 const WaitlistForm = dynamic(() => import('@/components/landing/WaitlistForm'), { ssr: false })
 const RGPDConsent  = dynamic(() => import('@/components/landing/RGPDConsent'),  { ssr: false })
 
-// ─── Magnetic cursor ──────────────────────────────────────────────────────────
-function MagneticCursor() {
-  const ringRef = useRef<HTMLDivElement>(null)
-  const dotRef  = useRef<HTMLDivElement>(null)
+// ─── Crosshair cursor (mirilla) ───────────────────────────────────────────────
+function CrosshairCursor() {
+  const cursorRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -22,24 +21,33 @@ function MagneticCursor() {
 
     import('@/lib/gsap/config').then(({ getGSAP }) =>
       getGSAP().then(({ gsap }) => {
-        const xRing = gsap.quickTo(ringRef.current, 'x', { duration: 0.5, ease: 'power3.out' })
-        const yRing = gsap.quickTo(ringRef.current, 'y', { duration: 0.5, ease: 'power3.out' })
-        const xDot  = gsap.quickTo(dotRef.current,  'x', { duration: 0.08, ease: 'none' })
-        const yDot  = gsap.quickTo(dotRef.current,  'y', { duration: 0.08, ease: 'none' })
+        const el = cursorRef.current
+        if (!el) return
 
-        const onMove = (e: MouseEvent) => { xRing(e.clientX); yRing(e.clientY); xDot(e.clientX); yDot(e.clientY) }
+        const xTo = gsap.quickTo(el, 'x', { duration: 0.35, ease: 'power3.out' })
+        const yTo = gsap.quickTo(el, 'y', { duration: 0.35, ease: 'power3.out' })
+
+        const onMove = (e: MouseEvent) => { xTo(e.clientX); yTo(e.clientY) }
         const onOver = (e: MouseEvent) => {
-          if ((e.target as HTMLElement).closest('a, button, input')) ringRef.current?.classList.add('mag-cursor--hover')
+          if ((e.target as HTMLElement).closest('a, button, input'))
+            el.classList.add('crosshair-cursor--hover')
         }
-        const onOut  = () => ringRef.current?.classList.remove('mag-cursor--hover')
+        const onOut = () => el.classList.remove('crosshair-cursor--hover')
+        const onLeave = () => gsap.to(el, { opacity: 0, duration: 0.2 })
+        const onEnter = () => gsap.to(el, { opacity: 1, duration: 0.2 })
 
         window.addEventListener('mousemove', onMove)
         document.addEventListener('mouseover', onOver)
         document.addEventListener('mouseout',  onOut)
+        document.addEventListener('mouseleave', onLeave)
+        document.addEventListener('mouseenter', onEnter)
+
         cleanup = () => {
           window.removeEventListener('mousemove', onMove)
           document.removeEventListener('mouseover', onOver)
           document.removeEventListener('mouseout',  onOut)
+          document.removeEventListener('mouseleave', onLeave)
+          document.removeEventListener('mouseenter', onEnter)
         }
       })
     )
@@ -48,10 +56,89 @@ function MagneticCursor() {
   }, [])
 
   return (
-    <>
-      <div ref={ringRef} className="mag-cursor" aria-hidden="true" />
-      <div ref={dotRef}  className="mag-cursor-dot" aria-hidden="true" />
-    </>
+    <div ref={cursorRef} className="crosshair-cursor" aria-hidden="true">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Outer ring */}
+        <circle className="crosshair-ring" cx="26" cy="26" r="22" />
+        {/* Top arm */}
+        <line className="crosshair-arm" x1="26" y1="3" x2="26" y2="19" />
+        {/* Bottom arm */}
+        <line className="crosshair-arm" x1="26" y1="33" x2="26" y2="49" />
+        {/* Left arm */}
+        <line className="crosshair-arm" x1="3" y1="26" x2="19" y2="26" />
+        {/* Right arm */}
+        <line className="crosshair-arm" x1="33" y1="26" x2="49" y2="26" />
+        {/* Center dot */}
+        <circle className="crosshair-dot" cx="26" cy="26" r="2" />
+      </svg>
+    </div>
+  )
+}
+
+// ─── Scroll progress bar ──────────────────────────────────────────────────────
+function ScrollProgress() {
+  return (
+    <div className="scroll-progress" aria-hidden="true">
+      <div className="scroll-progress-fill" />
+    </div>
+  )
+}
+
+// ─── DrawSVG separator ────────────────────────────────────────────────────────
+function DrawSep() {
+  return (
+    <svg className="draw-separator" height="1" aria-hidden="true">
+      <line className="draw-sep-line" x1="0" y1="0.5" x2="100%" y2="0.5"
+        stroke="rgba(212,137,42,0.18)" strokeWidth="1" />
+    </svg>
+  )
+}
+
+// ─── Ticker ───────────────────────────────────────────────────────────────────
+const TICKER_ITEMS = [
+  'GESTIÓN DE CLIENTES',
+  'COBROS CON STRIPE',
+  'RUTINAS PERSONALIZADAS',
+  'PORTAL WEB PARA CLIENTES',
+  'SEGUIMIENTO DE PROGRESO',
+  'SERVIDORES EN EUROPA',
+  'CHAT DIRECTO',
+  '100% EN ESPAÑOL',
+  'RGPD COMPLIANT',
+  '0% COMISIÓN EN COBROS',
+]
+
+function Ticker() {
+  const trackRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let lastY = window.scrollY
+    const onScroll = () => {
+      const velocity = Math.abs(window.scrollY - lastY)
+      lastY = window.scrollY
+      if (!trackRef.current) return
+      if (velocity > 12) {
+        trackRef.current.classList.add('ticker-track--fast')
+      } else {
+        trackRef.current.classList.remove('ticker-track--fast')
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const items = [...TICKER_ITEMS, ...TICKER_ITEMS]
+  return (
+    <div className="ticker-section" aria-hidden="true">
+      <div ref={trackRef} className="ticker-track">
+        {items.map((item, i) => (
+          <span key={i} className="ticker-item">
+            <span className="ticker-sep" />
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -66,15 +153,15 @@ const PROBLEMS = [
 const FEATURES = [
   {
     statement: 'TUS CLIENTES VEN SUS RUTINAS SIN DESCARGAR NADA.',
-    detail: 'Portal web incluido. Tus clientes acceden desde cualquier dispositivo sin instalar ninguna app.',
+    detail: 'Portal web incluido. Acceden desde cualquier dispositivo sin instalar ninguna app.',
   },
   {
     statement: 'COBRAS AUTOMÁTICAMENTE. SIN RECORDAR A NADIE.',
-    detail: 'Stripe integrado de forma nativa. Pagos recurrentes, facturas automáticas, historial limpio.',
+    detail: 'Stripe nativo. Pagos recurrentes, facturas automáticas, historial limpio.',
   },
   {
     statement: 'CADA CLIENTE. SU HISTORIAL COMPLETO. SIEMPRE.',
-    detail: 'Progreso, mediciones, rutinas pasadas. Todo en un solo lugar, accesible en segundos.',
+    detail: 'Progreso, mediciones, rutinas pasadas. Todo accesible en segundos.',
   },
 ]
 
@@ -82,7 +169,6 @@ const STATUS_ROWS = [
   { k: 'ESTADO',          v: 'BETA PRIVADA',    amber: true  },
   { k: 'LANZAMIENTO',     v: 'Q3 2026',         amber: false },
   { k: 'PRECIO FUNDADOR', v: '19€ / MES',       amber: true  },
-  { k: 'DESCUENTO BETA',  v: '—40% VITALICIO',  amber: false },
   { k: 'PLATAFORMA',      v: 'WEB + MÓVIL',     amber: false },
   { k: 'SERVIDORES',      v: 'EU · RGPD',       amber: false },
   { k: 'COMISIÓN COBROS', v: '0%',              amber: true  },
@@ -95,29 +181,16 @@ const FAQS = [
   },
   {
     q: '¿Cuánto cuesta?',
-    a: 'El plan base arranca en 19€/mes para hasta 10 clientes activos. Los fundadores obtienen un 40% de descuento permanente, bloqueado desde el día que se unen.',
+    a: 'El plan base arranca en 19€/mes para hasta 10 clientes activos. Los que se apunten durante la beta obtienen el precio de lanzamiento, fijo desde el primer día.',
   },
   {
-    q: '¿Necesito dar mi tarjeta ahora?',
-    a: 'No. La lista de espera es solo tu email. Sin tarjeta, sin compromiso. Te avisamos cuando tu acceso esté listo y decides en ese momento.',
+    q: '¿Para quién es TrainerBoost?',
+    a: 'Para entrenadores personales en España que trabajan con entre 5 y 50 clientes simultáneos y quieren dejar de gestionar con WhatsApp, Excel y Bizum.',
   },
   {
     q: '¿Por qué TrainerBoost y no otra plataforma?',
-    a: 'La mayoría están pensadas para el mercado anglosajón: en inglés, con precios en dólares y soporte en otra zona horaria. TrainerBoost está construido desde cero para el entrenador personal en España.',
+    a: 'La mayoría están pensadas para el mercado anglosajón: en inglés, con precios en dólares y soporte en otra zona horaria. TrainerBoost está construido para el entrenador personal en España.',
   },
-]
-
-const TICKER_ITEMS = [
-  'GESTIÓN DE CLIENTES',
-  'PAGOS CON STRIPE',
-  'RUTINAS PERSONALIZADAS',
-  'PORTAL WEB PARA CLIENTES',
-  'SEGUIMIENTO DE PROGRESO',
-  'SERVIDORES EN EUROPA',
-  'CHAT DIRECTO',
-  '100% EN ESPAÑOL',
-  'RGPD COMPLIANT',
-  'SIN COMISIÓN EN COBROS',
 ]
 
 // ─── FaqItem ──────────────────────────────────────────────────────────────────
@@ -138,43 +211,10 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   )
 }
 
-// ─── DrawSVG separator ────────────────────────────────────────────────────────
-function DrawSep() {
-  return (
-    <svg
-      className="draw-separator"
-      height="1"
-      style={{ display: 'block', marginBottom: '48px', overflow: 'visible' }}
-      aria-hidden="true"
-    >
-      <line className="draw-sep-line" x1="0" y1="0.5" x2="100%" y2="0.5"
-        stroke="rgba(212,137,42,0.18)" strokeWidth="1" />
-    </svg>
-  )
-}
-
-// ─── Ticker ───────────────────────────────────────────────────────────────────
-function Ticker() {
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS]
-  return (
-    <div className="ticker-section" aria-hidden="true">
-      <div className="ticker-track">
-        {items.map((item, i) => (
-          <span key={i} className="ticker-item">
-            <span className="ticker-sep" />
-            {item}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 // ─── LandingPage ──────────────────────────────────────────────────────────────
 export default function LandingPage() {
   const [count, setCount] = useState(0)
 
-  // Fetch real waitlist count
   useEffect(() => {
     fetch('/api/waitlist')
       .then(r => r.json())
@@ -182,56 +222,87 @@ export default function LandingPage() {
       .catch(() => {})
   }, [])
 
-  // GSAP orchestration
   useEffect(() => {
     let cleanup: (() => void) | null = null
-    let magneticCleanup: (() => void) | null = null
 
     import('@/lib/gsap/config').then(({ getGSAPFull }) =>
-      getGSAPFull().then(({ gsap, ScrollTrigger, SplitText, ScrambleTextPlugin, DrawSVGPlugin }) => {
+      getGSAPFull().then(({ gsap, ScrollTrigger, SplitText, ScrambleTextPlugin, DrawSVGPlugin, Observer }) => {
 
-        void ScrambleTextPlugin // registered in getGSAPFull
+        void ScrambleTextPlugin
         void DrawSVGPlugin
 
         const ctx = gsap.context(() => {
 
-          // ── Hero entrance timeline ────────────────────────────────────────
-          const tl = gsap.timeline({ delay: 0.55 })
+          // ── 1. Scroll progress bar ────────────────────────────────────────
+          gsap.to('.scroll-progress-fill', {
+            height: '100%',
+            ease: 'none',
+            scrollTrigger: { start: 'top top', end: 'bottom bottom', scrub: 0.15 },
+          })
+
+          // ── 2. Velocity-based page skew (Observer) ────────────────────────
+          let lastVelocity = 0
+          Observer.create({
+            type: 'scroll',
+            onChangeY(self) {
+              const v = self.velocityY ?? 0
+              lastVelocity = v
+              gsap.to('.landing-inner', {
+                skewY: v * 0.0006,
+                ease: 'power4.out',
+                duration: 0.6,
+                overwrite: 'auto',
+              })
+            },
+            onStop() {
+              gsap.to('.landing-inner', {
+                skewY: 0,
+                ease: 'elastic.out(1, 0.6)',
+                duration: 1.2,
+                overwrite: 'auto',
+              })
+              lastVelocity = 0
+            },
+          })
+          void lastVelocity
+
+          // ── 3. Hero entrance timeline ─────────────────────────────────────
+          const tl = gsap.timeline({ delay: 0.5 })
 
           tl.fromTo('.lp-nav-inner',
             { opacity: 0, y: -14 },
             { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }
           )
 
-          // SplitText per headline line — alternating stagger direction
-          const lines = document.querySelectorAll<HTMLElement>('.hero-h1-line')
-          lines.forEach((line, idx) => {
+          // SplitText per headline line — alternating direction
+          const heroLines = document.querySelectorAll<HTMLElement>('.hero-h1-line')
+          heroLines.forEach((line, idx) => {
             const split = new SplitText(line, { type: 'chars' })
             tl.fromTo(split.chars,
-              { opacity: 0, y: idx % 2 === 0 ? -70 : 70, skewX: idx % 2 === 0 ? -10 : 10 },
+              { opacity: 0, y: idx % 2 === 0 ? -80 : 80, skewX: idx % 2 === 0 ? -12 : 12 },
               {
                 opacity: 1, y: 0, skewX: 0,
-                duration: 0.8, ease: 'expo.out',
-                stagger: { amount: 0.25, from: idx % 2 === 0 ? 'start' : 'end' },
+                duration: 0.85, ease: 'expo.out',
+                stagger: { amount: 0.28, from: idx % 2 === 0 ? 'start' : 'end' },
               },
-              idx === 0 ? undefined : '-=0.55'
+              idx === 0 ? undefined : '-=0.6'
             )
           })
 
           tl.fromTo('.hero-sub',
-            { opacity: 0, y: 24 },
+            { opacity: 0, y: 28 },
+            { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' },
+            '-=0.45'
+          )
+          tl.fromTo('.hero-form-section',
+            { opacity: 0, y: 28 },
             { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' },
             '-=0.4'
           )
-          tl.fromTo('.hero-form-section',
-            { opacity: 0, y: 24 },
-            { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' },
-            '-=0.35'
-          )
 
-          // ── Hero background text parallax ─────────────────────────────────
+          // ── 4. Hero bg text parallax ──────────────────────────────────────
           gsap.to('.hero-bg-text', {
-            y: '-22%',
+            y: '-24%',
             ease: 'none',
             scrollTrigger: {
               trigger: '.hero-section',
@@ -241,122 +312,126 @@ export default function LandingPage() {
             },
           })
 
-          // ── ScrambleText on section labels ────────────────────────────────
+          // ── 5. ScrambleText — section labels (one-time on enter) ──────────
           gsap.utils.toArray<HTMLElement>('.section-label').forEach((el) => {
-            const original = el.getAttribute('data-label') ?? el.textContent ?? ''
+            const original = el.textContent ?? ''
             el.setAttribute('data-label', original)
             ScrollTrigger.create({
               trigger: el,
-              start: 'top 92%',
+              start: 'top 93%',
               once: true,
               onEnter: () => {
                 gsap.to(el, {
                   duration: 1.0,
-                  scrambleText: { text: original, chars: '#@!%$&', revealDelay: 0.25, speed: 0.85 },
+                  scrambleText: { text: original, chars: '#@!%$&', revealDelay: 0.25, speed: 0.9 },
                 })
               },
             })
           })
 
-          // ── DrawSVG on separator lines ─────────────────────────────────────
+          // ── 6. DrawSVG — bidirectional ────────────────────────────────────
           gsap.utils.toArray<SVGLineElement>('.draw-sep-line').forEach((line) => {
             gsap.fromTo(line,
               { drawSVG: '0%' },
               {
                 drawSVG: '100%', duration: 1.4, ease: 'power2.inOut',
-                scrollTrigger: { trigger: line, start: 'top 90%', once: true },
+                scrollTrigger: {
+                  trigger: line,
+                  start: 'top 90%',
+                  toggleActions: 'play none none reverse',
+                },
               }
             )
           })
 
-          // ── Problem rows — enter from left ────────────────────────────────
+          // ── 7. Problem rows — 3D entrance, bidirectional ──────────────────
           gsap.utils.toArray<HTMLElement>('.problem-item').forEach((el, i) => {
             gsap.fromTo(el,
-              { opacity: 0, x: -48 },
+              { opacity: 0, x: -56, rotateX: 8, transformPerspective: 900, transformOrigin: 'left center' },
               {
-                opacity: 1, x: 0, duration: 0.55, ease: 'power3.out',
-                delay: i * 0.09,
-                scrollTrigger: { trigger: el, start: 'top 92%', once: true },
+                opacity: 1, x: 0, rotateX: 0,
+                duration: 0.6, ease: 'power3.out',
+                delay: i * 0.08,
+                scrollTrigger: {
+                  trigger: el,
+                  start: 'top 90%',
+                  toggleActions: 'play none none reverse',
+                },
               }
             )
           })
 
-          // ── Feature items — clipPath wipe from left ───────────────────────
+          // ── 8. Feature items — clipPath wipe, bidirectional ───────────────
           gsap.utils.toArray<HTMLElement>('.feature-item').forEach((el) => {
             gsap.fromTo(el,
               { clipPath: 'inset(0 100% 0 0)', opacity: 1 },
               {
-                clipPath: 'inset(0 0% 0 0)', duration: 0.85, ease: 'power3.inOut',
-                scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+                clipPath: 'inset(0 0% 0 0)',
+                duration: 0.9, ease: 'power3.inOut',
+                scrollTrigger: {
+                  trigger: el,
+                  start: 'top 87%',
+                  toggleActions: 'play none none reverse',
+                },
               }
             )
           })
 
-          // ── Status board rows ──────────────────────────────────────────────
+          // ── 9. Status board rows, bidirectional ───────────────────────────
           gsap.fromTo('.status-row',
-            { opacity: 0, x: -20 },
+            { opacity: 0, x: -22 },
             {
-              opacity: 1, x: 0, duration: 0.4, ease: 'power2.out', stagger: 0.08,
-              scrollTrigger: { trigger: '.status-board', start: 'top 85%', once: true },
+              opacity: 1, x: 0,
+              duration: 0.45, ease: 'power2.out', stagger: 0.08,
+              scrollTrigger: {
+                trigger: '.status-board',
+                start: 'top 84%',
+                toggleActions: 'play none none reverse',
+              },
             }
           )
 
-          // ── FAQ rows ───────────────────────────────────────────────────────
-          gsap.utils.toArray<HTMLElement>('.faq-row').forEach((el) => {
+          // ── 10. FAQ rows, bidirectional ───────────────────────────────────
+          gsap.utils.toArray<HTMLElement>('.faq-row').forEach((el, i) => {
             gsap.fromTo(el,
-              { opacity: 0, y: 14 },
+              { opacity: 0, x: i % 2 === 0 ? -20 : 20 },
               {
-                opacity: 1, y: 0, duration: 0.4, ease: 'power2.out',
-                scrollTrigger: { trigger: el, start: 'top 94%', once: true },
+                opacity: 1, x: 0,
+                duration: 0.4, ease: 'power2.out',
+                scrollTrigger: {
+                  trigger: el,
+                  start: 'top 93%',
+                  toggleActions: 'play none none reverse',
+                },
               }
             )
           })
 
-          // ── CTA section heading SplitText ─────────────────────────────────
+          // ── 11. CTA headline SplitText, bidirectional ─────────────────────
           const ctaLines = document.querySelectorAll<HTMLElement>('.cta-h2-line')
           ctaLines.forEach((line, idx) => {
             const split = new SplitText(line, { type: 'chars' })
             gsap.fromTo(split.chars,
-              { opacity: 0, y: 60 },
+              { opacity: 0, y: 70, skewX: idx % 2 === 0 ? 8 : -8 },
               {
-                opacity: 1, y: 0, duration: 0.75, ease: 'expo.out',
-                stagger: { amount: 0.2, from: idx % 2 === 0 ? 'start' : 'end' },
+                opacity: 1, y: 0, skewX: 0,
+                duration: 0.8, ease: 'expo.out',
+                stagger: { amount: 0.22, from: idx % 2 === 0 ? 'start' : 'end' },
                 delay: idx * 0.1,
-                scrollTrigger: { trigger: '.cta-section', start: 'top 80%', once: true },
+                scrollTrigger: {
+                  trigger: '.cta-section',
+                  start: 'top 82%',
+                  toggleActions: 'play none none reverse',
+                },
               }
             )
           })
 
         }) // end gsap.context
 
-        // ── Magnetic CTA button (outside context for cleanup) ─────────────
-        const ctaBtn = document.querySelector<HTMLElement>('.magnetic-cta')
-        if (ctaBtn) {
-          let inRange = false
-          const onMouse = (e: MouseEvent) => {
-            const r  = ctaBtn.getBoundingClientRect()
-            const cx = r.left + r.width / 2
-            const cy = r.top  + r.height / 2
-            const dx = e.clientX - cx
-            const dy = e.clientY - cy
-            const dist = Math.sqrt(dx * dx + dy * dy)
-            if (dist < 130) {
-              inRange = true
-              const pull = 0.38 * (1 - dist / 130)
-              gsap.to(ctaBtn, { x: dx * pull, y: dy * pull, duration: 0.25, ease: 'power2.out' })
-            } else if (inRange) {
-              inRange = false
-              gsap.to(ctaBtn, { x: 0, y: 0, duration: 0.65, ease: 'elastic.out(1.1, 0.4)' })
-            }
-          }
-          window.addEventListener('mousemove', onMouse)
-          magneticCleanup = () => window.removeEventListener('mousemove', onMouse)
-        }
-
         cleanup = () => {
           ctx.revert()
           ScrollTrigger.getAll().forEach(t => t.kill())
-          magneticCleanup?.()
         }
       })
     )
@@ -366,7 +441,8 @@ export default function LandingPage() {
 
   return (
     <div className="landing-root">
-      <MagneticCursor />
+      <CrosshairCursor />
+      <ScrollProgress />
       <div className="scanline-sweep" aria-hidden="true" />
 
       {/* ── Nav ────────────────────────────────────────────────────────────── */}
@@ -388,189 +464,146 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      <main id="main-content" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="landing-inner">
+        <main id="main-content" style={{ position: 'relative', zIndex: 1 }}>
 
-        {/* ── Hero ─────────────────────────────────────────────────────────── */}
-        <section className="hero-section lp-section">
-          <div className="hero-bg-text" aria-hidden="true">BOOST</div>
-          <div className="lp-container hero-content">
-
-            <h1 className="hero-h1">
-              <span className="hero-h1-line">ENTRENA MÁS.</span>
-              <span className="hero-h1-line hero-h1-line--amber">GESTIONA MENOS.</span>
-            </h1>
-
-            <div className="hero-bottom-grid">
-              <p className="hero-sub" style={{ opacity: 0 }}>
-                Construimos TrainerBoost porque los entrenadores personales en España
-                merecen una herramienta hecha para ellos.
-                <br /><br />
-                <strong>Sin comisiones ocultas. Sin inglés. Sin onboarding de tres horas.</strong>
-              </p>
-              <div className="hero-form-section" style={{ opacity: 0 }}>
-                <WaitlistForm onSuccess={(t) => setCount(t)} />
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        {/* ── Ticker ───────────────────────────────────────────────────────── */}
-        <Ticker />
-
-        {/* ── Problem ──────────────────────────────────────────────────────── */}
-        <section className="lp-section">
-          <div className="lp-container">
-            <DrawSep />
-            <span className="section-label">EL PROBLEMA</span>
-            <div className="problem-list">
-              {PROBLEMS.map(({ tool, text }) => (
-                <div key={tool} className="problem-item">
-                  <span className="problem-tool">{tool}</span>
-                  <span className="problem-text">{text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Features ─────────────────────────────────────────────────────── */}
-        <section className="lp-section">
-          <div className="lp-container">
-            <DrawSep />
-            <span className="section-label">LO QUE CONSTRUIMOS</span>
-            <div className="feature-list">
-              {FEATURES.map(({ statement, detail }, i) => (
-                <div key={i} className="feature-item">
-                  <div>
-                    <div className="feature-index">0{i + 1}</div>
-                    <p className="feature-statement">{statement}</p>
-                  </div>
-                  <p className="feature-detail">{detail}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Status board ─────────────────────────────────────────────────── */}
-        <section className="lp-section">
-          <div className="lp-container">
-            <DrawSep />
-            <span className="section-label">ESTADO DEL PROYECTO</span>
-            <div className="status-board" style={{ maxWidth: '600px' }}>
-              <div className="status-board-header">
-                <span className="status-board-title">TRAINERBOOST — MISSION BRIEF</span>
-                <span className="status-live-dot" aria-hidden="true" />
-              </div>
-              {STATUS_ROWS.map(({ k, v, amber }) => (
-                <div key={k} className="status-row">
-                  <span className="status-key">{k}</span>
-                  <span className={`status-val${amber ? ' status-val--amber' : ''}`}>{v}</span>
-                </div>
-              ))}
-            </div>
-            {count > 0 && (
-              <p style={{
-                fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.1em',
-                color: 'var(--smoke)', marginTop: '20px', textTransform: 'uppercase',
-              }}>
-                {count} entrenadores en la lista de espera
-              </p>
-            )}
-          </div>
-        </section>
-
-        {/* ── FAQ ──────────────────────────────────────────────────────────── */}
-        <section className="lp-section">
-          <div className="lp-container">
-            <DrawSep />
-            <div className="faq-grid">
-              <div>
-                <span className="section-label">PREGUNTAS</span>
-                <h2 className="faq-heading">
-                  ANTES DE<br />APUNTARTE
-                </h2>
-              </div>
-              <div>
-                {FAQS.map(faq => <FaqItem key={faq.q} {...faq} />)}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Final CTA ────────────────────────────────────────────────────── */}
-        <section className="cta-section lp-section">
-          <div className="lp-container">
-            <DrawSep />
-            <h2 className="cta-h2">
-              <span className="cta-h2-line">APÚNTATE</span>
-              <span className="cta-h2-line cta-h2-line--amber">AHORA.</span>
-            </h2>
-
-            <div className="cta-grid">
-              <div>
-                <a href="#main-content" className="magnetic-cta" onClick={(e) => {
-                  e.preventDefault()
-                  document.querySelector('.waitlist-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                }}>
-                  <span>QUIERO ACCESO</span>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </a>
-                <p style={{
-                  fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.1em',
-                  color: 'var(--smoke)', marginTop: '14px', textTransform: 'uppercase',
-                }}>
-                  Sin tarjeta · Sin compromiso · Solo tu email
+          {/* ── Hero ─────────────────────────────────────────────────────── */}
+          <section className="hero-section lp-section">
+            <div className="hero-bg-text" aria-hidden="true">BOOST</div>
+            <div className="lp-container hero-content">
+              <h1 className="hero-h1">
+                <span className="hero-h1-line">ENTRENA MÁS.</span>
+                <span className="hero-h1-line hero-h1-line--amber">GESTIONA MENOS.</span>
+              </h1>
+              <div className="hero-bottom-grid">
+                <p className="hero-sub" style={{ opacity: 0 }}>
+                  Construimos TrainerBoost porque los entrenadores personales
+                  en España merecen una herramienta hecha para ellos.
+                  <br /><br />
+                  <strong>Sin comisiones ocultas. Sin inglés. Sin onboarding de tres horas.</strong>
                 </p>
+                <div className="hero-form-section" style={{ opacity: 0 }}>
+                  <WaitlistForm onSuccess={(t) => setCount(t)} />
+                </div>
               </div>
+            </div>
+          </section>
 
-              <div className="cta-perks">
-                {[
-                  '40% descuento vitalicio en precio fundador',
-                  'Acceso semanas antes del lanzamiento público',
-                  'Canal directo con el equipo de producto',
-                ].map((perk) => (
-                  <div key={perk} style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-                    <span style={{ color: 'var(--amber)', fontFamily: 'var(--font-mono)', fontSize: '11px', flexShrink: 0 }}>→</span>
-                    <span style={{ fontSize: '13px', color: 'var(--ivory-dim)', lineHeight: 1.6 }}>{perk}</span>
+          {/* ── Ticker ───────────────────────────────────────────────────── */}
+          <Ticker />
+
+          {/* ── Problem ──────────────────────────────────────────────────── */}
+          <section className="lp-section">
+            <div className="lp-container">
+              <DrawSep />
+              <span className="section-label">EL PROBLEMA</span>
+              <div className="problem-list">
+                {PROBLEMS.map(({ tool, text }) => (
+                  <div key={tool} className="problem-item">
+                    <span className="problem-tool">{tool}</span>
+                    <span className="problem-text">{text}</span>
                   </div>
                 ))}
               </div>
             </div>
+          </section>
 
+          {/* ── Features ─────────────────────────────────────────────────── */}
+          <section className="lp-section">
+            <div className="lp-container">
+              <DrawSep />
+              <span className="section-label">LO QUE CONSTRUIMOS</span>
+              <div className="feature-list">
+                {FEATURES.map(({ statement, detail }, i) => (
+                  <div key={i} className="feature-item">
+                    <div>
+                      <div className="feature-index">0{i + 1}</div>
+                      <p className="feature-statement">{statement}</p>
+                    </div>
+                    <p className="feature-detail">{detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ── Status board ─────────────────────────────────────────────── */}
+          <section className="lp-section">
+            <div className="lp-container">
+              <DrawSep />
+              <span className="section-label">ESTADO DEL PROYECTO</span>
+              <div className="status-board" style={{ maxWidth: '600px' }}>
+                <div className="status-board-header">
+                  <span className="status-board-title">TRAINERBOOST — MISSION BRIEF</span>
+                  <span className="status-live-dot" aria-hidden="true" />
+                </div>
+                {STATUS_ROWS.map(({ k, v, amber }) => (
+                  <div key={k} className="status-row">
+                    <span className="status-key">{k}</span>
+                    <span className={`status-val${amber ? ' status-val--amber' : ''}`}>{v}</span>
+                  </div>
+                ))}
+              </div>
+              {count > 0 && (
+                <p style={{
+                  fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.1em',
+                  color: 'var(--smoke)', marginTop: '20px', textTransform: 'uppercase',
+                }}>
+                  {count} entrenadores en la lista de espera
+                </p>
+              )}
+            </div>
+          </section>
+
+          {/* ── FAQ ──────────────────────────────────────────────────────── */}
+          <section className="lp-section">
+            <div className="lp-container">
+              <DrawSep />
+              <div className="faq-grid">
+                <div>
+                  <span className="section-label">PREGUNTAS</span>
+                  <h2 className="faq-heading">ANTES DE<br />APUNTARTE</h2>
+                </div>
+                <div>
+                  {FAQS.map(faq => <FaqItem key={faq.q} {...faq} />)}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ── CTA final ────────────────────────────────────────────────── */}
+          <section className="cta-section lp-section">
+            <div className="lp-container">
+              <DrawSep />
+              <h2 className="cta-h2">
+                <span className="cta-h2-line">APÚNTATE</span>
+                <span className="cta-h2-line cta-h2-line--amber">AHORA.</span>
+              </h2>
+              <div className="cta-form-wrap">
+                <WaitlistForm onSuccess={(t) => setCount(t)} />
+              </div>
+            </div>
+          </section>
+
+        </main>
+
+        {/* ── Footer ───────────────────────────────────────────────────────── */}
+        <footer className="lp-footer">
+          <div className="lp-container lp-footer-inner">
+            <LogoFull height={18} animated={false} />
+            <div className="lp-footer-links">
+              <Link href="/privacy" className="lp-footer-link">Privacidad</Link>
+              <Link href="/terms" className="lp-footer-link">Términos</Link>
+            </div>
+            <p style={{
+              fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.12em',
+              color: 'var(--ash)', margin: 0, textTransform: 'uppercase',
+            }}>
+              © 2026 TrainerBoost · España
+            </p>
           </div>
-        </section>
-
-      </main>
-
-      {/* ── Footer ───────────────────────────────────────────────────────────── */}
-      <footer className="lp-footer">
-        <div className="lp-container lp-footer-inner">
-          <LogoFull height={20} animated={false} />
-          <nav style={{ display: 'flex', flexWrap: 'wrap', gap: '0 28px', justifyContent: 'center' }} aria-label="Footer">
-            {([
-              ['/pricing',      'Precios'],
-              ['/demo/trainer', 'Demo'],
-              ['/login',        'Acceso'],
-              ['/privacy',      'Privacidad'],
-              ['/terms',        'Términos'],
-            ] as [string, string][]).map(([href, label]) => (
-              <Link key={href} href={href} className="lp-nav-link" style={{ fontSize: '10px' }}>
-                {label}
-              </Link>
-            ))}
-          </nav>
-          <p style={{
-            fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.14em',
-            color: 'var(--ash)', margin: 0, textTransform: 'uppercase',
-          }}>
-            © 2026 TrainerBoost · España
-          </p>
-        </div>
-      </footer>
+        </footer>
+      </div>
 
       <RGPDConsent />
     </div>

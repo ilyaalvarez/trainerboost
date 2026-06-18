@@ -226,10 +226,12 @@ export default function LandingPage() {
     let cleanup: (() => void) | null = null
 
     import('@/lib/gsap/config').then(({ getGSAPFull }) =>
-      getGSAPFull().then(({ gsap, ScrollTrigger, SplitText, ScrambleTextPlugin, DrawSVGPlugin, Observer }) => {
+      getGSAPFull().then(({ gsap, ScrollTrigger, SplitText, ScrambleTextPlugin, DrawSVGPlugin }) => {
 
         void ScrambleTextPlugin
         void DrawSVGPlugin
+
+        let heroMoveCleanup: (() => void) | null = null
 
         const ctx = gsap.context(() => {
 
@@ -240,69 +242,29 @@ export default function LandingPage() {
             scrollTrigger: { start: 'top top', end: 'bottom bottom', scrub: 0.15 },
           })
 
-          // ── 2. Velocity-based page skew (Observer) ────────────────────────
-          let lastVelocity = 0
-          Observer.create({
-            type: 'scroll',
-            onChangeY(self) {
-              const v = self.velocityY ?? 0
-              lastVelocity = v
-              gsap.to('.landing-inner', {
-                skewY: v * 0.0006,
-                ease: 'power4.out',
-                duration: 0.6,
-                overwrite: 'auto',
-              })
-            },
-            onStop() {
-              gsap.to('.landing-inner', {
-                skewY: 0,
-                ease: 'elastic.out(1, 0.6)',
-                duration: 1.2,
-                overwrite: 'auto',
-              })
-              lastVelocity = 0
-            },
-          })
-          void lastVelocity
+          // ── 2. Hero mouse parallax (depth layers) ─────────────────────────
+          const heroEl = document.querySelector<HTMLElement>('.hero-section')
+          if (heroEl) {
+            const bgX = gsap.quickTo('.hero-bg-text', 'x', { duration: 1.1, ease: 'power2.out' })
+            const bgY = gsap.quickTo('.hero-bg-text', 'y', { duration: 1.1, ease: 'power2.out' })
+            const h1X = gsap.quickTo('.hero-h1',      'x', { duration: 0.65, ease: 'power2.out' })
+            const h1Y = gsap.quickTo('.hero-h1',      'y', { duration: 0.65, ease: 'power2.out' })
+            const onMove = (e: MouseEvent) => {
+              const { width, height } = heroEl.getBoundingClientRect()
+              const xPct = e.clientX / width - 0.5
+              const yPct = e.clientY / height - 0.5
+              bgX(xPct * -90)   // ghost moves opposite = depth illusion
+              bgY(yPct * -35)
+              h1X(xPct * 14)    // headline follows mouse subtly
+              h1Y(yPct * 7)
+            }
+            heroEl.addEventListener('mousemove', onMove)
+            heroMoveCleanup = () => heroEl.removeEventListener('mousemove', onMove)
+          }
 
-          // ── 3. Hero entrance timeline ─────────────────────────────────────
-          const tl = gsap.timeline({ delay: 0.5 })
-
-          tl.fromTo('.lp-nav-inner',
-            { opacity: 0, y: -14 },
-            { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }
-          )
-
-          // SplitText per headline line — alternating direction
-          const heroLines = document.querySelectorAll<HTMLElement>('.hero-h1-line')
-          heroLines.forEach((line, idx) => {
-            const split = new SplitText(line, { type: 'chars' })
-            tl.fromTo(split.chars,
-              { opacity: 0, y: idx % 2 === 0 ? -80 : 80, skewX: idx % 2 === 0 ? -12 : 12 },
-              {
-                opacity: 1, y: 0, skewX: 0,
-                duration: 0.85, ease: 'expo.out',
-                stagger: { amount: 0.28, from: idx % 2 === 0 ? 'start' : 'end' },
-              },
-              idx === 0 ? undefined : '-=0.6'
-            )
-          })
-
-          tl.fromTo('.hero-sub',
-            { opacity: 0, y: 28 },
-            { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' },
-            '-=0.45'
-          )
-          tl.fromTo('.hero-form-section',
-            { opacity: 0, y: 28 },
-            { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' },
-            '-=0.4'
-          )
-
-          // ── 4. Hero bg text parallax ──────────────────────────────────────
+          // ── 3. Hero scroll parallax (BOOST ghost) ─────────────────────────
           gsap.to('.hero-bg-text', {
-            y: '-24%',
+            y: '-28%',
             ease: 'none',
             scrollTrigger: {
               trigger: '.hero-section',
@@ -312,18 +274,59 @@ export default function LandingPage() {
             },
           })
 
-          // ── 5. ScrambleText — section labels (one-time on enter) ──────────
+          // ── 4. Hero entrance — 3D word flip ───────────────────────────────
+          const tl = gsap.timeline({ delay: 0.4 })
+
+          tl.fromTo('.lp-nav-inner',
+            { opacity: 0, y: -14 },
+            { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }
+          )
+
+          // Line 1: words flip in from top (rotateX -90→0)
+          // Line 2: words flip in from bottom (rotateX 90→0)
+          const heroLines = document.querySelectorAll<HTMLElement>('.hero-h1-line')
+          heroLines.forEach((line, idx) => {
+            const split = new SplitText(line, { type: 'words' })
+            const fromBottom = idx === 1
+            tl.fromTo(split.words,
+              {
+                opacity: 0,
+                rotateX: fromBottom ? 90 : -90,
+                y: fromBottom ? -24 : 24,
+                transformPerspective: 1000,
+                transformOrigin: fromBottom ? 'bottom center' : 'top center',
+              },
+              {
+                opacity: 1, rotateX: 0, y: 0,
+                duration: 0.72, ease: 'expo.out',
+                stagger: { amount: 0.18, from: fromBottom ? 'end' : 'start' },
+              },
+              idx === 0 ? undefined : '-=0.55'
+            )
+          })
+
+          tl.fromTo('.hero-sub',
+            { opacity: 0, y: 26 },
+            { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' },
+            '-=0.4'
+          )
+          tl.fromTo('.hero-form-section',
+            { opacity: 0, y: 26 },
+            { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' },
+            '-=0.35'
+          )
+
+          // ── 5. ScrambleText — section labels (one-time) ───────────────────
           gsap.utils.toArray<HTMLElement>('.section-label').forEach((el) => {
             const original = el.textContent ?? ''
-            el.setAttribute('data-label', original)
             ScrollTrigger.create({
               trigger: el,
               start: 'top 93%',
               once: true,
               onEnter: () => {
                 gsap.to(el, {
-                  duration: 1.0,
-                  scrambleText: { text: original, chars: '#@!%$&', revealDelay: 0.25, speed: 0.9 },
+                  duration: 0.9,
+                  scrambleText: { text: original, chars: '01#@!', revealDelay: 0.2, speed: 1.0 },
                 })
               },
             })
@@ -344,14 +347,14 @@ export default function LandingPage() {
             )
           })
 
-          // ── 7. Problem rows — 3D entrance, bidirectional ──────────────────
+          // ── 7. Problem rows — rotateY perspective, bidirectional ──────────
           gsap.utils.toArray<HTMLElement>('.problem-item').forEach((el, i) => {
             gsap.fromTo(el,
-              { opacity: 0, x: -56, rotateX: 8, transformPerspective: 900, transformOrigin: 'left center' },
+              { opacity: 0, x: -64, rotateY: -8, transformPerspective: 1100, transformOrigin: 'right center' },
               {
-                opacity: 1, x: 0, rotateX: 0,
-                duration: 0.6, ease: 'power3.out',
-                delay: i * 0.08,
+                opacity: 1, x: 0, rotateY: 0,
+                duration: 0.65, ease: 'expo.out',
+                delay: i * 0.09,
                 scrollTrigger: {
                   trigger: el,
                   start: 'top 90%',
@@ -361,28 +364,44 @@ export default function LandingPage() {
             )
           })
 
-          // ── 8. Feature items — clipPath wipe, bidirectional ───────────────
-          gsap.utils.toArray<HTMLElement>('.feature-item').forEach((el) => {
+          // ── 8. Feature items — clip from TOP (zone scan reveal) ───────────
+          gsap.utils.toArray<HTMLElement>('.feature-item').forEach((el, i) => {
             gsap.fromTo(el,
-              { clipPath: 'inset(0 100% 0 0)', opacity: 1 },
+              { clipPath: 'inset(0 0 100% 0)', opacity: 1 },
               {
-                clipPath: 'inset(0 0% 0 0)',
-                duration: 0.9, ease: 'power3.inOut',
+                clipPath: 'inset(0 0 0% 0)',
+                duration: 0.85, ease: 'expo.inOut',
+                delay: i * 0.06,
                 scrollTrigger: {
                   trigger: el,
-                  start: 'top 87%',
+                  start: 'top 88%',
                   toggleActions: 'play none none reverse',
                 },
               }
             )
           })
 
-          // ── 9. Status board rows, bidirectional ───────────────────────────
+          // ── 9. Power bars — fill left to right ───────────────────────────
+          gsap.utils.toArray<HTMLElement>('.feature-power-fill').forEach((bar) => {
+            gsap.fromTo(bar,
+              { width: '0%' },
+              {
+                width: '100%', duration: 1.3, ease: 'power2.out',
+                scrollTrigger: {
+                  trigger: bar,
+                  start: 'top 92%',
+                  toggleActions: 'play none none reverse',
+                },
+              }
+            )
+          })
+
+          // ── 10. Status board rows, bidirectional ──────────────────────────
           gsap.fromTo('.status-row',
-            { opacity: 0, x: -22 },
+            { opacity: 0, x: -24 },
             {
               opacity: 1, x: 0,
-              duration: 0.45, ease: 'power2.out', stagger: 0.08,
+              duration: 0.42, ease: 'power2.out', stagger: 0.075,
               scrollTrigger: {
                 trigger: '.status-board',
                 start: 'top 84%',
@@ -391,13 +410,13 @@ export default function LandingPage() {
             }
           )
 
-          // ── 10. FAQ rows, bidirectional ───────────────────────────────────
+          // ── 11. FAQ rows, bidirectional ───────────────────────────────────
           gsap.utils.toArray<HTMLElement>('.faq-row').forEach((el, i) => {
             gsap.fromTo(el,
-              { opacity: 0, x: i % 2 === 0 ? -20 : 20 },
+              { opacity: 0, x: i % 2 === 0 ? -18 : 18 },
               {
                 opacity: 1, x: 0,
-                duration: 0.4, ease: 'power2.out',
+                duration: 0.38, ease: 'power2.out',
                 scrollTrigger: {
                   trigger: el,
                   start: 'top 93%',
@@ -407,17 +426,24 @@ export default function LandingPage() {
             )
           })
 
-          // ── 11. CTA headline SplitText, bidirectional ─────────────────────
+          // ── 12. CTA headline — 3D word flip, bidirectional ────────────────
           const ctaLines = document.querySelectorAll<HTMLElement>('.cta-h2-line')
           ctaLines.forEach((line, idx) => {
-            const split = new SplitText(line, { type: 'chars' })
-            gsap.fromTo(split.chars,
-              { opacity: 0, y: 70, skewX: idx % 2 === 0 ? 8 : -8 },
+            const split = new SplitText(line, { type: 'words' })
+            const fromBottom = idx === 1
+            gsap.fromTo(split.words,
               {
-                opacity: 1, y: 0, skewX: 0,
-                duration: 0.8, ease: 'expo.out',
-                stagger: { amount: 0.22, from: idx % 2 === 0 ? 'start' : 'end' },
-                delay: idx * 0.1,
+                opacity: 0,
+                rotateX: fromBottom ? 90 : -90,
+                y: fromBottom ? -20 : 20,
+                transformPerspective: 1000,
+                transformOrigin: fromBottom ? 'bottom center' : 'top center',
+              },
+              {
+                opacity: 1, rotateX: 0, y: 0,
+                duration: 0.72, ease: 'expo.out',
+                stagger: { amount: 0.16, from: fromBottom ? 'end' : 'start' },
+                delay: idx * 0.08,
                 scrollTrigger: {
                   trigger: '.cta-section',
                   start: 'top 82%',
@@ -432,6 +458,7 @@ export default function LandingPage() {
         cleanup = () => {
           ctx.revert()
           ScrollTrigger.getAll().forEach(t => t.kill())
+          heroMoveCleanup?.()
         }
       })
     )
@@ -496,6 +523,7 @@ export default function LandingPage() {
           <section className="lp-section">
             <div className="lp-container">
               <DrawSep />
+              <span className="level-badge">LVL.01</span>
               <span className="section-label">EL PROBLEMA</span>
               <div className="problem-list">
                 {PROBLEMS.map(({ tool, text }) => (
@@ -512,15 +540,19 @@ export default function LandingPage() {
           <section className="lp-section">
             <div className="lp-container">
               <DrawSep />
-              <span className="section-label">LO QUE CONSTRUIMOS</span>
+              <span className="level-badge">LVL.02</span>
+              <span className="section-label">EL ARSENAL</span>
               <div className="feature-list">
                 {FEATURES.map(({ statement, detail }, i) => (
-                  <div key={i} className="feature-item">
+                  <div key={i} className="feature-item hud-frame" style={{ padding: '32px 28px' }}>
                     <div>
                       <div className="feature-index">0{i + 1}</div>
                       <p className="feature-statement">{statement}</p>
                     </div>
                     <p className="feature-detail">{detail}</p>
+                    <div className="feature-power-bar" style={{ gridColumn: '1 / -1', marginTop: 0 }}>
+                      <div className="feature-power-fill" />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -531,10 +563,14 @@ export default function LandingPage() {
           <section className="lp-section">
             <div className="lp-container">
               <DrawSep />
-              <span className="section-label">ESTADO DEL PROYECTO</span>
+              <span className="level-badge">LVL.03</span>
+              <span className="section-label">MISSION BRIEF</span>
               <div className="status-board" style={{ maxWidth: '600px' }}>
                 <div className="status-board-header">
-                  <span className="status-board-title">TRAINERBOOST — MISSION BRIEF</span>
+                  <span className="status-board-title">
+                    TRAINERBOOST — SISTEMA ACTIVO
+                    <span className="blink-cursor" aria-hidden="true">_</span>
+                  </span>
                   <span className="status-live-dot" aria-hidden="true" />
                 </div>
                 {STATUS_ROWS.map(({ k, v, amber }) => (
@@ -561,8 +597,9 @@ export default function LandingPage() {
               <DrawSep />
               <div className="faq-grid">
                 <div>
+                  <span className="level-badge">LVL.04</span>
                   <span className="section-label">PREGUNTAS</span>
-                  <h2 className="faq-heading">ANTES DE<br />APUNTARTE</h2>
+                  <h2 className="faq-heading">ANTES DE<br />ENTRAR</h2>
                 </div>
                 <div>
                   {FAQS.map(faq => <FaqItem key={faq.q} {...faq} />)}
@@ -575,6 +612,7 @@ export default function LandingPage() {
           <section className="cta-section lp-section">
             <div className="lp-container">
               <DrawSep />
+              <span className="level-badge">SPAWN POINT</span>
               <h2 className="cta-h2">
                 <span className="cta-h2-line">APÚNTATE</span>
                 <span className="cta-h2-line cta-h2-line--amber">AHORA.</span>

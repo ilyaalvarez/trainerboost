@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   TRAINERBOOST LANDING v4 — THE FORGE
-   Bebas Neue × JetBrains Mono × Barlow Condensed
-   Crosshair cursor · Velocity skew · Bidirectional scroll
+   TRAINERBOOST LANDING v5 — SPAWN POINT
+   Anton × JetBrains Mono × Barlow Condensed
+   Crosshair cursor · Mouse parallax · HUD frames · Power bars
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─── Root tokens ──────────────────────────────────────────────────────────── */
@@ -47,9 +47,9 @@
   z-index: 0;
 }
 
-/* ─── Inner scroll wrapper (for velocity skew) ─────────────────────────────── */
+/* ─── Inner scroll wrapper ──────────────────────────────────────────────────── */
 .landing-inner {
-  will-change: transform;
+  position: relative;
 }
 
 /* ─── Scroll progress — left edge ──────────────────────────────────────────── */
@@ -193,11 +193,11 @@
   padding: 0 clamp(20px, 5vw, 60px);
 }
 
-/* ─── Section label (mono tag with line) ────────────────────────────────────── */
+/* ─── Section label (mono tag with game prefix) ─────────────────────────────── */
 .section-label {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-family: var(--font-mono), monospace;
   font-size: 10px;
   font-weight: 700;
@@ -208,11 +208,15 @@
 }
 
 .section-label::before {
-  content: '';
-  display: block;
-  width: 20px;
-  height: 1px;
-  background: var(--amber);
+  content: '//';
+  display: inline;
+  width: auto;
+  height: auto;
+  background: none;
+  color: rgba(212, 137, 42, 0.38);
+  font-size: 0.9em;
+  letter-spacing: 0;
+  font-weight: 700;
   flex-shrink: 0;
 }
 
@@ -240,17 +244,17 @@
   padding: clamp(100px, 14vw, 160px) 0 clamp(60px, 8vw, 100px);
 }
 
-/* Ghost "BOOST" behind hero — parallax target */
+/* Ghost "BOOST" behind hero — mouse parallax target */
 .hero-bg-text {
   position: absolute;
   top: 50%;
   left: -2%;
   transform: translateY(-50%);
-  font-family: var(--font-impact, 'Bebas Neue', sans-serif);
+  font-family: var(--font-impact, 'Anton', sans-serif);
   font-weight: 400;
   font-size: clamp(10rem, 28vw, 24rem);
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
   line-height: 0.85;
   color: var(--ivory);
   opacity: 0.025;
@@ -266,16 +270,17 @@
   z-index: 1;
 }
 
-/* ─── Hero headline — Bebas Neue ────────────────────────────────────────────── */
+/* ─── Hero headline — Anton ──────────────────────────────────────────────────── */
 .hero-h1 {
-  font-family: var(--font-impact, 'Bebas Neue', sans-serif);
-  font-size: clamp(5.5rem, 14.5vw, 12.5rem);
-  font-weight: 400; /* Bebas Neue is inherently heavy */
-  line-height: 0.9;
-  letter-spacing: 0.01em;
+  font-family: var(--font-impact, 'Anton', sans-serif);
+  font-size: clamp(5.5rem, 14.5vw, 13rem);
+  font-weight: 400; /* Anton is inherently ultra-bold at 400 */
+  line-height: 0.87;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--ivory);
   margin: 0;
+  will-change: transform;
 }
 
 .hero-h1-line {
@@ -588,12 +593,12 @@
 
 /* ─── CTA section ───────────────────────────────────────────────────────────── */
 .cta-h2 {
-  font-family: var(--font-impact, 'Bebas Neue', sans-serif);
-  font-size: clamp(4.5rem, 12vw, 10rem);
+  font-family: var(--font-impact, 'Anton', sans-serif);
+  font-size: clamp(4.5rem, 12vw, 11rem);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.01em;
-  line-height: 0.88;
+  letter-spacing: 0.02em;
+  line-height: 0.87;
   margin: 0 0 clamp(40px, 6vw, 64px);
 }
 
@@ -821,6 +826,72 @@
 .rgpd-btn--primary { background: var(--amber); color: #080810; }
 .rgpd-btn--primary:hover { background: var(--amber-bright); }
 
+/* ─── HUD frame — asymmetric corner brackets ────────────────────────────────── */
+.hud-frame {
+  position: relative;
+}
+
+.hud-frame::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 22px; height: 22px;
+  border-top: 1px solid rgba(212, 137, 42, 0.45);
+  border-left: 1px solid rgba(212, 137, 42, 0.45);
+  pointer-events: none;
+}
+
+.hud-frame::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 22px; height: 22px;
+  border-bottom: 1px solid rgba(212, 137, 42, 0.45);
+  border-right: 1px solid rgba(212, 137, 42, 0.45);
+  pointer-events: none;
+}
+
+/* ─── Level badge ───────────────────────────────────────────────────────────── */
+.level-badge {
+  display: block;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(212, 137, 42, 0.32);
+  margin-bottom: 4px;
+}
+
+/* ─── Power bar (XP/progress fill per feature) ──────────────────────────────── */
+.feature-power-bar {
+  height: 2px;
+  background: rgba(212, 137, 42, 0.1);
+  margin-top: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.feature-power-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--amber) 0%, var(--amber-bright) 100%);
+  transform-origin: left;
+}
+
+/* ─── Terminal cursor blink ─────────────────────────────────────────────────── */
+.blink-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--amber);
+  animation: blink-caret 1.1s step-end infinite;
+}
+
+@keyframes blink-caret {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 /* ─── Focus ring ────────────────────────────────────────────────────────────── */
 a:focus-visible, button:focus-visible {
   outline: 2px solid var(--amber);
@@ -834,7 +905,7 @@ a:focus-visible, button:focus-visible {
   .logo-orbit-outer, .logo-orbit-inner { animation: none; }
   .status-live-dot, .waitlist-count-dot { animation: none; }
   .ticker-track { animation: none; }
-  .problem-item, .status-row { opacity: 1; }
+  .problem-item, .status-row, .feature-item { opacity: 1; clip-path: none; }
   .landing-root, .landing-root * { cursor: auto !important; }
   .crosshair-cursor { display: none; }
 }

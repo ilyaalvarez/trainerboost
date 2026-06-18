@@ -165,14 +165,31 @@ const FEATURES = [
   },
 ]
 
-const STATUS_ROWS = [
-  { k: 'ESTADO',          v: 'BETA PRIVADA',    amber: true  },
-  { k: 'LANZAMIENTO',     v: 'Q3 2026',         amber: false },
-  { k: 'PRECIO FUNDADOR', v: '19€ / MES',       amber: true  },
-  { k: 'PLATAFORMA',      v: 'WEB + MÓVIL',     amber: false },
-  { k: 'SERVIDORES',      v: 'EU · RGPD',       amber: false },
-  { k: 'COMISIÓN COBROS', v: '0%',              amber: true  },
+// ─── Competitor comparison ────────────────────────────────────────────────────
+// Deliberately no competitor brand names — legal safety + cleaner messaging
+const COMP_COLS = ['APPS INTERNACIONALES', 'SOFTWARE DE CENTRO', 'GESTIÓN BÁSICA']
+
+type CV = boolean | string
+
+const COMP_ROWS: { label: string; tb: CV; c: [CV, CV, CV] }[] = [
+  { label: 'Idioma de la plataforma',     tb: 'ESPAÑOL',   c: ['INGLÉS',   'PARCIAL',  'INGLÉS']   },
+  { label: 'Para entrenadores individuales', tb: true,     c: [true,        false,      false]      },
+  { label: 'Portal web para tu cliente',  tb: true,        c: [false,       false,      false]      },
+  { label: 'Cobros e historial integrado',tb: true,        c: [false,       true,       false]      },
+  { label: 'Comisión en cobros',          tb: '0%',        c: ['2 – 5 %',  '3 – 8 %',  '—']        },
+  { label: 'RGPD · Servidores en Europa', tb: true,        c: [false,       false,      false]      },
+  { label: 'Soporte en español',          tb: true,        c: [false,       false,      false]      },
+  { label: 'Precio desde (mes)',          tb: '19 €',      c: ['80 €+',    '129 €+',   '30 €+']    },
+  { label: 'Configuración inicial',       tb: '< 1 HORA',  c: ['DÍAS',     'SEMANAS',  'HORAS']    },
 ]
+
+function CompCell({ val, isOwn }: { val: CV; isOwn: boolean }) {
+  if (val === true) return (
+    <span className={isOwn ? 'cval cval--yes' : 'cval cval--yes-dim'}>✓</span>
+  )
+  if (val === false) return <span className="cval cval--no">✗</span>
+  return <span className={isOwn ? 'cval cval--text cval--amber' : 'cval cval--text'}>{val}</span>
+}
 
 const FAQS = [
   {
@@ -347,39 +364,36 @@ export default function LandingPage() {
             )
           })
 
-          // ── 7. Problem rows — rotateY perspective, bidirectional ──────────
-          gsap.utils.toArray<HTMLElement>('.problem-item').forEach((el, i) => {
-            gsap.fromTo(el,
-              { opacity: 0, x: -64, rotateY: -8, transformPerspective: 1100, transformOrigin: 'right center' },
-              {
-                opacity: 1, x: 0, rotateY: 0,
-                duration: 0.65, ease: 'expo.out',
-                delay: i * 0.09,
-                scrollTrigger: {
-                  trigger: el,
-                  start: 'top 90%',
-                  toggleActions: 'play none none reverse',
-                },
-              }
-            )
-          })
+          // ── 7. Problem rows — batched rotateY, bidirectional ─────────────
+          // Batch = correct stagger reversal when scrolling up
+          gsap.fromTo('.problem-item',
+            { opacity: 0, x: -56, rotateY: -6, transformPerspective: 1100, transformOrigin: 'right center' },
+            {
+              opacity: 1, x: 0, rotateY: 0,
+              duration: 0.65, ease: 'expo.out',
+              stagger: { amount: 0.28, ease: 'power2.out' },
+              scrollTrigger: {
+                trigger: '.problem-list',
+                start: 'top 82%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          )
 
-          // ── 8. Feature items — clip from TOP (zone scan reveal) ───────────
-          gsap.utils.toArray<HTMLElement>('.feature-item').forEach((el, i) => {
-            gsap.fromTo(el,
-              { clipPath: 'inset(0 0 100% 0)', opacity: 1 },
-              {
-                clipPath: 'inset(0 0 0% 0)',
-                duration: 0.85, ease: 'expo.inOut',
-                delay: i * 0.06,
-                scrollTrigger: {
-                  trigger: el,
-                  start: 'top 88%',
-                  toggleActions: 'play none none reverse',
-                },
-              }
-            )
-          })
+          // ── 8. Feature items — clip from TOP batched, bidirectional ──────
+          gsap.fromTo('.feature-item',
+            { clipPath: 'inset(0 0 100% 0)', opacity: 1 },
+            {
+              clipPath: 'inset(0 0 0% 0)',
+              duration: 0.88, ease: 'expo.inOut',
+              stagger: { amount: 0.22, ease: 'power1.inOut' },
+              scrollTrigger: {
+                trigger: '.feature-list',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          )
 
           // ── 9. Power bars — fill left to right ───────────────────────────
           gsap.utils.toArray<HTMLElement>('.feature-power-fill').forEach((bar) => {
@@ -396,15 +410,34 @@ export default function LandingPage() {
             )
           })
 
-          // ── 10. Status board rows, bidirectional ──────────────────────────
-          gsap.fromTo('.status-row',
-            { opacity: 0, x: -24 },
+          // ── 10. Comparison — intro word flip + row stagger, bidirectional ─
+          const compIntro = document.querySelector<HTMLElement>('.comp-intro')
+          if (compIntro) {
+            const compWords = new SplitText(compIntro, { type: 'words' })
+            gsap.fromTo(compWords.words,
+              { opacity: 0, rotateX: -70, transformPerspective: 900, transformOrigin: 'top center', y: 18 },
+              {
+                opacity: 1, rotateX: 0, y: 0,
+                duration: 0.65, ease: 'expo.out',
+                stagger: { amount: 0.2, from: 'start' },
+                scrollTrigger: {
+                  trigger: compIntro,
+                  start: 'top 86%',
+                  toggleActions: 'play none none reverse',
+                },
+              }
+            )
+          }
+
+          gsap.fromTo('.comp-row',
+            { opacity: 0, x: -20 },
             {
               opacity: 1, x: 0,
-              duration: 0.42, ease: 'power2.out', stagger: 0.075,
+              duration: 0.38, ease: 'power2.out',
+              stagger: { amount: 0.4, ease: 'power1.out' },
               scrollTrigger: {
-                trigger: '.status-board',
-                start: 'top 84%',
+                trigger: '.comp-body',
+                start: 'top 80%',
                 toggleActions: 'play none none reverse',
               },
             }
@@ -559,33 +592,52 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* ── Status board ─────────────────────────────────────────────── */}
-          <section className="lp-section">
+          {/* ── Comparativa ──────────────────────────────────────────────── */}
+          <section className="lp-section comp-section">
             <div className="lp-container">
               <DrawSep />
               <span className="level-badge">LVL.03</span>
-              <span className="section-label">MISSION BRIEF</span>
-              <div className="status-board" style={{ maxWidth: '600px' }}>
-                <div className="status-board-header">
-                  <span className="status-board-title">
-                    TRAINERBOOST — SISTEMA ACTIVO
-                    <span className="blink-cursor" aria-hidden="true">_</span>
-                  </span>
-                  <span className="status-live-dot" aria-hidden="true" />
+              <span className="section-label">COMPARATIVA</span>
+
+              <h2 className="comp-intro">
+                LA DIFERENCIA<br />
+                <span style={{ color: 'var(--amber)' }}>ES CLARA.</span>
+              </h2>
+
+              <div className="comp-table-wrap">
+                {/* Header */}
+                <div className="comp-header-row">
+                  <div className="comp-hcell comp-hcell--label" />
+                  <div className="comp-hcell comp-hcell--own">TRAINERBOOST</div>
+                  {COMP_COLS.map(c => (
+                    <div key={c} className="comp-hcell comp-hcell--other">{c}</div>
+                  ))}
                 </div>
-                {STATUS_ROWS.map(({ k, v, amber }) => (
-                  <div key={k} className="status-row">
-                    <span className="status-key">{k}</span>
-                    <span className={`status-val${amber ? ' status-val--amber' : ''}`}>{v}</span>
-                  </div>
-                ))}
+
+                {/* Rows */}
+                <div className="comp-body">
+                  {COMP_ROWS.map(({ label, tb, c }) => (
+                    <div key={label} className="comp-row">
+                      <div className="comp-cell comp-cell--label">{label}</div>
+                      <div className="comp-cell comp-cell--own">
+                        <CompCell val={tb} isOwn />
+                      </div>
+                      {c.map((v, j) => (
+                        <div key={j} className="comp-cell comp-cell--other">
+                          <CompCell val={v} isOwn={false} />
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
               </div>
+
               {count > 0 && (
                 <p style={{
                   fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.1em',
-                  color: 'var(--smoke)', marginTop: '20px', textTransform: 'uppercase',
+                  color: 'var(--smoke)', marginTop: '32px', textTransform: 'uppercase',
                 }}>
-                  {count} entrenadores en la lista de espera
+                  {count} entrenadores ya en lista
                 </p>
               )}
             </div>

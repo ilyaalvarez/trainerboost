@@ -3,14 +3,108 @@
   "autoApprove": ["read", "list", "mcp__github__*", "mcp__vercel__*"],
   "enableAllProjectMcpServers": true,
   "hooks": {
-    "PostToolUse": "git -C \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" add --update 2>/dev/null; true"
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nimport os,sys,json,subprocess\nfrom datetime import datetime\np=os.environ.get('CLAUDE_PROJECT_DIR',os.getcwd())\nidx=os.path.join(p,'.claude','knowledge','index.md')\ntasks=os.path.join(p,'.claude','projects','trainerboost','tasks.md')\nif not os.path.exists(tasks):\n  tasks=os.path.join(p,'.claude','tasks.md')\nprint('━'*43)\nprint(f'⚡ KIRITO OS · {datetime.now().strftime(\"%a %d/%m · %H:%M\")}')\nprint('━'*43)\ntry:\n  with open(idx) as f:\n    lines=f.readlines()\n  for l in lines:\n    if 'Nivel:' in l: print('NIVEL    ',l.strip().replace('Nivel: ',''))\n    if 'XP actual:' in l: print('XP      ',l.strip().replace('XP actual: ',''))\nexcept:print('MEMORIA  inicializando...')\ntry:\n  r=subprocess.run(['git','log','-1','--pretty=format:%s (%cr)'],capture_output=True,text=True,cwd=p)\n  b=subprocess.run(['git','branch','--show-current'],capture_output=True,text=True,cwd=p)\n  ch=subprocess.run(['git','status','--porcelain'],capture_output=True,text=True,cwd=p)\n  branch=b.stdout.strip() or '?'\n  estado='limpio ✓' if not ch.stdout.strip() else f'{len(ch.stdout.strip().splitlines())} archivos'\n  print(f'PROYECTO  TrainerBoost · {branch} · {estado}')\n  print(f'COMMIT    {r.stdout.strip()}')\nexcept:print('PROYECTO  (sin git en este directorio)')\nprint('━'*43)\ntry:\n  with open(tasks) as f:\n    ts=[l.strip() for l in f if l.strip().startswith('- [ ]')][:2]\n  if ts:\n    print('FOCO →')\n    for t in ts:print(' ',t.replace('- [ ] ','→ '))\nexcept:pass\nprint('━'*43)\nsys.exit(0)\n\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"\nimport sys, json\ntry:\n    d = json.load(sys.stdin)\n    fp = d.get('tool_input', {}).get('file_path', '')\n    blocked = ['.env', '.env.local', '.env.production', '.env.staging', '.env.test']\n    import os\n    fname = os.path.basename(fp)\n    if fname in blocked or any(fp.endswith(b) for b in blocked):\n        print(f'BLOQUEADO: Acceso a archivo de entorno sensible: {fp}', file=sys.stderr)\n        print(f'   Razon: los secrets nunca se leen directamente', file=sys.stderr)\n        sys.exit(2)\nexcept Exception: pass\nsys.exit(0)\n\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"\nimport sys, json, re\ntry:\n    d = json.load(sys.stdin)\n    cmd = d.get('tool_input', {}).get('command', '')\n    dangerous = [\n        r'rm\\s+-rf\\s+/',\n        r'DROP\\s+TABLE',\n        r'DELETE\\s+FROM.+WHERE\\s+1=1',\n        r'truncate\\s+/',\n        r'format\\s+[A-Z]:',\n    ]\n    for pattern in dangerous:\n        if re.search(pattern, cmd, re.IGNORECASE):\n            print(f'BLOQUEADO: Comando potencialmente destructivo detectado', file=sys.stderr)\n            print(f'   Comando: {cmd[:100]}', file=sys.stderr)\n            sys.exit(2)\nexcept Exception: pass\nsys.exit(0)\n\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"\nimport sys, json, subprocess, os\ntry:\n    d = json.load(sys.stdin)\n    fp = d.get('tool_input', {}).get('file_path', '')\n    if fp.endswith(('.ts', '.tsx', '.js', '.jsx')):\n        proj = os.environ.get('CLAUDE_PROJECT_DIR', os.getcwd())\n        result = subprocess.run(\n            ['npx', '--yes', 'eslint', fp,\n             '--rule', '{\"no-console\": \"warn\", \"no-unused-vars\": \"warn\"}',\n             '--format', 'compact', '--max-warnings', '5'],\n            capture_output=True, text=True, cwd=proj, timeout=20\n        )\n        if result.stdout.strip():\n            lines = result.stdout.strip().split('\\n')[:5]\n            print('ESLint:', '\\n'.join(lines))\nexcept Exception: pass\nsys.exit(0)\n\"",
+            "timeout": 25
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"\nimport sys, json, os\nfrom datetime import datetime\ntry:\n    d = json.load(sys.stdin)\n    tool = d.get('tool_name', 'unknown')\n    proj = os.environ.get('CLAUDE_PROJECT_DIR', os.path.expanduser('~'))\n    log_path = os.path.join(proj, '.claude', 'mcp-audit.log')\n    os.makedirs(os.path.dirname(log_path), exist_ok=True)\n    with open(log_path, 'a') as f:\n        f.write(f\"{datetime.now().strftime('%H:%M:%S')} {tool}\\n\")\nexcept Exception: pass\nsys.exit(0)\n\"",
+            "timeout": 3
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git -C \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" add --update 2>/dev/null; true",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"\nimport sys, json, os, shutil\nfrom datetime import datetime\ntry:\n    proj = os.environ.get('CLAUDE_PROJECT_DIR', os.path.expanduser('~'))\n    transcript = os.environ.get('CLAUDE_TRANSCRIPT_PATH', '')\n    backup_dir = os.path.join(proj, '.claude', 'daily')\n    os.makedirs(backup_dir, exist_ok=True)\n    today = datetime.now().strftime('%Y-%m-%d')\n    daily_log = os.path.join(backup_dir, f'{today}.md')\n    if transcript and os.path.exists(transcript):\n        backup = os.path.join(backup_dir, f'transcript-{datetime.now().strftime(\"%H%M%S\")}.json')\n        shutil.copy2(transcript, backup)\n        if not os.path.exists(daily_log):\n            with open(daily_log, 'w') as f:\n                f.write(f'# Sesion {today}\\n\\n')\n        print(f'Transcript guardado: {os.path.basename(backup)}')\nexcept Exception as e:\n    pass\nsys.exit(0)\n\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"\nimport sys, json, os, shutil\nfrom datetime import datetime\ntry:\n    proj = os.environ.get('CLAUDE_PROJECT_DIR', os.path.expanduser('~'))\n    transcript = os.environ.get('CLAUDE_TRANSCRIPT_PATH', '')\n    backup_dir = os.path.join(proj, '.claude', 'daily')\n    os.makedirs(backup_dir, exist_ok=True)\n    today = datetime.now().strftime('%Y-%m-%d')\n    if transcript and os.path.exists(transcript):\n        backup = os.path.join(backup_dir, f'session-end-{datetime.now().strftime(\"%H%M%S\")}.json')\n        shutil.copy2(transcript, backup)\n        daily_log = os.path.join(backup_dir, f'{today}.md')\n        if not os.path.exists(daily_log):\n            with open(daily_log, 'w') as f:\n                f.write(f'# Sesion {today}\\n\\n_Compilar con /compile-memory para extraer decisiones_\\n')\n    print('─────────────────────────────')\n    print('Sesion finalizada')\n    print('   Transcript guardado en .claude/daily/')\n    print('   Tip: ejecuta /compile-memory para actualizar tu knowledge base')\n    print('─────────────────────────────')\nexcept Exception: pass\nsys.exit(0)\n\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   },
   "permissions": {
     "allow": [
+      "Read(**)",
+      "Bash(git *)",
       "Bash(git:*)",
+      "Bash(pnpm *)",
+      "Bash(npm *)",
       "Bash(npm:*)",
+      "Bash(npx *)",
       "Bash(npx:*)",
+      "Bash(npx eslint *)",
+      "Bash(npx tsc *)",
+      "Bash(npx --yes *)",
       "Bash(node:*)",
+      "Bash(python:*)",
       "Bash(python3:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
@@ -18,7 +112,6 @@
       "Bash(pwd:*)",
       "Bash(mkdir:*)",
       "Bash(cat:*)",
-      "Read(**)",
       "Write(src/**)",
       "Write(docs/**)",
       "Write(.claude/**)",
@@ -27,7 +120,14 @@
       "Write(.mcp.json)"
     ],
     "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.local)",
+      "Read(**/.env.production)",
+      "Read(**/.env.staging)",
       "Bash(rm -rf:*)"
     ]
+  },
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-4-6"
   }
 }

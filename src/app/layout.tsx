@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, JetBrains_Mono, Barlow_Condensed, Anton } from 'next/font/google'
+import { Inter, JetBrains_Mono, Barlow_Condensed, Anton, Instrument_Serif, Space_Grotesk, Outfit } from 'next/font/google'
 import Script from 'next/script'
 import { Toaster } from 'sonner'
 import { Analytics } from '@vercel/analytics/next'
@@ -34,13 +34,35 @@ const anton = Anton({
   display: 'swap',
 })
 
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  style: ['italic'],
+  weight: ['400'],
+  variable: '--font-serif',
+  display: 'swap',
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['500', '700'],
+  variable: '--font-wordmark',
+  display: 'swap',
+})
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['500', '700', '800'],
+  variable: '--font-outfit',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
   title: {
-    default: 'TrainerBoost — Gestiona tu negocio de entrenamiento personal',
+    default: 'TrainerBoost — Software para Entrenadores Personales en España',
     template: '%s | TrainerBoost',
   },
-  description: 'La plataforma SaaS para entrenadores personales: gestión de clientes, rutinas, nutrición, citas y mensajes en un solo lugar.',
-  keywords: ['entrenador personal', 'gestión clientes', 'rutinas fitness', 'nutrición deportiva', 'plataforma entrenadores', 'software entrenador'],
+  description: 'Gestiona clientes, rutinas, pagos y seguimiento desde un solo lugar. La herramienta para entrenadores personales en España. Sin comisiones. En español. Sin app que descargar.',
+  keywords: ['software entrenador personal', 'app entrenadores personales España', 'gestión clientes entrenamiento personal', 'herramienta entrenador personal', 'cobrar automaticamente entrenador personal', 'plataforma entrenadores personales', 'gestionar clientes entrenamiento'],
   authors: [{ name: 'TrainerBoost' }],
   creator: 'TrainerBoost',
   metadataBase: new URL('https://trainerboost.es'),
@@ -69,7 +91,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#D4892A',
+  themeColor: '#C0392B',
 }
 
 const jsonLd = {
@@ -100,7 +122,7 @@ const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`dark ${inter.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable} ${anton.variable}`}>
+    <html lang="es" className={`dark ${inter.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable} ${anton.variable} ${instrumentSerif.variable} ${spaceGrotesk.variable} ${outfit.variable}`}>
       <head>
         <script
           type="application/ld+json"

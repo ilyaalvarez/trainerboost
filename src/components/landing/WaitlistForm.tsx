@@ -70,15 +70,6 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
 
   return (
     <div className={`waitlist-form-wrapper ${className}`}>
-      {spotsLeft !== null && spotsLeft > 0 && state !== 'success' && (
-        <div className="waitlist-count-bar">
-          <span className="waitlist-count-dot" />
-          <span className="waitlist-count-text">
-            {spotsLeft} entrenadores ya en lista
-          </span>
-        </div>
-      )}
-
       {state !== 'success' ? (
         <form onSubmit={handleSubmit} className="waitlist-form" noValidate>
           {/* Honeypot — hidden from real users */}
@@ -116,7 +107,7 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
                 <span className="waitlist-spinner" aria-hidden="true" />
               ) : (
                 <>
-                  <span>Quiero acceso</span>
+                  <span>Avísame al lanzar</span>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -134,7 +125,7 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
         <div className="waitlist-success" role="status">
           <div className="waitlist-success-icon" aria-hidden="true">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M5 13l4 4L19 7" stroke="#D4892A" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M5 13l4 4L19 7" stroke="#C0392B" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <div>

@@ -7,24 +7,45 @@ interface LogoFullProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export default function LogoFull({ height = 28, animated = true, className = '', ...props }: LogoFullProps) {
-  const iconSize = Math.round(height * 1.15)
-  const fontSize = Math.round(height * 0.62)
+  const iconSize = Math.round(height * 1.2)
 
   return (
-    <div className={`flex items-center gap-2 select-none ${className}`} {...props}>
+    <div className={`flex items-center gap-2.5 select-none ${className}`} {...props}>
       <LogoIcon size={iconSize} animated={animated} />
       <div
         style={{
-          fontFamily: 'var(--font-display, "Barlow Condensed", sans-serif)',
-          fontWeight: 800,
-          fontSize: `${fontSize}px`,
-          letterSpacing: '-0.01em',
-          textTransform: 'uppercase',
+          fontFamily: 'var(--font-wordmark, "Space Grotesk", sans-serif)',
           lineHeight: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1px',
         }}
       >
-        <span style={{ color: '#E8E4D9' }}>TRAINER</span>
-        <span style={{ color: '#D4892A' }}>BOOST</span>
+        <span
+          style={{
+            display: 'block',
+            fontWeight: 500,
+            fontSize: `${Math.round(height * 0.45)}px`,
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            color: 'rgba(240,236,230,0.55)',
+          }}
+        >
+          Trainer
+        </span>
+        <span
+          style={{
+            display: 'block',
+            fontWeight: 700,
+            fontSize: `${Math.round(height * 0.68)}px`,
+            letterSpacing: '-0.01em',
+            textTransform: 'uppercase',
+            color: '#C0392B',
+            marginTop: '-1px',
+          }}
+        >
+          Boost
+        </span>
       </div>
     </div>
   )

@@ -96,13 +96,16 @@ export function FichasScroll() {
         pin: true,
         scrub: 2,
         start: 'top top',
-        end: '+=250%',
+        end: '+=360%',
         onUpdate(self) {
           const progress = self.progress
           const segmentSize = 1 / (N - 1)
           const rawIdx      = progress / segmentSize
           const activeIdx   = Math.min(Math.floor(rawIdx), N - 2)
-          const segProgress = Math.min(rawIdx - activeIdx, 1)
+          const rawSeg      = Math.min(rawIdx - activeIdx, 1)
+          // Cada carta se queda visible el 45% de su segmento antes de salir
+          const DWELL       = 0.45
+          const segProgress = rawSeg < DWELL ? 0 : (rawSeg - DWELL) / (1 - DWELL)
 
           cardWraps.forEach((wrap, i) => {
             if (i < activeIdx) {

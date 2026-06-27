@@ -24,6 +24,7 @@ const limiters = {
 
 // Ordered so more specific prefixes win (invite/send before invite/)
 const ROUTE_LIMITS: Array<[string, keyof typeof limiters]> = [
+  ['/api/waitlist',            'strict'],
   ['/api/contact',             'strict'],
   ['/api/invite/send',         'account'],
   ['/api/invite/',             'lookup'],

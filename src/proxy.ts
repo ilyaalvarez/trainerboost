@@ -66,7 +66,7 @@ export default async function proxy(request: NextRequest) {
   }
 
   const publicPrefixes = ['/_next', '/favicon', '/api/webhooks', '/api/health', '/pricing', '/demo', '/auth', '/p/']
-  const publicExact = ['/', '/login', '/register', '/onboarding', '/forgot-password', '/reset-password', '/privacy', '/terms', '/contact', '/manifest.json', '/sw.js', '/icon-192.png', '/icon-512.png']
+  const publicExact = ['/', '/login', '/register', '/onboarding', '/forgot-password', '/reset-password', '/privacidad', '/terminos', '/cookies', '/aviso-legal', '/contact', '/manifest.json', '/sw.js', '/icon-192.png', '/icon-512.png']
   const isPublic = publicPrefixes.some(p => path.startsWith(p)) || publicExact.includes(path)
 
   if (!user && !isPublic) {

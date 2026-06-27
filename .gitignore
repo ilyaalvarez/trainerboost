@@ -45,3 +45,14 @@ setup-vercel-env.ps1
 
 # Claude Code session logs
 .session-log.md
+.env.production
+.env.staging
+.claude/daily/
+.claude/knowledge/
+.claude/mcp-audit.log
+.claude/projects/
+
+# Screenshots de referencia en raiz (no son assets del proyecto)
+/*.png
+/*.jpg
+/*.jpeg

@@ -7,7 +7,7 @@ import { CLIENTS } from './clientData'
 
 const INIT_SCALE   = [1.0, 0.93, 0.86, 0.79]
 const INIT_Y       = [0, 20, 40, 60]
-const INIT_OPACITY = [1.0, 0.68, 0.40, 0.20]
+const INIT_OPACITY = [1.0, 0.82, 0.60, 0.36]
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t

@@ -126,14 +126,15 @@ export default function LandingPage() {
         .from('.hero-sub',       { opacity: 0, y: 20, duration: 0.6 }, '-=0.4')
         .from('.hero-ctas',      { opacity: 0, y: 16, duration: 0.5 }, '-=0.3')
         .from('.hero-card-wrap', { opacity: 0, y: 60, scale: 0.92, duration: 1.0 }, 0.3)
-
-      if (heroCardRef.current) {
-        gsap.to(heroCardRef.current, {
-          y: 12, repeat: -1, yoyo: true, duration: 4, ease: 'sine.inOut',
-        })
-      }
     }, landingRef)
-    return () => ctx.revert()
+
+    // Float animation outside ctx — evita warning "rotateX/Y not eligible for reset"
+    // cuando ctx.revert() corre mientras el parallax tiene rotateX/Y activos
+    const floatTween = heroCardRef.current
+      ? gsap.to(heroCardRef.current, { y: 12, repeat: -1, yoyo: true, duration: 4, ease: 'sine.inOut' })
+      : null
+
+    return () => { ctx.revert(); floatTween?.kill() }
   }, [booted])
 
   // Mouse parallax on hero card

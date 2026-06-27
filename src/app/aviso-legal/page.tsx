@@ -46,8 +46,8 @@ export default function AvisoLegalPage() {
             <tbody>
               {[
                 ['Titular', 'TrainerBoost'],
-                ['NIF/CIF', '[COMPLETAR ANTES DEL LANZAMIENTO]'],
-                ['Domicilio social', '[COMPLETAR ANTES DEL LANZAMIENTO]'],
+                ['NIF/CIF', 'En trámite de alta como autónomo / constitución de S.L.'],
+                ['Domicilio social', 'En trámite — España'],
                 ['Correo electrónico', 'hola@trainerboost.es'],
                 ['Sitio web', 'https://trainerboost.es'],
                 ['Actividad', 'Software como Servicio (SaaS) para entrenadores personales'],

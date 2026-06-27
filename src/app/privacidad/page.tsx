@@ -39,9 +39,9 @@ export default function PrivacidadPage() {
         <LegalSection title="1. Responsable del tratamiento">
           <p>El responsable del tratamiento de tus datos personales es:</p>
           <ul>
-            <li><strong>Denominación social:</strong> TrainerBoost (titular en proceso de constitución como SL)</li>
-            <li><strong>NIF del titular provisional:</strong> <em>[COMPLETAR ANTES DEL LANZAMIENTO]</em></li>
-            <li><strong>Domicilio:</strong> <em>[COMPLETAR ANTES DEL LANZAMIENTO]</em></li>
+            <li><strong>Denominación social:</strong> TrainerBoost</li>
+            <li><strong>NIF del titular:</strong> <em>En trámite de alta como autónomo / constitución de S.L.</em></li>
+            <li><strong>Domicilio:</strong> <em>En trámite — España</em></li>
             <li><strong>Email de contacto:</strong>{' '}
               <a href="mailto:privacidad@trainerboost.es" style={{ color: '#8FD43A' }}>privacidad@trainerboost.es</a>
             </li>

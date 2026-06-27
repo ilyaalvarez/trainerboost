@@ -216,11 +216,6 @@ export default function LandingPage() {
             <GymLights />
 
             <div className="hero-left" style={{ position: 'relative', zIndex: 1 }}>
-              <div className="hero-badge" aria-hidden="true">
-                <span className="hero-badge-dot" />
-                Beta privada
-              </div>
-
               <h1 id="hero-heading" className="hero-h1">
                 Gestiona tu PT<br />como un profesional
               </h1>

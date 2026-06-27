@@ -17,14 +17,14 @@ export default function LogoIcon({ size = 32, animated = true, ...props }: LogoI
       {...props}
     >
       <defs>
-        <filter id="tb-peak-glow" x="-80%" y="-80%" width="260%" height="260%">
+        <filter id="tb-acc-glow" x="-80%" y="-80%" width="260%" height="260%">
           <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <filter id="tb-bar3-glow" x="-20%" y="-10%" width="140%" height="120%">
+        <filter id="tb-disc-glow" x="-20%" y="-15%" width="140%" height="130%">
           <feGaussianBlur stdDeviation="1.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
@@ -33,29 +33,28 @@ export default function LogoIcon({ size = 32, animated = true, ...props }: LogoI
         </filter>
       </defs>
 
-      {/* Bar 1 — lowest, darkest */}
-      <rect x="2" y="27" width="10" height="11" rx="2" fill="#7B1C10" />
+      {/* Left disc — darker, receding */}
+      <rect x="2" y="11" width="9" height="18" rx="2.5" fill="#7B1C10" />
 
-      {/* Bar 2 — middle */}
-      <rect x="15" y="18" width="10" height="20" rx="2" fill="#A8281B" />
+      {/* Left collar */}
+      <rect x="11" y="15" width="3.5" height="10" rx="1.5" fill="#A8281B" />
 
-      {/* Bar 3 — tallest, full crimson with glow */}
-      <rect x="28" y="9" width="10" height="29" rx="2" fill="#C0392B" filter="url(#tb-bar3-glow)" />
+      {/* Center bar */}
+      <rect x="14.5" y="18" width="11" height="4" rx="2" fill="#A8281B" />
 
-      {/* Trend line connecting bar tops */}
-      <polyline
-        points="7,27 20,18 33,9"
-        stroke="rgba(240,236,230,0.32)"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {/* Right collar */}
+      <rect x="25.5" y="15" width="3.5" height="10" rx="1.5" fill="#A8281B" />
 
-      {/* Peak indicator — bright accent dot */}
+      {/* Right disc — brighter, coming forward */}
+      <rect x="29" y="11" width="9" height="18" rx="2.5" fill="#C0392B" filter="url(#tb-disc-glow)" />
+
+      {/* Accent dot — top corner of right disc */}
       <circle
-        cx="33" cy="9" r="2.8"
+        cx="33"
+        cy="14"
+        r="2.8"
         fill="#E74C3C"
-        filter="url(#tb-peak-glow)"
+        filter="url(#tb-acc-glow)"
         className={animated ? 'logo-peak-pulse' : undefined}
       />
     </svg>

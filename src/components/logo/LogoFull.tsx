@@ -40,7 +40,7 @@ export default function LogoFull({ height = 28, animated = true, className = '',
             fontSize: `${Math.round(height * 0.68)}px`,
             letterSpacing: '-0.01em',
             textTransform: 'uppercase',
-            color: '#C0392B',
+            color: '#8FD43A',
             marginTop: '-1px',
           }}
         >

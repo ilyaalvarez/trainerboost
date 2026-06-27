@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    const lenis = new Lenis({ lerp: 0.08, smoothWheel: true })
+    const lenis = new Lenis({ lerp: 0.06, smoothWheel: true, wheelMultiplier: 0.8 })
     lenis.on('scroll', ScrollTrigger.update)
     const tick = (time: number) => { lenis.raf(time * 1000) }
     gsap.ticker.add(tick)

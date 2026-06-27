@@ -17,6 +17,8 @@ export function FichasScroll() {
       const getX = () =>
         -(trackRef.current!.scrollWidth - window.innerWidth + 160)
 
+      const cardEls = Array.from(trackRef.current!.querySelectorAll<HTMLElement>('.client-card'))
+
       ScrollTrigger.create({
         trigger: wrapRef.current,
         pin: true,
@@ -26,15 +28,14 @@ export function FichasScroll() {
         onUpdate(self) {
           gsap.set(trackRef.current, { x: getX() * self.progress })
 
-          const cards = trackRef.current!.querySelectorAll<HTMLElement>('.client-card')
           const center = window.innerWidth / 2
-          cards.forEach((card) => {
+          cardEls.forEach((card) => {
             const rect = card.getBoundingClientRect()
             const cardCenter = rect.left + rect.width / 2
             const dist = Math.abs(cardCenter - center)
             const scale = Math.max(0.88, 1 - (dist / window.innerWidth) * 0.3)
             const opacity = Math.max(0.45, 1 - (dist / window.innerWidth) * 0.8)
-            gsap.to(card, { scale, opacity, duration: 0.3, ease: 'power2.out' })
+            gsap.set(card, { scale, opacity })
           })
 
           const idx = Math.min(

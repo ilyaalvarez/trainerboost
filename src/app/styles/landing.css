@@ -1879,8 +1879,8 @@
 .profile-tab:hover:not(.profile-tab--active) { color: var(--tb-text); }
 .profile-content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--s16);
+  grid-template-columns: 1fr minmax(380px, 480px);
+  gap: clamp(var(--s32), 5vw, 96px);
   align-items: center;
 }
 @media (max-width: 900px) {
@@ -2107,11 +2107,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  perspective: 1200px;
+}
+.fichas-stack-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 480px 560px at center, rgba(255,255,255,0.035) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.fichas-stack-inner {
+  position: relative;
+  z-index: 1;
 }
 .fichas-stack-inner {
   position: relative;
   width: 380px;
-  height: 520px;
+  height: 640px;
 }
 .fichas-stack-card-wrap {
   position: absolute;
@@ -2142,4 +2155,61 @@
   .fichas-stack-inner { position: static; width: 100%; height: auto; }
   .fichas-stack-card-wrap { position: static; width: min(380px, 100%); margin: 0 auto; }
   .fichas-stack-card-wrap:not(:first-child) { display: none; }
+}
+/* Side panels — hidden by default, shown on large screens */
+.fichas-side-panel {
+  display: none;
+  flex-direction: column;
+  gap: var(--s6);
+  max-width: 300px;
+  z-index: 1;
+}
+.fichas-side-panel--left { align-items: flex-start; }
+.fichas-side-panel--right { align-items: flex-end; }
+.fichas-panel-label {
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tb-brand);
+}
+.fichas-panel-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 2.2vw, 40px);
+  font-weight: 900;
+  color: var(--tb-text);
+  line-height: 1.05;
+}
+.fichas-panel-desc {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--tb-muted);
+  line-height: 1.65;
+  max-width: 240px;
+}
+.fichas-panel-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: right;
+}
+.fichas-panel-features li {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--tb-muted);
+  line-height: 1.5;
+}
+.fichas-panel-features li::after {
+  content: ' —';
+  color: var(--tb-brand);
+}
+
+@media (min-width: 1400px) {
+  .fichas-side-panel { display: flex; }
+  .fichas-stack-stage { gap: clamp(48px, 4vw, 88px); }
+  .fichas-stack-inner { transform: scale(1.15); transform-origin: center center; }
+  .fichas-stack-stage::before {
+    background: radial-gradient(ellipse 620px 720px at center, rgba(255,255,255,0.05) 0%, transparent 70%);
+  }
 }

@@ -7,7 +7,7 @@ import { CLIENTS } from './clientData'
 
 const INIT_SCALE   = [1.0, 0.93, 0.86, 0.79]
 const INIT_Y       = [0, 20, 40, 60]
-const INIT_OPACITY = [1.0, 0.55, 0.28, 0.12]
+const INIT_OPACITY = [1.0, 0.68, 0.40, 0.20]
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t
@@ -106,12 +106,30 @@ export function FichasScroll() {
       <span className="fichas-stack-label" aria-hidden="true">Sus clientes</span>
 
       <div className="fichas-stack-stage">
+        <div className="fichas-side-panel fichas-side-panel--left">
+          <p className="fichas-panel-label">Gestión de clientes</p>
+          <h3 className="fichas-panel-title">Al siguiente<br />nivel</h3>
+          <p className="fichas-panel-desc">
+            Cada cliente tiene su propia ficha con historial, progreso y objetivos.
+            Siempre actualizado.
+          </p>
+        </div>
+
         <div ref={stackRef} className="fichas-stack-inner">
           {CLIENTS.map((client) => (
             <div key={client.variant} className="fichas-stack-card-wrap">
               <ClientCard client={client} animateMode="none" />
             </div>
           ))}
+        </div>
+
+        <div className="fichas-side-panel fichas-side-panel--right">
+          <ul className="fichas-panel-features">
+            <li>Historial de sesiones</li>
+            <li>Progreso visual en tiempo real</li>
+            <li>Objetivos personalizados</li>
+            <li>Desde cualquier dispositivo</li>
+          </ul>
         </div>
       </div>
 

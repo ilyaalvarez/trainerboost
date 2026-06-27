@@ -10,12 +10,11 @@ export const metadata: Metadata = {
 
 const LAST_UPDATED = '18 de junio de 2026'
 
-export default function TermsPage() {
+export default function TerminosPage() {
   return (
     <div style={{ background: '#080810', minHeight: '100vh', color: '#E8E4D9' }}>
 
-      {/* Nav */}
-      <nav style={{ borderBottom: '1px solid rgba(212,137,42,0.12)', padding: '0 24px' }}>
+      <nav style={{ borderBottom: '1px solid rgba(143,212,58,0.12)', padding: '0 24px' }}>
         <div style={{ maxWidth: '780px', margin: '0 auto', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link href="/" aria-label="Volver a TrainerBoost"><LogoFull height={20} /></Link>
           <Link href="/" style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', letterSpacing: '0.1em', color: 'rgba(232,228,217,0.5)', textDecoration: 'none', textTransform: 'uppercase' }}>
@@ -24,10 +23,9 @@ export default function TermsPage() {
         </div>
       </nav>
 
-      {/* Content */}
       <main style={{ maxWidth: '780px', margin: '0 auto', padding: '64px 24px 120px' }}>
         <div style={{ marginBottom: '48px' }}>
-          <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', letterSpacing: '0.12em', color: '#D4892A', textTransform: 'uppercase', marginBottom: '12px' }}>
+          <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', letterSpacing: '0.12em', color: '#8FD43A', textTransform: 'uppercase', marginBottom: '12px' }}>
             Legal · Condiciones · Contrato de servicio
           </p>
           <h1 style={{ fontFamily: 'var(--font-display, sans-serif)', fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.1, margin: '0 0 16px', textTransform: 'uppercase' }}>
@@ -211,15 +209,13 @@ export default function TermsPage() {
           </ul>
           <p>
             Las condiciones detalladas del encargo del tratamiento se rigen por la{' '}
-            <Link href="/privacy" style={{ color: '#D4892A' }}>Política de Privacidad</Link> de
+            <Link href="/privacidad" style={{ color: '#8FD43A' }}>Política de Privacidad</Link> de
             TrainerBoost, que forma parte integrante de estos Términos.
           </p>
         </LegalSection>
 
         <LegalSection title="8. Limitación de responsabilidad">
-          <p>
-            En la máxima medida permitida por la legislación aplicable:
-          </p>
+          <p>En la máxima medida permitida por la legislación aplicable:</p>
           <ul>
             <li>TrainerBoost no garantiza que el Servicio sea ininterrumpido, libre de errores o completamente seguro.</li>
             <li>TrainerBoost no es responsable de pérdidas de datos debidas a causas de fuerza mayor o errores del usuario.</li>
@@ -291,29 +287,29 @@ export default function TermsPage() {
             Si eres consumidor conforme a la normativa española (Art. 3 TRLGDCU), puedes
             también acceder a la plataforma europea de resolución de litigios en línea
             (ODR):{' '}
-            <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" style={{ color: '#D4892A' }}>
+            <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" style={{ color: '#8FD43A' }}>
               ec.europa.eu/consumers/odr
             </a>.
           </p>
         </LegalSection>
 
         <LegalSection title="13. Contacto">
-          <p>
-            Para cualquier consulta sobre estos Términos:
-          </p>
+          <p>Para cualquier consulta sobre estos Términos:</p>
           <ul>
-            <li>Email: <a href="mailto:legal@trainerboost.es" style={{ color: '#D4892A' }}>legal@trainerboost.es</a></li>
-            <li>Web: <a href="https://trainerboost.es" style={{ color: '#D4892A' }}>trainerboost.es</a></li>
+            <li>Email: <a href="mailto:legal@trainerboost.es" style={{ color: '#8FD43A' }}>legal@trainerboost.es</a></li>
+            <li>Web: <a href="https://trainerboost.es" style={{ color: '#8FD43A' }}>trainerboost.es</a></li>
           </ul>
         </LegalSection>
-
       </main>
 
-      {/* Footer */}
-      <footer style={{ borderTop: '1px solid rgba(212,137,42,0.12)', padding: '24px', textAlign: 'center' }}>
+      <footer style={{ borderTop: '1px solid rgba(143,212,58,0.12)', padding: '24px', textAlign: 'center' }}>
         <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', color: 'rgba(232,228,217,0.3)', letterSpacing: '0.1em', margin: 0 }}>
           © 2026 TrainerBoost · España ·{' '}
-          <Link href="/privacy" style={{ color: 'rgba(212,137,42,0.7)', textDecoration: 'none' }}>Privacidad</Link>
+          <Link href="/privacidad" style={{ color: 'rgba(143,212,58,0.7)', textDecoration: 'none' }}>Privacidad</Link>
+          {' · '}
+          <Link href="/cookies" style={{ color: 'rgba(143,212,58,0.7)', textDecoration: 'none' }}>Cookies</Link>
+          {' · '}
+          <Link href="/aviso-legal" style={{ color: 'rgba(143,212,58,0.7)', textDecoration: 'none' }}>Aviso Legal</Link>
         </p>
       </footer>
     </div>
@@ -322,11 +318,11 @@ export default function TermsPage() {
 
 function LegalSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section style={{ marginBottom: '48px', paddingTop: '48px', borderTop: '1px solid rgba(212,137,42,0.08)' }}>
+    <section style={{ marginBottom: '48px', paddingTop: '48px', borderTop: '1px solid rgba(143,212,58,0.08)' }}>
       <h2 style={{
         fontFamily: 'var(--font-display, sans-serif)',
         fontSize: '18px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase',
-        color: '#D4892A', marginBottom: '20px',
+        color: '#8FD43A', marginBottom: '20px',
       }}>
         {title}
       </h2>

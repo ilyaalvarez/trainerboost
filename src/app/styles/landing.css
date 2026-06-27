@@ -1720,6 +1720,19 @@
 }
 .hero-cta-secondary:hover { color: var(--tb-brand); border-color: var(--tb-brand); }
 
+.hero-waitlist-inline {
+  width: 100%;
+  max-width: 420px;
+  margin-top: var(--s4, 16px);
+}
+.hero-waitlist-hint {
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
 .hero-right {
   display: flex;
   justify-content: center;

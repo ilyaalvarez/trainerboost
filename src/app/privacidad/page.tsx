@@ -10,12 +10,11 @@ export const metadata: Metadata = {
 
 const LAST_UPDATED = '18 de junio de 2026'
 
-export default function PrivacyPage() {
+export default function PrivacidadPage() {
   return (
     <div style={{ background: '#080810', minHeight: '100vh', color: '#E8E4D9' }}>
 
-      {/* Nav */}
-      <nav style={{ borderBottom: '1px solid rgba(212,137,42,0.12)', padding: '0 24px' }}>
+      <nav style={{ borderBottom: '1px solid rgba(143,212,58,0.12)', padding: '0 24px' }}>
         <div style={{ maxWidth: '780px', margin: '0 auto', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link href="/" aria-label="Volver a TrainerBoost"><LogoFull height={20} /></Link>
           <Link href="/" style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', letterSpacing: '0.1em', color: 'rgba(232,228,217,0.5)', textDecoration: 'none', textTransform: 'uppercase' }}>
@@ -24,10 +23,9 @@ export default function PrivacyPage() {
         </div>
       </nav>
 
-      {/* Content */}
       <main style={{ maxWidth: '780px', margin: '0 auto', padding: '64px 24px 120px' }}>
         <div style={{ marginBottom: '48px' }}>
-          <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', letterSpacing: '0.12em', color: '#D4892A', textTransform: 'uppercase', marginBottom: '12px' }}>
+          <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', letterSpacing: '0.12em', color: '#8FD43A', textTransform: 'uppercase', marginBottom: '12px' }}>
             Legal · RGPD · LOPDGDD
           </p>
           <h1 style={{ fontFamily: 'var(--font-display, sans-serif)', fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.1, margin: '0 0 16px', textTransform: 'uppercase' }}>
@@ -42,10 +40,10 @@ export default function PrivacyPage() {
           <p>El responsable del tratamiento de tus datos personales es:</p>
           <ul>
             <li><strong>Denominación social:</strong> TrainerBoost (titular en proceso de constitución como SL)</li>
-            <li><strong>NIF:</strong> Pendiente de constitución</li>
-            <li><strong>Domicilio:</strong> España</li>
+            <li><strong>NIF del titular provisional:</strong> <em>[COMPLETAR ANTES DEL LANZAMIENTO]</em></li>
+            <li><strong>Domicilio:</strong> <em>[COMPLETAR ANTES DEL LANZAMIENTO]</em></li>
             <li><strong>Email de contacto:</strong>{' '}
-              <a href="mailto:privacidad@trainerboost.es" style={{ color: '#D4892A' }}>privacidad@trainerboost.es</a>
+              <a href="mailto:privacidad@trainerboost.es" style={{ color: '#8FD43A' }}>privacidad@trainerboost.es</a>
             </li>
             <li><strong>Web:</strong> https://trainerboost.es</li>
           </ul>
@@ -149,7 +147,7 @@ export default function PrivacyPage() {
         <LegalSection title="5. Derechos de los interesados">
           <p>
             Conforme al RGPD y la LOPDGDD, puedes ejercer los siguientes derechos enviando
-            un email a <a href="mailto:privacidad@trainerboost.es" style={{ color: '#D4892A' }}>privacidad@trainerboost.es</a>:
+            un email a <a href="mailto:privacidad@trainerboost.es" style={{ color: '#8FD43A' }}>privacidad@trainerboost.es</a>:
           </p>
           <ul>
             <li><strong>Acceso (Art. 15 RGPD):</strong> Obtener confirmación de si tratamos tus datos y una copia de los mismos.</li>
@@ -164,40 +162,41 @@ export default function PrivacyPage() {
             Responderemos en el plazo máximo de <strong>30 días naturales</strong>. Si
             consideras que tus derechos no han sido atendidos adecuadamente, puedes presentar
             una reclamación ante la{' '}
-            <a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" style={{ color: '#D4892A' }}>
+            <a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" style={{ color: '#8FD43A' }}>
               Agencia Española de Protección de Datos (AEPD)
             </a>.
           </p>
         </LegalSection>
 
         <LegalSection title="6. Cookies y tecnologías similares">
+          <p>
+            Para información completa sobre las cookies que utilizamos, consulta nuestra{' '}
+            <Link href="/cookies" style={{ color: '#8FD43A' }}>Política de Cookies</Link>.
+          </p>
           <h3>6.1 Cookies estrictamente necesarias</h3>
           <p>
             Utilizamos cookies de sesión para mantener tu sesión autenticada. Estas cookies
             son imprescindibles para el funcionamiento de la plataforma y no requieren
             consentimiento (Art. 22.2 LSSI-CE).
           </p>
-
           <h3>6.2 Cookies analíticas</h3>
           <p>
-            Con tu consentimiento previo, utilizamos Plausible Analytics (sin cookies
-            identificadoras de terceros) para medir el uso de la plataforma de forma
-            agregada y anónima. No se comparte información con terceros para fines
-            publicitarios.
+            Con tu consentimiento previo, utilizamos Plausible Analytics, que opera sin cookies
+            identificadoras y recopila datos de forma agregada y anónima. No se comparte
+            información con terceros para fines publicitarios.
           </p>
-
           <h3>6.3 Gestión del consentimiento</h3>
           <p>
             Al acceder por primera vez a trainerboost.es, te mostramos un banner de
             consentimiento. Puedes modificar tus preferencias en cualquier momento desde
-            el pie de la página.
+            el pie de la página o en nuestra{' '}
+            <Link href="/cookies" style={{ color: '#8FD43A' }}>Política de Cookies</Link>.
           </p>
-
           <h3>6.4 Cookies de terceros integrados</h3>
           <p>
             Stripe puede establecer cookies necesarias para la verificación antifraude
             durante el proceso de pago. Consulta la{' '}
-            <a href="https://stripe.com/es/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#D4892A' }}>
+            <a href="https://stripe.com/es/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8FD43A' }}>
               política de privacidad de Stripe
             </a>.
           </p>
@@ -237,7 +236,7 @@ export default function PrivacyPage() {
             Cuando un entrenador introduce datos de sus clientes en TrainerBoost, se establece
             automáticamente una relación de encargo del tratamiento conforme al Art. 28 RGPD.
             Los términos de dicho encargo están regulados en el{' '}
-            <Link href="/terms" style={{ color: '#D4892A' }}>Contrato de Encargo del Tratamiento</Link>{' '}
+            <Link href="/terminos" style={{ color: '#8FD43A' }}>Contrato de Encargo del Tratamiento</Link>{' '}
             incluido en los Términos de Servicio.
           </p>
           <p>Garantizamos al entrenador (como responsable del tratamiento) que:</p>
@@ -261,30 +260,29 @@ export default function PrivacyPage() {
         </LegalSection>
 
         <LegalSection title="11. Contacto y reclamaciones">
-          <p>
-            Para cualquier consulta sobre privacidad o para ejercer tus derechos:
-          </p>
+          <p>Para cualquier consulta sobre privacidad o para ejercer tus derechos:</p>
           <ul>
-            <li>Email: <a href="mailto:privacidad@trainerboost.es" style={{ color: '#D4892A' }}>privacidad@trainerboost.es</a></li>
+            <li>Email: <a href="mailto:privacidad@trainerboost.es" style={{ color: '#8FD43A' }}>privacidad@trainerboost.es</a></li>
             <li>Plazo de respuesta: máximo 30 días naturales</li>
           </ul>
           <p>
-            Si no estás satisfecho con nuestra respuesta, puedes reclamar ante la AEPD:
-            <br />
-            <a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" style={{ color: '#D4892A' }}>
+            Si no estás satisfecho con nuestra respuesta, puedes reclamar ante la AEPD:{' '}
+            <a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" style={{ color: '#8FD43A' }}>
               www.aepd.es
             </a>
             {' '}— C/ Jorge Juan, 6, 28001 Madrid
           </p>
         </LegalSection>
-
       </main>
 
-      {/* Footer */}
-      <footer style={{ borderTop: '1px solid rgba(212,137,42,0.12)', padding: '24px', textAlign: 'center' }}>
+      <footer style={{ borderTop: '1px solid rgba(143,212,58,0.12)', padding: '24px', textAlign: 'center' }}>
         <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', color: 'rgba(232,228,217,0.3)', letterSpacing: '0.1em', margin: 0 }}>
           © 2026 TrainerBoost · España ·{' '}
-          <Link href="/terms" style={{ color: 'rgba(212,137,42,0.7)', textDecoration: 'none' }}>Términos</Link>
+          <Link href="/terminos" style={{ color: 'rgba(143,212,58,0.7)', textDecoration: 'none' }}>Términos</Link>
+          {' · '}
+          <Link href="/cookies" style={{ color: 'rgba(143,212,58,0.7)', textDecoration: 'none' }}>Cookies</Link>
+          {' · '}
+          <Link href="/aviso-legal" style={{ color: 'rgba(143,212,58,0.7)', textDecoration: 'none' }}>Aviso Legal</Link>
         </p>
       </footer>
     </div>
@@ -293,11 +291,11 @@ export default function PrivacyPage() {
 
 function LegalSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section style={{ marginBottom: '48px', paddingTop: '48px', borderTop: '1px solid rgba(212,137,42,0.08)' }}>
+    <section style={{ marginBottom: '48px', paddingTop: '48px', borderTop: '1px solid rgba(143,212,58,0.08)' }}>
       <h2 style={{
         fontFamily: 'var(--font-display, sans-serif)',
         fontSize: '18px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase',
-        color: '#D4892A', marginBottom: '20px',
+        color: '#8FD43A', marginBottom: '20px',
       }}>
         {title}
       </h2>

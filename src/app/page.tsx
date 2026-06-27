@@ -124,7 +124,7 @@ export default function LandingPage() {
       tl.from('.hero-badge',     { opacity: 0, y: 16, duration: 0.6 }, 0.1)
         .from('.hero-h1',        { opacity: 0, y: 32, duration: 0.8 }, 0.2)
         .from('.hero-sub',       { opacity: 0, y: 20, duration: 0.6 }, '-=0.4')
-        .from('.hero-ctas',      { opacity: 0, y: 16, duration: 0.5 }, '-=0.3')
+        .from('.hero-waitlist-inline', { opacity: 0, y: 16, duration: 0.5 }, '-=0.3')
         .from('.hero-card-wrap', { opacity: 0, y: 60, scale: 0.92, duration: 1.0 }, 0.3)
     }, landingRef)
 
@@ -225,19 +225,11 @@ export default function LandingPage() {
                 Cobros sin perseguir a nadie. Todo en un sitio.
               </p>
 
-              <div className="hero-ctas">
-                <button
-                  className="hero-cta-primary"
-                  onClick={() => scrollTo('cta-final')}
-                >
-                  Unirse a la lista de espera
-                </button>
-                <button
-                  className="hero-cta-secondary"
-                  onClick={() => scrollTo('fichas')}
-                >
-                  Ver cómo funciona →
-                </button>
+              <div className="hero-waitlist-inline">
+                <WaitlistForm />
+                <p className="hero-waitlist-hint">
+                  Sin compromiso &middot; Te avisamos antes del lanzamiento
+                </p>
               </div>
             </div>
 
@@ -262,7 +254,7 @@ export default function LandingPage() {
               as="h2"
               className="pain-section-title"
             >
-              {"Sin TrainerBoost, así\nes el día de un PT"}
+              {"Sin TrainerBoost, así\nes el día de un\nEntrenador Personal"}
             </TextReveal>
 
             <div className="pain-list">
@@ -292,7 +284,7 @@ export default function LandingPage() {
           {/* ── S5: FAQ ───────────────────────────────────────────────────── */}
           <section className="faq-section" id="faq" aria-labelledby="faq-heading">
             <h2 id="faq-heading" className="faq-section-title">
-              Preguntas que<br />se hacen los PTs
+              Preguntas frecuentes<br />de Entrenadores Personales
             </h2>
             <div className="faq-inner">
               <Accordion items={FAQ_ITEMS} />
@@ -330,9 +322,10 @@ export default function LandingPage() {
         <footer className="lp-footer-v2" aria-label="Pie de página">
           <LogoFull height={24} />
           <nav className="lp-footer-v2-links" aria-label="Páginas legales">
-            <a href="/privacidad" className="lp-footer-v2-link">Privacidad</a>
-            <a href="/terminos"   className="lp-footer-v2-link">Términos</a>
-            <a href="/cookies"    className="lp-footer-v2-link">Cookies</a>
+            <a href="/privacidad"   className="lp-footer-v2-link">Privacidad</a>
+            <a href="/terminos"     className="lp-footer-v2-link">Términos</a>
+            <a href="/cookies"      className="lp-footer-v2-link">Cookies</a>
+            <a href="/aviso-legal"  className="lp-footer-v2-link">Aviso Legal</a>
           </nav>
           <p className="lp-footer-v2-copy">&copy; 2026 TrainerBoost &middot; España</p>
         </footer>

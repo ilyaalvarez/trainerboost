@@ -1765,9 +1765,36 @@
     grid-template-rows: auto auto;
     padding-top: 100px;
     padding-bottom: 60px;
-    gap: 48px;
+    gap: 32px;
   }
-  .hero-right { order: -1; }
+  /* Texto primero, carta debajo — y override del display:none del bloque anterior */
+  .hero-right {
+    display: flex;
+    order: 2;
+    padding-bottom: 40px;
+  }
+  .hero-card-inner {
+    transform: rotate(-2deg) rotateX(3deg) scale(0.82);
+  }
+  .hero-card-glow { display: none; }
+}
+
+/* ─── iPhone 12 mini y similares (375px) ──────────────────────────────────── */
+@media (max-width: 640px) {
+  .hero-section {
+    padding-top: 88px;
+    gap: 24px;
+  }
+  .hero-h1     { font-size: clamp(34px, 10vw, 48px); }
+  .hero-right  { padding-bottom: 32px; }
+  .hero-card-inner { transform: rotate(-1deg) scale(0.72); }
+  .hero-waitlist-inline { max-width: 100%; }
+
+  /* Form apilado verticalmente en móvil */
+  .waitlist-input-row { flex-direction: column; gap: 8px; }
+  /* 16px evita el zoom automático de iOS al hacer focus en el input */
+  .waitlist-input { height: 48px; font-size: 16px; }
+  .waitlist-btn   { width: 100%; justify-content: center; height: 48px; }
 }
 
 /* ─── FICHAS SCROLL ──────────────────────────────────────────────────────────── */

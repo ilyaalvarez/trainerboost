@@ -10,7 +10,7 @@ export interface ClientData {
   bg: string
 }
 
-export const CLIENTS: ClientData[] = [
+export const CLIENTS = [
   {
     variant: 1,
     name: 'Alejandro M.',
@@ -55,6 +55,6 @@ export const CLIENTS: ClientData[] = [
     badge: 'COMPLETADO',
     bg: 'radial-gradient(ellipse 70% 50% at 50% 60%, rgba(180,220,80,0.18) 0%, transparent 70%)',
   },
-]
+] as const satisfies readonly ClientData[]
 
-export const HERO_CLIENT = CLIENTS[2]
+export const HERO_CLIENT: ClientData = CLIENTS[2] as ClientData

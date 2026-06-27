@@ -1,7 +1,6 @@
 'use client'
 import { useLayoutEffect, useRef } from 'react'
 import gsap from 'gsap'
-import ScrollTrigger from 'gsap/ScrollTrigger'
 
 interface Props {
   children: string
@@ -40,7 +39,7 @@ export function TextReveal({ children, as: Tag = 'h2', delay = 0, style, classNa
   }, [children, delay])
 
   return (
-    <Tag ref={ref as React.Ref<HTMLHeadingElement>} style={style} className={className}>
+    <Tag ref={ref as React.Ref<HTMLHeadingElement>} style={style} className={className} suppressHydrationWarning>
       {children}
     </Tag>
   )

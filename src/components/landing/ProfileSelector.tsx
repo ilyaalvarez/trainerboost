@@ -64,11 +64,15 @@ export function ProfileSelector() {
   const [active, setActive] = useState(0)
   const contentRef = useRef<HTMLDivElement>(null)
   const cardRef    = useRef<HTMLDivElement>(null)
+  const tweenRef   = useRef<gsap.core.Tween | null>(null)
+
+  useEffect(() => () => { tweenRef.current?.kill() }, [])
 
   const handleTab = (idx: number) => {
     if (idx === active) return
-    const els = [contentRef.current, cardRef.current].filter(Boolean)
-    gsap.to(els, {
+    const els = [contentRef.current, cardRef.current].filter((el): el is HTMLDivElement => el !== null)
+    gsap.killTweensOf(els)
+    tweenRef.current = gsap.to(els, {
       opacity: 0,
       y: -6,
       duration: 0.25,

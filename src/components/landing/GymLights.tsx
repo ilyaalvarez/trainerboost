@@ -30,6 +30,7 @@ export function GymLights() {
         yoyo: true,
         ease: 'sine.inOut',
         stagger: { amount: 4, from: 'random' },
+        delay: 2.6,
       })
     }, ref)
     return () => ctx.revert()

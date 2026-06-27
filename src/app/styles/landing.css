@@ -2163,9 +2163,27 @@
   gap: var(--s6);
   max-width: 300px;
   z-index: 1;
+  position: relative;
+  min-height: 260px;
 }
 .fichas-side-panel--left { align-items: flex-start; }
 .fichas-side-panel--right { align-items: flex-end; }
+.fichas-panel-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+.fichas-side-panel--left .fichas-panel-state  { align-items: flex-start; }
+.fichas-side-panel--right .fichas-panel-state { align-items: flex-end; }
+.fichas-panel-state.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
 .fichas-panel-label {
   font-family: monospace;
   font-size: 10px;

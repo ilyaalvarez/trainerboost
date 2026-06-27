@@ -33,27 +33,27 @@ export default function LogoIcon({ size = 32, animated = true, ...props }: LogoI
         </filter>
       </defs>
 
-      {/* Left disc — darker, receding */}
-      <rect x="2" y="11" width="9" height="18" rx="2.5" fill="#7B1C10" />
+      {/* Base — suelo, más oscuro */}
+      <rect x="11" y="34" width="18" height="4" rx="2" fill="#2D6A05" />
 
-      {/* Left collar */}
-      <rect x="11" y="15" width="3.5" height="10" rx="1.5" fill="#A8281B" />
+      {/* Stem */}
+      <rect x="17" y="24" width="6" height="12" rx="2" fill="#4A8B12" />
 
-      {/* Center bar */}
-      <rect x="14.5" y="18" width="11" height="4" rx="2" fill="#A8281B" />
+      {/* Saddle — cuerpo principal de la seta */}
+      <rect x="3" y="19" width="34" height="11" rx="5.5" fill="#6CB52A" filter="url(#tb-disc-glow)" />
 
-      {/* Right collar */}
-      <rect x="25.5" y="15" width="3.5" height="10" rx="1.5" fill="#A8281B" />
+      {/* Left pommel — en sombra, retrocede */}
+      <rect x="8" y="10" width="8" height="12" rx="3" fill="#5A9B1A" />
 
-      {/* Right disc — brighter, coming forward */}
-      <rect x="29" y="11" width="9" height="18" rx="2.5" fill="#C0392B" filter="url(#tb-disc-glow)" />
+      {/* Right pommel — verde marca, avanza */}
+      <rect x="24" y="10" width="8" height="12" rx="3" fill="#8FD43A" />
 
-      {/* Accent dot — top corner of right disc */}
+      {/* Accent dot — punto más alto, pulsando */}
       <circle
-        cx="33"
-        cy="14"
-        r="2.8"
-        fill="#E74C3C"
+        cx="28"
+        cy="11"
+        r="2.5"
+        fill="#B4F060"
         filter="url(#tb-acc-glow)"
         className={animated ? 'logo-peak-pulse' : undefined}
       />

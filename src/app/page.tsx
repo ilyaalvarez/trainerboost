@@ -217,7 +217,7 @@ export default function LandingPage() {
 
             <div className="hero-left" style={{ position: 'relative', zIndex: 1 }}>
               <h1 id="hero-heading" className="hero-h1">
-                Gestiona tu PT<br />como un profesional
+                Gestiona tus clientes<br />como un profesional
               </h1>
 
               <p className="hero-sub">

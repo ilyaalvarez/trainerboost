@@ -7,7 +7,7 @@ import { CLIENTS } from './clientData'
 
 const INIT_SCALE   = [1.0, 0.93, 0.86, 0.79]
 const INIT_Y       = [0, 20, 40, 60]
-const INIT_OPACITY = [1.0, 0.96, 0.88, 0.76]
+const INIT_OPACITY = [1.0, 1.0, 0.95, 0.88]
 
 const PANEL_DATA = [
   {

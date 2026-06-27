@@ -206,6 +206,31 @@ export function FichasScroll() {
           <div key={i} className="fichas-dot" data-dot={i} />
         ))}
       </div>
+
+      {/* ── Versión móvil: scroll vertical natural ─────────────────────────── */}
+      <div className="fichas-mobile-list">
+        {CLIENTS.map((client, i) => (
+          <div key={client.variant} className="fichas-mobile-item">
+            <div className="fichas-mobile-card-wrap">
+              <ClientCard client={client} animateMode="none" />
+            </div>
+            <div className="fichas-mobile-info">
+              <p className="fichas-panel-label">{PANEL_DATA[i].label}</p>
+              <h3 className="fichas-mobile-title">
+                {PANEL_DATA[i].title.split('\n').map((line, j, arr) => (
+                  <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
+                ))}
+              </h3>
+              <p className="fichas-mobile-desc">{PANEL_DATA[i].desc}</p>
+              <ul className="fichas-mobile-features">
+                {PANEL_DATA[i].features.map(f => (
+                  <li key={f}>{f}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

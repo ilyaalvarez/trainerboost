@@ -1626,6 +1626,7 @@
   --text-md:   18px;
   --text-sm:   14px;
   --text-xs:   12px;
+  --text-base: 16px;
 
   --s2:8px;   --s3:12px;  --s4:16px;  --s5:20px;  --s6:24px;
   --s8:32px;  --s10:40px; --s12:48px; --s16:64px;
@@ -1634,6 +1635,10 @@
   --r-sm:4px; --r-md:6px; --r-lg:8px; --r-card:16px; --r-pill:999px;
 
   --tb-brand-glow: rgba(143,212,58,0.12);
+  --crimson-strike: rgba(192, 57, 43, 0.55);
+  --crimson-strike-line: rgba(192, 57, 43, 0.4);
+  --tb-void-nav: rgba(5, 8, 5, 0.8);
+  --tb-border-nav: rgba(26, 35, 26, 0.6);
 }
 
 /* ─── HERO ───────────────────────────────────────────────────────────────────── */
@@ -1699,7 +1704,6 @@
   font-size: 15px;
   border: none;
   border-radius: var(--r-md);
-  cursor: pointer;
   transition: background 0.2s, box-shadow 0.2s;
 }
 .hero-cta-primary:hover { background: var(--tb-brand-dim); box-shadow: var(--shadow-md); }
@@ -1712,7 +1716,6 @@
   font-size: 15px;
   border: 1px solid var(--tb-border);
   border-radius: var(--r-md);
-  cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
 .hero-cta-secondary:hover { color: var(--tb-brand); border-color: var(--tb-brand); }
@@ -1815,9 +1818,9 @@
 .pain-bad {
   font-family: var(--font-body);
   font-size: clamp(15px, 2.2vw, 20px);
-  color: rgba(192, 57, 43, 0.55);
+  color: var(--crimson-strike);
   text-decoration: line-through;
-  text-decoration-color: rgba(192, 57, 43, 0.4);
+  text-decoration-color: var(--crimson-strike-line);
   margin: 0 0 var(--s3);
 }
 .pain-good {
@@ -1869,7 +1872,6 @@
   font-family: var(--font-body);
   font-size: 14px;
   color: var(--tb-muted);
-  cursor: pointer;
   margin-bottom: -1px;
   transition: color 0.2s, border-color 0.2s;
 }
@@ -1986,9 +1988,10 @@
   align-items: center;
   padding: 0 clamp(24px, 5vw, 64px);
   justify-content: space-between;
-  background: rgba(5,8,5,0.8);
+  background: var(--tb-void-nav);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(26,35,26,0.6);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--tb-border-nav);
 }
 .lp-nav-v2-logo {
   display: flex;
@@ -1996,7 +1999,6 @@
   gap: var(--s3);
   background: transparent;
   border: none;
-  cursor: pointer;
 }
 .lp-nav-v2-anchors {
   display: flex;
@@ -2019,7 +2021,6 @@
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--tb-muted);
-  cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
 .lp-nav-v2-cta:hover { color: var(--tb-brand); border-color: var(--tb-brand); }

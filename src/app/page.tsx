@@ -125,7 +125,7 @@ export default function LandingPage() {
         .from('.hero-h1',        { opacity: 0, y: 32, duration: 0.8 }, 0.2)
         .from('.hero-sub',       { opacity: 0, y: 20, duration: 0.6 }, '-=0.4')
         .from('.hero-ctas',      { opacity: 0, y: 16, duration: 0.5 }, '-=0.3')
-        .from('.hero-card-wrap', { opacity: 0, y: 60, scale: 0.92, rotateX: 10, duration: 1.0 }, 0.3)
+        .from('.hero-card-wrap', { opacity: 0, y: 60, scale: 0.92, duration: 1.0 }, 0.3)
 
       if (heroCardRef.current) {
         gsap.to(heroCardRef.current, {

@@ -5,72 +5,119 @@ import ScrollTrigger from 'gsap/ScrollTrigger'
 import { ClientCard } from './ClientCard'
 import { CLIENTS } from './clientData'
 
+const INIT_SCALE   = [1.0, 0.93, 0.86, 0.79]
+const INIT_Y       = [0, 20, 40, 60]
+const INIT_OPACITY = [1.0, 0.55, 0.28, 0.12]
+
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t
+}
+
 export function FichasScroll() {
-  const wrapRef  = useRef<HTMLDivElement>(null)
-  const trackRef = useRef<HTMLDivElement>(null)
-  const bgRef    = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const bgRef      = useRef<HTMLDivElement>(null)
+  const stackRef   = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
+    const section = sectionRef.current
+    const stack   = stackRef.current
+    if (!section || !stack) return
+
+    // Mobile: sin animacion
     if (window.innerWidth < 768) return
 
     const ctx = gsap.context(() => {
-      const getX = () =>
-        -(trackRef.current!.scrollWidth - window.innerWidth + 160)
+      const cardWraps = Array.from(stack.querySelectorAll<HTMLElement>('.fichas-stack-card-wrap'))
+      const dots      = Array.from(section.querySelectorAll<HTMLElement>('.fichas-dot'))
+      const N = CLIENTS.length  // 4
 
-      const cardEls = Array.from(trackRef.current!.querySelectorAll<HTMLElement>('.client-card'))
+      // Set initial stack state
+      cardWraps.forEach((wrap, i) => {
+        gsap.set(wrap, {
+          scale:   INIT_SCALE[i],
+          y:       INIT_Y[i],
+          opacity: INIT_OPACITY[i],
+          zIndex:  N - i,
+        })
+      })
+
+      // Set first dot as active
+      if (dots[0]) gsap.set(dots[0], { width: 20, background: '#8FD43A' })
 
       ScrollTrigger.create({
-        trigger: wrapRef.current,
+        trigger: section,
         pin: true,
-        scrub: 1.5,
+        scrub: 1.4,
         start: 'top top',
-        end: () => `+=${Math.abs(getX())}`,
+        end: '+=250%',
         onUpdate(self) {
-          gsap.set(trackRef.current, { x: getX() * self.progress })
+          const progress = self.progress
+          const segmentSize = 1 / (N - 1)  // 0.333...
+          const rawIdx      = progress / segmentSize
+          const activeIdx   = Math.min(Math.floor(rawIdx), N - 2)
+          const segProgress = Math.min(rawIdx - activeIdx, 1)
 
-          const center = window.innerWidth / 2
-          cardEls.forEach((card) => {
-            const rect = card.getBoundingClientRect()
-            const cardCenter = rect.left + rect.width / 2
-            const dist = Math.abs(cardCenter - center)
-            const scale = Math.max(0.88, 1 - (dist / window.innerWidth) * 0.3)
-            const opacity = Math.max(0.45, 1 - (dist / window.innerWidth) * 0.8)
-            gsap.set(card, { scale, opacity })
+          cardWraps.forEach((wrap, i) => {
+            if (i < activeIdx) {
+              gsap.set(wrap, { scale: 0.72, y: -80, opacity: 0, zIndex: 0 })
+            } else if (i === activeIdx) {
+              gsap.set(wrap, {
+                scale:   lerp(1.0, 0.72, segProgress),
+                y:       lerp(0, -80, segProgress),
+                opacity: lerp(1.0, 0, segProgress),
+                zIndex:  N - i,
+              })
+            } else {
+              const relPos     = i - activeIdx      // 1, 2, 3...
+              const prevRelPos = relPos - 1          // 0, 1, 2...
+              gsap.set(wrap, {
+                scale:   lerp(INIT_SCALE[relPos] ?? 0.79,   INIT_SCALE[prevRelPos] ?? 1.0,   segProgress),
+                y:       lerp(INIT_Y[relPos] ?? 60,         INIT_Y[prevRelPos] ?? 0,         segProgress),
+                opacity: lerp(INIT_OPACITY[relPos] ?? 0.12, INIT_OPACITY[prevRelPos] ?? 1.0, segProgress),
+                zIndex:  N - i,
+              })
+            }
           })
 
-          const idx = Math.min(
-            Math.round(self.progress * (CLIENTS.length - 1)),
-            CLIENTS.length - 1
-          )
+          // Actualizar fondo
+          const bgIdx = Math.min(Math.round(progress * (N - 1)), N - 1)
           if (bgRef.current) {
-            bgRef.current.style.background = CLIENTS[idx].bg
+            bgRef.current.style.background = CLIENTS[bgIdx].bg
           }
+
+          // Actualizar dots
+          dots.forEach((dot, i) => {
+            const isActive = i === Math.min(activeIdx, N - 1)
+            gsap.set(dot, {
+              width:      isActive ? 20 : 6,
+              background: isActive ? '#8FD43A' : 'rgba(255,255,255,0.2)',
+            })
+          })
         },
       })
-    }, wrapRef)
+    }, sectionRef)
 
     return () => ctx.revert()
   }, [])
 
   return (
-    <div ref={wrapRef} className="fichas-wrap">
-      {/* Fondo dinámico crossfade */}
-      <div
-        ref={bgRef}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          pointerEvents: 'none',
-          transition: 'background 0.6s cubic-bezier(0.16,1,0.3,1)',
-          background: CLIENTS[0].bg,
-        }}
-      />
+    <div ref={sectionRef} className="fichas-stack-section">
+      <div ref={bgRef} className="fichas-stack-bg" />
+      <span className="fichas-stack-label" aria-hidden="true">Sus clientes</span>
 
-      <span className="fichas-label" aria-hidden="true">Tus clientes</span>
+      <div className="fichas-stack-stage">
+        <div ref={stackRef} className="fichas-stack-inner">
+          {CLIENTS.map((client) => (
+            <div key={client.variant} className="fichas-stack-card-wrap">
+              <ClientCard client={client} animateMode="none" />
+            </div>
+          ))}
+        </div>
+      </div>
 
-      <div ref={trackRef} className="fichas-track">
-        {CLIENTS.map((client) => (
-          <ClientCard key={client.variant} client={client} animateMode="scroll" />
+      <div className="fichas-stack-dots" aria-hidden="true">
+        {CLIENTS.map((_, i) => (
+          <div key={i} className="fichas-dot" data-dot={i} />
         ))}
       </div>
     </div>

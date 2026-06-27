@@ -60,10 +60,15 @@ const XP = 750
 const XP_NEXT = 1500
 const XP_PCT = Math.round((XP / XP_NEXT) * 100)
 
+const ADMIN_EMAIL = process.env.KIRITO_ADMIN_EMAIL ?? 'ilyaalvarez66@gmail.com'
+
 export default async function KiritoPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  // Página de administración — solo accesible para el admin del sistema
+  if (user.email !== ADMIN_EMAIL) redirect('/dashboard')
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -71,7 +76,7 @@ export default async function KiritoPage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile || profile.role !== 'trainer') redirect('/dashboard')
+  if (!profile) redirect('/onboarding')
 
   const [
     { count: trainerCount },

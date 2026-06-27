@@ -6,6 +6,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import CookieBanner from '@/components/CookieBanner'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
+import { SmoothScrollProvider } from '@/providers/SmoothScrollProvider'
 import './globals.css'
 
 const inter = Inter({
@@ -137,7 +138,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Saltar al contenido principal
         </a>
-        {children}
+        <SmoothScrollProvider>
+          {children}
+        </SmoothScrollProvider>
         <Toaster
           theme="dark"
           position="top-right"

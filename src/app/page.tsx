@@ -114,6 +114,7 @@ function ScrollProgressBar() {
 export default function LandingPage() {
   const [booted, setBooted] = useState(false)
   const heroCardRef = useRef<HTMLDivElement>(null)
+  const landingRef  = useRef<HTMLDivElement>(null)
 
   // Hero entrance after boot
   useEffect(() => {
@@ -131,7 +132,7 @@ export default function LandingPage() {
           y: 12, repeat: -1, yoyo: true, duration: 4, ease: 'sine.inOut',
         })
       }
-    })
+    }, landingRef)
     return () => ctx.revert()
   }, [booted])
 
@@ -150,7 +151,11 @@ export default function LandingPage() {
     const onLeave = () => { quickX(0); quickY(0) }
     window.addEventListener('mousemove', onMove)
     card.addEventListener('mouseleave', onLeave)
-    return () => { window.removeEventListener('mousemove', onMove); card.removeEventListener('mouseleave', onLeave) }
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      card.removeEventListener('mouseleave', onLeave)
+      gsap.killTweensOf(card)
+    }
   }, [booted])
 
   // Pain section scroll reveals
@@ -162,7 +167,7 @@ export default function LandingPage() {
           .from(item.querySelector('.pain-bad'),  { opacity: 0, x: -16, duration: 0.5, ease: 'expo.out' })
           .from(item.querySelector('.pain-good'), { opacity: 0, x: -16, duration: 0.5, ease: 'expo.out' }, '-=0.2')
       })
-    })
+    }, landingRef)
     return () => ctx.revert()
   }, [booted])
 
@@ -175,6 +180,7 @@ export default function LandingPage() {
       {!booted && <BootLoader onComplete={() => setBooted(true)} />}
 
       <div
+        ref={landingRef}
         className="landing-root"
         style={{ opacity: booted ? 1 : 0, transition: 'opacity 0.4s ease' }}
       >

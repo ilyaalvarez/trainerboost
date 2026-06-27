@@ -2053,3 +2053,26 @@
   font-size: 11px;
   color: var(--tb-faint);
 }
+
+/* ─── CLIENT CARD v2 ─────────────────────────────────────────────────────────── */
+.client-card-v2 {
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.client-card-v2::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--card-accent, #8FD43A);
+  z-index: 2;
+}
+
+@media (max-width: 767px) {
+  .fichas-track .client-card-v2 {
+    width: min(360px, 100%) !important;
+    height: auto !important;
+    min-height: 460px;
+  }
+}

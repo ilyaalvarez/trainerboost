@@ -2161,10 +2161,11 @@
   display: none;
   flex-direction: column;
   gap: var(--s6);
-  max-width: 300px;
+  width: 260px;
+  flex-shrink: 0;
   z-index: 1;
   position: relative;
-  min-height: 260px;
+  min-height: 280px;
 }
 .fichas-side-panel--left { align-items: flex-start; }
 .fichas-side-panel--right { align-items: flex-end; }

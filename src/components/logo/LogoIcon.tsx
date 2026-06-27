@@ -33,25 +33,19 @@ export default function LogoIcon({ size = 32, animated = true, ...props }: LogoI
         </filter>
       </defs>
 
-      {/* Base — suelo, más oscuro */}
+      {/* Base — planta, la mas oscura */}
       <rect x="11" y="34" width="18" height="4" rx="2" fill="#2D6A05" />
 
       {/* Stem */}
-      <rect x="17" y="24" width="6" height="12" rx="2" fill="#4A8B12" />
+      <rect x="17" y="26" width="6" height="10" rx="2" fill="#4A8B12" />
 
-      {/* Saddle — cuerpo principal de la seta */}
-      <rect x="3" y="19" width="34" height="11" rx="5.5" fill="#6CB52A" filter="url(#tb-disc-glow)" />
+      {/* Saddle — oval, cuerpo principal de la seta */}
+      <ellipse cx="20" cy="23" rx="17" ry="8" fill="#6CB52A" filter="url(#tb-disc-glow)" />
 
-      {/* Left pommel — en sombra, retrocede */}
-      <rect x="8" y="10" width="8" height="12" rx="3" fill="#5A9B1A" />
-
-      {/* Right pommel — verde marca, avanza */}
-      <rect x="24" y="10" width="8" height="12" rx="3" fill="#8FD43A" />
-
-      {/* Accent dot — punto más alto, pulsando */}
+      {/* Accent dot — cima del ovalo, pulsando */}
       <circle
         cx="28"
-        cy="11"
+        cy="16"
         r="2.5"
         fill="#B4F060"
         filter="url(#tb-acc-glow)"

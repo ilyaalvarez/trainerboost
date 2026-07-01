@@ -66,7 +66,7 @@ export default async function proxy(request: NextRequest) {
   }
 
   const publicPrefixes = ['/_next', '/favicon', '/api/webhooks', '/api/health', '/pricing', '/demo', '/auth', '/p/', '/blog', '/entrenador-personal']
-  const publicExact = ['/', '/es', '/es/', '/en', '/en/', '/login', '/register', '/onboarding', '/forgot-password', '/reset-password', '/privacidad', '/terminos', '/cookies', '/aviso-legal', '/contact', '/manifest.json', '/sw.js', '/icon-192.png', '/icon-512.png']
+  const publicExact = ['/', '/es', '/es/', '/en', '/en/', '/login', '/register', '/onboarding', '/forgot-password', '/reset-password', '/privacidad', '/terminos', '/cookies', '/aviso-legal', '/contact', '/manifest.json', '/sw.js', '/icon-192.png', '/icon-512.png', '/sitemap.xml', '/robots.txt']
   const isPublic = publicPrefixes.some(p => path.startsWith(p)) || publicExact.includes(path)
 
   if (!user && !isPublic) {

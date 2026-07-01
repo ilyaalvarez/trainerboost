@@ -69,7 +69,7 @@
   font-family: var(--body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip; /* clip no crea scroll-container, no rompe position: sticky */
   cursor: none;
 }
 
@@ -1422,10 +1422,25 @@
 }
 
 /* ─── FICHAS STACK ───────────────────────────────────────────────────────────── */
+
+/* Outer wrapper — pre-renderizado por SSR: reserva el espacio de scroll (400vh)
+   para que no haya layout shift cuando GSAP inicializa (sin pin-spacer dinámico) */
+.fichas-scroll-outer {
+  height: 400vh;
+}
+@media (max-width: 767px) {
+  .fichas-scroll-outer { height: auto; }
+}
+
 .fichas-stack-section {
-  position: relative;
+  position: sticky;
+  top: 0;
+  height: 100vh;
   background: var(--tb-void);
   overflow: hidden;
+}
+@media (max-width: 767px) {
+  .fichas-stack-section { position: relative; height: auto; }
 }
 .fichas-stack-bg {
   position: absolute;

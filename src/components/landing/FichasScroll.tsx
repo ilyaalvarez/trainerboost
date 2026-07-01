@@ -139,6 +139,11 @@ export function FichasScroll({ locale = 'es' }: { locale?: Locale }) {
 
     if (window.innerWidth < 768) return
 
+    // El outer wrapper (.fichas-scroll-outer) tiene height: 400vh renderizado por SSR.
+    // La section es position: sticky — no necesitamos pin: true → no hay pin-spacer → CLS = 0.
+    const outer = section.parentElement
+    if (!outer) return
+
     const ctx = gsap.context(() => {
       const cardWraps = Array.from(stack.querySelectorAll<HTMLElement>('.fichas-stack-card-wrap'))
       const dots      = Array.from(section.querySelectorAll<HTMLElement>('.fichas-dot'))
@@ -155,12 +160,14 @@ export function FichasScroll({ locale = 'es' }: { locale?: Locale }) {
 
       if (dots[0]) gsap.set(dots[0], { width: 20, background: '#8FD43A' })
 
+      // trigger: outer (400vh) con end: 'bottom bottom' = 300vh de scroll total
+      // mismo rango que el anterior end: '+=300%' — sin pin, sin DOM insertions
       ScrollTrigger.create({
-        trigger: section,
-        pin: true,
+        trigger: outer,
+        pin: false,
         scrub: 2,
         start: 'top top',
-        end: '+=300%',
+        end: 'bottom bottom',
         onUpdate(self) {
           const progress = self.progress
           const segmentSize = 1 / (N - 1)

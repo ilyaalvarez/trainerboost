@@ -156,7 +156,7 @@ export default function LocaleLandingPage() {
 
   return (
     <>
-      {!booted && <BootLoader onComplete={() => setBooted(true)} />}
+      {!booted && <BootLoader locale={locale} onComplete={() => setBooted(true)} />}
 
       <div ref={landingRef} className="landing-root">
         <DualCursor />
@@ -219,7 +219,7 @@ export default function LocaleLandingPage() {
           </section>
 
           {/* ── S2: Fichas Scroll ─────────────────────────────────────────── */}
-          <div id="fichas">
+          <div id="fichas" className="fichas-scroll-outer">
             <FichasScroll locale={locale} />
           </div>
 

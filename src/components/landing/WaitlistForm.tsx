@@ -3,15 +3,47 @@
 import { useState, useEffect, useRef } from 'react'
 import { siteConfig } from '../../../config/site'
 import { waitlistConfig } from '../../../config/waitlist'
+import type { Locale } from '@/messages/types'
 
 type State = 'idle' | 'loading' | 'success' | 'error'
 
 interface WaitlistFormProps {
   className?: string
+  locale?: Locale
   onSuccess?: (total: number) => void
 }
 
-export default function WaitlistForm({ className = '', onSuccess }: WaitlistFormProps) {
+const COPY: Record<Locale, {
+  placeholder: string; buttonText: string; ariaEmail: string; ariaSubmit: string
+  errorDefault: string; errorNetwork: string; successNew: string; successAlready: string
+  spotsLeft: (n: number) => string
+}> = {
+  es: {
+    placeholder: 'tu@email.com',
+    buttonText: 'Avísame al lanzar',
+    ariaEmail: 'Tu email para unirte a la lista de espera',
+    ariaSubmit: 'Unirme a la lista de espera',
+    errorDefault: 'Error al unirse. Inténtalo de nuevo.',
+    errorNetwork: 'Sin conexión. Comprueba tu red e inténtalo de nuevo.',
+    successNew: 'Recibido. Te avisamos antes del lanzamiento.',
+    successAlready: 'Ya estás en la lista. Te avisamos cuando abramos.',
+    spotsLeft: (n) => `${n} personas en la lista de espera`,
+  },
+  en: {
+    placeholder: 'your@email.com',
+    buttonText: 'Notify me at launch',
+    ariaEmail: 'Your email to join the waitlist',
+    ariaSubmit: 'Join the waitlist',
+    errorDefault: 'Failed to join. Please try again.',
+    errorNetwork: 'No connection. Check your network and try again.',
+    successNew: "Received. We'll notify you before launch.",
+    successAlready: "You're already on the list. We'll let you know when we open.",
+    spotsLeft: (n) => `${n} people on the waitlist`,
+  },
+}
+
+export default function WaitlistForm({ className = '', locale = 'es', onSuccess }: WaitlistFormProps) {
+  const c = COPY[locale]
   const [email, setEmail] = useState('')
   const [state, setState] = useState<State>('idle')
   const [message, setMessage] = useState('')
@@ -50,21 +82,21 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
 
       if (!res.ok) {
         setState('error')
-        setMessage(data.error ?? 'Error al unirse. Inténtalo de nuevo.')
+        setMessage(data.error ?? c.errorDefault)
         return
       }
 
       setState('success')
       if (data.alreadyJoined) {
-        setMessage('Ya estás en la lista. Te avisamos cuando abramos.')
+        setMessage(c.successAlready)
       } else {
-        setMessage('Recibido. Te avisamos antes del lanzamiento.')
+        setMessage(c.successNew)
         if (typeof data.total === 'number') setSpotsLeft(data.total)
       }
       onSuccess?.(data.total ?? siteConfig.waitlist.seedCount)
     } catch {
       setState('error')
-      setMessage('Sin conexión. Comprueba tu red e inténtalo de nuevo.')
+      setMessage(c.errorNetwork)
     }
   }
 
@@ -90,24 +122,24 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
               name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
+              placeholder={c.placeholder}
               required
               autoComplete="email"
               disabled={state === 'loading'}
               className="waitlist-input"
-              aria-label="Tu email para unirte a la lista de espera"
+              aria-label={c.ariaEmail}
             />
             <button
               type="submit"
               disabled={state === 'loading' || !email}
               className="waitlist-btn"
-              aria-label="Unirme a la lista de espera"
+              aria-label={c.ariaSubmit}
             >
               {state === 'loading' ? (
                 <span className="waitlist-spinner" aria-hidden="true" />
               ) : (
                 <>
-                  <span>Avísame al lanzar</span>
+                  <span>{c.buttonText}</span>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -129,10 +161,10 @@ export default function WaitlistForm({ className = '', onSuccess }: WaitlistForm
             </svg>
           </div>
           <div>
-            <p className="text-sm font-semibold text-fg-primary">{message}</p>
+            <p className="waitlist-success-text">{message}</p>
             {spotsLeft !== null && (
-              <p className="text-xs text-fg-muted mt-1 font-mono">
-                {spotsLeft} personas en la lista de espera
+              <p className="waitlist-success-subtext">
+                {c.spotsLeft(spotsLeft)}
               </p>
             )}
           </div>

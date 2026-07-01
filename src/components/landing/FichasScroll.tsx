@@ -157,7 +157,9 @@ export function FichasScroll() {
       })
     }, sectionRef)
 
-    return () => ctx.revert()
+    const onResize = () => { if (window.innerWidth < 768) ctx.revert() }
+    window.addEventListener('resize', onResize)
+    return () => { window.removeEventListener('resize', onResize); ctx.revert() }
   }, [])
 
   return (

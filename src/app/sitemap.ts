@@ -7,10 +7,23 @@ export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: BASE,            lastModified: new Date(), changeFrequency: 'monthly',  priority: 1.0 },
-    { url: `${BASE}/pricing`, lastModified: new Date(), changeFrequency: 'monthly',  priority: 0.9 },
-    { url: `${BASE}/login`,   lastModified: new Date(), changeFrequency: 'yearly',   priority: 0.3 },
-    { url: `${BASE}/register`,lastModified: new Date(), changeFrequency: 'yearly',   priority: 0.5 },
+    {
+      url: `${BASE}/es/`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 1.0,
+      alternates: { languages: { es: `${BASE}/es/`, en: `${BASE}/en/` } },
+    },
+    {
+      url: `${BASE}/en/`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 1.0,
+      alternates: { languages: { es: `${BASE}/es/`, en: `${BASE}/en/` } },
+    },
+    { url: `${BASE}/pricing`,  lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE}/login`,    lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
+    { url: `${BASE}/register`, lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.5 },
   ]
 
   try {

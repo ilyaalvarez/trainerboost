@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import gsap from 'gsap'
 
 interface Item { q: string; a: string }
@@ -7,6 +7,10 @@ interface Item { q: string; a: string }
 export function Accordion({ items }: { items: Item[] }) {
   const [open, setOpen] = useState<number | null>(null)
   const bodyRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  useEffect(() => {
+    return () => { bodyRefs.current.forEach(el => el && gsap.killTweensOf(el)) }
+  }, [])
 
   const toggle = (i: number) => {
     const bodyEl = bodyRefs.current[i]
@@ -53,7 +57,6 @@ export function Accordion({ items }: { items: Item[] }) {
               fontWeight: 500,
               fontSize: '15px',
               color: 'var(--tb-text)',
-              cursor: 'pointer',
               textAlign: 'left',
               gap: '16px',
             }}

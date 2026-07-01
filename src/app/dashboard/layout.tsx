@@ -1,5 +1,35 @@
 import { redirect } from 'next/navigation'
+import { Barlow_Condensed, Anton, Instrument_Serif, Space_Grotesk } from 'next/font/google'
 import { createClient } from '@/lib/supabase/server'
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  variable: '--font-display',
+  display: 'swap',
+})
+
+const anton = Anton({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-impact',
+  display: 'swap',
+})
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  style: ['italic'],
+  weight: ['400'],
+  variable: '--font-serif',
+  display: 'swap',
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['500', '700'],
+  variable: '--font-wordmark',
+  display: 'swap',
+})
 import DashboardShell from '@/components/layout/DashboardShell'
 import { getUnreadMessageCount, getPendingAppointmentsCount, getPendingCheckinCount } from '@/lib/data/dashboard'
 import type { Profile, Subscription } from '@/types/database'
@@ -22,14 +52,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (profile.role !== 'trainer') redirect('/client')
 
   return (
-    <DashboardShell
-      profile={profile as Profile}
-      subscription={subscription as Subscription | null}
-      unreadMessages={unread ?? 0}
-      pendingApts={pendingApts ?? 0}
-      pendingCheckins={pendingCheckins ?? 0}
-    >
-      {children}
-    </DashboardShell>
+    <div className={`${barlowCondensed.variable} ${anton.variable} ${instrumentSerif.variable} ${spaceGrotesk.variable}`}>
+      <DashboardShell
+        profile={profile as Profile}
+        subscription={subscription as Subscription | null}
+        unreadMessages={unread ?? 0}
+        pendingApts={pendingApts ?? 0}
+        pendingCheckins={pendingCheckins ?? 0}
+      >
+        {children}
+      </DashboardShell>
+    </div>
   )
 }

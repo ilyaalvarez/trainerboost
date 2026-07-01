@@ -68,6 +68,10 @@ export const en: Messages = {
     copy: '© 2026 TrainerBoost',
     ariaLabel: 'Footer',
     legalLinks: 'Legal pages',
+    privacy: 'Privacy',
+    terms: 'Terms',
+    cookies: 'Cookies',
+    legalNotice: 'Legal Notice',
   },
   form: {
     placeholder: 'your@email.com',

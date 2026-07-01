@@ -2,71 +2,131 @@
 import { useState, useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import { ClientCard } from './ClientCard'
-import { CLIENTS } from './clientData'
-import type { ClientData } from './clientData'
+import { getClients } from './clientData'
+import type { Locale } from '@/messages/types'
 
-interface Profile {
+interface ProfileBase {
   tab: string
   title: string
   desc: string
   bullets: string[]
-  client: ClientData
+  clientIdx: 0 | 1 | 2 | 3
 }
 
-const PROFILES: Profile[] = [
-  {
-    tab: '🏋️ Fuerza',
-    title: 'Para entrenadores\nde fuerza y musculación',
-    desc: 'Seguimiento de cargas, RPE y progresión de fuerza. Tus clientes ven cómo sus récords personales suben cada semana.',
-    bullets: [
-      'Registro de 1RM automático',
-      'Progresión de series y pesos',
-      'Gráficas de fuerza por grupo muscular',
-    ],
-    client: CLIENTS[2], // Carlos R. — 78%
-  },
-  {
-    tab: '🏃 Cardio',
-    title: 'Para entrenadores\nde running y resistencia',
-    desc: 'Planes de entrenamiento por zonas de frecuencia cardíaca. Seguimiento de ritmos, distancias y evolución aeróbica.',
-    bullets: [
-      'Zonas FC integradas',
-      'Planes por semanas de carrera',
-      'Historial de entrenamientos outdoor',
-    ],
-    client: CLIENTS[3], // María G. — completado
-  },
-  {
-    tab: '🥗 Nutrición',
-    title: 'Para entrenadores\ncon enfoque nutricional',
-    desc: 'Combina entrenamiento y hábitos alimenticios. Seguimiento de composición corporal y adherencia al plan.',
-    bullets: [
-      'Registro de peso corporal',
-      'Evolución de % grasa',
-      'Adherencia al plan nutricional',
-    ],
-    client: CLIENTS[0], // Alejandro M. — 12%
-  },
-  {
-    tab: '⚡ Online',
-    title: 'Para entrenadores\nque trabajan 100% en remoto',
-    desc: 'Gestiona clientes de toda España sin reuniones presenciales. Todo el seguimiento y los cobros de forma digital.',
-    bullets: [
-      'Chat con todos los clientes centralizado',
-      'Pagos recurrentes sin facturas manuales',
-      'Seguimiento sin necesidad de vernos',
-    ],
-    client: CLIENTS[1], // Sara L. — 45%
-  },
-]
+const PROFILE_BASE: Record<Locale, ProfileBase[]> = {
+  es: [
+    {
+      tab: '🏋️ Fuerza',
+      title: 'Para entrenadores\nde fuerza y musculación',
+      desc: 'Seguimiento de cargas, RPE y progresión de fuerza. Tus clientes ven cómo sus récords personales suben cada semana.',
+      bullets: [
+        'Registro de 1RM automático',
+        'Progresión de series y pesos',
+        'Gráficas de fuerza por grupo muscular',
+      ],
+      clientIdx: 2,
+    },
+    {
+      tab: '🏃 Cardio',
+      title: 'Para entrenadores\nde running y resistencia',
+      desc: 'Planes de entrenamiento por zonas de frecuencia cardíaca. Seguimiento de ritmos, distancias y evolución aeróbica.',
+      bullets: [
+        'Zonas FC integradas',
+        'Planes por semanas de carrera',
+        'Historial de entrenamientos outdoor',
+      ],
+      clientIdx: 3,
+    },
+    {
+      tab: '🥗 Nutrición',
+      title: 'Para entrenadores\ncon enfoque nutricional',
+      desc: 'Combina entrenamiento y hábitos alimenticios. Seguimiento de composición corporal y adherencia al plan.',
+      bullets: [
+        'Registro de peso corporal',
+        'Evolución de % grasa',
+        'Adherencia al plan nutricional',
+      ],
+      clientIdx: 0,
+    },
+    {
+      tab: '⚡ Online',
+      title: 'Para entrenadores\nque trabajan 100% en remoto',
+      desc: 'Gestiona clientes de toda España sin reuniones presenciales. Todo el seguimiento y los cobros de forma digital.',
+      bullets: [
+        'Chat con todos los clientes centralizado',
+        'Pagos recurrentes sin facturas manuales',
+        'Seguimiento sin necesidad de vernos',
+      ],
+      clientIdx: 1,
+    },
+  ],
+  en: [
+    {
+      tab: '🏋️ Strength',
+      title: 'For strength\nand bodybuilding coaches',
+      desc: 'Load tracking, RPE and strength progression. Your clients see their personal records rise week after week.',
+      bullets: [
+        'Automatic 1RM tracking',
+        'Sets and weights progression',
+        'Strength charts by muscle group',
+      ],
+      clientIdx: 2,
+    },
+    {
+      tab: '🏃 Cardio',
+      title: 'For running\nand endurance coaches',
+      desc: 'Training plans by heart rate zones. Tracking paces, distances and aerobic evolution.',
+      bullets: [
+        'Built-in HR zones',
+        'Weekly run plans',
+        'Outdoor workout history',
+      ],
+      clientIdx: 3,
+    },
+    {
+      tab: '🥗 Nutrition',
+      title: 'For coaches\nwith nutritional focus',
+      desc: 'Combine training and eating habits. Body composition and plan adherence tracking.',
+      bullets: [
+        'Body weight tracking',
+        'Body fat % evolution',
+        'Nutrition plan adherence',
+      ],
+      clientIdx: 0,
+    },
+    {
+      tab: '⚡ Online',
+      title: 'For coaches\nworking 100% remote',
+      desc: 'Manage clients from anywhere with no in-person meetings. All tracking and payments fully digital.',
+      bullets: [
+        'Centralized chat with all clients',
+        'Recurring payments without manual invoices',
+        'Progress tracking without meeting in person',
+      ],
+      clientIdx: 1,
+    },
+  ],
+}
 
-export function ProfileSelector() {
+const SECTION_LABEL: Record<Locale, string> = {
+  es: 'Para cada tipo de entrenador',
+  en: 'For every type of trainer',
+}
+
+export function ProfileSelector({ locale = 'es' }: { locale?: Locale }) {
   const [active, setActive] = useState(0)
   const contentRef = useRef<HTMLDivElement>(null)
   const cardRef    = useRef<HTMLDivElement>(null)
   const tweenRef   = useRef<gsap.core.Tween | null>(null)
 
+  const clients  = getClients(locale)
+  const profiles = PROFILE_BASE[locale].map(p => ({ ...p, client: clients[p.clientIdx] }))
+  const profile  = profiles[active]
+
   useEffect(() => () => { tweenRef.current?.kill() }, [])
+
+  // Reset active tab when locale changes
+  useEffect(() => { setActive(0) }, [locale])
 
   const handleTab = (idx: number) => {
     if (idx === active) return
@@ -88,15 +148,12 @@ export function ProfileSelector() {
     })
   }
 
-  const profile = PROFILES[active]
-
   return (
     <section className="profile-section" id="sistema">
-      <p className="profile-section-label">Para cada tipo de entrenador</p>
+      <p className="profile-section-label">{SECTION_LABEL[locale]}</p>
 
-      {/* Tabs */}
       <div className="profile-tabs" role="tablist">
-        {PROFILES.map((p, i) => (
+        {profiles.map((p, i) => (
           <button
             key={p.tab}
             role="tab"
@@ -109,7 +166,6 @@ export function ProfileSelector() {
         ))}
       </div>
 
-      {/* Content */}
       <div className="profile-content">
         <div ref={contentRef} className="profile-text-col">
           <h2 className="profile-title">
@@ -127,7 +183,7 @@ export function ProfileSelector() {
 
         <div ref={cardRef} className="profile-card-col">
           <ClientCard
-            key={active}
+            key={`${locale}-${active}`}
             client={profile.client}
             animateMode="immediate"
           />

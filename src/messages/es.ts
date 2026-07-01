@@ -68,6 +68,10 @@ export const es: Messages = {
     copy: '© 2026 TrainerBoost · España',
     ariaLabel: 'Pie de página',
     legalLinks: 'Páginas legales',
+    privacy: 'Privacidad',
+    terms: 'Términos',
+    cookies: 'Cookies',
+    legalNotice: 'Aviso Legal',
   },
   form: {
     placeholder: 'tu@email.com',

@@ -1173,6 +1173,7 @@
   color: var(--tb-muted);
   text-transform: uppercase;
   margin-bottom: var(--s8);
+  text-align: center;
 }
 .profile-tabs {
   display: flex;
@@ -1180,6 +1181,7 @@
   margin-bottom: var(--s16);
   border-bottom: 1px solid var(--tb-border);
   flex-wrap: wrap;
+  justify-content: center;
 }
 .profile-tab {
   padding: var(--s3) var(--s6);
@@ -1245,10 +1247,11 @@
   color: var(--tb-text);
   line-height: 1.1;
   letter-spacing: -0.02em;
-  margin: 0 0 var(--s12);
+  margin: 0 auto var(--s12);
   max-width: 680px;
+  text-align: center;
 }
-.faq-inner { max-width: 680px; }
+.faq-inner { max-width: 680px; margin: 0 auto; }
 
 /* ─── CTA FINAL ──────────────────────────────────────────────────────────────── */
 .cta-final-section {
@@ -1341,37 +1344,33 @@
   transition: color 0.2s, border-color 0.2s;
 }
 .lp-nav-v2-cta:hover { color: var(--tb-brand); border-color: var(--tb-brand); }
+.lp-nav-v2-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 @media (max-width: 600px) {
   .lp-nav-v2-anchors { display: none; }
 }
 
 /* ─── LANGUAGE SELECTOR ──────────────────────────────────────────────────────── */
-.lang-selector {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: 8px;
-}
-.lang-selector-btn {
+.lang-select {
+  height: 36px;
+  padding: 0 10px;
   background: transparent;
-  border: none;
+  border: 1px solid var(--tb-border);
+  border-radius: var(--r-md);
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--tb-muted);
   cursor: pointer;
-  padding: 4px 2px;
-  transition: color 0.2s;
-  line-height: 1;
+  outline: none;
+  transition: color 0.2s, border-color 0.2s;
 }
-.lang-selector-btn:hover { color: var(--tb-text); }
-.lang-selector-btn--active { color: var(--tb-brand); }
-.lang-selector-sep {
-  font-size: 10px;
-  color: var(--tb-faint);
-  user-select: none;
-}
+.lang-select:hover { color: var(--tb-text); border-color: var(--tb-text); }
+.lang-select option { background: #050805; color: #EEF5EE; }
 
 /* ─── FOOTER ─────────────────────────────────────────────────────────────────── */
 .lp-footer-v2 {

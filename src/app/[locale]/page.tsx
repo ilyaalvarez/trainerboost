@@ -1,9 +1,9 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import gsap from 'gsap'
 import { BootLoader } from '@/components/landing/BootLoader'
-import { GymLights } from '@/components/landing/GymLights'
 import { ClientCard } from '@/components/landing/ClientCard'
 import { FichasScroll } from '@/components/landing/FichasScroll'
 import { ProfileSelector } from '@/components/landing/ProfileSelector'
@@ -13,11 +13,17 @@ import WaitlistForm from '@/components/landing/WaitlistForm'
 import { LanguageSelector } from '@/components/landing/LanguageSelector'
 import LogoFull from '@/components/logo/LogoFull'
 import LogoIcon from '@/components/logo/LogoIcon'
-import { CLIENTS, HERO_CLIENT } from '@/components/landing/clientData'
+import { getClients, getHeroClient } from '@/components/landing/clientData'
 import { es } from '@/messages/es'
 import { en } from '@/messages/en'
 import type { Locale } from '@/messages/types'
 import '../styles/landing.css'
+
+// Decorativo — no afecta LCP, carga en chunk separado
+const GymLights = dynamic(
+  () => import('@/components/landing/GymLights').then(m => ({ default: m.GymLights })),
+  { ssr: false }
+)
 
 function DualCursor() {
   const dotRef  = useRef<HTMLDivElement>(null)
@@ -78,6 +84,9 @@ export default function LocaleLandingPage() {
   const params = useParams()
   const locale = (params?.locale as Locale) === 'en' ? 'en' : 'es'
   const t = locale === 'en' ? en : es
+
+  const clients    = getClients(locale)
+  const heroClient = getHeroClient(locale)
 
   const [booted, setBooted] = useState(false)
   const heroCardRef      = useRef<HTMLDivElement>(null)
@@ -166,10 +175,12 @@ export default function LocaleLandingPage() {
             <a href="#sistema" className="lp-nav-v2-anchor">{t.nav.howItWorks}</a>
             <a href="#faq"     className="lp-nav-v2-anchor">{t.nav.faq}</a>
           </div>
-          <button className="lp-nav-v2-cta" onClick={() => scrollTo('cta-final')}>
-            {t.nav.waitlist}
-          </button>
-          <LanguageSelector locale={locale} />
+          <div className="lp-nav-v2-right">
+            <button className="lp-nav-v2-cta" onClick={() => scrollTo('cta-final')}>
+              {t.nav.waitlist}
+            </button>
+            <LanguageSelector locale={locale} />
+          </div>
         </nav>
 
         <main id="main-content" aria-label={t.a11y.mainContent}>
@@ -201,7 +212,7 @@ export default function LocaleLandingPage() {
               <div className="hero-card-wrap">
                 <div ref={heroCardRef} className="hero-card-inner">
                   <div className="hero-card-glow" aria-hidden="true" />
-                  <ClientCard client={HERO_CLIENT} animateMode="none" />
+                  <ClientCard client={heroClient} animateMode="none" />
                 </div>
               </div>
             </div>
@@ -209,7 +220,7 @@ export default function LocaleLandingPage() {
 
           {/* ── S2: Fichas Scroll ─────────────────────────────────────────── */}
           <div id="fichas">
-            <FichasScroll />
+            <FichasScroll locale={locale} />
           </div>
 
           {/* ── S3: Problema ──────────────────────────────────────────────── */}
@@ -236,7 +247,7 @@ export default function LocaleLandingPage() {
           </section>
 
           {/* ── S4: Profile Selector ──────────────────────────────────────── */}
-          <ProfileSelector />
+          <ProfileSelector locale={locale} />
 
           {/* ── S5: FAQ ───────────────────────────────────────────────────── */}
           <section className="faq-section" id="faq" aria-labelledby="faq-heading">
@@ -258,7 +269,7 @@ export default function LocaleLandingPage() {
           >
             <div className="cta-final-card-bg" aria-hidden="true">
               <ClientCard
-                client={CLIENTS[3]}
+                client={clients[3]}
                 animateMode="none"
                 style={{ opacity: 0.12, transform: 'rotate(6deg)' }}
               />
@@ -277,10 +288,10 @@ export default function LocaleLandingPage() {
         <footer className="lp-footer-v2" aria-label={t.footer.ariaLabel}>
           <LogoFull height={24} />
           <nav className="lp-footer-v2-links" aria-label={t.footer.legalLinks}>
-            <a href="/privacidad"  className="lp-footer-v2-link">Privacidad</a>
-            <a href="/terminos"    className="lp-footer-v2-link">Términos</a>
-            <a href="/cookies"     className="lp-footer-v2-link">Cookies</a>
-            <a href="/aviso-legal" className="lp-footer-v2-link">Aviso Legal</a>
+            <a href="/privacidad"  className="lp-footer-v2-link">{t.footer.privacy}</a>
+            <a href="/terminos"    className="lp-footer-v2-link">{t.footer.terms}</a>
+            <a href="/cookies"     className="lp-footer-v2-link">{t.footer.cookies}</a>
+            <a href="/aviso-legal" className="lp-footer-v2-link">{t.footer.legalNotice}</a>
           </nav>
           <p className="lp-footer-v2-copy">{t.footer.copy}</p>
         </footer>

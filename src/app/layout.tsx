@@ -13,12 +13,14 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
+  adjustFontFallback: true,
 })
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
+  adjustFontFallback: true,
 })
 
 const outfit = Outfit({
@@ -26,6 +28,7 @@ const outfit = Outfit({
   weight: ['500', '700', '800'],
   variable: '--font-outfit',
   display: 'swap',
+  adjustFontFallback: true,
 })
 
 export const metadata: Metadata = {

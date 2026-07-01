@@ -28,6 +28,10 @@ export interface Messages {
     copy: string
     ariaLabel: string
     legalLinks: string
+    privacy: string
+    terms: string
+    cookies: string
+    legalNotice: string
   }
   form: {
     placeholder: string

@@ -29,7 +29,7 @@ export function GymLightsBackground() {
       })
 
       gsap.to('.gym-segment', {
-        opacity: (i) => 0.5 + Math.random() * 0.4,
+        opacity: () => 0.5 + Math.random() * 0.4,
         duration: () => 2 + Math.random() * 2,
         repeat: -1,
         yoyo: true,

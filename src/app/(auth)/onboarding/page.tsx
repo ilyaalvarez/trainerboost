@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import {
@@ -293,7 +294,7 @@ function TrainerWizard({ firstName, userId }: { firstName: string; userId: strin
                       {inviteCode.toUpperCase()}
                     </div>
                     <p className="text-[10px] text-fg-disabled text-center mt-1">
-                      Válido 7 días · <a href="/onboarding" className="underline">trainerboost.es/onboarding</a>
+                      Válido 7 días · <Link href="/onboarding" className="underline">trainerboost.es/onboarding</Link>
                     </p>
                   </div>
 

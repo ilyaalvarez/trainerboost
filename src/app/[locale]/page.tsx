@@ -9,6 +9,7 @@ import { FichasScroll } from '@/components/landing/FichasScroll'
 import { ProfileSelector } from '@/components/landing/ProfileSelector'
 import { TextReveal } from '@/components/ui/TextReveal'
 import { Accordion } from '@/components/ui/Accordion'
+import Link from 'next/link'
 import WaitlistForm from '@/components/landing/WaitlistForm'
 import { LanguageSelector } from '@/components/landing/LanguageSelector'
 import LogoFull from '@/components/logo/LogoFull'
@@ -288,10 +289,10 @@ export default function LocaleLandingPage() {
         <footer className="lp-footer-v2" aria-label={t.footer.ariaLabel}>
           <LogoFull height={24} />
           <nav className="lp-footer-v2-links" aria-label={t.footer.legalLinks}>
-            <a href="/privacidad"  className="lp-footer-v2-link">{t.footer.privacy}</a>
-            <a href="/terminos"    className="lp-footer-v2-link">{t.footer.terms}</a>
-            <a href="/cookies"     className="lp-footer-v2-link">{t.footer.cookies}</a>
-            <a href="/aviso-legal" className="lp-footer-v2-link">{t.footer.legalNotice}</a>
+            <Link href="/privacidad"  className="lp-footer-v2-link">{t.footer.privacy}</Link>
+            <Link href="/terminos"    className="lp-footer-v2-link">{t.footer.terms}</Link>
+            <Link href="/cookies"     className="lp-footer-v2-link">{t.footer.cookies}</Link>
+            <Link href="/aviso-legal" className="lp-footer-v2-link">{t.footer.legalNotice}</Link>
           </nav>
           <p className="lp-footer-v2-copy">{t.footer.copy}</p>
         </footer>

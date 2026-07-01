@@ -1,5 +1,5 @@
 'use client'
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import { ClientCard } from './ClientCard'
@@ -129,8 +129,8 @@ export function FichasScroll({ locale = 'es' }: { locale?: Locale }) {
   const rightPanelRef  = useRef<HTMLDivElement>(null)
   const activePanelIdx = useRef(0)
 
-  const clients   = getClients(locale)
-  const panelData = PANELS[locale]
+  const clients   = useMemo(() => getClients(locale), [locale])
+  const panelData = useMemo(() => PANELS[locale], [locale])
 
   useLayoutEffect(() => {
     const section = sectionRef.current
@@ -229,7 +229,7 @@ export function FichasScroll({ locale = 'es' }: { locale?: Locale }) {
     const onResize = () => { if (window.innerWidth < 768) ctx.revert() }
     window.addEventListener('resize', onResize)
     return () => { window.removeEventListener('resize', onResize); ctx.revert() }
-  }, [locale]) // re-init when locale changes
+  }, [locale, clients, panelData])
 
   return (
     <div ref={sectionRef} className="fichas-stack-section">

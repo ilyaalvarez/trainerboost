@@ -455,8 +455,7 @@ export default function TrainerDemoPage() {
           <span className="text-slate-300 sm:hidden">Panel entrenador · Demo</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Link href="/demo" className="text-xs text-slate-400 hover:text-white transition-colors hidden sm:block">← Volver</Link>
-          <a href="#demo-cta" className="btn-gradient text-xs px-4 py-1.5"><Zap className="w-3 h-3" /> Apuntarme</a>
+          <Link href="/demo" className="text-xs text-slate-400 hover:text-white transition-colors">← Volver</Link>
         </div>
       </div>
 

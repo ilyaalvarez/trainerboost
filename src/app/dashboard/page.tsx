@@ -7,6 +7,7 @@ import { formatRelative, formatDate, timeAgo } from '@/lib/utils'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import StatsCard from '@/components/ui/StatsCard'
+import { FREE_MAX_CLIENTS } from '@/lib/plans'
 
 
 export default async function DashboardPage() {
@@ -150,7 +151,7 @@ export default async function DashboardPage() {
             <Zap className="w-5 h-5 text-brand-primary shrink-0" />
             <div>
               <p className="text-sm font-semibold text-fg-primary">Completa tu configuración para empezar</p>
-              <p className="text-xs text-fg-muted mt-0.5">Empieza gratis con 3 clientes, o amplía tu plan desde 19€/mes</p>
+              <p className="text-xs text-fg-muted mt-0.5">Empieza gratis con {FREE_MAX_CLIENTS} clientes, o amplía tu plan desde 19€/mes</p>
             </div>
           </div>
           <Link href="/pricing" className="btn-gradient shrink-0 text-sm py-1.5 px-4 flex items-center gap-1.5">

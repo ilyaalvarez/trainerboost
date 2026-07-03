@@ -9,27 +9,27 @@ export const es: Messages = {
     goToTop: 'Ir al inicio',
   },
   hero: {
-    h1: 'Gestiona tus clientes\ncomo un profesional',
-    sub: 'Clientes organizados. Seguimiento automático.\nCobros sin perseguir a nadie. Todo en un sitio.',
+    h1: 'Deja de gestionar\ntu negocio desde\nWhatsApp',
+    sub: 'Agenda semanal, rutinas con vídeo y seguimiento automático.\nTodo lo que necesitas para llevar 20 clientes con la misma energía que llevas 5.',
     hint: 'Sin compromiso · Te avisamos antes del lanzamiento',
   },
   pain: {
     sectionTitle: 'Sin TrainerBoost, así\nes el día de un\nEntrenador Personal',
     items: [
       {
-        bad: 'Planes de entrenamiento en PDF por WhatsApp',
-        good: 'Rutinas digitales que el cliente ve desde su móvil',
+        bad: 'Persigues a tus clientes para agendar sesiones y confirmar cambios de última hora',
+        good: 'Agenda semanal visual. Ellos reservan, tú recibes la notificación.',
       },
       {
-        bad: 'Cobros manuales y recordatorios incómodos',
-        good: 'Stripe integrado — el cobro llega solo, sin perseguir',
+        bad: 'PDF por WhatsApp que nadie vuelve a abrir',
+        good: 'Rutinas con vídeo integrado que el cliente sigue desde su móvil, paso a paso.',
       },
       {
-        bad: 'Clientes que abandonan porque no ven su progreso',
-        good: 'Gráficas automáticas que los mantienen comprometidos',
+        bad: 'Con más de 10 clientes el caos se multiplica y el tiempo desaparece',
+        good: 'De 5 a 50 clientes sin cambiar de herramienta. TrainerBoost escala contigo.',
       },
     ],
-    closeTitle: 'Todo lo que necesitas\npara gestionar mejor\ny cobrar a tiempo.',
+    closeTitle: 'Recupera el tiempo que\nahora gestionas. Úsalo\npara crecer de verdad.',
   },
   faq: {
     sectionTitle: 'Preguntas frecuentes\nde Entrenadores Personales',
@@ -55,14 +55,14 @@ export const es: Messages = {
         a: 'Sí. Desde 5 hasta más de 100 clientes sin cambiar de herramienta. La plataforma escala contigo.',
       },
       {
-        q: '¿En qué se diferencia de una app genérica de fitness?',
-        a: 'Las apps de fitness están pensadas para el cliente final. TrainerBoost está pensado para ti: para gestionar tu negocio, hacer seguimiento y cobrar. Sin ruido extra.',
+        q: '¿En qué se diferencia de otras plataformas para entrenadores?',
+        a: 'La mayoría no tienen agenda semanal visual para organizar tus entrenamientos. Los vídeos de ejercicios en TrainerBoost funcionan mediante enlace — sin subidas que fallen. Todo está en español, pensado para el mercado español, con soporte de precios en euros y cumplimiento RGPD.',
       },
     ],
   },
   cta: {
-    h2: 'Empieza hoy.',
-    sub: 'Apúntate. Te avisamos antes del lanzamiento.',
+    h2: 'El primer paso para dejar\nde perseguir clientes.',
+    sub: 'Apúntate. Te avisamos antes que a nadie.',
   },
   footer: {
     copy: '© 2026 TrainerBoost · España',

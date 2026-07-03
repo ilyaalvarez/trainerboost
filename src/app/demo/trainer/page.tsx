@@ -1,17 +1,18 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import {
   Zap, LayoutDashboard, Users, Dumbbell, UtensilsCrossed, CalendarDays,
   MessageSquare, Settings, CreditCard, BarChart2, Clock, TrendingUp, Plus,
-  ExternalLink, Check, Flame, ArrowUpRight, Award, ChevronRight, Activity,
+  Check, Flame, ArrowUpRight, Award, ChevronRight, Activity,
   Video, MapPin, Trophy, Search, X, Send, ChevronDown, GripVertical, Phone,
-  Mail, Trash2, ArrowLeft,
+  Mail, Trash2, ArrowLeft, List,
 } from 'lucide-react'
 import StatsCard from '@/components/ui/StatsCard'
 import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
+import DemoWaitlistCTA from '@/components/demo/DemoWaitlistCTA'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ClientStatus = 'active' | 'paused'
@@ -33,6 +34,9 @@ interface Appointment   { id: number; client: string; initials: string; colorCla
 interface ChatMessage   { from: 'trainer' | 'client'; text: string; time: string }
 interface Conversation  { id: number; initials: string; colorClass: string; name: string; unread: boolean; lastTime: string; thread: ChatMessage[] }
 interface NewExercise   { name: string; sets: string; reps: string; rest: string }
+interface CalApt       { id: number; dayOffset: number; time: string; client: string; initials: string; colorClass: string; borderColor: string; type: AptType; duration: number }
+interface MonthApt     { id: number; monthOffset: number; time: string; client: string; initials: string; borderColor: string }
+type ViewMode          = 'list' | 'week' | 'month'
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
 function useCountUp(target: number, dur = 1000): number {
@@ -132,6 +136,62 @@ const INIT_APPOINTMENTS: Appointment[] = [
   { id: 5, client: 'Pedro López', initials: 'PL', colorClass: 'bg-violet-500/20 text-violet-300',  date: 'Vie 6 Jun', time: '09:00', duration: 60, type: 'Online',     status: 'pending'   },
 ]
 
+const CALENDAR_WEEK: CalApt[] = [
+  { id: 1,  dayOffset: 0, time: '09:00', client: 'Ana García',      initials: 'AG', colorClass: 'bg-sky-500/10',      borderColor: '#0EA5E9', type: 'Online',     duration: 60 },
+  { id: 2,  dayOffset: 0, time: '17:00', client: 'Pedro López',     initials: 'PL', colorClass: 'bg-violet-500/10',   borderColor: '#7C3AED', type: 'Presencial', duration: 60 },
+  { id: 3,  dayOffset: 1, time: '10:30', client: 'María Fdez.',     initials: 'MF', colorClass: 'bg-emerald-500/10',  borderColor: '#10B981', type: 'Presencial', duration: 45 },
+  { id: 4,  dayOffset: 2, time: '09:00', client: 'Ana García',      initials: 'AG', colorClass: 'bg-sky-500/10',      borderColor: '#0EA5E9', type: 'Online',     duration: 60 },
+  { id: 5,  dayOffset: 2, time: '11:00', client: 'Sofía Martín',    initials: 'SM', colorClass: 'bg-rose-500/10',     borderColor: '#F43F5E', type: 'Online',     duration: 45 },
+  { id: 6,  dayOffset: 3, time: '09:00', client: 'Ana García',      initials: 'AG', colorClass: 'bg-sky-500/10',      borderColor: '#0EA5E9', type: 'Online',     duration: 60 },
+  { id: 7,  dayOffset: 3, time: '11:30', client: 'Pedro López',     initials: 'PL', colorClass: 'bg-violet-500/10',   borderColor: '#7C3AED', type: 'Presencial', duration: 45 },
+  { id: 8,  dayOffset: 3, time: '16:00', client: 'María Fdez.',     initials: 'MF', colorClass: 'bg-emerald-500/10',  borderColor: '#10B981', type: 'Online',     duration: 60 },
+  { id: 9,  dayOffset: 4, time: '09:00', client: 'Sofía Martín',    initials: 'SM', colorClass: 'bg-rose-500/10',     borderColor: '#F43F5E', type: 'Presencial', duration: 60 },
+  { id: 10, dayOffset: 4, time: '17:30', client: 'Pedro López',     initials: 'PL', colorClass: 'bg-violet-500/10',   borderColor: '#7C3AED', type: 'Online',     duration: 60 },
+]
+
+const MONTH_APTS: MonthApt[] = [
+  // Semana -2
+  { id:101, monthOffset:-10, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:102, monthOffset:-10, time:'10:30', client:'María Fdez.',   initials:'MF', borderColor:'#10B981' },
+  { id:103, monthOffset: -9, time:'17:00', client:'Pedro López',   initials:'PL', borderColor:'#7C3AED' },
+  { id:104, monthOffset: -9, time:'16:00', client:'Sofía Martín',  initials:'SM', borderColor:'#F43F5E' },
+  { id:105, monthOffset: -8, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:106, monthOffset: -7, time:'11:00', client:'Jorge Ruiz',    initials:'JR', borderColor:'#F59E0B' },
+  { id:107, monthOffset: -7, time:'17:00', client:'Pedro López',   initials:'PL', borderColor:'#7C3AED' },
+  { id:108, monthOffset: -6, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:109, monthOffset: -6, time:'16:00', client:'Sofía Martín',  initials:'SM', borderColor:'#F43F5E' },
+  // Semana -1
+  { id:110, monthOffset: -3, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:111, monthOffset: -3, time:'10:30', client:'María Fdez.',   initials:'MF', borderColor:'#10B981' },
+  { id:112, monthOffset: -2, time:'17:00', client:'Pedro López',   initials:'PL', borderColor:'#7C3AED' },
+  { id:113, monthOffset: -2, time:'16:00', client:'Sofía Martín',  initials:'SM', borderColor:'#F43F5E' },
+  { id:114, monthOffset: -1, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:115, monthOffset: -1, time:'10:30', client:'María Fdez.',   initials:'MF', borderColor:'#10B981' },
+  // Esta semana
+  { id:116, monthOffset:  0, time:'11:00', client:'Jorge Ruiz',    initials:'JR', borderColor:'#F59E0B' },
+  { id:117, monthOffset:  0, time:'17:00', client:'Pedro López',   initials:'PL', borderColor:'#7C3AED' },
+  { id:118, monthOffset:  1, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:119, monthOffset:  1, time:'16:00', client:'Sofía Martín',  initials:'SM', borderColor:'#F43F5E' },
+  // Semana +1
+  { id:120, monthOffset:  4, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:121, monthOffset:  4, time:'10:30', client:'María Fdez.',   initials:'MF', borderColor:'#10B981' },
+  { id:122, monthOffset:  5, time:'17:00', client:'Pedro López',   initials:'PL', borderColor:'#7C3AED' },
+  { id:123, monthOffset:  5, time:'16:00', client:'Sofía Martín',  initials:'SM', borderColor:'#F43F5E' },
+  { id:124, monthOffset:  6, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:125, monthOffset:  6, time:'10:30', client:'María Fdez.',   initials:'MF', borderColor:'#10B981' },
+  { id:126, monthOffset:  7, time:'11:00', client:'Jorge Ruiz',    initials:'JR', borderColor:'#F59E0B' },
+  { id:127, monthOffset:  7, time:'17:00', client:'Pedro López',   initials:'PL', borderColor:'#7C3AED' },
+  { id:128, monthOffset:  8, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:129, monthOffset:  8, time:'16:00', client:'Sofía Martín',  initials:'SM', borderColor:'#F43F5E' },
+  // Semana +2
+  { id:130, monthOffset: 11, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:131, monthOffset: 11, time:'10:30', client:'María Fdez.',   initials:'MF', borderColor:'#10B981' },
+  { id:132, monthOffset: 12, time:'17:00', client:'Pedro López',   initials:'PL', borderColor:'#7C3AED' },
+  { id:133, monthOffset: 13, time:'09:00', client:'Ana García',    initials:'AG', borderColor:'#0EA5E9' },
+  { id:134, monthOffset: 14, time:'11:00', client:'Jorge Ruiz',    initials:'JR', borderColor:'#F59E0B' },
+  { id:135, monthOffset: 15, time:'16:00', client:'Sofía Martín',  initials:'SM', borderColor:'#F43F5E' },
+]
+
 const INIT_CONVERSATIONS: Conversation[] = [
   { id: 1, initials: 'AG', colorClass: 'bg-sky-500/20 text-sky-300',        name: 'Ana García',      unread: true,  lastTime: '10:32',
     thread: [
@@ -173,7 +233,7 @@ const ACTIVITY = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function TrainerDemoPage() {
-  const [activeKey, setActiveKey] = useState('dashboard')
+  const [activeKey, setActiveKey] = useState('appointments')
 
   // Animated counters (always top-level)
   const cClients   = useCountUp(24)
@@ -207,6 +267,40 @@ export default function TrainerDemoPage() {
   const [aptTime, setAptTime]           = useState('10:00')
   const [aptDur, setAptDur]             = useState(60)
   const [aptType, setAptType]           = useState<AptType>('Online')
+  const [viewMode, setViewMode]         = useState<ViewMode>('week')
+
+  const weekDays = useMemo(() => {
+    const today = new Date()
+    const dow   = today.getDay()
+    const mon   = new Date(today)
+    mon.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1))
+    mon.setHours(0, 0, 0, 0)
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(mon)
+      d.setDate(mon.getDate() + i)
+      return d
+    })
+  }, [])
+
+  const { monthCells, monthAptsMap } = useMemo(() => {
+    const today = new Date()
+    const yr = today.getFullYear(), mo = today.getMonth()
+    const firstDow = new Date(yr, mo, 1).getDay()
+    const startOffset = firstDow === 0 ? -6 : 1 - firstDow
+    const daysInMonth = new Date(yr, mo + 1, 0).getDate()
+    const totalCells  = Math.ceil((daysInMonth - startOffset) / 7) * 7
+    const cells = Array.from({ length: totalCells }, (_, i) => new Date(yr, mo, 1 + startOffset + i))
+
+    const map: Record<string, MonthApt[]> = {}
+    MONTH_APTS.forEach(apt => {
+      const d = new Date(today)
+      d.setDate(today.getDate() + apt.monthOffset)
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+      if (!map[key]) map[key] = []
+      map[key].push(apt)
+    })
+    return { monthCells: cells, monthAptsMap: map }
+  }, [])
 
   // Messages
   const [conversations, setConversations] = useState<Conversation[]>(INIT_CONVERSATIONS)
@@ -362,7 +456,7 @@ export default function TrainerDemoPage() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Link href="/demo" className="text-xs text-slate-400 hover:text-white transition-colors hidden sm:block">← Volver</Link>
-          <Link href="/register" className="btn-gradient text-xs px-4 py-1.5"><Zap className="w-3 h-3" /> Crear cuenta gratis</Link>
+          <a href="#demo-cta" className="btn-gradient text-xs px-4 py-1.5"><Zap className="w-3 h-3" /> Apuntarme</a>
         </div>
       </div>
 
@@ -744,62 +838,190 @@ export default function TrainerDemoPage() {
             {/* ══════ CITAS ══════ */}
             {activeKey === 'appointments' && (
               <>
+                {/* Header */}
                 <div className="flex items-center justify-between animate-fade-in-up">
-                  <div><h1 className="text-2xl font-bold text-white">Citas</h1><p className="text-slate-400 text-sm mt-0.5">Hoy · Jueves 29 Mayo · {appointments.filter(a=>a.date==='Hoy').length} programadas</p></div>
-                  <button onClick={() => setShowAM(true)} className="btn-primary text-sm"><Plus className="w-4 h-4" /> Nueva cita</button>
+                  <div>
+                    <h1 className="text-2xl font-bold text-white">Citas</h1>
+                    <p className="text-slate-400 text-sm mt-0.5">
+                      {weekDays[0].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} — {weekDays[6].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} · {CALENDAR_WEEK.length} citas esta semana
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="inline-flex rounded-lg border border-border/60 p-1 bg-surface">
+                      {([['list','Lista',List],['week','Semana',CalendarDays],['month','Mes',CalendarDays]] as const).map(([mode, label, Icon]) => (
+                        <button key={mode} onClick={() => setViewMode(mode)}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${viewMode === mode ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'}`}>
+                          <Icon className="w-3.5 h-3.5" />{label}
+                        </button>
+                      ))}
+                    </div>
+                    <button onClick={() => setShowAM(true)} className="btn-primary text-sm"><Plus className="w-4 h-4" /> Nueva cita</button>
+                  </div>
                 </div>
 
-                <div className="animate-fade-in-up delay-100">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Hoy</p>
-                  <div className="relative">
-                    <div className="absolute left-[27px] top-4 bottom-4 w-px bg-border/50" />
-                    <div className="space-y-4">
-                      {appointments.filter(a => a.date==='Hoy').map((apt,i) => (
-                        <div key={apt.id} className="flex items-center gap-4 relative animate-fade-in-up" style={{ animationDelay:`${i*80}ms` }}>
-                          <div className="w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 z-10" style={{ background:'rgba(14,165,233,0.08)', border:'1px solid rgba(14,165,233,0.2)' }}>
-                            <span className="text-xl font-bold font-mono text-brand-primary leading-none">{apt.time.split(':')[0]}</span>
-                            <span className="text-[10px] text-slate-500">:{apt.time.split(':')[1]}</span>
-                          </div>
-                          <div className="flex-1 card p-4 hover:border-border-bright transition-all hover:-translate-y-0.5">
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex items-center gap-3">
-                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${apt.colorClass}`}>{apt.initials}</div>
-                                <div>
-                                  <div className="font-semibold text-white">{apt.client}</div>
-                                  <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                                    <Clock className="w-3 h-3" /> {apt.duration}min · {apt.type==='Online'?<><Video className="w-3 h-3" /> Online</>:<><MapPin className="w-3 h-3" /> Presencial</>}
+                {/* Calendar week view */}
+                {viewMode === 'week' && (
+                  <div className="card p-4 animate-fade-in-up delay-75">
+                    <div className="overflow-x-auto">
+                      <div className="grid grid-cols-7 gap-2 min-w-[700px]">
+                        {weekDays.map((day, idx) => {
+                          const isToday = day.toDateString() === new Date().toDateString()
+                          const dayApts = CALENDAR_WEEK.filter(a => a.dayOffset === idx)
+                          return (
+                            <div key={idx} className="min-h-[140px]">
+                              <div className={`text-center mb-2 pb-2 border-b ${isToday ? 'border-sky-500' : 'border-border/40'}`}>
+                                <p className="text-[10px] text-slate-500 uppercase tracking-wide">
+                                  {day.toLocaleDateString('es-ES', { weekday: 'short' })}
+                                </p>
+                                <p className={`text-lg font-bold leading-tight ${isToday ? 'text-sky-400' : 'text-white'}`}>
+                                  {day.getDate()}
+                                </p>
+                                {isToday && <span className="text-[9px] text-sky-400 font-semibold uppercase tracking-wide">Hoy</span>}
+                              </div>
+                              <div className="space-y-1.5">
+                                {dayApts.length === 0 && (
+                                  <p className="text-[10px] text-slate-600 text-center pt-2">—</p>
+                                )}
+                                {dayApts.map(apt => (
+                                  <div
+                                    key={apt.id}
+                                    className="w-full text-left p-2 rounded-lg text-xs transition-transform hover:scale-[1.03] cursor-default"
+                                    style={{ background: apt.colorClass.replace('/10', '/15').replace('bg-', 'rgba(').replace('-500', ''), borderLeft: `2px solid ${apt.borderColor}`, backgroundColor: `${apt.borderColor}18` }}
+                                  >
+                                    <p className="font-bold text-white leading-none">{apt.time}</p>
+                                    <p className="text-slate-300 truncate mt-0.5">{apt.client}</p>
+                                    <p className="text-slate-500 mt-0.5">{apt.duration}min</p>
                                   </div>
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    {/* Legend */}
+                    <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border/40">
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wide font-semibold">Tipo:</span>
+                      {([['#0EA5E9','Online'],['#7C3AED','Presencial'],['#F59E0B','Llamada']] as const).map(([color, label]) => (
+                        <span key={label} className="flex items-center gap-1.5 text-xs text-slate-400">
+                          <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: `${color}40`, border: `1px solid ${color}` }} />
+                          {label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Month view */}
+                {viewMode === 'month' && (
+                  <div className="card p-4 animate-fade-in-up delay-75">
+                    {/* Month header */}
+                    <p className="text-sm font-semibold text-white mb-4 capitalize">
+                      {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
+                    </p>
+                    {/* Day headers */}
+                    <div className="grid grid-cols-7 gap-1 mb-1">
+                      {['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d => (
+                        <div key={d} className="text-center text-[10px] font-semibold text-slate-500 uppercase tracking-wide py-1">{d}</div>
+                      ))}
+                    </div>
+                    {/* Days grid */}
+                    <div className="grid grid-cols-7 gap-1">
+                      {monthCells.map((day, idx) => {
+                        const isCurrentMonth = day.getMonth() === new Date().getMonth()
+                        const isToday        = day.toDateString() === new Date().toDateString()
+                        const key            = `${day.getFullYear()}-${day.getMonth()}-${day.getDate()}`
+                        const dayApts        = monthAptsMap[key] ?? []
+                        return (
+                          <div key={idx} className={`min-h-[72px] rounded-lg p-1.5 border transition-colors ${isToday ? 'border-sky-500/60 bg-sky-500/5' : 'border-border/30 bg-surface/50'} ${!isCurrentMonth ? 'opacity-30' : ''}`}>
+                            <p className={`text-xs font-bold leading-none mb-1.5 ${isToday ? 'text-sky-400' : 'text-slate-300'}`}>
+                              {day.getDate()}
+                            </p>
+                            <div className="space-y-0.5">
+                              {dayApts.slice(0, 3).map(apt => (
+                                <div key={apt.id} className="flex items-center gap-1 text-[10px] truncate rounded px-1 py-0.5"
+                                  style={{ backgroundColor: `${apt.borderColor}18`, borderLeft: `2px solid ${apt.borderColor}` }}>
+                                  <span className="font-bold text-white shrink-0">{apt.time}</span>
+                                  <span className="text-slate-400 truncate">{apt.initials}</span>
                                 </div>
+                              ))}
+                              {dayApts.length > 3 && (
+                                <p className="text-[10px] text-slate-500 pl-1">+{dayApts.length - 3} más</p>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    {/* Legend */}
+                    <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border/40">
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wide font-semibold">Clientes:</span>
+                      {([['#0EA5E9','AG','Ana García'],['#7C3AED','PL','Pedro López'],['#10B981','MF','María Fdez.'],['#F43F5E','SM','Sofía Martín'],['#F59E0B','JR','Jorge Ruiz']] as const).map(([color,initials,name]) => (
+                        <span key={initials} className="flex items-center gap-1 text-[10px] text-slate-400">
+                          <span className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold shrink-0" style={{ backgroundColor: `${color}25`, border: `1px solid ${color}`, color }}>{initials}</span>
+                          {name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* List view */}
+                {viewMode === 'list' && (
+                  <>
+                    <div className="animate-fade-in-up delay-100">
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Hoy</p>
+                      <div className="relative">
+                        <div className="absolute left-[27px] top-4 bottom-4 w-px bg-border/50" />
+                        <div className="space-y-4">
+                          {appointments.filter(a => a.date==='Hoy').map((apt,i) => (
+                            <div key={apt.id} className="flex items-center gap-4 relative animate-fade-in-up" style={{ animationDelay:`${i*80}ms` }}>
+                              <div className="w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 z-10" style={{ background:'rgba(14,165,233,0.08)', border:'1px solid rgba(14,165,233,0.2)' }}>
+                                <span className="text-xl font-bold font-mono text-brand-primary leading-none">{apt.time.split(':')[0]}</span>
+                                <span className="text-[10px] text-slate-500">:{apt.time.split(':')[1]}</span>
+                              </div>
+                              <div className="flex-1 card p-4 hover:border-border-bright transition-all hover:-translate-y-0.5">
+                                <div className="flex items-center justify-between gap-3">
+                                  <div className="flex items-center gap-3">
+                                    <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${apt.colorClass}`}>{apt.initials}</div>
+                                    <div>
+                                      <div className="font-semibold text-white">{apt.client}</div>
+                                      <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                                        <Clock className="w-3 h-3" /> {apt.duration}min · {apt.type==='Online'?<><Video className="w-3 h-3" /> Online</>:<><MapPin className="w-3 h-3" /> Presencial</>}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Badge status={apt.status} />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {appointments.filter(a => a.date!=='Hoy').length > 0 && (
+                      <div className="animate-fade-in-up delay-200">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Próximas citas</p>
+                        <div className="space-y-3">
+                          {appointments.filter(a => a.date!=='Hoy').map(apt => (
+                            <div key={apt.id} className="card p-4 flex items-center gap-4 hover:border-border-bright transition-all">
+                              <div className="text-center shrink-0 w-20">
+                                <div className="text-xs font-semibold text-slate-300">{apt.date}</div>
+                                <div className="text-sm font-bold font-mono text-brand-primary">{apt.time}</div>
+                              </div>
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${apt.colorClass}`}>{apt.initials}</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-sm text-white">{apt.client}</div>
+                                <div className="text-xs text-slate-400">{apt.duration}min · {apt.type}</div>
                               </div>
                               <Badge status={apt.status} />
                             </div>
-                          </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {appointments.filter(a => a.date!=='Hoy').length > 0 && (
-                  <div className="animate-fade-in-up delay-200">
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Próximas citas</p>
-                    <div className="space-y-3">
-                      {appointments.filter(a => a.date!=='Hoy').map(apt => (
-                        <div key={apt.id} className="card p-4 flex items-center gap-4 hover:border-border-bright transition-all">
-                          <div className="text-center shrink-0 w-20">
-                            <div className="text-xs font-semibold text-slate-300">{apt.date}</div>
-                            <div className="text-sm font-bold font-mono text-brand-primary">{apt.time}</div>
-                          </div>
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${apt.colorClass}`}>{apt.initials}</div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-sm text-white">{apt.client}</div>
-                            <div className="text-xs text-slate-400">{apt.duration}min · {apt.type}</div>
-                          </div>
-                          <Badge status={apt.status} />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -965,15 +1187,13 @@ export default function TrainerDemoPage() {
               </>
             )}
 
-            {/* CTA */}
-            <div className="rounded-2xl p-8 text-center border border-brand-primary/20 animate-fade-in-up"
+            {/* CTA — waitlist */}
+            <div id="demo-cta" className="rounded-2xl p-8 border border-brand-primary/20 animate-fade-in-up"
                  style={{ background:'linear-gradient(135deg,rgba(14,165,233,0.07),rgba(124,58,237,0.05))' }}>
-              <h3 className="text-xl font-bold text-white mb-2">¿Listo para empezar?</h3>
-              <p className="text-slate-400 text-sm mb-6">Crea tu cuenta gratis y gestiona hasta 3 clientes sin pagar nada.</p>
-              <div className="flex items-center justify-center gap-3 flex-wrap">
-                <Link href="/register" className="btn-gradient px-8 py-2.5"><Zap className="w-4 h-4" /> Crear cuenta gratis</Link>
-                <Link href="/pricing" className="btn-secondary px-6 py-2.5">Ver planes <ExternalLink className="w-3.5 h-3.5" /></Link>
-              </div>
+              <DemoWaitlistCTA
+                title="¿Listo para empezar?"
+                subtitle="Apúntate a la lista de espera y te avisamos el día que abramos. Gratis, sin tarjeta."
+              />
             </div>
 
           </div>

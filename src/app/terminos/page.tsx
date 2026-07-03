@@ -122,7 +122,7 @@ export default function TerminosPage() {
             IVA incluido):
           </p>
           <ul>
-            <li><strong>Gratis:</strong> Hasta 3 clientes activos. Sin coste.</li>
+            <li><strong>Gratis:</strong> Hasta 5 clientes activos. Sin coste.</li>
             <li><strong>Starter:</strong> 19€/mes — hasta 10 clientes activos.</li>
             <li><strong>Pro:</strong> 39€/mes — hasta 30 clientes activos.</li>
             <li><strong>Unlimited:</strong> 79€/mes — clientes ilimitados.</li>

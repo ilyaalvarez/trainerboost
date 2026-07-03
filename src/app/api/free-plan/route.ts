@@ -27,7 +27,7 @@ export async function POST() {
   }
 
   const { error } = await service.from('subscriptions').upsert(
-    { user_id: user.id, status: 'active', plan: null, max_clients: 3 },
+    { user_id: user.id, status: 'active', plan: null, max_clients: 5 },
     { onConflict: 'user_id' }
   )
 

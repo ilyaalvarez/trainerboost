@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Dumbbell, UtensilsCrossed, CalendarDays,
   MessageSquare, BarChart2, TrendingUp, CheckCircle2,
 } from 'lucide-react'
+import DemoWaitlistCTA from '@/components/demo/DemoWaitlistCTA'
 
 const TRAINER_FEATURES = [
   { icon: LayoutDashboard, text: 'Dashboard con KPIs en tiempo real' },
@@ -45,10 +46,9 @@ export default function DemoPage() {
             </div>
             <span className="font-bold text-white text-sm tracking-tight">TrainerBoost</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/login"    className="text-sm text-slate-400 hover:text-white transition-colors duration-150 px-3 py-1.5 rounded-lg hover:bg-surface/70">Iniciar sesión</Link>
-            <Link href="/register" className="btn-gradient text-sm py-1.5 px-4">Empezar gratis</Link>
-          </div>
+          <Link href="/" className="text-sm text-slate-400 hover:text-white transition-colors duration-150 px-3 py-1.5 rounded-lg hover:bg-surface/70">
+            Volver al inicio
+          </Link>
         </div>
       </nav>
 
@@ -242,20 +242,13 @@ export default function DemoPage() {
           </Link>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="text-center animate-fade-in-up delay-300">
-          <p className="text-slate-400 text-base mb-6">
-            ¿Te convence lo que ves?
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/register" className="btn-gradient text-base px-8 py-3">
-              <Zap className="w-4 h-4" /> Crear cuenta gratis
-            </Link>
-            <Link href="/pricing" className="btn-secondary text-base px-6 py-3">
-              Ver precios →
-            </Link>
-          </div>
-          <p className="text-xs text-slate-500 mt-4">Sin tarjeta · 3 clientes gratis para siempre</p>
+        {/* Bottom CTA — waitlist */}
+        <div className="animate-fade-in-up delay-300 rounded-2xl border border-border bg-surface p-8 text-center">
+          <DemoWaitlistCTA
+            title="¿Te convence lo que ves?"
+            subtitle="Apúntate a la lista de espera. Te avisamos el día que abramos, antes que nadie."
+          />
+          <p className="text-xs text-slate-500 mt-5">Sin tarjeta · Gratis para siempre hasta 5 clientes</p>
         </div>
       </div>
     </div>

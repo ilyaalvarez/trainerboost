@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       .eq('trainer_id', inv.trainer_id).eq('status', 'active'),
   ])
 
-  if ((clientCount ?? 0) >= (sub?.max_clients ?? 3)) {
+  if ((clientCount ?? 0) >= (sub?.max_clients ?? 5)) {
     return NextResponse.json(
       { error: 'El entrenador ha alcanzado el límite de clientes. Pídele que actualice su plan.' },
       { status: 409 }

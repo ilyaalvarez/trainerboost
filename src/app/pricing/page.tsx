@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils'
 const PLAN_ORDER: PlanKey[] = ['starter', 'pro', 'unlimited']
 
 const FREE_FEATURES = [
-  '3 clientes',
+  '5 clientes',
   'Rutinas básicas',
   'Mensajería básica',
   'Gestión de citas',
@@ -32,7 +32,7 @@ const TRUST_BADGES = [
 
 const TESTIMONIALS = [
   {
-    text: 'Empecé con el plan gratuito y en una semana ya tenía los 3 clientes llenos. El upgrade a Starter fue inmediato.',
+    text: 'Empecé con el plan gratuito y en tres semanas ya tenía los 5 clientes llenos. El upgrade a Starter fue inmediato.',
     name: 'Marcos T.',
     role: 'PT · Málaga',
     initials: 'MT',

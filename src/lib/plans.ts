@@ -18,7 +18,7 @@ export interface PlanConfig {
 }
 
 /** Clients allowed on the free tier (no active paid subscription). */
-export const FREE_MAX_CLIENTS = 3
+export const FREE_MAX_CLIENTS = 5
 
 export const PLAN_CONFIG: Record<PlanKey, PlanConfig> = {
   starter: {

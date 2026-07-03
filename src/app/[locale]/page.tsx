@@ -11,6 +11,7 @@ import { TextReveal } from '@/components/ui/TextReveal'
 import { Accordion } from '@/components/ui/Accordion'
 import Link from 'next/link'
 import WaitlistForm from '@/components/landing/WaitlistForm'
+import { ProductPreview } from '@/components/landing/ProductPreview'
 import { LanguageSelector } from '@/components/landing/LanguageSelector'
 import LogoFull from '@/components/logo/LogoFull'
 import LogoIcon from '@/components/logo/LogoIcon'
@@ -175,6 +176,7 @@ export default function LocaleLandingPage() {
           <div className="lp-nav-v2-anchors">
             <a href="#sistema" className="lp-nav-v2-anchor">{t.nav.howItWorks}</a>
             <a href="#faq"     className="lp-nav-v2-anchor">{t.nav.faq}</a>
+            <Link href="/demo" className="lp-nav-v2-anchor">Demo</Link>
           </div>
           <div className="lp-nav-v2-right">
             <button className="lp-nav-v2-cta" onClick={() => scrollTo('cta-final')}>
@@ -247,7 +249,24 @@ export default function LocaleLandingPage() {
             </TextReveal>
           </section>
 
-          {/* ── S4: Profile Selector ──────────────────────────────────────── */}
+          {/* ── S4: Product Preview ───────────────────────────────────────── */}
+          <ProductPreview locale={locale} />
+
+          {/* Demo link — debajo del preview */}
+          <div className="flex justify-center pb-16 -mt-8">
+            <Link
+              href="/demo"
+              className="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors duration-200 border border-border hover:border-border/80 rounded-lg px-5 py-2.5 bg-surface/50 hover:bg-surface"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse shrink-0" />
+              Probar la demo completa — sin registro
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="group-hover:translate-x-0.5 transition-transform duration-200" aria-hidden="true">
+                <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
+          </div>
+
+          {/* ── S5: Profile Selector ──────────────────────────────────────── */}
           <ProfileSelector locale={locale} />
 
           {/* ── S5: FAQ ───────────────────────────────────────────────────── */}

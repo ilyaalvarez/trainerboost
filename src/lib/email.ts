@@ -263,7 +263,7 @@ function trainerWelcomeHtml(name: string) {
       <!-- Free plan note -->
       <div style="margin-top:24px;padding:14px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:10px;">
         <p style="color:#94A3B8;font-size:13px;margin:0;line-height:1.5;">
-          <strong style="color:#E2E8F0;">Plan gratuito incluido.</strong> Gestiona hasta 3 clientes sin tarjeta. Escala cuando quieras desde 19€/mes.
+          <strong style="color:#E2E8F0;">Plan gratuito incluido.</strong> Gestiona hasta 5 clientes sin tarjeta. Escala cuando quieras desde 19€/mes.
         </p>
       </div>
     </div>

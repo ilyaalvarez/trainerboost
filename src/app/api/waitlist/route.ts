@@ -13,7 +13,7 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const ALLOWED_SOURCES = ['landing', 'instagram', 'referral', 'seo', 'direct']
+    const ALLOWED_SOURCES = ['landing', 'instagram', 'referral', 'seo', 'direct', 'demo']
     const rawSource = body.source
     const source = ALLOWED_SOURCES.includes(rawSource) ? rawSource : 'landing'
     const { email } = body

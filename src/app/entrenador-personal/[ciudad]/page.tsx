@@ -74,7 +74,7 @@ const FAQS = (ciudad: string) => [
   },
   {
     q: '¿Cuánto cuesta TrainerBoost?',
-    a: 'Hay un plan gratuito para empezar con hasta 3 clientes. Los planes de pago arrancan en 19€/mes. Actualmente estamos en lista de espera cerrada — puedes apuntarte gratis y entrar antes que nadie.',
+    a: 'Hay un plan gratuito para empezar con hasta 5 clientes. Los planes de pago arrancan en 19€/mes. Actualmente estamos en lista de espera cerrada — puedes apuntarte gratis y entrar antes que nadie.',
   },
   {
     q: '¿Necesito que mis clientes descarguen algo?',

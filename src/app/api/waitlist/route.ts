@@ -5,12 +5,11 @@ import { waitlistConfig } from '../../../../config/waitlist'
 import { siteConfig } from '../../../../config/site'
 import crypto from 'crypto'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export async function POST(req: NextRequest) {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   try {
     const body = await req.json()
     const ALLOWED_SOURCES = ['landing', 'instagram', 'referral', 'seo', 'direct', 'demo']
@@ -69,6 +68,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   try {
     const { count } = await supabase
       .from('waitlist')

@@ -259,7 +259,7 @@ export default function LocaleLandingPage() {
               className="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors duration-200 border border-border hover:border-border/80 rounded-lg px-5 py-2.5 bg-surface/50 hover:bg-surface"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse shrink-0" />
-              Probar la demo completa — sin registro
+              {locale === 'en' ? 'Try the full demo — no sign-up needed' : 'Probar la demo completa — sin registro'}
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="group-hover:translate-x-0.5 transition-transform duration-200" aria-hidden="true">
                 <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>

@@ -10,42 +10,111 @@ interface PreviewApt {
   bg:          string
 }
 
-const PREVIEW_APTS: PreviewApt[] = [
-  { dayOffset: 0, time: '09:00', client: 'Ana García',   borderColor: '#0EA5E9', bg: 'rgba(14,165,233,0.12)'  },
-  { dayOffset: 0, time: '17:00', client: 'Pedro López',  borderColor: '#7C3AED', bg: 'rgba(124,58,237,0.12)'  },
-  { dayOffset: 1, time: '10:30', client: 'María Fdez.',  borderColor: '#10B981', bg: 'rgba(16,185,129,0.12)'  },
-  { dayOffset: 2, time: '09:00', client: 'Ana García',   borderColor: '#0EA5E9', bg: 'rgba(14,165,233,0.12)'  },
-  { dayOffset: 2, time: '11:00', client: 'Sofía M.',     borderColor: '#F43F5E', bg: 'rgba(244,63,94,0.12)'   },
-  { dayOffset: 3, time: '09:00', client: 'Ana García',   borderColor: '#0EA5E9', bg: 'rgba(14,165,233,0.12)'  },
-  { dayOffset: 3, time: '11:30', client: 'Pedro López',  borderColor: '#7C3AED', bg: 'rgba(124,58,237,0.12)'  },
-  { dayOffset: 3, time: '16:00', client: 'María Fdez.',  borderColor: '#10B981', bg: 'rgba(16,185,129,0.12)'  },
-  { dayOffset: 4, time: '09:00', client: 'Sofía M.',     borderColor: '#F43F5E', bg: 'rgba(244,63,94,0.12)'   },
-  { dayOffset: 4, time: '17:30', client: 'Pedro López',  borderColor: '#7C3AED', bg: 'rgba(124,58,237,0.12)'  },
-]
+const PREVIEW_APTS: Record<Locale, PreviewApt[]> = {
+  es: [
+    { dayOffset: 0, time: '09:00', client: 'Ana García',   borderColor: '#0EA5E9', bg: 'rgba(14,165,233,0.12)'  },
+    { dayOffset: 0, time: '17:00', client: 'Pedro López',  borderColor: '#7C3AED', bg: 'rgba(124,58,237,0.12)'  },
+    { dayOffset: 1, time: '10:30', client: 'María Fdez.',  borderColor: '#10B981', bg: 'rgba(16,185,129,0.12)'  },
+    { dayOffset: 2, time: '09:00', client: 'Ana García',   borderColor: '#0EA5E9', bg: 'rgba(14,165,233,0.12)'  },
+    { dayOffset: 2, time: '11:00', client: 'Sofía M.',     borderColor: '#F43F5E', bg: 'rgba(244,63,94,0.12)'   },
+    { dayOffset: 3, time: '09:00', client: 'Ana García',   borderColor: '#0EA5E9', bg: 'rgba(14,165,233,0.12)'  },
+    { dayOffset: 3, time: '11:30', client: 'Pedro López',  borderColor: '#7C3AED', bg: 'rgba(124,58,237,0.12)'  },
+    { dayOffset: 3, time: '16:00', client: 'María Fdez.',  borderColor: '#10B981', bg: 'rgba(16,185,129,0.12)'  },
+    { dayOffset: 4, time: '09:00', client: 'Sofía M.',     borderColor: '#F43F5E', bg: 'rgba(244,63,94,0.12)'   },
+    { dayOffset: 4, time: '17:30', client: 'Pedro López',  borderColor: '#7C3AED', bg: 'rgba(124,58,237,0.12)'  },
+  ],
+  en: [
+    { dayOffset: 0, time: '09:00', client: 'Anna G.',      borderColor: '#0EA5E9', bg: 'rgba(14,165,233,0.12)'  },
+    { dayOffset: 0, time: '17:00', client: 'Peter L.',     borderColor: '#7C3AED', bg: 'rgba(124,58,237,0.12)'  },
+    { dayOffset: 1, time: '10:30', client: 'Maria F.',     borderColor: '#10B981', bg: 'rgba(16,185,129,0.12)'  },
+    { dayOffset: 2, time: '09:00', client: 'Anna G.',      borderColor: '#0EA5E9', bg: 'rgba(14,165,233,0.12)'  },
+    { dayOffset: 2, time: '11:00', client: 'Sofia M.',     borderColor: '#F43F5E', bg: 'rgba(244,63,94,0.12)'   },
+    { dayOffset: 3, time: '09:00', client: 'Anna G.',      borderColor: '#0EA5E9', bg: 'rgba(14,165,233,0.12)'  },
+    { dayOffset: 3, time: '11:30', client: 'Peter L.',     borderColor: '#7C3AED', bg: 'rgba(124,58,237,0.12)'  },
+    { dayOffset: 3, time: '16:00', client: 'Maria F.',     borderColor: '#10B981', bg: 'rgba(16,185,129,0.12)'  },
+    { dayOffset: 4, time: '09:00', client: 'Sofia M.',     borderColor: '#F43F5E', bg: 'rgba(244,63,94,0.12)'   },
+    { dayOffset: 4, time: '17:30', client: 'Peter L.',     borderColor: '#7C3AED', bg: 'rgba(124,58,237,0.12)'  },
+  ],
+}
 
-const CALLOUTS = [
-  {
-    title: 'Sin más WhatsApps para quedar',
-    desc:  'Cada cita de la semana en un solo sitio. Presencial, online o llamada — con el tipo, la hora y el cliente de un vistazo.',
+const CONTENT: Record<Locale, {
+  ariaLabel: string
+  title: string
+  titleAccent: string
+  subtitle: string
+  sectionHeader: string
+  viewLabels: [string, string, string]
+  today: string
+  sessionsThisWeek: (n: number) => string
+  dateLocale: string
+  dayLabels: string[]
+  browserUrl: string
+  callouts: { title: string; desc: string }[]
+}> = {
+  es: {
+    ariaLabel: 'Vista previa de la agenda semanal',
+    title: 'Tu semana completa,',
+    titleAccent: 'de un vistazo',
+    subtitle: 'La vista de agenda semanal que faltaba en el mercado.\nTodos tus clientes, todas tus citas — sin abrir WhatsApp.',
+    sectionHeader: 'Citas',
+    viewLabels: ['Lista', 'Semana', 'Mes'],
+    today: 'Hoy',
+    sessionsThisWeek: (n) => `${n} citas esta semana`,
+    dateLocale: 'es-ES',
+    dayLabels: ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
+    browserUrl: 'trainerboost.es/dashboard/citas',
+    callouts: [
+      {
+        title: 'Sin más WhatsApps para quedar',
+        desc:  'Cada cita de la semana en un solo sitio. Presencial, online o llamada — con el tipo, la hora y el cliente de un vistazo.',
+      },
+      {
+        title: 'El cliente reserva, tú recibes la notificación',
+        desc:  'Tus clientes gestionan sus citas desde su portal móvil. Cuando reservan o cambian, te llega una notificación al momento.',
+      },
+      {
+        title: 'Planifica la semana en segundos',
+        desc:  'Navega entre semanas, ve tu carga de trabajo real y detecta huecos para nuevos clientes sin revisar nada más.',
+      },
+    ],
   },
-  {
-    title: 'El cliente reserva, tú recibes la notificación',
-    desc:  'Tus clientes gestionan sus citas desde su portal móvil. Cuando reservan o cambian, te llega una notificación al momento.',
+  en: {
+    ariaLabel: 'Weekly schedule preview',
+    title: 'Your full week,',
+    titleAccent: 'at a glance',
+    subtitle: 'The weekly schedule view the market was missing.\nAll your clients, all your sessions — no WhatsApp needed.',
+    sectionHeader: 'Sessions',
+    viewLabels: ['List', 'Week', 'Month'],
+    today: 'Today',
+    sessionsThisWeek: (n) => `${n} sessions this week`,
+    dateLocale: 'en-GB',
+    dayLabels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+    browserUrl: 'trainerboost.es/dashboard/schedule',
+    callouts: [
+      {
+        title: 'No more messages to schedule sessions',
+        desc:  'Every session of the week in one place. In-person, online or call — with type, time and client at a glance.',
+      },
+      {
+        title: 'Client books, you get the notification',
+        desc:  'Your clients manage their sessions from their mobile portal. When they book or change, you get an instant notification.',
+      },
+      {
+        title: 'Plan your week in seconds',
+        desc:  'Navigate between weeks, see your real workload and spot gaps for new clients without checking anything else.',
+      },
+    ],
   },
-  {
-    title: 'Planifica la semana en segundos',
-    desc:  'Navega entre semanas, ve tu carga de trabajo real y detecta huecos para nuevos clientes sin revisar nada más.',
-  },
-]
-
-const DAY_LABELS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
+}
 
 const NAV_ITEMS = [
   { active: false }, { active: false }, { active: false },
   { active: true  }, { active: false }, { active: false },
 ]
 
-export function ProductPreview({ locale: _locale }: { locale: Locale }) {
+export function ProductPreview({ locale }: { locale: Locale }) {
+  const c = CONTENT[locale]
+  const apts = PREVIEW_APTS[locale]
   const weekDays = useMemo(() => {
     const today = new Date()
     const dow   = today.getDay()
@@ -62,10 +131,10 @@ export function ProductPreview({ locale: _locale }: { locale: Locale }) {
   const todayStr = new Date().toDateString()
 
   return (
-    <section style={{ padding: 'var(--gap-3xl) 0' }} aria-label="Vista previa de la agenda semanal">
+    <section style={{ padding: 'var(--gap-3xl) 0' }} aria-label={c.ariaLabel}>
       <div className="lp-container">
 
-        {/* Título */}
+        {/* Title */}
         <div style={{ marginBottom: '48px', textAlign: 'center' }}>
           <h2 style={{
             fontFamily:  'var(--display)',
@@ -75,8 +144,8 @@ export function ProductPreview({ locale: _locale }: { locale: Locale }) {
             color:       'var(--text)',
             marginBottom: '16px',
           }}>
-            Tu semana completa,{' '}
-            <span style={{ color: 'var(--brand)' }}>de un vistazo</span>
+            {c.title}{' '}
+            <span style={{ color: 'var(--brand)' }}>{c.titleAccent}</span>
           </h2>
           <p style={{
             color:      'var(--text-dim)',
@@ -85,8 +154,9 @@ export function ProductPreview({ locale: _locale }: { locale: Locale }) {
             lineHeight: 1.65,
             fontSize:   '1rem',
           }}>
-            La vista de agenda semanal que faltaba en el mercado.
-            Todos tus clientes, todas tus citas — sin abrir WhatsApp.
+            {c.subtitle.split('\n').map((line, i) => (
+              <span key={i} style={{ display: 'block' }}>{line}</span>
+            ))}
           </p>
         </div>
 
@@ -120,7 +190,7 @@ export function ProductPreview({ locale: _locale }: { locale: Locale }) {
                 color:        'var(--text-dim)',
                 fontFamily:   'var(--mono)',
               }}>
-                trainerboost.es/dashboard/citas
+                {c.browserUrl}
               </span>
             </div>
           </div>
@@ -171,24 +241,24 @@ export function ProductPreview({ locale: _locale }: { locale: Locale }) {
               {/* Cabecera */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', gap: '12px', flexWrap: 'wrap' }}>
                 <div>
-                  <p style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text)', lineHeight: 1.2 }}>Citas</p>
+                  <p style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text)', lineHeight: 1.2 }}>{c.sectionHeader}</p>
                   <p style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '3px' }}>
-                    {weekDays[0].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                    {weekDays[0].toLocaleDateString(c.dateLocale, { day: 'numeric', month: 'short' })}
                     {' — '}
-                    {weekDays[6].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
-                    {' · '}{PREVIEW_APTS.length} citas esta semana
+                    {weekDays[6].toLocaleDateString(c.dateLocale, { day: 'numeric', month: 'short' })}
+                    {' · '}{c.sessionsThisWeek(apts.length)}
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
-                  {(['Lista', 'Semana', 'Mes'] as const).map(label => (
+                  {c.viewLabels.map(label => (
                     <span key={label} style={{
                       fontSize:     '11px',
                       padding:      '4px 10px',
                       borderRadius: '6px',
-                      fontWeight:   label === 'Semana' ? 600 : 400,
-                      background:   label === 'Semana' ? 'var(--brand)' : 'transparent',
-                      color:        label === 'Semana' ? '#0A0A0A' : 'var(--text-dim)',
-                      border:       label === 'Semana' ? 'none' : '1px solid var(--border)',
+                      fontWeight:   label === c.viewLabels[1] ? 600 : 400,
+                      background:   label === c.viewLabels[1] ? 'var(--brand)' : 'transparent',
+                      color:        label === c.viewLabels[1] ? '#0A0A0A' : 'var(--text-dim)',
+                      border:       label === c.viewLabels[1] ? 'none' : '1px solid var(--border)',
                     }}>
                       {label}
                     </span>
@@ -205,7 +275,7 @@ export function ProductPreview({ locale: _locale }: { locale: Locale }) {
               }}>
                 {weekDays.map((day, idx) => {
                   const isToday = day.toDateString() === todayStr
-                  const dayApts = PREVIEW_APTS.filter(a => a.dayOffset === idx)
+                  const dayApts = apts.filter(a => a.dayOffset === idx)
 
                   return (
                     <div key={idx} style={{ minHeight: '160px' }}>
@@ -223,7 +293,7 @@ export function ProductPreview({ locale: _locale }: { locale: Locale }) {
                           letterSpacing: '0.06em',
                           marginBottom:  '2px',
                         }}>
-                          {DAY_LABELS[idx]}
+                          {c.dayLabels[idx]}
                         </p>
                         <p style={{
                           fontSize:   '17px',
@@ -241,7 +311,7 @@ export function ProductPreview({ locale: _locale }: { locale: Locale }) {
                             textTransform: 'uppercase',
                             letterSpacing: '0.08em',
                           }}>
-                            Hoy
+                            {c.today}
                           </p>
                         )}
                       </div>
@@ -287,18 +357,18 @@ export function ProductPreview({ locale: _locale }: { locale: Locale }) {
           gap:                 '20px',
           marginTop:           '32px',
         }}>
-          {CALLOUTS.map(c => (
-            <div key={c.title} style={{
+          {c.callouts.map(callout => (
+            <div key={callout.title} style={{
               padding:      '20px 24px',
               border:       '1px solid var(--border)',
               borderRadius: '10px',
               background:   'var(--surface)',
             }}>
               <p style={{ fontWeight: 700, color: 'var(--brand)', marginBottom: '8px', fontSize: '0.9rem' }}>
-                {c.title}
+                {callout.title}
               </p>
               <p style={{ color: 'var(--text-dim)', fontSize: '0.83rem', lineHeight: 1.65 }}>
-                {c.desc}
+                {callout.desc}
               </p>
             </div>
           ))}
